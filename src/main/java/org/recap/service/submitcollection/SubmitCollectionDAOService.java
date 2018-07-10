@@ -241,7 +241,7 @@ public class SubmitCollectionDAOService {
         boolean isValidRecordToProcess = submitCollectionValidationService.validateIncomingItemHavingBibCountGreaterThanExistingItem(submitCollectionReportInfoMap,
                 boundWithBibliographicEntityObject.getBibliographicEntityList(),existingBibliographicEntityList);
         int itemId = existingItemEntity.getItemId();
-
+        boolean deleteDummyRecord=true;
         if (isValidRecordToProcess) {
             for (BibliographicEntity incomingBibliographicEntity : boundWithBibliographicEntityObject.getBibliographicEntityList()) {
                 for (ItemEntity incomingItemEntity : incomingBibliographicEntity.getItemEntities()) {
@@ -253,7 +253,10 @@ public class SubmitCollectionDAOService {
                         if(fetchedBibliographicEntityList.get(0).getOwningInstitutionBibId().substring(0, 1).equals("d")) {//update existing dummy record if any (Removes existing dummy record and creates new record for the same barcode based on the input xml)
                             isIncomingDummyRecord = true;
                             BibliographicEntity updatedBibliographicEntity = null;
-                            updatedBibliographicEntity = updateDummyRecordForBoundWith(incomingBibliographicEntity, submitCollectionReportInfoMap, idMapToRemoveIndexList, processedBarcodeSetForDummyRecords, updatedBibliographicEntity, fetchedBibliographicEntityList.get(0),itemChangeLogEntityList);
+                            if(processedBarcodeSetForDummyRecords.contains(boundWithBibliographicEntityObject.getBarcode())) {
+                                deleteDummyRecord=false;
+                                }
+                            updatedBibliographicEntity = updateDummyRecordForBoundWith(incomingBibliographicEntity, submitCollectionReportInfoMap, idMapToRemoveIndexList, processedBarcodeSetForDummyRecords, updatedBibliographicEntity, fetchedBibliographicEntityList.get(0), itemChangeLogEntityList,deleteDummyRecord,processedBibIds);
                             if (updatedBibliographicEntity != null) {
                                 updatedBibliographicEntityList.add(updatedBibliographicEntity);
                             }
@@ -635,7 +638,7 @@ public class SubmitCollectionDAOService {
      */
     public BibliographicEntity updateDummyRecordForBoundWith(BibliographicEntity incomingBibliographicEntity, Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap
             , List<Map<String, String>> idMapToRemoveIndexList, Set<String> processedBarcodeSet, BibliographicEntity savedBibliographicEntity
-            , BibliographicEntity fetchBibliographicEntity,List<ItemChangeLogEntity> itemChangeLogEntityList) {
+            , BibliographicEntity fetchBibliographicEntity,List<ItemChangeLogEntity> itemChangeLogEntityList,boolean deleteDummyRecord,Set<Integer> processedBibIds) {
         List<ItemEntity> fetchedItemBasedOnOwningInstitutionItemId = submitCollectionReportHelperService.getItemBasedOnOwningInstitutionItemIdAndOwningInstitutionId(incomingBibliographicEntity.getItemEntities());
         boolean boundWith = isBoundWithItem(incomingBibliographicEntity,processedBarcodeSet);
         BibliographicEntity bibliographicEntityToSave = null;
@@ -643,7 +646,9 @@ public class SubmitCollectionDAOService {
             boolean isCheckCGDNotNull = checkIsCGDNotNull(incomingBibliographicEntity);
             if (isCheckCGDNotNull) {
                 updateCustomerCode(fetchBibliographicEntity, incomingBibliographicEntity);//Added to get customer code for existing dummy record, this value is used when the input xml dosent have the customer code in it, this happens mostly for CUL
-                removeDummyRecord(idMapToRemoveIndexList, fetchBibliographicEntity);
+                if(deleteDummyRecord) {
+                    removeDummyRecord(idMapToRemoveIndexList, fetchBibliographicEntity);
+                }
                 BibliographicEntity fetchedBibliographicEntity = repositoryService.getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(incomingBibliographicEntity.getOwningInstitutionId(), incomingBibliographicEntity.getOwningInstitutionBibId());
                 setItemAvailabilityStatus(incomingBibliographicEntity.getItemEntities());
                 bibliographicEntityToSave = incomingBibliographicEntity;
@@ -651,8 +656,12 @@ public class SubmitCollectionDAOService {
                 updateCatalogingStatusForBib(bibliographicEntityToSave);
                 if (fetchedBibliographicEntity != null) {//1Bib n holding n item
                     bibliographicEntityToSave = updateExistingRecordForDummy(fetchedBibliographicEntity, incomingBibliographicEntity);
+                    processedBibIds.add(fetchedBibliographicEntity.getBibliographicId());
                 }
                 savedBibliographicEntity = bibliographicEntityToSave;
+                entityManager.merge(savedBibliographicEntity);
+                entityManager.flush();
+
                 //TODO need to change the item change log message for boundwith dummy record
                 List<ItemChangeLogEntity> preparedItemChangeLogEntityList = prepareItemChangeLogEntity(ReCAPConstants.SUBMIT_COLLECTION, ReCAPConstants.SUBMIT_COLLECTION_DUMMY_RECORD_UPDATE, savedBibliographicEntity.getItemEntities());
                 itemChangeLogEntityList.addAll(preparedItemChangeLogEntityList);

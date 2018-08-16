@@ -108,7 +108,9 @@ public class CancelItemController {
                 || (itemInformationResponse.getCirculationStatus().equalsIgnoreCase(ReCAPConstants.CIRCULATION_STATUS_ON_HOLDSHELF) || itemInformationResponse.getCirculationStatus().equalsIgnoreCase(ReCAPConstants.CIRCULATION_STATUS_IN_TRANSIT_NYPL))) {
             itemCanceHoldResponse = (ItemHoldResponse) requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
             if (itemCanceHoldResponse.isSuccess()) {
-                requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getItemOwningInstitution());
+                if (!itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+                    requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getItemOwningInstitution());
+                }
                 changeRetrievalToCancelStatus(requestItemEntity, itemCanceHoldResponse);
             } else {
                 itemCanceHoldResponse.setSuccess(false);

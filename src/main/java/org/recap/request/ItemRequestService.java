@@ -324,9 +324,13 @@ public class ItemRequestService {
                     } else { // Borrowed Inst not same as Recall Requesting Inst, Change Retrieval Order Status to Refiled.
                         requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
                         requestItemDetailsRepository.save(requestItemEntity);
-                        // Checkout the item based on the institution Princeton,Columbia or NYPL for the Recall order
-                        itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
-                        requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+
+                        // Checkout the item in Princeton and NYPL for the Recall order
+                        if (!requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode().equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+                            itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                            requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+                        }
+
                         itemRequestInfo.setRequestId(requestItemEntityRecalled.getRequestId());
                         itemRequestInfo.setRequestType(ReCAPConstants.REQUEST_TYPE_RETRIEVAL);
                         itemRequestInfo.setRequestNotes(requestItemEntityRecalled.getNotes());
@@ -346,7 +350,7 @@ public class ItemRequestService {
                 } else if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.NYPL)) {
                     requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
                 }
-                if (!itemRequestInfo.isOwningInstitutionItem()) {
+                if (!itemRequestInfo.isOwningInstitutionItem() && (itemRequestInfo.getItemOwningInstitution().equalsIgnoreCase(ReCAPConstants.NYPL) || itemRequestInfo.getItemOwningInstitution().equalsIgnoreCase(ReCAPConstants.PRINCETON))) {
                     itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
                     requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                 }
@@ -556,7 +560,9 @@ public class ItemRequestService {
         } else { // Item does not belong to requesting Institute
             String requestingPatron = itemRequestInfo.getPatronBarcode();
             itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
-            requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+            if (!itemRequestInfo.getItemOwningInstitution().equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+                requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+            }
             itemRequestInfo.setPatronBarcode(requestingPatron);
             itemResponseInformation = updateScsbAndGfa(itemRequestInfo, itemResponseInformation, itemEntity);
         }

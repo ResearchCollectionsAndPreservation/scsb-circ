@@ -22,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 /**
  * Created by rajeshbabuk on 19/12/16.
@@ -492,13 +492,11 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
      * @throws Exception the exception
      */
     public JobResponse queryForJob(String jobId) throws Exception {
-        ObjectMapper mapperObj = new ObjectMapper();
         String apiUrl = nyplDataApiUrl + "/jobs/" + jobId;
         getLogger().info("NYPL job url :" + apiUrl );
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = new HttpEntity(getHttpHeaders());
         ResponseEntity<JobResponse> jobResponseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, JobResponse.class);
-        getLogger().info("NYPL Job response : " + mapperObj.writeValueAsString(jobResponseEntity.getBody()));
         return jobResponseEntity.getBody();
     }
 
@@ -593,7 +591,6 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
      * @throws Exception
      */
     private NyplPatronResponse queryForPatronResponse(String patronIdentifier) throws Exception {
-        ObjectMapper mapperObj = new ObjectMapper();
         String apiUrl = nyplDataApiUrl + ReCAPConstants.NYPL_PATRON_BY_BARCODE_URL + patronIdentifier;
         getLogger().info("NYPL patron response url :" + apiUrl );
         RestTemplate restTemplate = new RestTemplate();

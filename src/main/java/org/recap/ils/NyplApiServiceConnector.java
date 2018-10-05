@@ -590,9 +590,11 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
      */
     private NyplPatronResponse queryForPatronResponse(String patronIdentifier) throws Exception {
         String apiUrl = nyplDataApiUrl + ReCAPConstants.NYPL_PATRON_BY_BARCODE_URL + patronIdentifier;
+        getLogger().info("NYPL job url :" + apiUrl );
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = new HttpEntity(getHttpHeaders());
         ResponseEntity<NyplPatronResponse> jobResponseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, NyplPatronResponse.class);
+        getLogger().info("NYPL Job response : " + jobResponseEntity.getBody());
         return jobResponseEntity.getBody();
     }
 

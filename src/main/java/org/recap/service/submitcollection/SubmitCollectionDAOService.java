@@ -890,6 +890,7 @@ public class SubmitCollectionDAOService {
 
     private BibliographicEntity updateExistingRecordForDummy(BibliographicEntity fetchBibliographicEntity, BibliographicEntity bibliographicEntity) {
         copyBibliographicEntity(fetchBibliographicEntity, bibliographicEntity);
+        fetchBibliographicEntity.setDeleted(false);
         Map<String,HoldingsEntity> fetchedOwningInstHoldingIdHoldingsEntityMap = getOwningInstHoldingIdHoldingsEntityMap(fetchBibliographicEntity.getHoldingsEntities());
         Map<String,HoldingsEntity> incomingOwningInstHoldingIdHoldingsEntityMap = getOwningInstHoldingIdHoldingsEntityMap(bibliographicEntity.getHoldingsEntities());
         boolean isMatchingHoldingAvailable = false;
@@ -898,6 +899,7 @@ public class SubmitCollectionDAOService {
             if(isMatchingHoldingAvailable){
                 HoldingsEntity fetchedHoldingEntity = fetchedOwningInstHoldingIdHoldingsEntityMap.get(incomingOwningInstHoldingIdHoldingsEntityMapEntry.getKey());
                 copyHoldingsEntity(fetchedHoldingEntity, incomingOwningInstHoldingIdHoldingsEntityMapEntry.getValue(),true);
+                fetchedHoldingEntity.setDeleted(false);
             } else {
                 fetchBibliographicEntity.getHoldingsEntities().addAll(bibliographicEntity.getHoldingsEntities());
             }

@@ -43,6 +43,7 @@ public class ItemInformationResponse extends AbstractResponseItem {
     private Integer itemId;
     private String username;
     private boolean isBulk;
+    private boolean requestTypeForScheduledOnWO;
 
     /**
      * Gets request id.
@@ -690,5 +691,13 @@ public class ItemInformationResponse extends AbstractResponseItem {
      */
     public void setBulk(boolean bulk) {
         isBulk = bulk;
+    }
+
+    public boolean isRequestTypeForScheduledOnWO() {
+        return requestTypeForScheduledOnWO;
+    }
+
+    public void setRequestTypeForScheduledOnWO(boolean requestTypeForScheduledOnWO) {
+        this.requestTypeForScheduledOnWO = requestTypeForScheduledOnWO;
     }
 }

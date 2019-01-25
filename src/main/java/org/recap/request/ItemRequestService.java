@@ -10,6 +10,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
 import org.recap.controller.RequestItemController;
+import org.recap.gfa.model.*;
 import org.recap.ils.model.response.ItemCreateBibResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -287,6 +288,7 @@ public class ItemRequestService {
 
         // Change Response for this Method
         boolean bSuccess = false;
+        boolean firstScan = false;
         String itemBarcode;
         ItemEntity itemEntity;
         List<String> requestItemStatusList = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD);
@@ -295,64 +297,100 @@ public class ItemRequestService {
         for (RequestItemEntity requestItemEntity : requestEntities) {
             itemEntity = requestItemEntity.getItemEntity();
             RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_REFILED);
-            if (itemEntity.getItemAvailabilityStatusId() == 2) { // Only Item Not Availability, Status is Processed
-                itemBarcode = itemEntity.getBarcode();
-                ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
-                itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
-                itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
-                itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
+            String gfaItemStatus = callGfaItemStatus(itemEntity.getBarcode());
+            logger.info("GFA Item Status received for Refile : {}",gfaItemStatus);
+            if(ReCAPConstants.GFA_STATUS_SCH_ON_EDD_WORK_ORDER.contains(gfaItemStatus)){
+                firstScan =true;
+            }
+            if(!requestItemEntity.isGFAStatusSch()) {
+                if (itemEntity.getItemAvailabilityStatusId() == 2) { // Only Item Not Availability, Status is Processed
+                    itemBarcode = itemEntity.getBarcode();
+                    ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
+                    itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
+                    itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
+                    itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
 
-                RequestItemEntity requestItemEntityRecalled = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ReCAPConstants.REQUEST_STATUS_RECALLED);
-                if (requestItemEntityRecalled == null) { // Recall Request Does not Exist
-                    requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
-                    requestItemEntity.setLastUpdatedDate(new Date());
-                    requestItemDetailsRepository.save(requestItemEntity);
-                    rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
-                    itemRequestServiceUtil.updateSolrIndex(itemEntity);
-                    bSuccess = true;
-                } else { // Recall Request Exist
-                    if (requestItemEntityRecalled.getRequestingInstitutionId().intValue() == requestItemEntity.getRequestingInstitutionId().intValue()) { // Borrowed Inst same as Recall Requesting Inst
+                    RequestItemEntity requestItemEntityRecalled = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ReCAPConstants.REQUEST_STATUS_RECALLED);
+                    if (requestItemEntityRecalled == null) { // Recall Request Does not Exist
                         requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
                         requestItemEntity.setLastUpdatedDate(new Date());
-                        requestItemEntityRecalled.setRequestStatusId(requestStatusEntity.getRequestStatusId());
-                        requestItemEntityRecalled.setLastUpdatedDate(new Date());
+                        requestItemEntity.setGFAStatusSch(false);
                         requestItemDetailsRepository.save(requestItemEntity);
-                        requestItemDetailsRepository.save(requestItemEntityRecalled);
-                        rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), ReCAPConstants.GUEST_USER);
-                        itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
+                        rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
+                        itemRequestServiceUtil.updateSolrIndex(itemEntity);
                         bSuccess = true;
-                    } else { // Borrowed Inst not same as Recall Requesting Inst, Change Retrieval Order Status to Refiled.
-                        requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
-                        requestItemDetailsRepository.save(requestItemEntity);
-                        // Checkout the item based on the institution Princeton,Columbia or NYPL for the Recall order
+                    } else { // Recall Request Exist
+                        if (requestItemEntityRecalled.getRequestingInstitutionId().intValue() == requestItemEntity.getRequestingInstitutionId().intValue()) { // Borrowed Inst same as Recall Requesting Inst
+                            requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                            requestItemEntity.setLastUpdatedDate(new Date());
+                            if (firstScan) {
+                                requestItemEntity.setGFAStatusSch(false);
+                                requestItemEntityRecalled.setGFAStatusSch(true);
+                            }
+                            requestItemEntityRecalled.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                            requestItemEntityRecalled.setLastUpdatedDate(new Date());
+                            requestItemDetailsRepository.save(requestItemEntity);
+                            requestItemDetailsRepository.save(requestItemEntityRecalled);
+                            rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), ReCAPConstants.GUEST_USER);
+                            itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
+                            bSuccess = true;
+                        } else { // Borrowed Inst not same as Recall Requesting Inst, Change Retrieval Order Status to Refiled.
+                            requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                            requestItemEntity.setGFAStatusSch(false);
+                            requestItemDetailsRepository.save(requestItemEntity);
+                            // Checkout the item based on the institution Princeton,Columbia or NYPL for the Recall order
+                            itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                            requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+                            itemRequestInfo.setRequestId(requestItemEntityRecalled.getRequestId());
+                            itemRequestInfo.setRequestType(ReCAPConstants.REQUEST_TYPE_RETRIEVAL);
+                            itemRequestInfo.setRequestNotes(requestItemEntityRecalled.getNotes());
+                            itemRequestInfo.setUsername(requestItemEntityRecalled.getCreatedBy());
+                            itemRequestInfo.setDeliveryLocation(requestItemEntityRecalled.getStopCode());
+                            itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
+                            ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+                            // Put back the Recall order to LAS. On success from LAS, recall order is updated to retrieval.
+                            updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
+                            bSuccess = true;
+                        }
+                    }
+                    logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getRequestId(), itemBarcode);
+                    if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.PRINCETON) || itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+                        itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
+                        requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
+                    } else if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.NYPL)) {
+                        requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
+                    }
+                    if (!itemRequestInfo.isOwningInstitutionItem()) {
                         itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
-                        requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
-                        itemRequestInfo.setRequestId(requestItemEntityRecalled.getRequestId());
-                        itemRequestInfo.setRequestType(ReCAPConstants.REQUEST_TYPE_RETRIEVAL);
-                        itemRequestInfo.setRequestNotes(requestItemEntityRecalled.getNotes());
-                        itemRequestInfo.setUsername(requestItemEntityRecalled.getCreatedBy());
-                        itemRequestInfo.setDeliveryLocation(requestItemEntityRecalled.getStopCode());
-                        itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
-                        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
-                        // Put back the Recall order to LAS. On success from LAS, recall order is updated to retrieval.
-                        updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
-                        bSuccess = true;
+                        requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                     }
                 }
-                logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getRequestId(), itemBarcode);
-                if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.PRINCETON) || itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
-                    itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
-                    requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
-                } else if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.NYPL)) {
-                    requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
-                }
-                if (!itemRequestInfo.isOwningInstitutionItem()) {
-                    itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
-                    requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
-                }
+            }
+            else {
+                requestItemEntity.setGFAStatusSch(false);
+                requestItemDetailsRepository.save(requestItemEntity);
             }
         }
         return bSuccess;
+    }
+
+    private String callGfaItemStatus(String itemBarcode) {
+        String gfaItemStatusValue = null;
+        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
+        GFAItemStatus gfaItemStatus = new GFAItemStatus();
+        gfaItemStatus.setItemBarCode(itemBarcode);
+        gfaItemStatusCheckRequest.setItemStatus(Arrays.asList(gfaItemStatus));
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = gfaService.itemStatusCheck(gfaItemStatusCheckRequest);
+        if (null != gfaItemStatusCheckResponse) {
+            Dsitem dsitem = gfaItemStatusCheckResponse.getDsitem();
+            if (null != dsitem) {
+                List<Ttitem> ttitems = dsitem.getTtitem();
+                if (CollectionUtils.isNotEmpty(ttitems)) {
+                    gfaItemStatusValue = ttitems.get(0).getItemStatus();
+                }
+            }
+        }
+        return gfaItemStatusValue;
     }
 
     /**
@@ -589,6 +627,11 @@ public class ItemRequestService {
 
         itemResponseInformation.setRequestId(requestId);
         itemResponseInformation = updateGFA(itemRequestInfo, itemResponseInformation);
+        if(itemResponseInformation.isRequestTypeForScheduledOnWO()){
+            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(itemResponseInformation.getRequestId());
+            requestItemEntity.setGFAStatusSch(true);
+            requestItemDetailsRepository.save(requestItemEntity);
+        }
         if (itemResponseInformation.isSuccess()) {
             itemResponseInformation.setScreenMessage(ReCAPConstants.SUCCESSFULLY_PROCESSED_REQUEST_ITEM);
         } else {
@@ -782,6 +825,11 @@ public class ItemRequestService {
     private void rollbackAfterGFA(ItemEntity itemEntity, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation) {
         if (!itemResponseInformation.getScreenMessage().equalsIgnoreCase(ReCAPConstants.GFA_ITEM_STATUS_CHECK_FAILED)) {
             rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
+            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(itemRequestInfo.getRequestId());
+            if(requestItemEntity.isGFAStatusSch()){
+                requestItemEntity.setGFAStatusSch(false);
+                requestItemDetailsRepository.save(requestItemEntity);
+            }
             saveItemChangeLogEntity(itemEntity.getItemId(), getUser(itemRequestInfo.getUsername()), ReCAPConstants.REQUEST_ITEM_GFA_FAILURE, itemRequestInfo.getPatronBarcode() + " - " + itemResponseInformation.getScreenMessage());
         }
         requestItemController.cancelHoldItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());

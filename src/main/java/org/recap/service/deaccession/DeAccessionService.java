@@ -452,6 +452,7 @@ public class DeAccessionService {
         String requestNotes = requestItemEntity.getNotes();
         requestNotes = requestNotes + "\n" + "SCSB : " + ReCAPConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION;
         requestItemEntity.setNotes(requestNotes);
+        requestItemEntity.setGFAStatusSch(false);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         saveDeAccessionItemChangeLogEntity(savedRequestItemEntity.getRequestId(), username, ReCAPConstants.REQUEST_ITEM_CANCEL_DEACCESSION_ITEM, ReCAPConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION + savedRequestItemEntity.getItemId());
         itemRequestServiceUtil.updateSolrIndex(savedRequestItemEntity.getItemEntity());

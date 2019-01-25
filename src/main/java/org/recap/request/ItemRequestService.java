@@ -10,6 +10,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
 import org.recap.controller.RequestItemController;
+import org.recap.gfa.model.*;
 import org.recap.ils.model.response.ItemCreateBibResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -287,6 +288,7 @@ public class ItemRequestService {
 
         // Change Response for this Method
         boolean bSuccess = false;
+        boolean firstScan = false;
         String itemBarcode;
         ItemEntity itemEntity;
         List<String> requestItemStatusList = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD);
@@ -295,6 +297,11 @@ public class ItemRequestService {
         for (RequestItemEntity requestItemEntity : requestEntities) {
             itemEntity = requestItemEntity.getItemEntity();
             RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_REFILED);
+            String gfaItemStatus = callGfaItemStatus(itemEntity.getBarcode());
+            logger.info("GFA Item Status received for Refile : {}",gfaItemStatus);
+            if(ReCAPConstants.GFA_STATUS_SCH_ON_EDD_WORK_ORDER.contains(gfaItemStatus)){
+                firstScan =true;
+            }
             if(!requestItemEntity.isGFAStatusSch()) {
                 if (itemEntity.getItemAvailabilityStatusId() == 2) { // Only Item Not Availability, Status is Processed
                     itemBarcode = itemEntity.getBarcode();
@@ -316,7 +323,7 @@ public class ItemRequestService {
                         if (requestItemEntityRecalled.getRequestingInstitutionId().intValue() == requestItemEntity.getRequestingInstitutionId().intValue()) { // Borrowed Inst same as Recall Requesting Inst
                             requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
                             requestItemEntity.setLastUpdatedDate(new Date());
-                            if (requestItemEntity.isGFAStatusSch()) {
+                            if (firstScan) {
                                 requestItemEntity.setGFAStatusSch(false);
                                 requestItemEntityRecalled.setGFAStatusSch(true);
                             }
@@ -365,6 +372,25 @@ public class ItemRequestService {
             }
         }
         return bSuccess;
+    }
+
+    private String callGfaItemStatus(String itemBarcode) {
+        String gfaItemStatusValue = null;
+        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
+        GFAItemStatus gfaItemStatus = new GFAItemStatus();
+        gfaItemStatus.setItemBarCode(itemBarcode);
+        gfaItemStatusCheckRequest.setItemStatus(Arrays.asList(gfaItemStatus));
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = gfaService.itemStatusCheck(gfaItemStatusCheckRequest);
+        if (null != gfaItemStatusCheckResponse) {
+            Dsitem dsitem = gfaItemStatusCheckResponse.getDsitem();
+            if (null != dsitem) {
+                List<Ttitem> ttitems = dsitem.getTtitem();
+                if (CollectionUtils.isNotEmpty(ttitems)) {
+                    gfaItemStatusValue = ttitems.get(0).getItemStatus();
+                }
+            }
+        }
+        return gfaItemStatusValue;
     }
 
     /**

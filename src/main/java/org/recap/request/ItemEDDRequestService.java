@@ -3,11 +3,15 @@ package org.recap.request;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
+import org.recap.controller.RequestItemController;
+import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.ItemEntity;
 import org.recap.model.ItemRequestInformation;
+import org.recap.model.RequestItemEntity;
 import org.recap.model.SearchResultRow;
 import org.recap.repository.ItemDetailsRepository;
+import org.recap.repository.RequestItemDetailsRepository;
 import org.recap.repository.RequestTypeDetailsRepository;
 import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
@@ -37,6 +41,12 @@ public class ItemEDDRequestService {
 
     @Autowired
     private ItemRequestServiceUtil itemRequestServiceUtil;
+
+    @Autowired
+    private RequestItemController requestItemController;
+
+    @Autowired
+    private RequestItemDetailsRepository requestItemDetailsRepository;
 
     /**
      * Gets item details repository.
@@ -126,16 +136,31 @@ public class ItemEDDRequestService {
                     itemResponseInformation.setSuccess(false);
                 } else {
                     // Process
-                    if (getItemRequestService().getGfaService().isUseQueueLasCall()) {
-                        getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PENDING);
+                    ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInfo,itemRequestInfo.getItemOwningInstitution());
+                    if (itemCheckoutResponse.isSuccess()) {
+                        logger.info("Checkout successful for EDD request");
+                        if (getItemRequestService().getGfaService().isUseQueueLasCall()) {
+                            getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PENDING);
+                        }
+                        itemRequestInfo.setRequestNotes(userNotes);
+                        itemResponseInformation.setItemId(itemEntity.getItemId());
+                        itemResponseInformation.setPatronBarcode(itemRequestInfo.getPatronBarcode());
+                        itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
+                        if(itemResponseInformation.isRequestTypeForScheduledOnWO()){
+                            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(itemResponseInformation.getRequestId());
+                            requestItemEntity.setGFAStatusSch(true);
+                            requestItemDetailsRepository.save(requestItemEntity);
+                        }
+                        itemRequestInfo.setRequestNotes(getNotes(itemRequestInfo));
+                        if (!itemResponseInformation.isSuccess()) {
+                            requestItemController.checkinItem(itemRequestInfo,itemRequestInfo.getItemOwningInstitution());
+                            getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
+                        }
                     }
-                    itemRequestInfo.setRequestNotes(userNotes);
-                    itemResponseInformation.setItemId(itemEntity.getItemId());
-                    itemResponseInformation.setPatronBarcode(itemRequestInfo.getPatronBarcode());
-                    itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
-                    itemRequestInfo.setRequestNotes(getNotes(itemRequestInfo));
-                    if (!itemResponseInformation.isSuccess()){
-                        getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity,ReCAPConstants.GUEST_USER);
+                   else{
+                       logger.info("Checkout failed for EDD request");
+                        itemResponseInformation.setScreenMessage(ReCAPConstants.REQUEST_ILS_EXCEPTION + itemCheckoutResponse.getScreenMessage());
+                        itemResponseInformation.setSuccess(false);
                     }
                 }
             } else {

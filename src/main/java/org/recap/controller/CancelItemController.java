@@ -146,6 +146,7 @@ public class CancelItemController {
         requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
         requestItemEntity.setLastUpdatedDate(new Date());
         requestItemEntity.setNotes(appendCancelMessageToNotes(requestItemEntity));
+        requestItemEntity.setGFAStatusSch(false);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         itemRequestService.saveItemChangeLogEntity(savedRequestItemEntity.getRequestId(), ReCAPConstants.GUEST_USER, ReCAPConstants.REQUEST_ITEM_CANCEL_ITEM_AVAILABILITY_STATUS, ReCAPConstants.REQUEST_STATUS_CANCELED + savedRequestItemEntity.getItemId());
         itemCanceHoldResponse.setSuccess(true);
@@ -171,6 +172,7 @@ public class CancelItemController {
         requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
         requestItemEntity.setLastUpdatedDate(new Date());
         requestItemEntity.setNotes(appendCancelMessageToNotes(requestItemEntity));
+        requestItemEntity.setGFAStatusSch(false);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         itemRequestService.saveItemChangeLogEntity(savedRequestItemEntity.getRequestId(), ReCAPConstants.GUEST_USER, ReCAPConstants.REQUEST_ITEM_CANCEL_ITEM_AVAILABILITY_STATUS, ReCAPConstants.REQUEST_STATUS_CANCELED + savedRequestItemEntity.getItemId());
         itemCanceHoldResponse.setSuccess(true);
@@ -185,6 +187,7 @@ public class CancelItemController {
         requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
         requestItemEntity.setLastUpdatedDate(new Date());
         requestItemEntity.setNotes(appendCancelMessageToNotes(requestItemEntity));
+        requestItemEntity.setGFAStatusSch(false);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         itemRequestService.saveItemChangeLogEntity(savedRequestItemEntity.getRequestId(), ReCAPConstants.GUEST_USER, ReCAPConstants.REQUEST_ITEM_CANCEL_ITEM_AVAILABILITY_STATUS, ReCAPConstants.REQUEST_STATUS_CANCELED + savedRequestItemEntity.getItemId());
         itemCanceHoldResponse.setSuccess(true);

@@ -593,6 +593,10 @@ public class GFAService {
                 logger.info(gfaOnlyStatus);
                 // Call Retrival Order
                 if (ReCAPConstants.getGFAStatusAvailableList().contains(gfaOnlyStatus)) {
+                    if(ReCAPConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.toLowerCase().contains(gfaOnlyStatus.toLowerCase())){
+                        logger.info("Request Received while GFA status is Sch on Refile WO");
+                        itemResponseInformation.setRequestTypeForScheduledOnWO(true);
+                    }
                     if (itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_EDD)) {
                         itemResponseInformation = callItemEDDRetrivate(itemRequestInfo, itemResponseInformation);
                     } else if (itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RETRIEVAL)) {

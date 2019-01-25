@@ -259,7 +259,7 @@ public class RequestItemController {
         if (bSuccess) {
             itemRefileResponse.setScreenMessage("Successfully Refiled");
         } else {
-            itemRefileResponse.setScreenMessage("Cannot refile a already available Item");
+            itemRefileResponse.setScreenMessage("Cannot refile a already available Item/Cannot refile as a request has been placed for first scan");
         }
 
         return itemRefileResponse;

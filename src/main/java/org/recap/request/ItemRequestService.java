@@ -473,6 +473,10 @@ public class ItemRequestService {
         return itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, requestStatusCode, null);
     }
 
+    public boolean updateRecapRequestItem(Integer requestId){
+        return itemRequestDBService.updateRecapRequestItem(requestId);
+    }
+
     /**
      * Update recap request item item information response.
      *
@@ -624,13 +628,11 @@ public class ItemRequestService {
         if (gfaService.isUseQueueLasCall()) {
             requestId = updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PENDING);
         }
-
         itemResponseInformation.setRequestId(requestId);
         itemResponseInformation = updateGFA(itemRequestInfo, itemResponseInformation);
         if(itemResponseInformation.isRequestTypeForScheduledOnWO()){
-            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(itemResponseInformation.getRequestId());
-            requestItemEntity.setGFAStatusSch(true);
-            requestItemDetailsRepository.save(requestItemEntity);
+            logger.info("Request Received on first scan");
+            updateRecapRequestItem(requestId);
         }
         if (itemResponseInformation.isSuccess()) {
             itemResponseInformation.setScreenMessage(ReCAPConstants.SUCCESSFULLY_PROCESSED_REQUEST_ITEM);

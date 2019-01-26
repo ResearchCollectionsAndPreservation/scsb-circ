@@ -115,6 +115,20 @@ public class ItemRequestDBService {
         return requestId;
     }
 
+    public boolean updateRecapRequestItem(Integer requestId){
+        RequestItemEntity requestItemEntity;
+        if(requestId > 0){
+            requestItemEntity = requestItemDetailsRepository.findByRequestId(requestId);
+            requestItemEntity.setGFAStatusSch(true);
+            RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
+            if(savedRequestItemEntity !=null){
+                logger.info("The request id {} is marked true",savedRequestItemEntity.getRequestId());
+            }
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Update recap request item item information response.
      *

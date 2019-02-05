@@ -298,7 +298,7 @@ public class ItemRequestService {
             itemEntity = requestItemEntity.getItemEntity();
             RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_REFILED);
             String gfaItemStatus = callGfaItemStatus(itemEntity.getBarcode());
-            logger.info("GFA Item Status received for Refile : {}",gfaItemStatus);
+            logger.info("GFA Item Status {} for the barcode {} received on Refile : {}",gfaItemStatus,itemEntity.getBarcode());
             if(ReCAPConstants.GFA_STATUS_SCH_ON_EDD_WORK_ORDER.contains(gfaItemStatus)){
                 firstScan =true;
             }
@@ -367,6 +367,7 @@ public class ItemRequestService {
                 }
             }
             else {
+                logger.info("Rejecting the Refile for the barcode {} where Request ID : {}",itemEntity.getBarcode(),requestItemEntity.getRequestId());
                 requestItemEntity.setGFAStatusSch(false);
                 requestItemDetailsRepository.save(requestItemEntity);
             }

@@ -94,6 +94,7 @@ public class ItemRequestDBService {
                 requestItemEntity.setPatronId(itemRequestInformation.getPatronBarcode());
                 requestItemEntity.setStopCode(itemRequestInformation.getDeliveryLocation());
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                requestItemEntity.setGFAStatusSch(false);
                 if(StringUtils.isNotBlank(itemRequestInformation.getEmailAddress()) && null == bulkRequestItemEntity){
                     requestItemEntity.setEmailId(securityUtil.getEncryptedValue(itemRequestInformation.getEmailAddress()));
                 }else {

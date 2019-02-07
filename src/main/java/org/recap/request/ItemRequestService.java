@@ -286,6 +286,8 @@ public class ItemRequestService {
      */
     public boolean reFileItem(ItemRefileRequest itemRefileRequest) {
 
+        logger.info("Processing received Refile request");
+        logger.info("Refile Request Information : Barcodes {} , Request Id's : {}",itemRefileRequest.getItemBarcodes(),itemRefileRequest.getRequestIds());
         // Change Response for this Method
         boolean bSuccess = false;
         boolean firstScan = false;
@@ -303,6 +305,7 @@ public class ItemRequestService {
                 firstScan =true;
             }
             if(!requestItemEntity.isGFAStatusSch()) {
+                logger.info("Refile Process started");
                 if (itemEntity.getItemAvailabilityStatusId() == 2) { // Only Item Not Availability, Status is Processed
                     itemBarcode = itemEntity.getBarcode();
                     ItemRequestInformation itemRequestInfo = new ItemRequestInformation();

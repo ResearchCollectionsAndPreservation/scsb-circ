@@ -293,18 +293,18 @@ public class ItemRequestService {
         boolean firstScan = false;
         String itemBarcode;
         ItemEntity itemEntity;
-        List<String> requestItemStatusList = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD);
+        List<String> requestItemStatusList = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD ,ReCAPConstants.REQUEST_STATUS_PENDING);
         List<RequestItemEntity> requestEntities = requestItemDetailsRepository.findByRequestIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList);
 
         for (RequestItemEntity requestItemEntity : requestEntities) {
             itemEntity = requestItemEntity.getItemEntity();
             RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_REFILED);
             String gfaItemStatus = callGfaItemStatus(itemEntity.getBarcode());
-            logger.info("GFA Item Status {} for the barcode {} received on Refile : {}",gfaItemStatus,itemEntity.getBarcode());
-            if(ReCAPConstants.GFA_STATUS_SCH_ON_EDD_WORK_ORDER.contains(gfaItemStatus)){
+            logger.info("GFA Item Status {} for the barcode {} received on Refile",gfaItemStatus,itemEntity.getBarcode());
+            if(ReCAPConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.contains(gfaItemStatus)){
                 firstScan =true;
             }
-            if(!requestItemEntity.isGFAStatusSch()) {
+            if(!requestItemEntity.isGFAStatusSch() && !requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(ReCAPConstants.REQUEST_STATUS_PENDING)) {
                 logger.info("Refile Process started");
                 if (itemEntity.getItemAvailabilityStatusId() == 2) { // Only Item Not Availability, Status is Processed
                     itemBarcode = itemEntity.getBarcode();
@@ -370,7 +370,7 @@ public class ItemRequestService {
                 }
             }
             else {
-                logger.info("Rejecting the Refile for the barcode {} where Request ID : {}",itemEntity.getBarcode(),requestItemEntity.getRequestId());
+                logger.info("Rejecting the Refile for the barcode {} where Request ID : {} and Request Status : {}",itemEntity.getBarcode(),requestItemEntity.getRequestId(),requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
                 requestItemEntity.setGFAStatusSch(false);
                 requestItemDetailsRepository.save(requestItemEntity);
             }

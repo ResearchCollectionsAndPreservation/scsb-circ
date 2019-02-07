@@ -123,7 +123,7 @@ public class ItemRequestDBService {
             requestItemEntity.setGFAStatusSch(true);
             RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
             if(savedRequestItemEntity !=null){
-                logger.info("The request id {} is marked true",savedRequestItemEntity.getRequestId());
+                logger.info("The request id {} is marked {}",savedRequestItemEntity.getRequestId(),savedRequestItemEntity.isGFAStatusSch());
             }
             return true;
         }

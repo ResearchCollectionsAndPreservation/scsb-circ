@@ -121,7 +121,8 @@ public class ItemRequestDBService {
         if(requestId > 0){
             requestItemEntity = requestItemDetailsRepository.findByRequestId(requestId);
             requestItemEntity.setGFAStatusSch(true);
-            RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
+            logger.info("Before Saving Request is {} and first scan status {}",requestItemEntity.getRequestId(),requestItemEntity.isGFAStatusSch());
+            RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
             if(savedRequestItemEntity !=null){
                 logger.info("The request id {} is marked {}",savedRequestItemEntity.getRequestId(),savedRequestItemEntity.isGFAStatusSch());
             }

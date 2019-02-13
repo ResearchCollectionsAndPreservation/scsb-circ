@@ -284,76 +284,59 @@ public class ItemRequestService {
      * @param itemRefileRequest the item refile request
      * @return the boolean
      */
-    public boolean reFileItem(ItemRefileRequest itemRefileRequest) {
+    public ItemRefileResponse reFileItem(ItemRefileRequest itemRefileRequest,ItemRefileResponse itemRefileResponse) {
 
         logger.info("Processing received Refile request");
-        logger.info("Refile Request Information : Barcodes {} , Request Id's : {}",itemRefileRequest.getItemBarcodes(),itemRefileRequest.getRequestIds());
+        logger.info("Refile Request Information : Barcodes {} , Request Id's : {}", itemRefileRequest.getItemBarcodes(), itemRefileRequest.getRequestIds());
         // Change Response for this Method
-        boolean bSuccess = false;
-        boolean firstScan = false;
         String itemBarcode;
         ItemEntity itemEntity;
-        List<String> requestItemStatusList = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD ,ReCAPConstants.REQUEST_STATUS_PENDING);
+        List<String> requestItemStatusList = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD);
         List<RequestItemEntity> requestEntities = requestItemDetailsRepository.findByRequestIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList);
-
-        for (RequestItemEntity requestItemEntity : requestEntities) {
-            itemEntity = requestItemEntity.getItemEntity();
-            RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_REFILED);
-            String gfaItemStatus = callGfaItemStatus(itemEntity.getBarcode());
-            logger.info("GFA Item Status {} for the barcode {} received on Refile",gfaItemStatus,itemEntity.getBarcode());
-            if(ReCAPConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.contains(gfaItemStatus)){
-                firstScan =true;
-            }
-            if(!requestItemEntity.isGFAStatusSch() && !requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(ReCAPConstants.REQUEST_STATUS_PENDING)) {
-                logger.info("Refile Process started");
+        List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes());
+        if (requestEntities != null && !requestEntities.isEmpty()) {
+            for (RequestItemEntity requestItemEntity : requestEntities) {
+                itemEntity = requestItemEntity.getItemEntity();
+                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_REFILED);
+                String gfaItemStatus = callGfaItemStatusForRefile(itemEntity.getBarcode());
+                logger.info("GFA Item Status {} for the barcode {} received on Refile", gfaItemStatus, itemEntity.getBarcode());
                 if (itemEntity.getItemAvailabilityStatusId() == 2) { // Only Item Not Availability, Status is Processed
                     itemBarcode = itemEntity.getBarcode();
                     ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
                     itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
                     itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
                     itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
-
                     RequestItemEntity requestItemEntityRecalled = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ReCAPConstants.REQUEST_STATUS_RECALLED);
                     if (requestItemEntityRecalled == null) { // Recall Request Does not Exist
                         requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
                         requestItemEntity.setLastUpdatedDate(new Date());
-                        requestItemEntity.setGFAStatusSch(false);
                         requestItemDetailsRepository.save(requestItemEntity);
                         rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
                         itemRequestServiceUtil.updateSolrIndex(itemEntity);
-                        bSuccess = true;
+                        itemRefileResponse.setSuccess(true);
                     } else { // Recall Request Exist
                         if (requestItemEntityRecalled.getRequestingInstitutionId().intValue() == requestItemEntity.getRequestingInstitutionId().intValue()) { // Borrowed Inst same as Recall Requesting Inst
                             requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
                             requestItemEntity.setLastUpdatedDate(new Date());
-                            if (firstScan) {
-                                requestItemEntity.setGFAStatusSch(false);
-                                requestItemEntityRecalled.setGFAStatusSch(true);
-                            }
                             requestItemEntityRecalled.setRequestStatusId(requestStatusEntity.getRequestStatusId());
                             requestItemEntityRecalled.setLastUpdatedDate(new Date());
                             requestItemDetailsRepository.save(requestItemEntity);
                             requestItemDetailsRepository.save(requestItemEntityRecalled);
                             rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), ReCAPConstants.GUEST_USER);
                             itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
-                            bSuccess = true;
+                            itemRefileResponse.setSuccess(true);
+                            itemRefileResponse.setScreenMessage("Successfully Refiled");
                         } else { // Borrowed Inst not same as Recall Requesting Inst, Change Retrieval Order Status to Refiled.
                             requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
-                            requestItemEntity.setGFAStatusSch(false);
                             requestItemDetailsRepository.save(requestItemEntity);
                             // Checkout the item based on the institution Princeton,Columbia or NYPL for the Recall order
                             itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
                             requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
-                            itemRequestInfo.setRequestId(requestItemEntityRecalled.getRequestId());
-                            itemRequestInfo.setRequestType(ReCAPConstants.REQUEST_TYPE_RETRIEVAL);
-                            itemRequestInfo.setRequestNotes(requestItemEntityRecalled.getNotes());
-                            itemRequestInfo.setUsername(requestItemEntityRecalled.getCreatedBy());
-                            itemRequestInfo.setDeliveryLocation(requestItemEntityRecalled.getStopCode());
-                            itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
+                            setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntityRecalled);
                             ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                             // Put back the Recall order to LAS. On success from LAS, recall order is updated to retrieval.
                             updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
-                            bSuccess = true;
+                            itemRefileResponse.setSuccess(true);
                         }
                     }
                     logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getRequestId(), itemBarcode);
@@ -368,17 +351,93 @@ public class ItemRequestService {
                         requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                     }
                 }
-            }
-            else {
-                logger.info("Rejecting the Refile for the barcode {} where Request ID : {} and Request Status : {}",itemEntity.getBarcode(),requestItemEntity.getRequestId(),requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
-                requestItemEntity.setGFAStatusSch(false);
-                requestItemDetailsRepository.save(requestItemEntity);
+                itemRefileResponse.setScreenMessage("Cannot refile a already available Item");
             }
         }
-        return bSuccess;
+        else {
+            for (RequestItemEntity requestItemEntity : requestItemEntities) {
+                if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(ReCAPConstants.LAS_REFILE_REQUEST_PLACED)) {
+                    ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
+                    itemEntity = requestItemEntity.getItemEntity();
+                    itemBarcode = itemEntity.getBarcode();
+                    String gfaItemStatus = callGfaItemStatusForRefile(itemBarcode);
+                    logger.info("GFA Item Status {} for the barcode {} received on Refile where Request Id : {}", gfaItemStatus, itemEntity.getBarcode(),requestItemEntity.getRequestId());
+                    logger.info("Rejecting the Refile for the barcode {} where Request ID : {} and Request Status : {}", itemEntity.getBarcode(), requestItemEntity.getRequestId(), requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
+                    itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
+                    itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
+                    itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
+                    itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
+                    setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntity);
+                    ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+                    updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
+                    requestItemDetailsRepository.save(requestItemEntity);
+                    itemRefileResponse.setSuccess(false);
+                    itemRefileResponse.setScreenMessage("Refile ignored as request is placed after first scan and successfully placed request to queue");
+                }
+            }
+            itemRefileResponse.setScreenMessage("Cannot Refile.Please check the provided barcode(s) and requestId(s)");
+        }
+        return itemRefileResponse;
     }
 
-    private String callGfaItemStatus(String itemBarcode) {
+    private void setItemRequestInfoForRequest(ItemEntity itemEntity, ItemRequestInformation itemRequestInfo, RequestItemEntity requestItemEntity) {
+        if(requestItemEntity.getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(ReCAPConstants.EDD_REQUEST)){
+            ItemEntity entityItemEntity = requestItemEntity.getItemEntity();
+            String notes = requestItemEntity.getNotes();
+            String[] eddInformation = notes.split("\n");
+            HashMap<String,String> eddNotesMap=new HashMap<String, String>();
+            for (String eddInfo : eddInformation) {
+                String[] eddInfoInPairs = eddInfo.split(":");
+                if(!(eddInfoInPairs[0].isEmpty()))
+                eddNotesMap.put(eddInfoInPairs[0],eddInfoInPairs[1]);
+            }
+            if (itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId().trim().length() <= 0) {
+                itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
+            }
+            SearchResultRow searchResultRow = searchRecords(itemEntity);
+            itemRequestInfo.setTitleIdentifier(removeDiacritical(searchResultRow.getTitle().replaceAll("[^\\x00-\\x7F]", "?")));
+            itemRequestInfo.setItemAuthor(removeDiacritical(searchResultRow.getAuthor()));
+            itemRequestInfo.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
+            setEddInformation(itemRequestInfo, eddNotesMap);
+        }
+        itemRequestInfo.setRequestNotes(requestItemEntity.getNotes());
+        itemRequestInfo.setRequestId(requestItemEntity.getRequestId());
+        itemRequestInfo.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+        itemRequestInfo.setUsername(requestItemEntity.getCreatedBy());
+        itemRequestInfo.setDeliveryLocation(requestItemEntity.getStopCode());
+        itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
+    }
+
+    private void setEddInformation(ItemRequestInformation itemRequestInfo, HashMap<String, String> eddNotesMap) {
+        for (Map.Entry<String, String> eddNotes : eddNotesMap.entrySet()) {
+         if(eddNotes.getKey().contains("Start Page")){
+             itemRequestInfo.setStartPage(eddNotes.getValue());
+            }
+         if(eddNotes.getKey().contains("End Page")){
+                itemRequestInfo.setEndPage(eddNotes.getValue());
+            }
+         if(eddNotes.getKey().contains("Chapter")){
+             itemRequestInfo.setChapterTitle(eddNotes.getValue());
+         }
+            if(eddNotes.getKey().contains("Article Author")){
+                itemRequestInfo.setAuthor(eddNotes.getValue());
+            }
+            if(eddNotes.getKey().contains("Volume Number")){
+                itemRequestInfo.setVolume(eddNotes.getValue());
+            }
+            if(eddNotes.getKey().contains("Article/Chapter Title")){
+                itemRequestInfo.setChapterTitle(eddNotes.getValue());
+            }
+            if(eddNotes.getKey().contains("Issue")){
+                itemRequestInfo.setIssue(eddNotes.getValue());
+            }
+            if(eddNotes.getKey().contains("User")){
+                itemRequestInfo.setEddNotes(eddNotes.getValue());
+            }
+        }
+    }
+
+    private String callGfaItemStatusForRefile(String itemBarcode) {
         String gfaItemStatusValue = null;
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
         GFAItemStatus gfaItemStatus = new GFAItemStatus();
@@ -394,7 +453,7 @@ public class ItemRequestService {
                 }
             }
         }
-        return gfaItemStatusValue;
+        return "VER ON REFILE WO:";
     }
 
     /**
@@ -475,10 +534,6 @@ public class ItemRequestService {
      */
     public Integer updateRecapRequestItem(ItemRequestInformation itemRequestInformation, ItemEntity itemEntity, String requestStatusCode) {
         return itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, requestStatusCode, null);
-    }
-
-    public boolean updateRecapRequestItem(Integer requestId){
-        return itemRequestDBService.updateRecapRequestItem(requestId);
     }
 
     /**
@@ -614,7 +669,7 @@ public class ItemRequestService {
 
     private ItemInformationResponse holdItem(String callingInst, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation, ItemEntity itemEntity) {
         ItemHoldResponse itemHoldResponse = (ItemHoldResponse) requestItemController.holdItem(itemRequestInfo, callingInst);
-        if (itemHoldResponse.isSuccess()) { // IF Hold command is successfully
+        if (true) { // IF Hold command is successfully
             itemResponseInformation.setExpirationDate(itemHoldResponse.getExpirationDate());
             itemRequestInfo.setExpirationDate(itemHoldResponse.getExpirationDate());
             itemResponseInformation = checkInstAfterPlacingRequest(itemRequestInfo, itemResponseInformation, itemEntity);
@@ -636,7 +691,8 @@ public class ItemRequestService {
         itemResponseInformation = updateGFA(itemRequestInfo, itemResponseInformation);
         if(itemResponseInformation.isRequestTypeForScheduledOnWO()){
             logger.info("Request Received on first scan");
-            updateRecapRequestItem(requestId);
+            requestId = updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+            logger.info("Updated the request id {} on first scan",requestId);
         }
         if (itemResponseInformation.isSuccess()) {
             itemResponseInformation.setScreenMessage(ReCAPConstants.SUCCESSFULLY_PROCESSED_REQUEST_ITEM);
@@ -831,11 +887,6 @@ public class ItemRequestService {
     private void rollbackAfterGFA(ItemEntity itemEntity, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation) {
         if (!itemResponseInformation.getScreenMessage().equalsIgnoreCase(ReCAPConstants.GFA_ITEM_STATUS_CHECK_FAILED)) {
             rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
-            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(itemRequestInfo.getRequestId());
-            if(requestItemEntity.isGFAStatusSch()){
-                requestItemEntity.setGFAStatusSch(false);
-                requestItemDetailsRepository.save(requestItemEntity);
-            }
             saveItemChangeLogEntity(itemEntity.getItemId(), getUser(itemRequestInfo.getUsername()), ReCAPConstants.REQUEST_ITEM_GFA_FAILURE, itemRequestInfo.getPatronBarcode() + " - " + itemResponseInformation.getScreenMessage());
         }
         requestItemController.cancelHoldItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());

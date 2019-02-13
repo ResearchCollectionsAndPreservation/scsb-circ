@@ -369,9 +369,10 @@ public class GFAService {
         }
         if (!barcodeList.isEmpty() && !requestIdList.isEmpty()) {
             ItemRefileRequest itemRefileRequest = new ItemRefileRequest();
+            ItemRefileResponse itemRefileResponse = new ItemRefileResponse();
             itemRefileRequest.setItemBarcodes(barcodeList);
             itemRefileRequest.setRequestIds(requestIdList);
-            itemRequestService.reFileItem(itemRefileRequest);
+            itemRequestService.reFileItem(itemRefileRequest,itemRefileResponse);
         }
         statusReconciliationCSVRecordList.add(statusReconciliationCSVRecord);
     }
@@ -593,16 +594,19 @@ public class GFAService {
                 logger.info("Item status check before executing Retrieval Order.Status received : {}",gfaOnlyStatus);
                 // Call Retrival Order
                 if (ReCAPConstants.getGFAStatusAvailableList().contains(gfaOnlyStatus)) {
-                    if(ReCAPConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.toLowerCase().contains(gfaOnlyStatus.toLowerCase())){
-                        logger.info("Request Received while GFA status is Sch on Refile WO");
-                        itemResponseInformation.setRequestTypeForScheduledOnWO(true);
-                    }
                     if (itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_EDD)) {
                         itemResponseInformation = callItemEDDRetrivate(itemRequestInfo, itemResponseInformation);
                     } else if (itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RETRIEVAL)) {
                         itemResponseInformation = callItemRetrivate(itemRequestInfo, itemResponseInformation);
                     }
-                } else {
+                }
+                else if (ReCAPConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.toLowerCase().contains(gfaOnlyStatus.toLowerCase())){
+                    logger.info("Request Received while GFA status is Sch on Refile WO");
+                    itemResponseInformation.setRequestTypeForScheduledOnWO(true);
+                    itemResponseInformation.setSuccess(true);
+                    itemResponseInformation.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                }
+                else {
                     itemResponseInformation.setSuccess(false);
                     itemResponseInformation.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ITEM_NOT_AVAILABLE);
                 }
@@ -685,7 +689,7 @@ public class GFAService {
             ttitem001.setArticleVolume(itemRequestInfo.getVolume() + ", " + itemRequestInfo.getIssue());
             ttitem001.setArticleIssue(itemRequestInfo.getIssue());
 
-            ttitem001.setNotes(itemRequestInfo.getRequestNotes());
+            ttitem001.setNotes(itemRequestInfo.getEddNotes());
 
             ttitem001.setBiblioTitle(itemRequestInfo.getTitleIdentifier());
             ttitem001.setBiblioAuthor(itemRequestInfo.getItemAuthor());

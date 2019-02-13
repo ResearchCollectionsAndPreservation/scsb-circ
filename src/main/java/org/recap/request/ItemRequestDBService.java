@@ -94,7 +94,6 @@ public class ItemRequestDBService {
                 requestItemEntity.setPatronId(itemRequestInformation.getPatronBarcode());
                 requestItemEntity.setStopCode(itemRequestInformation.getDeliveryLocation());
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
-                requestItemEntity.setGFAStatusSch(false);
                 if(StringUtils.isNotBlank(itemRequestInformation.getEmailAddress()) && null == bulkRequestItemEntity){
                     requestItemEntity.setEmailId(securityUtil.getEncryptedValue(itemRequestInformation.getEmailAddress()));
                 }else {
@@ -114,21 +113,6 @@ public class ItemRequestDBService {
             logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
         }
         return requestId;
-    }
-
-    public boolean updateRecapRequestItem(Integer requestId){
-        RequestItemEntity requestItemEntity;
-        if(requestId > 0){
-            requestItemEntity = requestItemDetailsRepository.findByRequestId(requestId);
-            requestItemEntity.setGFAStatusSch(true);
-            logger.info("Before Saving Request is {} and first scan status {}",requestItemEntity.getRequestId(),requestItemEntity.isGFAStatusSch());
-            RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
-            if(savedRequestItemEntity !=null){
-                logger.info("The request id {} is marked {}",savedRequestItemEntity.getRequestId(),savedRequestItemEntity.isGFAStatusSch());
-            }
-            return true;
-        }
-        return false;
     }
 
     /**

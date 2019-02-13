@@ -38,6 +38,7 @@ public class ItemRequestInformation {
     private String itemVolume;
     private Integer requestId;
     private String pickupLocation;
+    private String eddNotes;
 
     /**
      * Gets bib id.
@@ -493,5 +494,13 @@ public class ItemRequestInformation {
 
     public void setPickupLocation(String pickupLocation) {
         this.pickupLocation = pickupLocation;
+    }
+
+    public String getEddNotes() {
+        return eddNotes;
+    }
+
+    public void setEddNotes(String eddNotes) {
+        this.eddNotes = eddNotes;
     }
 }

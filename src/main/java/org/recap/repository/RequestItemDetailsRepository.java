@@ -120,4 +120,6 @@ public interface RequestItemDetailsRepository extends JpaRepository<RequestItemE
                     "and date(LAST_UPDATED_DATE) < DATE_SUB(date(curdate()), INTERVAL :dateDifference DAY) ",nativeQuery = true)
     List<Integer> getRequestItemEntitiesBasedOnDayLimit(@Param("itemId") Integer itemId, @Param("requestStatusCodes") List<Integer> requestStatusCodes,@Param("dateDifference") Integer dateDifference);
 
+    @Query(value = "select request from RequestItemEntity request inner join request.itemEntity item where item.barcode in :itemBarcodes")
+    List<RequestItemEntity> findByItemBarcodes(@Param("itemBarcodes")List<String> itemBarcodes);
 }

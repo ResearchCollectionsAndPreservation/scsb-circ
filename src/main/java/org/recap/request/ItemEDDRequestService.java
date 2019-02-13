@@ -8,7 +8,6 @@ import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.ItemEntity;
 import org.recap.model.ItemRequestInformation;
-import org.recap.model.RequestItemEntity;
 import org.recap.model.SearchResultRow;
 import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.RequestItemDetailsRepository;
@@ -97,7 +96,6 @@ public class ItemEDDRequestService {
         ItemEntity itemEntity=null;
         ItemInformationResponse itemResponseInformation = getItemInformationResponse();
         Integer requestId = 0;
-        String userNotes = "";
         try {
             itemEntities = getItemDetailsRepository().findByBarcodeIn(itemRequestInfo.getItemBarcodes());
 
@@ -114,7 +112,7 @@ public class ItemEDDRequestService {
                 itemRequestInfo.setItemAuthor(getItemRequestService().removeDiacritical(searchResultRow.getAuthor()));
                 itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
                 // Save user Notes to be sent to LAS
-                userNotes = itemRequestInfo.getRequestNotes();
+                itemRequestInfo.setEddNotes(itemRequestInfo.getRequestNotes());
                 // Add EDD Information to notes to be saved in database
                 itemRequestInfo.setRequestNotes(getNotes(itemRequestInfo));
                 boolean isItemStatusAvailable;
@@ -142,16 +140,14 @@ public class ItemEDDRequestService {
                         if (getItemRequestService().getGfaService().isUseQueueLasCall()) {
                             getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PENDING);
                         }
-                        itemRequestInfo.setRequestNotes(userNotes);
                         itemResponseInformation.setItemId(itemEntity.getItemId());
                         itemResponseInformation.setPatronBarcode(itemRequestInfo.getPatronBarcode());
                         itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
                         if(itemResponseInformation.isRequestTypeForScheduledOnWO()){
-                            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(itemResponseInformation.getRequestId());
-                            requestItemEntity.setGFAStatusSch(true);
-                            requestItemDetailsRepository.save(requestItemEntity);
+                            logger.info("EDD Request Received on first scan");
+                            requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+                            logger.info("Updated EDD request id {} on first scan",requestId);
                         }
-                        itemRequestInfo.setRequestNotes(getNotes(itemRequestInfo));
                         if (!itemResponseInformation.isSuccess()) {
                             requestItemController.checkinItem(itemRequestInfo,itemRequestInfo.getItemOwningInstitution());
                             getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);

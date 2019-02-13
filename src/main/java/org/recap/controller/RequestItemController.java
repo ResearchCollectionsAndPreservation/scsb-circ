@@ -253,15 +253,17 @@ public class RequestItemController {
      */
     @RequestMapping(value = "/refile", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ItemRefileResponse refileItem(@RequestBody ItemRefileRequest itemRefileRequest) {
-        boolean bSuccess = getItemRequestService().reFileItem(itemRefileRequest);
         ItemRefileResponse itemRefileResponse = new ItemRefileResponse();
-        itemRefileResponse.setSuccess(bSuccess);
-        if (bSuccess) {
+        itemRefileResponse = getItemRequestService().reFileItem(itemRefileRequest,itemRefileResponse);
+
+        if (itemRefileResponse.isSuccess()) {
             itemRefileResponse.setScreenMessage("Successfully Refiled");
         } else {
-            itemRefileResponse.setScreenMessage("Cannot refile a already available Item/Cannot refile as a request has been placed for first scan");
+            if(itemRefileResponse.getScreenMessage()==null){
+                itemRefileResponse.setScreenMessage("Cannot process Refile request");
+            }
         }
-
+        logger.info("Refile Response: {}",itemRefileResponse.getScreenMessage());
         return itemRefileResponse;
     }
 

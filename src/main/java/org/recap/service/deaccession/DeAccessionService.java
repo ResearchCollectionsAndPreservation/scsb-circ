@@ -329,10 +329,12 @@ public class DeAccessionService {
                         RequestItemEntity activeRecallRequest = null;
                         RequestItemEntity initialLoadRequest = null;
                         for (RequestItemEntity requestItemEntity : requestItemEntities) { // Get active retrieval and recall requests.
-                            if (ReCAPConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) {
+                            boolean isRequestTypeRetreivalAndFirstScan = ReCAPConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ReCAPConstants.LAS_REFILE_REQUEST_PLACED.equalsIgnoreCase(requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
+                            boolean isRequestTypeRecallAndFirstScan = ReCAPConstants.REQUEST_TYPE_RECALL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ReCAPConstants.LAS_REFILE_REQUEST_PLACED.equalsIgnoreCase(requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
+                            if ((ReCAPConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) || isRequestTypeRetreivalAndFirstScan) {
                                 activeRetrievalRequest = requestItemEntity;
                             }
-                            if (ReCAPConstants.REQUEST_TYPE_RECALL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ReCAPConstants.REQUEST_STATUS_RECALLED.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) {
+                            if ((ReCAPConstants.REQUEST_TYPE_RECALL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ReCAPConstants.REQUEST_STATUS_RECALLED.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) || isRequestTypeRecallAndFirstScan) {
                                 activeRecallRequest = requestItemEntity;
                             }
                             if (ReCAPConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) {
@@ -452,7 +454,6 @@ public class DeAccessionService {
         String requestNotes = requestItemEntity.getNotes();
         requestNotes = requestNotes + "\n" + "SCSB : " + ReCAPConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION;
         requestItemEntity.setNotes(requestNotes);
-        requestItemEntity.setGFAStatusSch(false);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         saveDeAccessionItemChangeLogEntity(savedRequestItemEntity.getRequestId(), username, ReCAPConstants.REQUEST_ITEM_CANCEL_DEACCESSION_ITEM, ReCAPConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION + savedRequestItemEntity.getItemId());
         itemRequestServiceUtil.updateSolrIndex(savedRequestItemEntity.getItemEntity());

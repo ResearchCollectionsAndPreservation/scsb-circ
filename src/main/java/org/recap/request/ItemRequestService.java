@@ -363,16 +363,21 @@ public class ItemRequestService {
                     String gfaItemStatus = callGfaItemStatusForRefile(itemBarcode);
                     logger.info("GFA Item Status {} for the barcode {} received on Refile where Request Id : {}", gfaItemStatus, itemEntity.getBarcode(),requestItemEntity.getRequestId());
                     logger.info("Rejecting the Refile for the barcode {} where Request ID : {} and Request Status : {}", itemEntity.getBarcode(), requestItemEntity.getRequestId(), requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
-                    itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
-                    itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
-                    itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
-                    itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
-                    setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntity);
-                    ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
-                    updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
-                    requestItemDetailsRepository.save(requestItemEntity);
-                    itemRefileResponse.setSuccess(false);
-                    itemRefileResponse.setScreenMessage("Refile ignored as request is placed after first scan and successfully placed request to queue");
+                    if(ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus)) {
+                        itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
+                        itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
+                        itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
+                        itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
+                        setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntity);
+                        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+                        updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
+                        requestItemDetailsRepository.save(requestItemEntity);
+                        itemRefileResponse.setSuccess(false);
+                        itemRefileResponse.setScreenMessage("Refile ignored as request is placed after first scan and successfully placed request to queue");
+                    }
+                    else {
+                        logger.info("Cannot Refile. LAS status is Not Available");
+                    }
                 }
             }
             itemRefileResponse.setScreenMessage("Cannot Refile.Please check the provided barcode(s) and requestId(s)");

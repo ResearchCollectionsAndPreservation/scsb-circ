@@ -364,8 +364,14 @@ public class ItemRequestService {
                     logger.info("Gfa status received during refile : {}",gfaItemStatus);
                     logger.info("GFA Item Status {} for the barcode {} received on Refile where Request Id : {}", gfaItemStatus, itemEntity.getBarcode(),requestItemEntity.getRequestId());
                     logger.info("Rejecting the Refile for the barcode {} where Request ID : {} and Request Status : {}", itemEntity.getBarcode(), requestItemEntity.getRequestId(), requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
-                    logger.info("Condition satified {}",ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus.toUpperCase()));
-                    if(ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus.toUpperCase())) {
+                    if (gfaItemStatus.contains(":")) {
+                        gfaItemStatus = gfaItemStatus.substring(0, gfaItemStatus.indexOf(':') + 1).toUpperCase();
+                    } else {
+                        gfaItemStatus = gfaItemStatus.toUpperCase();
+                    }
+                    logger.info("Gfa status After modifying : {}",gfaItemStatus);
+                    logger.info("Condition satified {}",ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus));
+                    if(ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus)) {
                         itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
                         itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
                         itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
@@ -373,6 +379,7 @@ public class ItemRequestService {
                         setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntity);
                         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                         updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
+                        logger.info("Successfully placed the request to Queue");
                         requestItemDetailsRepository.save(requestItemEntity);
                         itemRefileResponse.setSuccess(false);
                         itemRefileResponse.setScreenMessage("Refile ignored as request is placed after first scan and successfully placed request to queue");

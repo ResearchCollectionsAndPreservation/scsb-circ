@@ -364,8 +364,8 @@ public class ItemRequestService {
                     logger.info("Gfa status received during refile : {}",gfaItemStatus);
                     logger.info("GFA Item Status {} for the barcode {} received on Refile where Request Id : {}", gfaItemStatus, itemEntity.getBarcode(),requestItemEntity.getRequestId());
                     logger.info("Rejecting the Refile for the barcode {} where Request ID : {} and Request Status : {}", itemEntity.getBarcode(), requestItemEntity.getRequestId(), requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
-                    logger.info("Condition satified {}",ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus));
-                    if(ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus)) {
+                    logger.info("Condition satified {}",ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus.toUpperCase()));
+                    if(ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus.toUpperCase())) {
                         itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
                         itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
                         itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());

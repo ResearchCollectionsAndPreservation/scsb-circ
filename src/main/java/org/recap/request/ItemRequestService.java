@@ -458,7 +458,7 @@ public class ItemRequestService {
                 }
             }
         }
-        return "VER ON REFILE WO:";
+        return gfaItemStatusValue;
     }
 
     /**

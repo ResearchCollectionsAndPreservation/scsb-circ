@@ -203,8 +203,9 @@ public class DeAccessionService {
                             if (StringUtils.isNotBlank(gfaItemStatus)) {
                                 gfaItemStatus = gfaItemStatus.toUpperCase();
                                 gfaItemStatus = gfaItemStatus.contains(":") ? gfaItemStatus.substring(0, gfaItemStatus.indexOf(':') + 1) : gfaItemStatus;
+                                logger.info("GFA Item Status    after trimming : {}", gfaItemStatus);
                                 if ((StringUtils.isNotBlank(gfaItemStatus) && !ReCAPConstants.GFA_STATUS_NOT_ON_FILE.equalsIgnoreCase(gfaItemStatus))
-                                        && ((ReCAPConstants.AVAILABLE.equals(scsbItemStatus) && ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus))
+                                        && ((ReCAPConstants.AVAILABLE.equals(scsbItemStatus) && (ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus) || ReCAPConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.equals(gfaItemStatus)))
                                         || (ReCAPConstants.NOT_AVAILABLE.equals(scsbItemStatus) && ReCAPConstants.getGFAStatusNotAvailableList().contains(gfaItemStatus)))) {
                                     barcodeAndStopCodeMap.put(itemBarcode.trim(), deAccessionItem.getDeliveryLocation());
                                 } else {

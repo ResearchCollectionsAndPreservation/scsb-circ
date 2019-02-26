@@ -109,7 +109,11 @@ public class BulkItemRequestProcessService {
                 ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                 itemInformationResponse.setRequestId(requestId);
                 itemInformationResponse = gfaService.executeRetriveOrder(itemRequestInformation, itemInformationResponse);
-                if (itemInformationResponse.isSuccess()) {
+                if(itemInformationResponse.isRequestTypeForScheduledOnWO()){
+                    logger.info("Bulk Request : Request received on first scan");
+                    itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ReCAPConstants.LAS_REFILE_REQUEST_PLACED,bulkRequestItemEntity);
+                }
+                else if (itemInformationResponse.isSuccess()) {
                     itemInformationResponse.setScreenMessage(ReCAPConstants.SUCCESSFULLY_PROCESSED_REQUEST_ITEM);
                     itemRequestInformation.setRequestNotes(itemRequestInformation.getRequestNotes() + "\n" + ReCAPConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getBulkRequestId());
                     if (!gfaService.isUseQueueLasCall()) {

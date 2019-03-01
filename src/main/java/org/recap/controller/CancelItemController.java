@@ -4,9 +4,13 @@ import org.recap.ReCAPConstants;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.*;
+import org.recap.repository.ItemDetailsRepository;
+import org.recap.repository.ItemStatusDetailsRepository;
 import org.recap.repository.RequestItemDetailsRepository;
 import org.recap.repository.RequestItemStatusDetailsRepository;
+import org.recap.request.ItemRequestDBService;
 import org.recap.request.ItemRequestService;
+import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,18 @@ public class CancelItemController {
 
     @Autowired
     private ItemRequestService itemRequestService;
+
+    @Autowired
+    private ItemStatusDetailsRepository itemStatusDetailsRepository;
+
+    @Autowired
+    private ItemDetailsRepository itemDetailsRepository;
+
+    @Autowired
+    private ItemRequestDBService itemRequestDBService;
+
+    @Autowired
+    private ItemRequestServiceUtil itemRequestServiceUtil;
 
     /**
      * This is rest service  method, for cancel requested item.
@@ -120,10 +136,31 @@ public class CancelItemController {
             itemCanceHoldResponse = new ItemHoldResponse();
             changeRetrievalToCancelStatus(requestItemEntity,itemCanceHoldResponse);
         }
+        makeItemAvailableForFirstScanCancelRequest(requestItemEntity);
         return itemCanceHoldResponse;
     }
 
+    private void makeItemAvailableForFirstScanCancelRequest(RequestItemEntity requestItemEntity) {
+        if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(ReCAPConstants.LAS_REFILE_REQUEST_PLACED)) {
+            rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), ReCAPConstants.GUEST_USER);
+            itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
+        }
+    }
 
+    public void rollbackUpdateItemAvailabilutyStatus(ItemEntity itemEntity, String userName) {
+        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(ReCAPConstants.AVAILABLE);
+        itemEntity.setItemAvailabilityStatusId(itemStatusEntity.getItemStatusId()); // Available
+        itemEntity.setLastUpdatedBy(getUser(userName));
+        itemDetailsRepository.save(itemEntity);
+        saveItemChangeLogEntity(itemEntity.getItemId(), getUser(userName), ReCAPConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, ReCAPConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK);
+    }
+    public String getUser(String userId) {
+        return itemRequestDBService.getUser(userId);
+    }
+
+    public void saveItemChangeLogEntity(Integer recordId, String userName, String operationType, String notes) {
+        itemRequestDBService.saveItemChangeLogEntity(recordId, userName, operationType, notes);
+    }
     private ItemHoldResponse processRecall(ItemRequestInformation itemRequestInformation, ItemInformationResponse itemInformationResponse, RequestItemEntity requestItemEntity) {
         ItemHoldResponse itemCanceHoldResponse;
         if (getHoldQueueLength(itemInformationResponse) > 0 || (itemInformationResponse.getCirculationStatus().equalsIgnoreCase(ReCAPConstants.CIRCULATION_STATUS_ON_HOLDSHELF) || itemInformationResponse.getCirculationStatus().equalsIgnoreCase(ReCAPConstants.CIRCULATION_STATUS_IN_TRANSIT_NYPL))) {
@@ -139,6 +176,7 @@ public class CancelItemController {
             itemCanceHoldResponse = new ItemHoldResponse();
             changeRecallToCancelStatus(requestItemEntity, itemCanceHoldResponse);
         }
+        makeItemAvailableForFirstScanCancelRequest(requestItemEntity);
         return itemCanceHoldResponse;
     }
 
@@ -153,6 +191,7 @@ public class CancelItemController {
         itemCanceHoldResponse.setSuccess(true);
         itemCanceHoldResponse.setScreenMessage(ReCAPConstants.REQUEST_CANCELLATION_EDD_SUCCCESS);
         sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), requestItemEntity.getItemEntity().getBarcode(), requestItemEntity.getPatronId());
+        makeItemAvailableForFirstScanCancelRequest(requestItemEntity);
         return itemCanceHoldResponse;
     }
 

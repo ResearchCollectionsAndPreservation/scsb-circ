@@ -204,13 +204,17 @@ public class DeAccessionService {
                                 gfaItemStatus = gfaItemStatus.toUpperCase();
                                 gfaItemStatus = gfaItemStatus.contains(":") ? gfaItemStatus.substring(0, gfaItemStatus.indexOf(':') + 1) : gfaItemStatus;
                                 logger.info("GFA Item Status    after trimming : {}", gfaItemStatus);
-                                if ((StringUtils.isNotBlank(gfaItemStatus) && !ReCAPConstants.GFA_STATUS_NOT_ON_FILE.equalsIgnoreCase(gfaItemStatus))
-                                        && ((ReCAPConstants.AVAILABLE.equals(scsbItemStatus) && (ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus) || ReCAPConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.equals(gfaItemStatus)))
+                                if((StringUtils.isNotBlank(gfaItemStatus) && ReCAPConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.equals(gfaItemStatus))){
+                                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), "Cannot Deaccession as Item is awaiting for Refile.Please try again later or contact ReCAP staff for further assistance.", itemEntity));
+                                }
+                                else if ((StringUtils.isNotBlank(gfaItemStatus) && !ReCAPConstants.GFA_STATUS_NOT_ON_FILE.equalsIgnoreCase(gfaItemStatus))
+                                        && ((ReCAPConstants.AVAILABLE.equals(scsbItemStatus) && ReCAPConstants.getGFAStatusAvailableList().contains(gfaItemStatus))
                                         || (ReCAPConstants.NOT_AVAILABLE.equals(scsbItemStatus) && ReCAPConstants.getGFAStatusNotAvailableList().contains(gfaItemStatus)))) {
                                     barcodeAndStopCodeMap.put(itemBarcode.trim(), deAccessionItem.getDeliveryLocation());
                                 } else {
                                     deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), MessageFormat.format(ReCAPConstants.GFA_ITEM_STATUS_MISMATCH, recapAssistanceEmailTo, recapAssistanceEmailTo), itemEntity));
                                 }
+
                             } else {
                                 deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), MessageFormat.format(ReCAPConstants.GFA_SERVER_DOWN, recapAssistanceEmailTo, recapAssistanceEmailTo), itemEntity));
                             }

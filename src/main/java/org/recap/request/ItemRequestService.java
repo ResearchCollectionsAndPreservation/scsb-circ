@@ -71,6 +71,35 @@ public class ItemRequestService {
     @Value("${scsb.solr.client.url}")
     private String scsbSolrClientUrl;
 
+    //EDD values
+
+    @Value("${ils.princeton.patron.edd}")
+    private String princetonPatronForEDD;
+
+    @Value("${ils.columbia.patron.edd}")
+    private String columbiaPatronForEDD;
+
+    @Value("${ils.nypl.patron.edd}")
+    private String nyplPatronForEDD;
+
+    @Value("${ils.princeton.cul.patron.edd}")
+    private String princetonCULEDDPatron;
+
+    @Value("${ils.princeton.nypl.patron.edd}")
+    private String princetonNYPLEDDPatron;
+
+    @Value("${ils.columbia.pul.patron.edd}")
+    private String columbiaPULEDDPatron;
+
+    @Value("${ils.columbia.nypl.patron.edd}")
+    private String columbiaNYPLEDDPatron;
+
+    @Value("${ils.nypl.princeton.patron.edd}")
+    private String nyplPrincetonEDDPatron;
+
+    @Value("${ils.nypl.columbia.patron.edd}")
+    private String nyplColumbiaEDDPatron;
+
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;
 
@@ -115,6 +144,9 @@ public class ItemRequestService {
 
     @Autowired
     private SecurityUtil securityUtil;
+
+    @Autowired
+    private ItemEDDRequestService itemEDDRequestService;
 
     /**
      * @return
@@ -306,6 +338,7 @@ public class ItemRequestService {
                     itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
                     itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
                     itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
+                    itemRequestInfo.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
                     RequestItemEntity requestItemEntityRecalled = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ReCAPConstants.REQUEST_STATUS_RECALLED);
                     if (requestItemEntityRecalled == null) { // Recall Request Does not Exist
                         requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
@@ -330,8 +363,14 @@ public class ItemRequestService {
                             requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
                             requestItemDetailsRepository.save(requestItemEntity);
                             // Checkout the item based on the institution Princeton,Columbia or NYPL for the Recall order
-                            itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
-                            requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+                            if(itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.EDD_REQUEST)) {
+                                //Checkout for EDD patron
+                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution() ,itemRequestInfo.getItemOwningInstitution()));
+                                requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+                            }else {
+                                itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                                requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+                            }
                             setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntityRecalled);
                             ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                             // Put back the Recall order to LAS. On success from LAS, recall order is updated to retrieval.
@@ -341,13 +380,39 @@ public class ItemRequestService {
                     }
                     logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getRequestId(), itemBarcode);
                     if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.PRINCETON) || itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
-                        itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
+                        //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
+                        if(itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.EDD_REQUEST)){
+                            if(itemRequestInfo.isOwningInstitutionItem()) {
+                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                            }else {
+                                //Interchanging the arguments since the checkin call is made based on Requesting Institution.
+                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdBorrwingInsttution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution()));
+                            }
+                        }
+                        else {
+                            itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
+                        }
                         requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
                     } else if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.NYPL)) {
+                        //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
+                        if(itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.EDD_REQUEST)){
+                            if(itemRequestInfo.isOwningInstitutionItem()) {
+                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                            }else {
+                                //Interchanging the arguments since the checkin call is made based on Requesting Institution
+                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdBorrwingInsttution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution()));
+                            }
+                        }
                         requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
                     }
                     if (!itemRequestInfo.isOwningInstitutionItem()) {
-                        itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                        //TODO - Check if EDD and change Patron accordingly to checkIn in ItemOwningInstitution
+                        if(itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.EDD_REQUEST)){
+                            itemRequestInfo.setPatronBarcode(getPatronIDForEDDBorrowingInstitution(itemRequestInfo.getRequestingInstitution(),itemRequestInfo.getItemOwningInstitution()));
+                        }
+                        else {
+                            itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                        }
                         requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                     }
                 }
@@ -509,6 +574,7 @@ public class ItemRequestService {
         String json = "";
         try {
             json = objectMapper.writeValueAsString(itemResponseInfo);
+            System.out.println("Topic logs : " + json);
         } catch (JsonProcessingException e) {
             logger.error(ReCAPConstants.REQUEST_PARSE_EXCEPTION, e);
         }
@@ -575,7 +641,7 @@ public class ItemRequestService {
         for (ItemEntity itemEntity : itemEntities) {
             ItemEntity itemEntityByItemId = itemDetailsRepository.findByItemId(itemEntity.getItemId());
             logger.info("Item status : " + itemEntityByItemId.getItemStatusEntity().getStatusCode());
-            if (itemStatusEntity.getItemStatusId() == itemEntityByItemId.getItemAvailabilityStatusId()) {
+            if (itemStatusEntity.getItemStatusId() == itemEntityByItemId.getItemAvailabilityStatusId()) {  //Condition should be checked with equals not == ?
                 return false;
             }
         }
@@ -683,7 +749,7 @@ public class ItemRequestService {
 
     private ItemInformationResponse holdItem(String callingInst, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation, ItemEntity itemEntity) {
         ItemHoldResponse itemHoldResponse = (ItemHoldResponse) requestItemController.holdItem(itemRequestInfo, callingInst);
-        if (true) { // IF Hold command is successfully
+        if (itemHoldResponse.isSuccess()) { // IF Hold command is successfully
             itemResponseInformation.setExpirationDate(itemHoldResponse.getExpirationDate());
             itemRequestInfo.setExpirationDate(itemHoldResponse.getExpirationDate());
             itemResponseInformation = checkInstAfterPlacingRequest(itemRequestInfo, itemResponseInformation, itemEntity);
@@ -779,6 +845,31 @@ public class ItemRequestService {
         } else {
             return ReCAPConstants.REQUEST_SCSB_EXCEPTION + ReCAPConstants.RECALL_FAILED_NO_MESSAGE_RETURNED;
         }
+    }
+
+    private String getPatronIDForEDDBorrowingInstitution(String requestingInstitution, String owningInstitution) {
+        String patronId = "";
+        if (owningInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+            if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+                patronId = princetonCULEDDPatron;
+            } else if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+                patronId = princetonNYPLEDDPatron;
+            }
+        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+            if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+                patronId = columbiaPULEDDPatron;
+            } else if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+                patronId = columbiaNYPLEDDPatron;
+            }
+        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+            if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+                patronId = nyplPrincetonEDDPatron;
+            } else if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+                patronId = nyplColumbiaEDDPatron;
+            }
+        }
+        logger.info(patronId);
+        return patronId;
     }
 
     private String getPatronIdBorrwingInsttution(String requestingInstitution, String owningInstitution) {

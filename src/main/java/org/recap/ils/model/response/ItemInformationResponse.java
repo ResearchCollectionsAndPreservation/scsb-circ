@@ -44,6 +44,8 @@ public class ItemInformationResponse extends AbstractResponseItem {
     private String username;
     private boolean isBulk;
     private boolean requestTypeForScheduledOnWO;
+    private String eddSuccessResponseScreenMsg;
+    private String eddFailureResponseScreenMsg;
 
     /**
      * Gets request id.
@@ -699,5 +701,21 @@ public class ItemInformationResponse extends AbstractResponseItem {
 
     public void setRequestTypeForScheduledOnWO(boolean requestTypeForScheduledOnWO) {
         this.requestTypeForScheduledOnWO = requestTypeForScheduledOnWO;
+    }
+
+    public String getEddSuccessResponseScreenMsg() {
+        return eddSuccessResponseScreenMsg;
+    }
+
+    public void setEddSuccessResponseScreenMsg(String eddSuccessResponseScreenMsg) {
+        this.eddSuccessResponseScreenMsg = eddSuccessResponseScreenMsg;
+    }
+
+    public String getEddFailureResponseScreenMsg() {
+        return eddFailureResponseScreenMsg;
+    }
+
+    public void setEddFailureResponseScreenMsg(String eddFailureResponseScreenMsg) {
+        this.eddFailureResponseScreenMsg = eddFailureResponseScreenMsg;
     }
 }

@@ -16,6 +16,7 @@ import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
@@ -46,6 +47,33 @@ public class ItemEDDRequestService {
 
     @Autowired
     private RequestItemDetailsRepository requestItemDetailsRepository;
+
+    @Value("${ils.princeton.patron.edd}")
+    private String princetonPatronForEDD;
+
+    @Value("${ils.columbia.patron.edd}")
+    private String columbiaPatronForEDD;
+
+    @Value("${ils.nypl.patron.edd}")
+    private String nyplPatronForEDD;
+
+    @Value("${ils.princeton.cul.patron.edd}")
+    private String princetonEDDCULPatron;
+
+    @Value("${ils.princeton.nypl.patron.edd}")
+    private String princetonEDDNYPLPatron;
+
+    @Value("${ils.columbia.pul.patron.edd}")
+    private String columbiaEDDPULPatron;
+
+    @Value("${ils.columbia.nypl.patron.edd}")
+    private String columbiaEDDNYPLPatron;
+
+    @Value("${ils.nypl.princeton.patron.edd}")
+    private String nyplEDDPrincetonPatron;
+
+    @Value("${ils.nypl.columbia.patron.edd}")
+    private String nyplEDDColumbiaPatron;
 
     /**
      * Gets item details repository.
@@ -98,7 +126,6 @@ public class ItemEDDRequestService {
         Integer requestId = 0;
         try {
             itemEntities = getItemDetailsRepository().findByBarcodeIn(itemRequestInfo.getItemBarcodes());
-
             if (itemEntities != null && !itemEntities.isEmpty()) {
                 logger.info("Item Exists in SCSB Database");
                 itemEntity = itemEntities.get(0);
@@ -120,7 +147,6 @@ public class ItemEDDRequestService {
                     // Change Item Availablity
                     isItemStatusAvailable = getItemRequestService().updateItemAvailabilutyStatus(itemEntities, itemRequestInfo.getUsername());
                 }
-
                 requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PROCESSING);
                 itemRequestInfo.setRequestId(requestId);
                 itemResponseInformation.setRequestId(requestId);
@@ -134,30 +160,35 @@ public class ItemEDDRequestService {
                     itemResponseInformation.setSuccess(false);
                 } else {
                     // Process
-                    ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInfo,itemRequestInfo.getItemOwningInstitution());
+                    String requestInfoPatronBarcode = itemRequestInfo.getPatronBarcode();
+                    if(itemRequestInfo.isOwningInstitutionItem()){
+                     itemRequestInfo.setPatronBarcode(getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                    }
+                    else {
+                        itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                    }
+                    logger.info("Patron and Institution info before CheckOut Call in EDD : patron - {} , institution - {}",itemRequestInfo.getPatronBarcode(),itemRequestInfo.getItemOwningInstitution());
+                    ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                     if (itemCheckoutResponse.isSuccess()) {
-                        logger.info("Checkout successful for EDD request");
-                        if (getItemRequestService().getGfaService().isUseQueueLasCall()) {
-                            getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PENDING);
-                        }
-                        itemResponseInformation.setItemId(itemEntity.getItemId());
-                        itemResponseInformation.setPatronBarcode(itemRequestInfo.getPatronBarcode());
-                        itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
-                        if(itemResponseInformation.isRequestTypeForScheduledOnWO()){
-                            logger.info("EDD Request Received on first scan");
-                            requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
-                            logger.info("Updated EDD request id {} on first scan",requestId);
-                        }
-                        if (!itemResponseInformation.isSuccess()) {
-                            requestItemController.checkinItem(itemRequestInfo,itemRequestInfo.getItemOwningInstitution());
-                            getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
-                        }
+                        itemResponseInformation.setEddSuccessResponseScreenMsg(itemCheckoutResponse.getScreenMessage());
+                    } else {
+                        itemResponseInformation.setEddFailureResponseScreenMsg(itemCheckoutResponse.getScreenMessage());
                     }
-                   else{
-                       logger.info("Checkout failed for EDD request");
-                        itemResponseInformation.setScreenMessage(ReCAPConstants.REQUEST_ILS_EXCEPTION + itemCheckoutResponse.getScreenMessage());
-                        itemResponseInformation.setSuccess(false);
+                    if (getItemRequestService().getGfaService().isUseQueueLasCall()) {
+                        getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PENDING);
                     }
+                    itemResponseInformation.setItemId(itemEntity.getItemId());
+
+                    itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
+                    if (itemResponseInformation.isRequestTypeForScheduledOnWO()) {
+                        logger.info("EDD Request Received on first scan");
+                        requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+                        logger.info("Updated EDD request id {} on first scan", requestId);
+                    }
+                    if (!itemResponseInformation.isSuccess()) {
+                        getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
+                    }
+                    itemResponseInformation.setPatronBarcode(requestInfoPatronBarcode);
                 }
             } else {
                 itemResponseInformation.setScreenMessage(ReCAPConstants.WRONG_ITEM_BARCODE);
@@ -200,5 +231,43 @@ public class ItemEDDRequestService {
         }
         notes += String.format("\n\nStart Page: %s \nEnd Page: %s \nVolume Number: %s \nIssue: %s \nArticle Author: %s \nArticle/Chapter Title: %s ", itemRequestInfo.getStartPage(), itemRequestInfo.getEndPage(), itemRequestInfo.getVolume(), itemRequestInfo.getIssue(), itemRequestInfo.getAuthor(), itemRequestInfo.getChapterTitle());
         return notes;
+    }
+
+    public String getPatronIdForOwningInstitutionOnEdd(String owningInstitution){
+        String patronId = "";
+        if (owningInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+               patronId = princetonPatronForEDD;
+        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+               patronId = columbiaPatronForEDD;
+        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+                patronId = nyplPatronForEDD;
+        }
+        logger.info(patronId);
+        return patronId;
+    }
+
+    public String getPatronIdBorrwingInsttution(String requestingInstitution, String owningInstitution) {
+        String patronId = "";
+        if (owningInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+            if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+                patronId = princetonEDDCULPatron;
+            } else if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+                patronId = princetonEDDNYPLPatron;
+            }
+        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+            if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+                patronId = columbiaEDDPULPatron;
+            } else if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+                patronId = columbiaEDDNYPLPatron;
+            }
+        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+            if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+                patronId = nyplEDDPrincetonPatron;
+            } else if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+                patronId = nyplEDDColumbiaPatron;
+            }
+        }
+        logger.info(patronId);
+        return patronId;
     }
 }

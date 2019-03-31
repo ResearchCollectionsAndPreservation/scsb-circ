@@ -93,7 +93,9 @@ public class RequestItemController {
             String callInst = callingInsttution(callInstitition, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
+                logger.info("Patron barcode and Institution info before CheckIn call : patron - {} , institution - {} ",itemRequestInformation.getPatronBarcode(),callInstitition);
                 itemCheckinResponse = (ItemCheckinResponse) getJsipConectorFactory().getJSIPConnector(callInst).checkInItem(itemBarcode, itemRequestInformation.getPatronBarcode());
+                logger.info("CheckIn Response Message : {}",itemCheckinResponse.getScreenMessage());
             } else {
                 itemCheckinResponse = new ItemCheckinResponse();
                 itemCheckinResponse.setSuccess(false);

@@ -737,9 +737,11 @@ public class ItemRequestService {
         } else { // Item does not belong to requesting Institute
             String requestingPatron = itemRequestInfo.getPatronBarcode();
             itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
-            requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
             itemRequestInfo.setPatronBarcode(requestingPatron);
             itemResponseInformation = updateScsbAndGfa(itemRequestInfo, itemResponseInformation, itemEntity);
+            if(itemResponseInformation.isSuccess()){
+                requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+            }
         }
         if (itemResponseInformation.isSuccess()) {
             itemRequestServiceUtil.updateSolrIndex(itemEntity);

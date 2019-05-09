@@ -161,23 +161,11 @@ public class ItemEDDRequestService {
                 } else {
                     // Process
                     String requestInfoPatronBarcode = itemRequestInfo.getPatronBarcode();
-                    if(itemRequestInfo.isOwningInstitutionItem()){
-                     itemRequestInfo.setPatronBarcode(getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
-                    }
-                    else {
-                        itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
-                    }
-                    logger.info("Patron and Institution info before CheckOut Call in EDD : patron - {} , institution - {}",itemRequestInfo.getPatronBarcode(),itemRequestInfo.getItemOwningInstitution());
-                    ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
-                    if (itemCheckoutResponse.isSuccess()) {
-                        itemResponseInformation.setEddSuccessResponseScreenMsg(itemCheckoutResponse.getScreenMessage());
-                    } else {
-                        itemResponseInformation.setEddFailureResponseScreenMsg(itemCheckoutResponse.getScreenMessage());
-                    }
                     if (getItemRequestService().getGfaService().isUseQueueLasCall()) {
                         getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PENDING);
                     }
                     itemResponseInformation.setItemId(itemEntity.getItemId());
+
 
                     itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
                     if (itemResponseInformation.isRequestTypeForScheduledOnWO()) {
@@ -187,6 +175,21 @@ public class ItemEDDRequestService {
                     }
                     if (!itemResponseInformation.isSuccess()) {
                         getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
+                    }
+                    else {
+                        if(itemRequestInfo.isOwningInstitutionItem()){
+                            itemRequestInfo.setPatronBarcode(getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                        }
+                        else {
+                            itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                        }
+                        logger.info("Patron and Institution info before CheckOut Call in EDD : patron - {} , institution - {}",itemRequestInfo.getPatronBarcode(),itemRequestInfo.getItemOwningInstitution());
+                        ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+                        if (itemCheckoutResponse.isSuccess()) {
+                            itemResponseInformation.setEddSuccessResponseScreenMsg(itemCheckoutResponse.getScreenMessage());
+                        } else {
+                            itemResponseInformation.setEddFailureResponseScreenMsg(itemCheckoutResponse.getScreenMessage());
+                        }
                     }
                     itemResponseInformation.setPatronBarcode(requestInfoPatronBarcode);
                 }

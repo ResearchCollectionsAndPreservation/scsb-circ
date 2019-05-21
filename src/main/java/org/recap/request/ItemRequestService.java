@@ -735,11 +735,11 @@ public class ItemRequestService {
         if (itemRequestInfo.isOwningInstitutionItem()) {
             itemResponseInformation = updateScsbAndGfa(itemRequestInfo, itemResponseInformation, itemEntity);
         } else { // Item does not belong to requesting Institute
-            String requestingPatron = itemRequestInfo.getPatronBarcode();
-            itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
-            itemRequestInfo.setPatronBarcode(requestingPatron);
             itemResponseInformation = updateScsbAndGfa(itemRequestInfo, itemResponseInformation, itemEntity);
+            logger.info("GFA Response for Retrieval request : {}",itemResponseInformation.isSuccess());
             if(itemResponseInformation.isSuccess()){
+                itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                logger.info("Performing CheckOut using the generic patron : {}",itemRequestInfo.getPatronBarcode());
                 requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
             }
         }

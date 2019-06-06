@@ -129,7 +129,7 @@ public final class ReCAPConstants {
     public static final String REQUEST_ITEM_PUL_RECALL_TOPIC = "RequestItem-pulRecallTopic";
     public static final String REQUEST_ITEM_PUL_BORROW_DIRECT_TOPIC = "RequestItem-pulBorrowDirectTopic";
 
-    public static final String REQUEST_ITEM_CUL_REQUEST_TOPIC = "RequestItem-pulRequestTopic";
+    public static final String REQUEST_ITEM_CUL_REQUEST_TOPIC = "RequestItem-culRequestTopic";
     public static final String REQUEST_ITEM_CUL_EDD_TOPIC = "RequestItem-pulEDDTopic";
     public static final String REQUEST_ITEM_CUL_RECALL_TOPIC = "RequestItem-pulRecallTopic";
     public static final String REQUEST_ITEM_CUL_BORROW_DIRECT_TOPIC = "RequestItem-pulBorrowDirectTopic";

@@ -481,7 +481,7 @@ public class ItemRequestService {
         }
         itemRequestInfo.setRequestNotes(requestItemEntity.getNotes());
         itemRequestInfo.setRequestId(requestItemEntity.getRequestId());
-        itemRequestInfo.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+        itemRequestInfo.setRequestType(ReCAPConstants.RETRIEVAL);
         itemRequestInfo.setUsername(requestItemEntity.getCreatedBy());
         itemRequestInfo.setDeliveryLocation(requestItemEntity.getStopCode());
         itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());

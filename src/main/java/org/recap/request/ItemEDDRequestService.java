@@ -165,7 +165,12 @@ public class ItemEDDRequestService {
                         getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PENDING);
                     }
                     itemResponseInformation.setItemId(itemEntity.getItemId());
-
+                    if(itemRequestInfo.isOwningInstitutionItem()){
+                        itemRequestInfo.setPatronBarcode(getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                    }
+                    else {
+                        itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                    }
 
                     itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
                     if (itemResponseInformation.isRequestTypeForScheduledOnWO()) {
@@ -177,12 +182,7 @@ public class ItemEDDRequestService {
                         getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
                     }
                     else {
-                        if(itemRequestInfo.isOwningInstitutionItem()){
-                            itemRequestInfo.setPatronBarcode(getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
-                        }
-                        else {
-                            itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
-                        }
+
                         logger.info("Patron and Institution info before CheckOut Call in EDD : patron - {} , institution - {}",itemRequestInfo.getPatronBarcode(),itemRequestInfo.getItemOwningInstitution());
                         ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                         if (itemCheckoutResponse.isSuccess()) {

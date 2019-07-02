@@ -269,29 +269,34 @@ public class ItemRequestService {
         ItemInformationResponse itemResponseInformation = new ItemInformationResponse();
         try {
             itemEntities = itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes());
+            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemRequestInfo.getItemBarcodes().get(0), ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
+            if (requestItemEntity != null) {
+                if (itemEntities != null && !itemEntities.isEmpty()) {
+                    itemEntity = itemEntities.get(0);
+                    SearchResultRow searchResultRow = searchRecords(itemEntity); //Solr
 
-            if (itemEntities != null && !itemEntities.isEmpty()) {
-                itemEntity = itemEntities.get(0);
-                SearchResultRow searchResultRow = searchRecords(itemEntity); //Solr
+                    itemRequestInfo.setTitleIdentifier(getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, searchResultRow));
+                    itemRequestInfo.setAuthor(searchResultRow.getAuthor());
+                    itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
+                    itemRequestInfo.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+                    itemRequestInfo.setPickupLocation(getPickupLocation(itemRequestInfo.getDeliveryLocation()));
+                    itemResponseInformation.setItemId(itemEntity.getItemId());
+                    Integer requestId = updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PROCESSING);
+                    itemRequestInfo.setRequestId(requestId);
+                    itemResponseInformation.setRequestId(requestId);
 
-                itemRequestInfo.setTitleIdentifier(getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, searchResultRow));
-                itemRequestInfo.setAuthor(searchResultRow.getAuthor());
-                itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
-                itemRequestInfo.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
-                itemRequestInfo.setPickupLocation(getPickupLocation(itemRequestInfo.getDeliveryLocation()));
-                itemResponseInformation.setItemId(itemEntity.getItemId());
-                Integer requestId = updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PROCESSING);
-                itemRequestInfo.setRequestId(requestId);
-                itemResponseInformation.setRequestId(requestId);
-
-                if (requestId == 0) {
-                    itemResponseInformation.setScreenMessage(ReCAPConstants.REQUEST_EXCEPTION + ReCAPConstants.INTERNAL_ERROR_DURING_REQUEST);
-                    itemResponseInformation.setSuccess(false);
+                    if (requestId == 0) {
+                        itemResponseInformation.setScreenMessage(ReCAPConstants.REQUEST_EXCEPTION + ReCAPConstants.INTERNAL_ERROR_DURING_REQUEST);
+                        itemResponseInformation.setSuccess(false);
+                    } else {
+                        itemResponseInformation = checkOwningInstitutionRecall(itemRequestInfo, itemResponseInformation, itemEntity);
+                    }
                 } else {
-                    itemResponseInformation = checkOwningInstitutionRecall(itemRequestInfo, itemResponseInformation, itemEntity);
+                    itemResponseInformation.setScreenMessage(ReCAPConstants.REQUEST_SCSB_EXCEPTION + ReCAPConstants.WRONG_ITEM_BARCODE);
+                    itemResponseInformation.setSuccess(false);
                 }
             } else {
-                itemResponseInformation.setScreenMessage(ReCAPConstants.REQUEST_SCSB_EXCEPTION + ReCAPConstants.WRONG_ITEM_BARCODE);
+                itemResponseInformation.setScreenMessage(ReCAPConstants.REQUEST_SCSB_EXCEPTION + ReCAPConstants.CANNOT_REFILE_FIRST_SCAN_REQUEST);
                 itemResponseInformation.setSuccess(false);
             }
             logger.info(ReCAPConstants.FINISH_PROCESSING);

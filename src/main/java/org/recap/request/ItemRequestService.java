@@ -482,11 +482,14 @@ public class ItemRequestService {
             itemRequestInfo.setTitleIdentifier(removeDiacritical(searchResultRow.getTitle().replaceAll("[^\\x00-\\x7F]", "?")));
             itemRequestInfo.setItemAuthor(removeDiacritical(searchResultRow.getAuthor()));
             itemRequestInfo.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
+            itemRequestInfo.setRequestType(ReCAPConstants.EDD_REQUEST);
             setEddInformation(itemRequestInfo, eddNotesMap);
+        }
+        else {
+            itemRequestInfo.setRequestType(ReCAPConstants.RETRIEVAL);
         }
         itemRequestInfo.setRequestNotes(requestItemEntity.getNotes());
         itemRequestInfo.setRequestId(requestItemEntity.getRequestId());
-        itemRequestInfo.setRequestType(ReCAPConstants.RETRIEVAL);
         itemRequestInfo.setUsername(requestItemEntity.getCreatedBy());
         itemRequestInfo.setDeliveryLocation(requestItemEntity.getStopCode());
         itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());

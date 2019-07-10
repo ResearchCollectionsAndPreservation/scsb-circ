@@ -483,6 +483,12 @@ public class ItemRequestService {
             itemRequestInfo.setItemAuthor(removeDiacritical(searchResultRow.getAuthor()));
             itemRequestInfo.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
             itemRequestInfo.setRequestType(ReCAPConstants.EDD_REQUEST);
+            if(itemRequestInfo.isOwningInstitutionItem()) {
+                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+            }
+            else {
+                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+            }
             setEddInformation(itemRequestInfo, eddNotesMap);
         }
         else {

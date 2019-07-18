@@ -230,7 +230,7 @@ public class ItemEDDRequestService {
     private String getNotes(ItemRequestInformation itemRequestInfo) {
         String notes = "";
         if (!StringUtils.isBlank(itemRequestInfo.getRequestNotes())) {
-            notes = String.format("User: %s", itemRequestInfo.getRequestNotes());
+            notes = String.format("User: %s", itemRequestInfo.getRequestNotes().replace("\n"," "));
         }
         notes += String.format("\n\nStart Page: %s \nEnd Page: %s \nVolume Number: %s \nIssue: %s \nArticle Author: %s \nArticle/Chapter Title: %s ", itemRequestInfo.getStartPage(), itemRequestInfo.getEndPage(), itemRequestInfo.getVolume(), itemRequestInfo.getIssue(), itemRequestInfo.getAuthor(), itemRequestInfo.getChapterTitle());
         return notes;

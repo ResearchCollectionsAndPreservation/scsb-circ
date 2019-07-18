@@ -471,7 +471,7 @@ public class ItemRequestService {
             String[] eddInformation = notes.split("\n");
             HashMap<String,String> eddNotesMap=new HashMap<String, String>();
             for (String eddInfo : eddInformation) {
-                String[] eddInfoInPairs = eddInfo.split(":");
+                String[] eddInfoInPairs = eddInfo.split(":",2);
                 if(!(eddInfoInPairs[0].isEmpty()))
                 eddNotesMap.put(eddInfoInPairs[0],eddInfoInPairs[1]);
             }

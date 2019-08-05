@@ -153,6 +153,14 @@ public class EmailRouteBuilder {
                                     .setHeader("to", simple(requestPendingTo))
                                     .log("Email for request pending")
                                     .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                .when(header(ReCAPConstants.EMAIL_BODY_FOR).isEqualTo(ReCAPConstants.EMAIL_HEADER_REQUEST_STATUS_PENDING))
+                                    .setHeader("subject",simple("${header.emailPayLoad.subject}"))
+                                    .setBody(simple("${header.emailPayLoad.messageDisplay}"))
+                                    .setHeader("from", simple(from))
+                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
+                                    .setHeader("cc", simple("${header.emailPayLoad.cc}"))
+                                    .log("Email for pending Request status")
+                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
                                  .when(header(ReCAPConstants.EMAIL_BODY_FOR).isEqualTo(ReCAPConstants.BULK_REQUEST_EMAIL_QUEUE))
                                     .setHeader("subject", simple("${header.emailPayLoad.subject}"))
                                     .setBody(simple(emailBodyForBulkRequestProcess))
@@ -310,5 +318,4 @@ public class EmailRouteBuilder {
             logger.error(ReCAPConstants.REQUEST_EXCEPTION,e);
         }
     }
-
 }

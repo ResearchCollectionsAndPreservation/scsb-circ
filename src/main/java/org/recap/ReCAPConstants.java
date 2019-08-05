@@ -276,6 +276,8 @@ public final class ReCAPConstants {
     public static final String GFA_STATUS_VER_ON_RET_WORK_ORDER = "VER ON RET WO:";
     public static final String GFA_STATUS_VER_ON_WORK_ORDER = "VER ON WO:";
     public static final String CANNOT_REFILE_FIRST_SCAN_REQUEST ="Cannot place recall for requests placed on first scan LAS status";
+     public static final String REQUESTS_STUCK_IN__PENDING = "Requests stuck in pending";
+    public static final String NO_PENDING_REQUESTS_FOUND = "There are no pending requests or no new pending request";
 
     protected static final List<String> GFA_STATUS_AVAILABLE_LIST = Arrays.asList(GFA_STATUS_INCOMING_ON_WORK_ORDER, GFA_STATUS_REACC_ON_WORK_ORDER, GFA_STATUS_VER_ON_REFILE_WORK_ORDER, GFA_STATUS_IN);
     protected static final List<String> GFA_STATUS_NOT_AVAILABLE_LIST = Arrays.asList(GFA_STATUS_SCH_ON_REFILE_WORK_ORDER, GFA_STATUS_NOT_ON_FILE, GFA_STATUS_OUT_ON_RETRIVAL_WORK_ORDER, GFA_STATUS_PW_INDIRECT_WORK_ORDER, GFA_STATUS_PW_DIRECT_WORK_ORDER,
@@ -561,6 +563,8 @@ public final class ReCAPConstants {
     public static final String REQUEST_REPLACE_BY_TYPE_NOT_SELECTED = "Provide one of the values to \"replaceRequestByType\" :  RequestStatus, RequestIds, RangeOfRequestIds, RangeOfRequestDates";
     public static final String REQUEST_MESSAGE_RECEVIED = "Message received, your request will be processed";
     public static final String DEACCESSION = "Deaccession";
+
+    public static final String EMAIL_HEADER_REQUEST_STATUS_PENDING = "Requests in pending status";
 
     /**
      * 0 = Initialise Polling Processess

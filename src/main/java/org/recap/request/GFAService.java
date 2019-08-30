@@ -919,7 +919,16 @@ public class GFAService {
             GFARetrieveItemRequest gfaRetrieveItemRequest = buildGFARetrieveItemRequest(requestItemEntity);
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(gfaRetrieveItemRequest);
-            getProducer().sendBodyAndHeader(ReCAPConstants.SCSB_OUTGOING_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+            String itemStatus=itemRequestService.callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
+            if(ReCAPConstants.getGFAStatusAvailableList().contains(itemStatus)) {
+                getProducer().sendBodyAndHeader(ReCAPConstants.SCSB_OUTGOING_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+            }
+            else {
+                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+                requestItemEntity.setRequestStatusEntity(requestStatusEntity);
+                requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                requestItemDetailsRepository.save(requestItemEntity);
+            }
         } catch (Exception exception) {
             logger.error(ReCAPConstants.REQUEST_EXCEPTION, exception);
             return ReCAPConstants.FAILURE + ":" + exception.getMessage();
@@ -937,7 +946,16 @@ public class GFAService {
             GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = buildGFAEddItemRequest(requestItemEntity);
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(gfaRetrieveEDDItemRequest);
-            getProducer().sendBodyAndHeader(ReCAPConstants.SCSB_OUTGOING_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+            String itemStatus=itemRequestService.callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
+            if(ReCAPConstants.getGFAStatusAvailableList().contains(itemStatus)) {
+                getProducer().sendBodyAndHeader(ReCAPConstants.SCSB_OUTGOING_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+            }
+            else {
+                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+                requestItemEntity.setRequestStatusEntity(requestStatusEntity);
+                requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                requestItemDetailsRepository.save(requestItemEntity);
+            }
         } catch (Exception exception) {
             logger.error(ReCAPConstants.REQUEST_EXCEPTION, exception);
             return ReCAPConstants.FAILURE + ":" + exception.getMessage();

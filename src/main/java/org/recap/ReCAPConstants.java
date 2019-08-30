@@ -563,7 +563,8 @@ public final class ReCAPConstants {
     public static final String REQUEST_REPLACE_BY_TYPE_NOT_SELECTED = "Provide one of the values to \"replaceRequestByType\" :  RequestStatus, RequestIds, RangeOfRequestIds, RangeOfRequestDates";
     public static final String REQUEST_MESSAGE_RECEVIED = "Message received, your request will be processed";
     public static final String DEACCESSION = "Deaccession";
-
+    
+    public static final String EMAIL_HEADER_REQUEST_STATUS_PENDING = "Requests in pending status";
     public static final String EMAIL_SUBJECT_FOR_PENDING_STATUS = "Requests stuck in PENDING status";
     public static final String EMAIL_SUBJECT_FOR_LAS_PENDING_STATUS = "Requests in LAS ITEM STATUS PENDING status";
     public static final String EMAIL_SUBJECT_FOR_PENDING_AND_LAS_STATUS = "Requests in PENDING and LAS ITEM STATUS PENDING status";

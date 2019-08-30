@@ -22,11 +22,9 @@ public class IdentifyPendingRequestsController {
     public String identifyAndNotifyPendingRequests(){
         boolean identifyPendingRequest = pendingRequestService.identifyPendingRequest();
         if(identifyPendingRequest) {
-            logger.info("Identified pending requests and sent an email");
             return ReCAPConstants.SUCCESS;
         }
         else {
-            logger.info(ReCAPConstants.NO_PENDING_REQUESTS_FOUND);
             return ReCAPConstants.NO_PENDING_REQUESTS_FOUND;
         }
     }

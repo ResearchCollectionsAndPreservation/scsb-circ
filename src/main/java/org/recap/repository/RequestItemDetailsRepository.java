@@ -122,4 +122,8 @@ public interface RequestItemDetailsRepository extends JpaRepository<RequestItemE
 
     @Query(value = "select request from RequestItemEntity request inner join request.itemEntity item where item.barcode in :itemBarcodes")
     List<RequestItemEntity> findByItemBarcodes(@Param("itemBarcodes")List<String> itemBarcodes);
+
+
+    @Query(value =  "SELECT request FROM RequestItemEntity as request inner join request.requestStatusEntity as rse WHERE rse.requestStatusCode in :pendingLASStatusList AND request.requestId not in (select requestId from PendingRequestEntity)")
+    List<RequestItemEntity> findPendingAndLASReqNotNotified(@Param("pendingLASStatusList")List<String> pendingLASStatusList);
 }

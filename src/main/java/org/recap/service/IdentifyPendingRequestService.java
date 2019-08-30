@@ -18,11 +18,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
+
 
 @Service
 public class IdentifyPendingRequestService {
@@ -47,85 +44,94 @@ public class IdentifyPendingRequestService {
     private String pendingRequestEmailCc;
 
     public boolean identifyPendingRequest(){
-        EmailPayLoad emailPayLoad = new EmailPayLoad();
-        List<RequestItemEntity> requestItemEntitiesInPending=new ArrayList<>();
-        List<PendingRequestEntity> pendingRequestEntities=new ArrayList<>();
-        List<RequestItemEntity> requestsToBeNotified;
-        List<Integer> requestIds;
-        List<Integer> notifiedRequestIds;
-        List<RequestItemEntity> requestItemEntitiesInPendingList = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(ReCAPConstants.REQUEST_STATUS_PENDING));
-        if(!requestItemEntitiesInPendingList.isEmpty()) {
-            requestIds = requestItemEntitiesInPendingList.stream().map(RequestItemEntity::getRequestId).collect(Collectors.toList());
-            List<PendingRequestEntity> notifiedPendingRequests = pendingRequestDetailsRespository.findByRequestIds(requestIds);
-            notifiedRequestIds = notifiedPendingRequests.stream().map(PendingRequestEntity::getRequestId).collect(Collectors.toList());
-            requestIds.removeAll(notifiedRequestIds);
-            if(!requestIds.isEmpty()) {
-                requestsToBeNotified = requestItemDetailsRepository.findByRequestIdIn(requestIds);
-                if (requestsToBeNotified != null) {
-                    findRequestStuckAbove5mins(requestItemEntitiesInPending, requestsToBeNotified);
-                    for (RequestItemEntity requestItemEntity : requestItemEntitiesInPending) {
-                        PendingRequestEntity pendingRequestEntity = setPendingRequestEntity(requestItemEntity);
-                        pendingRequestEntities.add(pendingRequestEntity);
-                    }
-                    List<PendingRequestEntity> savedPendingRequestEntities = pendingRequestDetailsRespository.save(pendingRequestEntities);
-                    if (savedPendingRequestEntities != null && !savedPendingRequestEntities.isEmpty()) {
-                        String message = setEmailBodyForPendingRequest(savedPendingRequestEntities);
-                        sendEmailNotificationForPendingRequests(emailPayLoad, message);
-                        return true;
-                    }
+        List<RequestItemEntity> requestItemEntitiesInPendingList = new ArrayList<>();
+        List<RequestItemEntity> requestItemEntitiesInLASList = new ArrayList<>();
+        List<PendingRequestEntity> pendingRequestEntityList = new ArrayList<>();
+        List<RequestItemEntity> requestItemEntitiesInPendingLASList = requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(ReCAPConstants.REQUEST_STATUS_PENDING,ReCAPConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
+        requestItemEntitiesInPendingLASList.forEach(requestItemEntity -> {
+            if(requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(ReCAPConstants.REQUEST_STATUS_PENDING)){
+                if(isRequestExceedsfiveMins(requestItemEntity)){
+                    requestItemEntitiesInPendingList.add(requestItemEntity);
+                    pendingRequestEntityList.add(getPendingRequestEntityFromRequestEntity(requestItemEntity));
                 }
+            }else {
+                requestItemEntitiesInLASList.add(requestItemEntity);
+                pendingRequestEntityList.add(getPendingRequestEntityFromRequestEntity(requestItemEntity));
             }
+        });
+        if(!pendingRequestEntityList.isEmpty()) {
+            logger.info("Identified requests stuck in PENDING/LAS");
+            saveRequestPendingLASEntity(pendingRequestEntityList);
+            sendEmailAndSaveList(requestItemEntitiesInPendingList, requestItemEntitiesInLASList);
+            return true;
         }
         return false;
     }
 
-    private void findRequestStuckAbove5mins(List<RequestItemEntity> requestItemEntitiesInPending, List<RequestItemEntity> requestsToBeNotified) {
-        for (RequestItemEntity requestItemEntity : requestsToBeNotified) {
-            Date createdDate = requestItemEntity.getCreatedDate();
-            long minutes = getDifferenceInMinutes(createdDate);
-            if (minutes > 5) {
-                requestItemEntitiesInPending.add(requestItemEntity);
-            }
+    private PendingRequestEntity getPendingRequestEntityFromRequestEntity(RequestItemEntity requestItemEntity){
+        PendingRequestEntity pendingRequestEntity = new PendingRequestEntity();
+        pendingRequestEntity.setRequestId(requestItemEntity.getRequestId());
+        pendingRequestEntity.setItemId(requestItemEntity.getItemId());
+        pendingRequestEntity.setRequestItemEntity(requestItemEntity);
+        pendingRequestEntity.setRequestCreatedDate(new Date());
+        pendingRequestEntity.setItemEntity(requestItemEntity.getItemEntity());
+        return pendingRequestEntity;
+    }
+
+    private boolean isRequestExceedsfiveMins(RequestItemEntity requestItemEntity){
+        long minutes = getDifferenceInMinutes(requestItemEntity.getCreatedDate());
+        if (minutes > 5) {
+            return true;
+        }
+        return false;
+    }
+
+    private void sendEmailAndSaveList(List<RequestItemEntity> requestItemEntitiesInPendingList, List<RequestItemEntity> requestItemEntitiesInLASList){
+        String emailBody = getEmailBodyForPendinglasRequest(requestItemEntitiesInPendingList,requestItemEntitiesInLASList);
+        EmailPayLoad emailPayLoad = new EmailPayLoad();
+        if(!requestItemEntitiesInPendingList.isEmpty() && !requestItemEntitiesInLASList.isEmpty()){
+            sendEmailNotificationForPendingRequests(emailPayLoad,emailBody,ReCAPConstants.EMAIL_SUBJECT_FOR_PENDING_AND_LAS_STATUS);
+        } else if(!requestItemEntitiesInPendingList.isEmpty() && requestItemEntitiesInLASList.isEmpty()){
+            sendEmailNotificationForPendingRequests(emailPayLoad,emailBody,ReCAPConstants.EMAIL_SUBJECT_FOR_PENDING_STATUS);
+        } else if(requestItemEntitiesInPendingList.isEmpty() && !requestItemEntitiesInLASList.isEmpty()){
+            sendEmailNotificationForPendingRequests(emailPayLoad,emailBody,ReCAPConstants.EMAIL_SUBJECT_FOR_LAS_PENDING_STATUS);
         }
     }
 
-    private String setEmailBodyForPendingRequest(List<PendingRequestEntity> savedPendingRequestEntities) {
-        String message=null;
+    private void saveRequestPendingLASEntity(List<PendingRequestEntity> pendingRequestEntityList){
+        pendingRequestDetailsRespository.save(pendingRequestEntityList);
+    }
+
+    private String getEmailBodyForPendinglasRequest(List<RequestItemEntity> pendingRequestEntities , List<RequestItemEntity> lasRequestEntities) {
         StringBuilder stringBuilder=new StringBuilder();
-        for (PendingRequestEntity savedPendingRequestEntity : savedPendingRequestEntities) {
-            if((message ==null)){
-                stringBuilder.append("Below are the requests stuck in pending.")
-                        .append("\nBarcode : ").append(savedPendingRequestEntity.getItemEntity().getBarcode())
-                        .append("\t\t Request Created Date : ").append(savedPendingRequestEntity.getRequestItemEntity().getCreatedDate())
-                        .append( "\t\t Request Type :").append(savedPendingRequestEntity.getRequestItemEntity().getRequestTypeEntity().getRequestTypeCode());
-                message= String.valueOf(stringBuilder);
-            }
-            else {
-                stringBuilder.append("\nBarcode : ").append(savedPendingRequestEntity.getItemEntity().getBarcode())
-                        .append("\t\t Request Created Date : ").append(savedPendingRequestEntity.getRequestItemEntity().getCreatedDate())
-                        .append( "\t\t Request Type :").append(savedPendingRequestEntity.getRequestItemEntity().getRequestTypeEntity().getRequestTypeCode());
-                message=String.valueOf(stringBuilder);
-            }
+        if(!pendingRequestEntities.isEmpty()) {
+            stringBuilder.append("Below are the request in PENDING:");
+            pendingRequestEntities.forEach(pendingReq -> {
+                stringBuilder.append("\nBarcode : ").append(pendingReq.getItemEntity().getBarcode())
+                        .append("\t\t Request Created Date : ").append(pendingReq.getCreatedDate())
+                        .append("\t\t Request Type :").append(pendingReq.getRequestTypeEntity().getRequestTypeCode());
+            });
         }
-        return message;
+        if(!lasRequestEntities.isEmpty()) {
+            if(stringBuilder.length()>0){
+                stringBuilder.append("\n");
+            }
+            stringBuilder.append("Below are the request in LAS ITEM STATUS PENDING:");
+            lasRequestEntities.forEach(lasRequest -> {
+                stringBuilder.append("\nBarcode : ").append(lasRequest.getItemEntity().getBarcode())
+                        .append("\t\t Request Created Date : ").append(lasRequest.getCreatedDate())
+                        .append("\t\t Request Type :").append(lasRequest.getRequestTypeEntity().getRequestTypeCode());
+            });
+        }
+        return stringBuilder.toString();
     }
 
-    private void sendEmailNotificationForPendingRequests(EmailPayLoad emailPayLoad, String message) {
-        emailPayLoad.setSubject(ReCAPConstants.REQUESTS_STUCK_IN__PENDING);
+    private void sendEmailNotificationForPendingRequests(EmailPayLoad emailPayLoad, String message, String subject) {
+        emailPayLoad.setSubject(subject);
         emailPayLoad.setMessageDisplay(message);
         emailPayLoad.setTo(pendingRequestEmailTo);
         emailPayLoad.setCc(pendingRequestEmailCc);
-        producerTemplate.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad, ReCAPConstants.EMAIL_BODY_FOR, ReCAPConstants.EMAIL_HEADER_REQUEST_STATUS_PENDING);
-    }
-
-    private PendingRequestEntity setPendingRequestEntity(RequestItemEntity pendingStatusRequestEntity) {
-        PendingRequestEntity pendingRequestEntity = new PendingRequestEntity();
-        pendingRequestEntity.setItemId(pendingStatusRequestEntity.getItemEntity().getItemId());
-        pendingRequestEntity.setRequestId(pendingStatusRequestEntity.getRequestId());
-        pendingRequestEntity.setItemEntity(pendingStatusRequestEntity.getItemEntity());
-        pendingRequestEntity.setRequestCreatedDate(new Date());
-        pendingRequestEntity.setRequestItemEntity(pendingStatusRequestEntity);
-        return pendingRequestEntity;
+        producerTemplate.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad, ReCAPConstants.EMAIL_BODY_FOR, ReCAPConstants.EMAIL_SUBJECT_FOR_PENDING_STATUS);
     }
 
     private long getDifferenceInMinutes(Date createdDate) {

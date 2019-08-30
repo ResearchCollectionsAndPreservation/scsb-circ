@@ -131,7 +131,7 @@ public class IdentifyPendingRequestService {
         emailPayLoad.setMessageDisplay(message);
         emailPayLoad.setTo(pendingRequestEmailTo);
         emailPayLoad.setCc(pendingRequestEmailCc);
-        producerTemplate.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad, ReCAPConstants.EMAIL_BODY_FOR, ReCAPConstants.EMAIL_SUBJECT_FOR_PENDING_STATUS);
+        producerTemplate.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad, ReCAPConstants.EMAIL_BODY_FOR, ReCAPConstants.EMAIL_HEADER_REQUEST_STATUS_PENDING);
     }
 
     private long getDifferenceInMinutes(Date createdDate) {

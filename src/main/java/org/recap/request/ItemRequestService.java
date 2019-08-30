@@ -530,7 +530,7 @@ public class ItemRequestService {
         }
     }
 
-    private String callGfaItemStatusForRefile(String itemBarcode) {
+    public String callGfaItemStatusForRefile(String itemBarcode) {
         String gfaItemStatusValue = null;
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
         GFAItemStatus gfaItemStatus = new GFAItemStatus();
@@ -1314,7 +1314,16 @@ public class ItemRequestService {
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(itemRequestInformation);
-            producerTemplate.sendBodyAndHeader(ReCAPConstants.REQUEST_ITEM_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+            String itemStatus=callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
+            if(ReCAPConstants.getGFAStatusAvailableList().contains(itemStatus)) {
+                producerTemplate.sendBodyAndHeader(ReCAPConstants.REQUEST_ITEM_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+            }
+            else {
+                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+                requestItemEntity.setRequestStatusEntity(requestStatusEntity);
+                requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                requestItemDetailsRepository.save(requestItemEntity);
+            }
         } catch (Exception exception) {
             logger.error(ReCAPConstants.REQUEST_EXCEPTION, exception);
             return ReCAPConstants.FAILURE + ":" + exception.getMessage();
@@ -1353,7 +1362,16 @@ public class ItemRequestService {
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(itemRequestInformation);
-            producerTemplate.sendBodyAndHeader(ReCAPConstants.REQUEST_ITEM_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+            String itemStatus=callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
+            if(ReCAPConstants.getGFAStatusAvailableList().contains(itemStatus)) {
+                producerTemplate.sendBodyAndHeader(ReCAPConstants.REQUEST_ITEM_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+            }
+            else {
+                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+                requestItemEntity.setRequestStatusEntity(requestStatusEntity);
+                requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                requestItemDetailsRepository.save(requestItemEntity);
+            }
         } catch (Exception exception) {
             logger.error(ReCAPConstants.REQUEST_EXCEPTION, exception);
             return ReCAPConstants.FAILURE + ":" + exception.getMessage();

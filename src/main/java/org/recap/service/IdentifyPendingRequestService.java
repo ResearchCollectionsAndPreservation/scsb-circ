@@ -114,7 +114,7 @@ public class IdentifyPendingRequestService {
         }
         if(!lasRequestEntities.isEmpty()) {
             if(stringBuilder.length()>0){
-                stringBuilder.append("\n");
+                stringBuilder.append("\n\n");
             }
             stringBuilder.append("Below are the request in LAS ITEM STATUS PENDING:");
             lasRequestEntities.forEach(lasRequest -> {

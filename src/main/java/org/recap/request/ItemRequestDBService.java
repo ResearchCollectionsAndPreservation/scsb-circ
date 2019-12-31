@@ -101,7 +101,7 @@ public class ItemRequestDBService {
                 }
                 requestItemEntity.setNotes(itemRequestInformation.getRequestNotes());
             }
-            savedItemRequest = requestItemDetailsRepository.save(requestItemEntity);
+            savedItemRequest = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
             if (savedItemRequest != null) {
                 requestId = savedItemRequest.getRequestId();
                 saveItemChangeLogEntity(savedItemRequest.getRequestId(), getUser(itemRequestInformation.getUsername()), ReCAPConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());

@@ -55,6 +55,12 @@ public class BulkItemRequestProcessService {
     public void processBulkRequestItem(String itemBarcode, Integer bulkRequestId) {
         BulkRequestItemEntity bulkRequestItemEntity = bulkRequestItemDetailsRepository.findOne(bulkRequestId);
         if (ReCAPConstants.COMPLETE.equals(itemBarcode)) {
+            try {
+                this.wait(10000);
+            }
+            catch (InterruptedException e){
+                logger.info("Interrupted Exception");
+            }
             bulkRequestItemEntity = bulkRequestItemDetailsRepository.findOne(bulkRequestId);
             bulkRequestItemEntity.setBulkRequestStatus(ReCAPConstants.PROCESSED);
             bulkRequestItemEntity.setLastUpdatedDate(new Date());

@@ -56,7 +56,7 @@ public class BulkItemRequestProcessService {
         BulkRequestItemEntity bulkRequestItemEntity = bulkRequestItemDetailsRepository.findOne(bulkRequestId);
         if (ReCAPConstants.COMPLETE.equals(itemBarcode)) {
             try {
-                this.wait(10000);
+                Thread.sleep(5000);
             }
             catch (InterruptedException e){
                 logger.info("Interrupted Exception");

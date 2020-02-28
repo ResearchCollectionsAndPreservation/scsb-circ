@@ -170,7 +170,6 @@ public class ItemRequestDBService {
                 requestItemEntity.setNotes(itemInformationResponse.getRequestNotes());
             }
             savedItemRequest = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
-            logger.info("Saveditemrequest for bulk request" + savedItemRequest);
             if (savedItemRequest != null) {
                 requestId = savedItemRequest.getRequestId();
                 saveItemChangeLogEntity(savedItemRequest.getRequestId(), getUser(itemInformationResponse.getUsername()), ReCAPConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());

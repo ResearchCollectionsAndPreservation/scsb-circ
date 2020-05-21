@@ -393,7 +393,7 @@ public class SubmitCollectionDAOService {
         logger.info("updatedBibliographicEntityList size--->{}",updatedBibliographicEntityList.size());
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        repositoryService.getBibliographicDetailsRepository().save(updatedBibliographicEntityList);
+        repositoryService.getBibliographicDetailsRepository().saveAll(updatedBibliographicEntityList);
         repositoryService.getBibliographicDetailsRepository().flush();
         stopWatch.stop();
         logger.info("Time taken to save {} bib size---->{} sec",updatedBibliographicEntityList.size(),stopWatch.getTotalTimeSeconds());
@@ -402,11 +402,11 @@ public class SubmitCollectionDAOService {
     private void saveItemChangeLogEntityList(List<ItemChangeLogEntity> itemChangeLogEntityList){
         StopWatch itemChangeLogStopWatch = new StopWatch();
         itemChangeLogStopWatch.start();
-        repositoryService.getItemChangeLogDetailsRepository().save(itemChangeLogEntityList);
+        repositoryService.getItemChangeLogDetailsRepository().saveAll(itemChangeLogEntityList);
         repositoryService.getItemChangeLogDetailsRepository().flush();
         itemChangeLogStopWatch.stop();
         logger.info("Time taken to save item change log--->{}",itemChangeLogStopWatch.getTotalTimeSeconds());
-        repositoryService.getItemChangeLogDetailsRepository().save(itemChangeLogEntityList);
+        repositoryService.getItemChangeLogDetailsRepository().saveAll(itemChangeLogEntityList);
     }
 
     /**
@@ -1029,7 +1029,7 @@ public class SubmitCollectionDAOService {
             itemChangeLogEntity.setNotes(message);
             itemChangeLogEntityList.add(itemChangeLogEntity);
         }
-        repositoryService.getItemChangeLogDetailsRepository().save(itemChangeLogEntityList);
+        repositoryService.getItemChangeLogDetailsRepository().saveAll(itemChangeLogEntityList);
     }
 
     private List<ItemChangeLogEntity> prepareItemChangeLogEntity(String operationType, String message, List<ItemEntity> itemEntityList) {

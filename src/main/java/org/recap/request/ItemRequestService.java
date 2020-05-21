@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.DefaultFluentProducerTemplate;
+import org.apache.camel.impl.engine.DefaultFluentProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;

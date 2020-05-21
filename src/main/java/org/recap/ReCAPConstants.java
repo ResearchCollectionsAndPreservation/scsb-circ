@@ -400,7 +400,7 @@ public final class ReCAPConstants {
     //Daily Reconcilation
     public static final String DAILY_RR_FTP_ROUTE_ID = "DailyReconcilationFtpRoute";
     public static final String DAILY_RR_FS_ROUTE_ID = "DailyReconcilationFsRoute";
-    public static final String DAILY_RR_FTP_OPTIONS = "&move=.done&delay=2s&localWorkDirectory=";
+    public static final String DAILY_RR_FTP_OPTIONS = "&move=.done&delay=2&localWorkDirectory=";
     public static final String DAILY_RR_FS_OPTIONS = "?delete=true";
     public static final String DAILY_RR_FS_FILE = "file:";
     public static final String DAILY_RR_LAS = "LAS";
@@ -435,7 +435,7 @@ public final class ReCAPConstants {
 
     public static final String COMPLETE = "Complete";
 
-    public static final String ACCESSION_RR_FTP_OPTIONS = "&sendEmptyMessageWhenIdle=true&move=.done&delay=2s&localWorkDirectory=";
+    public static final String ACCESSION_RR_FTP_OPTIONS = "&sendEmptyMessageWhenIdle=true&move=.done&delay=2&localWorkDirectory=";
     public static final String ACCESSION_RECONCILATION_FTP_PUL_ROUTE = "accessionReconcilationFtpPulRoute";
     public static final String ACCESSION_RECONCILATION_FTP_CUL_ROUTE = "accessionReconcilationFtpCulRoute";
     public static final String ACCESSION_RECONCILATION_FTP_NYPL_ROUTE = "accessionReconcilationFtpNyplRoute";

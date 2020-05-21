@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by rajeshbabuk on 10/10/17.
@@ -53,7 +54,7 @@ public class BulkItemRequestProcessService {
      * @param bulkRequestId the bulk request id
      */
     public void processBulkRequestItem(String itemBarcode, Integer bulkRequestId) {
-        BulkRequestItemEntity bulkRequestItemEntity = bulkRequestItemDetailsRepository.findOne(bulkRequestId);
+        Optional<BulkRequestItemEntity> bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
         if (ReCAPConstants.COMPLETE.equals(itemBarcode)) {
             try {
                 Thread.sleep(5000);
@@ -61,10 +62,10 @@ public class BulkItemRequestProcessService {
             catch (InterruptedException e){
                 logger.info("Interrupted Exception");
             }
-            bulkRequestItemEntity = bulkRequestItemDetailsRepository.findOne(bulkRequestId);
-            bulkRequestItemEntity.setBulkRequestStatus(ReCAPConstants.PROCESSED);
-            bulkRequestItemEntity.setLastUpdatedDate(new Date());
-            BulkRequestItemEntity savedBulkRequestItemEntity = bulkRequestItemDetailsRepository.save(bulkRequestItemEntity);
+            bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
+            bulkRequestItemEntity.get().setBulkRequestStatus(ReCAPConstants.PROCESSED);
+            bulkRequestItemEntity.get().setLastUpdatedDate(new Date());
+            BulkRequestItemEntity savedBulkRequestItemEntity = bulkRequestItemDetailsRepository.save(bulkRequestItemEntity.get());
             List<RequestItemEntity> requestItemEntities = savedBulkRequestItemEntity.getRequestItemEntities();
             if (CollectionUtils.isNotEmpty(requestItemEntities)) {
                 List<BulkRequestItem> bulkRequestItems = new ArrayList<>();
@@ -87,7 +88,7 @@ public class BulkItemRequestProcessService {
             itemRequestServiceUtil.generateReportAndSendEmail(bulkRequestId);
             logger.info("Bulk request processing completed for bulk request id : {}", bulkRequestId);
         } else {
-            processBulkRequestForBarcode(itemBarcode, bulkRequestItemEntity);
+            processBulkRequestForBarcode(itemBarcode, bulkRequestItemEntity.get());
         }
     }
 

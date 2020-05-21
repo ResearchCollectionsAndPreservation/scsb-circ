@@ -12,7 +12,7 @@ import java.util.List;
 public class DeliveryRestrictionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="DELIVERY_RESTRICTION_CROSS_PARTNER_ID")
     private Integer deliveryRestrictionId;
 

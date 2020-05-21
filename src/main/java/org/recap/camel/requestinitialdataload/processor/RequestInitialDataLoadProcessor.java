@@ -101,15 +101,15 @@ public class RequestInitialDataLoadProcessor {
             try {
                 if(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL.equalsIgnoreCase(institutionCode)){
                     logger.info(ReCAPConstants.STARTING+ReCAPConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
-                    camelContext.startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
+                    camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
                 }
                 if(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL.equalsIgnoreCase(institutionCode)){
                     logger.info(ReCAPConstants.STARTING+ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
-                    camelContext.startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
+                    camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
                 }
                 if(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL.equalsIgnoreCase(institutionCode)){
                     logger.info(ReCAPConstants.STARTING+ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
-                    camelContext.startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
+                    camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR+e);

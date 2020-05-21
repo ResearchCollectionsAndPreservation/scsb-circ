@@ -112,15 +112,15 @@ public class AccessionReconciliationProcessor {
             try {
                 if(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL.equalsIgnoreCase(institutionCode)){
                     logger.info(ReCAPConstants.STARTING,ReCAPConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE);
-                    camelContext.startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE);
+                    camelContext.getRouteController().startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE);
                 }
                 if(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL.equalsIgnoreCase(institutionCode)){
                     logger.info(ReCAPConstants.STARTING,ReCAPConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE);
-                    camelContext.startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE);
+                    camelContext.getRouteController().startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE);
                 }
                 if(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL.equalsIgnoreCase(institutionCode)){
                     logger.info(ReCAPConstants.STARTING,ReCAPConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE);
-                    camelContext.startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE);
+                    camelContext.getRouteController().startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE);
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR+e);

@@ -45,7 +45,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
 
     @Test
     public void testRecallPatronValidation() {
-        Pageable pageable = new PageRequest(0, 1);
+        Pageable pageable = PageRequest.of(0, 1);
         Page<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByItemBarcode(pageable, "PULTST54333");
         if (requestItemEntities.iterator().hasNext()) {
             logger.info(requestItemEntities.iterator().next().getRequestTypeEntity().getRequestTypeDesc());

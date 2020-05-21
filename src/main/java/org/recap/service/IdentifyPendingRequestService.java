@@ -99,7 +99,7 @@ public class IdentifyPendingRequestService {
     }
 
     private void saveRequestPendingLASEntity(List<PendingRequestEntity> pendingRequestEntityList){
-        pendingRequestDetailsRespository.save(pendingRequestEntityList);
+        pendingRequestDetailsRespository.saveAll(pendingRequestEntityList);
     }
 
     private String getEmailBodyForPendinglasRequest(List<RequestItemEntity> pendingRequestEntities , List<RequestItemEntity> lasRequestEntities) {

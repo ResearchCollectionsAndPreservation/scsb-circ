@@ -1,7 +1,7 @@
 package org.recap.util;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.recap.ReCAPConstants;
 import org.recap.gfa.model.TtitemEDDResponse;
 import org.recap.model.BulkRequestItem;
@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by rajeshbabuk on 10/10/17.
@@ -100,8 +101,11 @@ public class ItemRequestServiceUtil {
      * @param bulkRequestId
      */
     public void generateReportAndSendEmail(Integer bulkRequestId) {
-        BulkRequestItemEntity bulkRequestItemEntity = bulkRequestItemDetailsRepository.findOne(bulkRequestId);
-        emailService.sendBulkRequestEmail(String.valueOf(bulkRequestItemEntity.getBulkRequestId()), bulkRequestItemEntity.getBulkRequestName(), bulkRequestItemEntity.getBulkRequestFileName(), bulkRequestItemEntity.getBulkRequestStatus(), new String(bulkRequestItemEntity.getBulkRequestFileData()), "Bulk Request Process Report");
+        Optional<BulkRequestItemEntity> bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
+        emailService.sendBulkRequestEmail(String.valueOf(bulkRequestItemEntity.get().getBulkRequestId()),
+                bulkRequestItemEntity.get().getBulkRequestName(), bulkRequestItemEntity.get().getBulkRequestFileName(),
+                bulkRequestItemEntity.get().getBulkRequestStatus(), new String(bulkRequestItemEntity.get().getBulkRequestFileData()),
+                "Bulk Request Process Report");
     }
 
     /**

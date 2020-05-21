@@ -485,7 +485,7 @@ public class DeAccessionService {
             itemChangeLogEntity.setNotes(itemIdAndMessageMap.get(itemId) + notes);
             itemChangeLogEntities.add(itemChangeLogEntity);
         }
-        deaccesionItemChangeLogDetailsRepository.save(itemChangeLogEntities);
+        deaccesionItemChangeLogDetailsRepository.saveAll(itemChangeLogEntities);
     }
 
     private int getHoldQueueLength(ItemInformationResponse itemInformationResponse) {
@@ -557,7 +557,7 @@ public class DeAccessionService {
                 }
             }
             if (!CollectionUtils.isEmpty(reportEntities)) {
-                reportDetailRepository.save(reportEntities);
+                reportDetailRepository.saveAll(reportEntities);
             }
         }
         return reportEntities;

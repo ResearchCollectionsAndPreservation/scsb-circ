@@ -67,9 +67,9 @@ public class DailyReconciliationRouteBuilder {
                             .log("daily reconciliation started")
                             .choice()
                             .when(gzipFile)
-                            .unmarshal()
-                            .gzip()
-                            .log("Unzip processed completed for daily reconciliation file")
+                            .unmarshal().
+                            gzipDeflater()
+                .log("Unzip processed completed for daily reconciliation file")
                             .process(new Processor() {
                                 @Override
                                 public void process(Exchange exchange) throws Exception {

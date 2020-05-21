@@ -35,7 +35,7 @@ public class SubmitCollectionJobController {
     public String startSubmitCollection() throws Exception{
 
 
-        camelContext.startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE);
+        camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE);
 
         Endpoint endpoint = camelContext.getEndpoint(ReCAPConstants.SUBMIT_COLLECTION_COMPLETION_QUEUE_TO);
         PollingConsumer consumer = endpoint.createPollingConsumer();

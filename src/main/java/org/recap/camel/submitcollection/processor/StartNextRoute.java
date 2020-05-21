@@ -4,9 +4,11 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-import org.apache.log4j.Logger;
+import org.apache.camel.support.EndpointHelper;
+import org.slf4j.Logger;
 import org.recap.ReCAPConstants;
 import org.recap.camel.EmailPayLoad;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -38,7 +40,7 @@ public class StartNextRoute implements Processor{
     private String emailToNYPL;
 
 
-    private static final Logger logger = Logger.getLogger(StartNextRoute.class);
+    private static final Logger logger = LoggerFactory.getLogger(StartNextRoute.class);
     private String routeId;
 
     public StartNextRoute(String routeId) {
@@ -53,19 +55,19 @@ public class StartNextRoute implements Processor{
     @Override
     public void process(Exchange exchange) throws Exception {
        if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE)){
-           camelContext.startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE);
+           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE);
        }
        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE)){
-           camelContext.startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE);
+           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE);
        }
        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE)){
-           camelContext.startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE);
+           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE);
        }
        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE)){
-           camelContext.startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE);
+           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE);
        }
        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE)){
-           camelContext.startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE);
+           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE);
        }
        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE)){
            logger.info("SubmitCollection Sequence completed");
@@ -77,8 +79,13 @@ public class StartNextRoute implements Processor{
      * @param exchange
      * @throws Exception
      */
+    /* TO DO Need to fix getEndpointConfiguration() and uncomment the code.
+    
+     */
     public void sendEmailForEmptyDirectory(Exchange exchange) throws Exception {
-        String ftpLocationPath = (String) exchange.getFromEndpoint().getEndpointConfiguration().getParameter("path");
+
+     //   String ftpLocationPath = (String) exchange.getFromEndpoint().getEndpointConfiguration().getParameter("path");
+        String ftpLocationPath = EndpointHelper.resolveParameter(camelContext, "path", exchange.getFromEndpoint().getClass()).getEndpointUri();
         if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE )){
             producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(ReCAPConstants.PRINCETON,ftpLocationPath), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
             logger.info("Email Sent");

@@ -11,7 +11,7 @@ import java.util.Date;
 public class DeletedRecordsEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "DELETED_RECORDS_ID")
     private Integer deletedRecordsId;
 

@@ -11,7 +11,7 @@ import java.util.Date;
 public class PendingRequestEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PENDING_ID")
     private Integer pendingId;
 

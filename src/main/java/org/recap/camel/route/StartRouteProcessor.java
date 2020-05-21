@@ -2,8 +2,10 @@ package org.recap.camel.route;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 import org.recap.ReCAPConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Scope("prototype")
 public class StartRouteProcessor implements Processor {
 
-    private static final Logger logger = Logger.getLogger(StartRouteProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(StartRouteProcessor.class);
     private String routeId;
 
     public StartRouteProcessor(String routeId) {
@@ -23,6 +25,6 @@ public class StartRouteProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        exchange.getContext().startRoute(routeId);
+        exchange.getContext().getRouteController().startRoute(routeId);
     }
 }

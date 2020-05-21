@@ -24,9 +24,10 @@ public class RequestDataLoadController {
     @RequestMapping(value = "/startRequestInitialLoad",method = RequestMethod.POST)
     public String startAccessionReconcilation() throws Exception{
         logger.info("Request Initial DataLoad Starting.....");
-        camelContext.startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL_FTP_ROUTE);
-        camelContext.startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FTP_ROUTE);
-        camelContext.startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL_FTP_ROUTE);
+        camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL_FTP_ROUTE);
+        camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FTP_ROUTE);
+        camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL_FTP_ROUTE);
+      //  camelContext.start();
         return ReCAPConstants.SUCCESS;
     }
 }

@@ -49,8 +49,8 @@ public class BulkItemRequestService {
      */
     public void bulkRequestItems(Integer bulkRequestId) {
         LinkedList<String> bulkRequestItemBarcodeList = new LinkedList<>();
-        BulkRequestItemEntity bulkRequestItemEntity = bulkRequestItemDetailsRepository.findOne(bulkRequestId);
-        String requestData = new String(bulkRequestItemEntity.getBulkRequestFileData());
+        Optional<BulkRequestItemEntity> bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
+        String requestData = new String(bulkRequestItemEntity.get().getBulkRequestFileData());
         new BufferedReader(new StringReader(requestData)).lines().forEach(barcodeRow -> bulkRequestItemBarcodeList.add(barcodeRow.split(",")[0]));
         bulkRequestItemBarcodeList.remove(0);
         Integer bulkRequestItemBarcodeCount = bulkRequestItemBarcodeList.size();
@@ -75,7 +75,7 @@ public class BulkItemRequestService {
                 ItemEntity itemEntity = itemEntities.get(0);
                 if (itemEntity.getItemStatusEntity().getStatusCode().equalsIgnoreCase(ReCAPConstants.NOT_AVAILABLE)) {
                     exceptionBulkRequestItems.add(buildBulkRequestItem(itemBarcode, itemEntity.getCustomerCode(), ReCAPConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM));
-                } else if (itemEntity.getOwningInstitutionId() != bulkRequestItemEntity.getRequestingInstitutionId()) {
+                } else if (itemEntity.getOwningInstitutionId() != bulkRequestItemEntity.get().getRequestingInstitutionId()) {
                     exceptionBulkRequestItems.add(buildBulkRequestItem(itemBarcode, itemEntity.getCustomerCode(), "Item doesn't belong to the requesting institution."));
                 } else {
                     producerTemplate.sendBodyAndHeader(ReCAPConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE, itemBarcode, ReCAPConstants.BULK_REQUEST_ID, bulkRequestId);
@@ -100,15 +100,15 @@ public class BulkItemRequestService {
      * @param bulkRequestId
      */
     private void updateStatusToBarcodes(List<BulkRequestItem> exceptionBulkRequestItems, Integer bulkRequestId) {
-        BulkRequestItemEntity bulkRequestItemEntity = bulkRequestItemDetailsRepository.findOne(bulkRequestId);
-        if (!ReCAPConstants.PROCESSED.equals(bulkRequestItemEntity.getBulkRequestStatus())) {
+       Optional<BulkRequestItemEntity> bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
+        if (!ReCAPConstants.PROCESSED.equals(bulkRequestItemEntity.get().getBulkRequestStatus())) {
             StringBuilder csvFormatDataBuilder = new StringBuilder();
             csvFormatDataBuilder.append("BARCODE,CUSTOMER CODE,REQUEST ID,REQUEST STATUS,STATUS");
             itemRequestServiceUtil.buildCsvFormatData(exceptionBulkRequestItems, csvFormatDataBuilder);
-            bulkRequestItemEntity.setBulkRequestFileData(csvFormatDataBuilder.toString().getBytes());
-            bulkRequestItemDetailsRepository.save(bulkRequestItemEntity);
+            bulkRequestItemEntity.get().setBulkRequestFileData(csvFormatDataBuilder.toString().getBytes());
+            bulkRequestItemDetailsRepository.save(bulkRequestItemEntity.get());
         } else {
-            itemRequestServiceUtil.updateStatusToBarcodes(exceptionBulkRequestItems, bulkRequestItemEntity);
+            itemRequestServiceUtil.updateStatusToBarcodes(exceptionBulkRequestItems, bulkRequestItemEntity.get());
         }
     }
 

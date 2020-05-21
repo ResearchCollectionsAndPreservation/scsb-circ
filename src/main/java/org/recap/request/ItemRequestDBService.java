@@ -238,7 +238,7 @@ public class ItemRequestDBService {
             saveItemChangeLogEntity(itemEntity.getItemId(), getUser(userName), ReCAPConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, ReCAPConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
         }
         // Not Available
-        itemDetailsRepository.save(itemEntities);
+        itemDetailsRepository.saveAll(itemEntities);
         itemDetailsRepository.flush();
     }
 

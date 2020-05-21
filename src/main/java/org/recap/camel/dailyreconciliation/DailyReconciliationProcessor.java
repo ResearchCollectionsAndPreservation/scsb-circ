@@ -105,7 +105,7 @@ public class DailyReconciliationProcessor {
                 fileOutputStream.flush();
                 fileOutputStream.close();
                 logger.info("total number of sheets created {}",xssfWorkbook.getNumberOfSheets());
-                camelContext.startRoute(ReCAPConstants.DAILY_RR_FS_ROUTE_ID);
+                camelContext.getRouteController().startRoute(ReCAPConstants.DAILY_RR_FS_ROUTE_ID);
                 logger.info("started "+ReCAPConstants.DAILY_RR_FS_ROUTE_ID);
             }
         }

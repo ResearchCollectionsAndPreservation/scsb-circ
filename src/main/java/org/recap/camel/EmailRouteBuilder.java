@@ -3,6 +3,7 @@ package org.recap.camel;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.apache.camel.attachment.AttachmentMessage;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
@@ -168,7 +169,9 @@ public class EmailRouteBuilder {
                                         @Override
                                         public void process(Exchange exchange) throws Exception {
                                             try {
-                                                Message in = exchange.getIn();
+                                              //  Message in = exchange.getIn();
+                                                AttachmentMessage in = exchange.getMessage(AttachmentMessage.class);
+
                                                 EmailPayLoad emailPayLoad = (EmailPayLoad) in.getHeader("emailPayLoad");
                                                 in.addAttachment("Results_" + emailPayLoad.getBulkRequestFileName(), new DataHandler(emailPayLoad.getBulkRequestCsvFileData(), "text/csv"));
                                             } catch (Exception ex) {

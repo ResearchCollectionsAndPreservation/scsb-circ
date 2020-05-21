@@ -30,9 +30,9 @@ public class AccessionReconcilationJobController {
     @RequestMapping(value = "/startAccessionReconcilation",method = RequestMethod.POST)
     public String startAccessionReconcilation() throws Exception{
         logger.info("Starting Accession Reconcilation Routes");
-        camelContext.startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FTP_PUL_ROUTE);
-        camelContext.startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FTP_CUL_ROUTE);
-        camelContext.startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FTP_NYPL_ROUTE);
+        camelContext.getRouteController().startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FTP_PUL_ROUTE);
+        camelContext.getRouteController().startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FTP_CUL_ROUTE);
+        camelContext.getRouteController().startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FTP_NYPL_ROUTE);
         return ReCAPConstants.SUCCESS;
     }
 }

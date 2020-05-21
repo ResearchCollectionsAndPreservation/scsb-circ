@@ -2,14 +2,15 @@ package org.recap.camel.route;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 import org.recap.ReCAPConstants;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Stop route processor.
  */
 public class StopRouteProcessor implements Processor {
-    private static final Logger logger = Logger.getLogger(StopRouteProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(StopRouteProcessor.class);
     private String routeId;
 
     /**
@@ -37,7 +38,7 @@ public class StopRouteProcessor implements Processor {
                             routeId.equalsIgnoreCase(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE)) {
                         stopRouteWithTimeOutOption();
                     } else {
-                        exchange.getContext().stopRoute(routeId);
+                        exchange.getContext().getRouteController().stopRoute(routeId);
                     }
                     logger.info("Stop Route " + routeId);
                 } catch (Exception e) {
@@ -49,7 +50,7 @@ public class StopRouteProcessor implements Processor {
 
             private void stopRouteWithTimeOutOption() throws Exception {
                 exchange.getContext().getShutdownStrategy().setTimeout(1);
-                exchange.getContext().stopRoute(routeId);
+                exchange.getContext().getRouteController().stopRoute(routeId);
             }
         };
         stopThread.start();

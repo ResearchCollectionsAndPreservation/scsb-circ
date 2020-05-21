@@ -103,7 +103,7 @@ public class RequestDataLoadService {
 
     private void savingRequestItemEntities(List<RequestItemEntity> requestItemEntityList) {
         if (!CollectionUtils.isEmpty(requestItemEntityList)){
-            List<RequestItemEntity> savedRequestItemEntities = requestItemDetailsRepository.save(requestItemEntityList);
+            List<RequestItemEntity> savedRequestItemEntities = requestItemDetailsRepository.saveAll(requestItemEntityList);
             requestItemDetailsRepository.flush();
             logger.info("Total request item count saved in db {}", savedRequestItemEntities.size());
         }

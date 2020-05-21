@@ -117,7 +117,7 @@ public class RequestItemControllerUT extends BaseTestCase {
         itemRefileRequest.setItemBarcodes(Arrays.asList("123"));
         itemRefileRequest.setRequestIds(Arrays.asList(1));
         Mockito.when(requestItemController.getItemRequestService()).thenReturn(itemRequestService);
-        Mockito.when(requestItemController.getItemRequestService().reFileItem(itemRefileRequest)).thenReturn(true);
+      //  Mockito.when(requestItemController.getItemRequestService().reFileItem(itemRefileRequest)).thenReturn(true);
         Mockito.when(requestItemController.refileItem(itemRefileRequest)).thenCallRealMethod();
         ItemRefileResponse refileResponse = requestItemController.refileItem(itemRefileRequest);
         refileResponse.setRequestId(1);

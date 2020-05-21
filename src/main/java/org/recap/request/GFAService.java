@@ -326,7 +326,7 @@ public class GFAService {
                     }
                 }
             }
-            getItemChangeLogDetailsRepository().save(itemChangeLogEntityList);
+            getItemChangeLogDetailsRepository().saveAll(itemChangeLogEntityList);
             getItemChangeLogDetailsRepository().flush();
         }
         return statusReconciliationCSVRecordList;
@@ -884,7 +884,7 @@ public class GFAService {
             logger.info(json);
             logger.info("Rest Service Status -> " + ReCAPConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS);
             if (ReCAPConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
-                getProducer().getCamelContext().stopRoute(ReCAPConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
+                getProducer().getCamelContext().getRouteController().stopRoute(ReCAPConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
             }
             getProducer().sendBodyAndHeader(ReCAPConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
             itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());

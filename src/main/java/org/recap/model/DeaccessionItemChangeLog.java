@@ -10,7 +10,7 @@ import java.util.Date;
 @Table(name = "deaccession_item_change_log_t", schema = "recap", catalog = "")
 public class DeaccessionItemChangeLog {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CHANGE_LOG_ID")
     private Integer changeLogId;
 

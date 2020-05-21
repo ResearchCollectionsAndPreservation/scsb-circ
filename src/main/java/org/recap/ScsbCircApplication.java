@@ -2,10 +2,12 @@ package org.recap;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * The type SCSB Circulation Application.
  */
+@PropertySource("classpath:application.properties")
 @SpringBootApplication
 public class ScsbCircApplication {
 

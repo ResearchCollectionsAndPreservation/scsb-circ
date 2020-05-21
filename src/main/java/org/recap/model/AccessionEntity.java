@@ -11,7 +11,7 @@ import java.util.Date;
 public class AccessionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ACCESSION_ID")
     private Integer accessionId;
 

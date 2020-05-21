@@ -44,7 +44,7 @@ public class EncryptEmailAddressService {
         for (int i =0;i < totalPageCounts;i++){
             List<RequestItemEntity> requestItemEntityListToSave = new ArrayList<>();
             try {
-                Pageable pageable = new PageRequest(i,1000, Sort.Direction.ASC,REQUEST_ID);
+                Pageable pageable = PageRequest.of(i,1000, Sort.Direction.ASC,REQUEST_ID);
                 Page<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findAll(pageable);
                 List<RequestItemEntity> requestItemEntityList = requestItemEntities.getContent();
                 for (RequestItemEntity requestItemEntity : requestItemEntityList) {
@@ -57,7 +57,7 @@ public class EncryptEmailAddressService {
                     }
                 }
                 if (CollectionUtils.isNotEmpty(requestItemEntityListToSave)){
-                    requestItemDetailsRepository.save(requestItemEntityListToSave);
+                    requestItemDetailsRepository.saveAll(requestItemEntityListToSave);
                     logger.info("Total number of request item entities saved in db : {}",requestItemEntityListToSave.size());
                 }
             }catch (Exception e){

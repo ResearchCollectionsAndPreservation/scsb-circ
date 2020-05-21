@@ -16,6 +16,7 @@ import org.recap.repository.ItemChangeLogDetailsRepository;
 import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.ItemStatusDetailsRepository;
 import org.recap.repository.RequestItemDetailsRepository;
+import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +98,9 @@ public class GFAServiceUT extends BaseTestCase{
 
     @Mock
     private ItemRequestService itemRequestService;
+
+    @Mock
+    private ItemRequestServiceUtil itemRequestServicUtil;
 
     @Mock
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
@@ -391,7 +395,7 @@ public class GFAServiceUT extends BaseTestCase{
                 "Article/Chapter Title: title";
 
         TtitemEDDResponse ttitem001 = new TtitemEDDResponse();
-        new BufferedReader(new StringReader(notes)).lines().forEach(line -> getGfaService.setEddInfoToGfaRequest(line, ttitem001));
+        new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServicUtil.setEddInfoToGfaRequest(line, ttitem001));
         assertNotNull(ttitem001);
         assertEquals("1", ttitem001.getStartPage());
         assertEquals("2", ttitem001.getEndPage());

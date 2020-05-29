@@ -4,10 +4,10 @@ package org.recap.ils.model.nypl.response;
  * Created by rajeshbabuk on 9/12/16.
  */
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.recap.ils.model.nypl.DebugInfo;
 import org.recap.ils.model.nypl.JobData;
 
@@ -33,7 +33,7 @@ public class JobResponse {
     private Integer statusCode;
     @JsonProperty("debugInfo")
     private List<DebugInfo> debugInfo = null;
-    @Ignore
+    @JsonIgnore
     private String statusMessage;
 
     /**

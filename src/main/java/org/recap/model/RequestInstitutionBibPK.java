@@ -1,67 +1,20 @@
 package org.recap.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
  * Created by angelind on 29/7/16.
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RequestInstitutionBibPK implements Serializable {
     private Integer itemId;
     private Integer owningInstitutionId;
-
-    /**
-     * Instantiates a new Request institution bib pk.
-     */
-    public RequestInstitutionBibPK(){
-        //Do nothing
-    }
-
-    /**
-     * Instantiates a new Request institution bib pk.
-     *
-     * @param itemId              the item id
-     * @param owningInstitutionId the owning institution id
-     */
-    public RequestInstitutionBibPK(Integer itemId, Integer owningInstitutionId) {
-        this.itemId = itemId;
-        this.owningInstitutionId = owningInstitutionId;
-    }
-
-    /**
-     * Gets item id.
-     *
-     * @return the item id
-     */
-    public Integer getItemId() {
-        return itemId;
-    }
-
-    /**
-     * Sets item id.
-     *
-     * @param itemId the item id
-     */
-    public void setItemId(Integer itemId) {
-        this.itemId = itemId;
-    }
-
-    /**
-     * Gets owning institution id.
-     *
-     * @return the owning institution id
-     */
-    public Integer getOwningInstitutionId() {
-        return owningInstitutionId;
-    }
-
-    /**
-     * Sets owning institution id.
-     *
-     * @param owningInstitutionId the owning institution id
-     */
-    public void setOwningInstitutionId(Integer owningInstitutionId) {
-        this.owningInstitutionId = owningInstitutionId;
-    }
 
     @Override
     public boolean equals(Object o) {

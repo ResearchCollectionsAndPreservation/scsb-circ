@@ -1,10 +1,14 @@
 package org.recap.model.submitcollection;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.recap.model.BibliographicEntity;
 
 /**
  * Created by premkb on 14/10/17.
  */
+@Setter
+@Getter
 public class BarcodeBibliographicEntityObject {
 
     private String barcode;
@@ -13,29 +17,7 @@ public class BarcodeBibliographicEntityObject {
 
     private BibliographicEntity bibliographicEntity;
 
-    public String getBarcode() {
-        return barcode;
-    }
 
-    public void setBarcode(String barcode) {
-        this.barcode = barcode;
-    }
-
-    public String getOwningInstitutionBibId() {
-        return owningInstitutionBibId;
-    }
-
-    public void setOwningInstitutionBibId(String owningInstitutionBibId) {
-        this.owningInstitutionBibId = owningInstitutionBibId;
-    }
-
-    public BibliographicEntity getBibliographicEntity() {
-        return bibliographicEntity;
-    }
-
-    public void setBibliographicEntity(BibliographicEntity bibliographicEntity) {
-        this.bibliographicEntity = bibliographicEntity;
-    }
 
     @Override
     public boolean equals(Object o) {

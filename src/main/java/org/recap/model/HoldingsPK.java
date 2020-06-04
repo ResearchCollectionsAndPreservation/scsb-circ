@@ -1,10 +1,15 @@
 package org.recap.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
  * Created by rajeshbabuk on 15/9/16.
  */
+@Setter
+@Getter
 public class HoldingsPK implements Serializable {
     private Integer owningInstitutionId;
     private String owningInstitutionHoldingsId;
@@ -27,41 +32,6 @@ public class HoldingsPK implements Serializable {
         this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
     }
 
-    /**
-     * Gets owning institution id.
-     *
-     * @return the owning institution id
-     */
-    public Integer getOwningInstitutionId() {
-        return owningInstitutionId;
-    }
-
-    /**
-     * Sets owning institution id.
-     *
-     * @param owningInstitutionId the owning institution id
-     */
-    public void setOwningInstitutionId(Integer owningInstitutionId) {
-        this.owningInstitutionId = owningInstitutionId;
-    }
-
-    /**
-     * Gets owning institution holdings id.
-     *
-     * @return the owning institution holdings id
-     */
-    public String getOwningInstitutionHoldingsId() {
-        return owningInstitutionHoldingsId;
-    }
-
-    /**
-     * Sets owning institution holdings id.
-     *
-     * @param owningInstitutionHoldingsId the owning institution holdings id
-     */
-    public void setOwningInstitutionHoldingsId(String owningInstitutionHoldingsId) {
-        this.owningInstitutionHoldingsId = owningInstitutionHoldingsId;
-    }
 
     @Override
     public int hashCode() {

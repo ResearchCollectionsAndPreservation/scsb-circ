@@ -12,10 +12,7 @@ import java.util.List;
 @Setter
 @Getter
 public class NonBoundWithBibliographicEntityObject {
-
     private String owningInstitutionBibId;
-
     private List<BibliographicEntity> bibliographicEntityList;
-
 
 }

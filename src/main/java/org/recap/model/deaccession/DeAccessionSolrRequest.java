@@ -17,5 +17,4 @@ public class DeAccessionSolrRequest {
     private List<Integer> holdingsIds = new ArrayList<>();
     private List<Integer> itemIds = new ArrayList<>();
     private String status;
-
 }

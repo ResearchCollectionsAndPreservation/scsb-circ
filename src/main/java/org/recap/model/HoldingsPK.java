@@ -1,8 +1,9 @@
 package org.recap.model;
 
+
 import lombok.Getter;
 import lombok.Setter;
-
+import lombok.Data;
 import java.io.Serializable;
 
 /**
@@ -51,5 +52,5 @@ public class HoldingsPK implements Serializable {
 
         return false;
     }
-}
+
 

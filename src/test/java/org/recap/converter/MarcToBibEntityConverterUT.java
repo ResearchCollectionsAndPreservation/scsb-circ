@@ -5,13 +5,11 @@ import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 import org.recap.model.BibliographicEntity;
-import org.recap.model.InstitutionEntity;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

@@ -1,6 +1,6 @@
 package org.recap.repository;
 
-import org.recap.model.CollectionGroupEntity;
+import org.recap.model.jpa.CollectionGroupEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**

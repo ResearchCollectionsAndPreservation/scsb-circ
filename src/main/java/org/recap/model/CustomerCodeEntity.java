@@ -1,5 +1,10 @@
 package org.recap.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.recap.model.jpa.AbstractEntity;
+import org.recap.model.jpa.InstitutionEntity;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -9,12 +14,10 @@ import java.util.List;
  */
 @Entity
 @Table(name = "customer_code_t", schema = "recap", catalog = "")
-public class CustomerCodeEntity implements Serializable, Comparable<CustomerCodeEntity> {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CUSTOMER_CODE_ID")
-    private Integer customerCodeId;
+@AttributeOverride(name = "id", column = @Column(name = "CUSTOMER_CODE_ID"))
+@Getter
+@Setter
+public class CustomerCodeEntity extends AbstractEntity<Integer>  implements Comparable<CustomerCodeEntity> {
 
     @Column(name = "CUSTOMER_CODE")
     private String customerCode;
@@ -48,55 +51,6 @@ public class CustomerCodeEntity implements Serializable, Comparable<CustomerCode
                     @JoinColumn(name = "DELIVERY_RESTRICTION_CROSS_PARTNER_ID", referencedColumnName = "DELIVERY_RESTRICTION_CROSS_PARTNER_ID")})
     private List<DeliveryRestrictionEntity> deliveryRestrictionEntityList;
 
-
-    public Integer getCustomerCodeId() {
-        return customerCodeId;
-    }
-
-    public void setCustomerCodeId(Integer customerCodeId) {
-        this.customerCodeId = customerCodeId;
-    }
-
-    public String getCustomerCode() {
-        return customerCode;
-    }
-
-    public void setCustomerCode(String customerCode) {
-        this.customerCode = customerCode;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getOwningInstitutionId() {
-        return owningInstitutionId;
-    }
-
-    public void setOwningInstitutionId(Integer owningInstitutionId) {
-        this.owningInstitutionId = owningInstitutionId;
-    }
-
-    public String getDeliveryRestrictions() {
-        return deliveryRestrictions;
-    }
-
-    public void setDeliveryRestrictions(String deliveryRestrictions) {
-        this.deliveryRestrictions = deliveryRestrictions;
-    }
-
-    public InstitutionEntity getInstitutionEntity() {
-        return institutionEntity;
-    }
-
-    public void setInstitutionEntity(InstitutionEntity institutionEntity) {
-        this.institutionEntity = institutionEntity;
-    }
-
     @Override
     public int compareTo(CustomerCodeEntity customerCodeEntity) {
         if (null != this.getDescription() && null !=  customerCodeEntity && null != customerCodeEntity.getDescription()) {
@@ -114,7 +68,7 @@ public class CustomerCodeEntity implements Serializable, Comparable<CustomerCode
 
         CustomerCodeEntity customerCodeEntity = (CustomerCodeEntity) object;
 
-        if (customerCodeId != null ? !customerCodeId.equals(customerCodeEntity.customerCodeId) : customerCodeEntity.customerCodeId != null)
+        if (id != null ? !id.equals(customerCodeEntity.id) : customerCodeEntity.id != null)
             return false;
         if (customerCode != null ? !customerCode.equals(customerCodeEntity.customerCode) : customerCodeEntity.customerCode != null)
             return false;
@@ -126,42 +80,10 @@ public class CustomerCodeEntity implements Serializable, Comparable<CustomerCode
 
     @Override
     public int hashCode() {
-        int result = customerCodeId != null ? customerCodeId.hashCode() : 0;
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (customerCode != null ? customerCode.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (owningInstitutionId != null ? owningInstitutionId.hashCode() : 0);
         return result;
-    }
-
-    public List<DeliveryRestrictionEntity> getDeliveryRestrictionEntityList() {
-        return deliveryRestrictionEntityList;
-    }
-
-    public void setDeliveryRestrictionEntityList(List<DeliveryRestrictionEntity> deliveryRestrictionEntityList) {
-        this.deliveryRestrictionEntityList = deliveryRestrictionEntityList;
-    }
-
-    public String getPwdDeliveryRestrictions() {
-        return pwdDeliveryRestrictions;
-    }
-
-    public void setPwdDeliveryRestrictions(String pwdDeliveryRestrictions) {
-        this.pwdDeliveryRestrictions = pwdDeliveryRestrictions;
-    }
-
-    public String getRecapDeliveryRestrictions() {
-        return recapDeliveryRestrictions;
-    }
-
-    public void setRecapDeliveryRestrictions(String recapDeliveryRestrictions) {
-        this.recapDeliveryRestrictions = recapDeliveryRestrictions;
-    }
-
-    public String getPickupLocation() {
-        return pickupLocation;
-    }
-
-    public void setPickupLocation(String pickupLocation) {
-        this.pickupLocation = pickupLocation;
     }
 }

@@ -1,6 +1,6 @@
 package org.recap.converter;
 
-import org.recap.model.InstitutionEntity;
+import org.recap.model.jpa.InstitutionEntity;
 
 import java.util.Map;
 

@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import org.apache.camel.ProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.model.ItemEntity;
-import org.recap.model.ItemStatusEntity;
-import org.recap.model.RequestStatusEntity;
+import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.RequestStatusEntity;
 import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.ItemStatusDetailsRepository;
 import org.recap.repository.RequestItemStatusDetailsRepository;
@@ -159,9 +159,9 @@ public class StatusReconciliationController {
         ItemStatusEntity itemStatusEntity = getItemStatusDetailsRepository().findByStatusCode(ReCAPConstants.ITEM_STATUS_NOT_AVAILABLE);
         List<String> requestStatusCodes = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD);
         List<RequestStatusEntity> requestStatusEntityList = getRequestItemStatusDetailsRepository().findByRequestStatusCodeIn(requestStatusCodes);
-        List<Integer> requestStatusIds = requestStatusEntityList.stream().map(RequestStatusEntity::getRequestStatusId).collect(Collectors.toList());
+        List<Integer> requestStatusIds = requestStatusEntityList.stream().map(RequestStatusEntity::getId).collect(Collectors.toList());
         logger.info("status reconciliation request ids : {} ",requestStatusIds);
-        Map<String,Integer> itemCountAndStatusIdMap = getTotalPageCount(requestStatusIds,itemStatusEntity.getItemStatusId());
+        Map<String,Integer> itemCountAndStatusIdMap = getTotalPageCount(requestStatusIds,itemStatusEntity.getId());
         if (itemCountAndStatusIdMap.size() > 0){
             int totalPagesCount = itemCountAndStatusIdMap.get("totalPagesCount");
             getLogger().info("status reconciliation total page count :{}",totalPagesCount);
@@ -170,7 +170,7 @@ public class StatusReconciliationController {
             List<StatusReconciliationErrorCSVRecord> statusReconciliationErrorCSVRecords = new ArrayList<>();
             for (int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
                 long from = getFromDate(pageNum);
-                List<ItemEntity> itemEntityList = getItemDetailsRepository().getNotAvailableItems(getStatusReconciliationDayLimit(),requestStatusIds,from, getBatchSize(),itemStatusEntity.getItemStatusId());
+                List<ItemEntity> itemEntityList = getItemDetailsRepository().getNotAvailableItems(getStatusReconciliationDayLimit(),requestStatusIds,from, getBatchSize(),itemStatusEntity.getId());
                 logger.info("items fetched from data base ----->{}",itemEntityList.size());
                 List<List<ItemEntity>> itemEntityChunkList = Lists.partition(itemEntityList, getStatusReconciliationLasBarcodeLimit());
                 statusReconciliationCSVRecordList = getGfaService().itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecords);

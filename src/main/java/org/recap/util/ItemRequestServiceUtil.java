@@ -102,7 +102,7 @@ public class ItemRequestServiceUtil {
      */
     public void generateReportAndSendEmail(Integer bulkRequestId) {
         Optional<BulkRequestItemEntity> bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
-        emailService.sendBulkRequestEmail(String.valueOf(bulkRequestItemEntity.get().getBulkRequestId()),
+        emailService.sendBulkRequestEmail(String.valueOf(bulkRequestItemEntity.get().getId()),
                 bulkRequestItemEntity.get().getBulkRequestName(), bulkRequestItemEntity.get().getBulkRequestFileName(),
                 bulkRequestItemEntity.get().getBulkRequestStatus(), new String(bulkRequestItemEntity.get().getBulkRequestFileData()),
                 "Bulk Request Process Report");

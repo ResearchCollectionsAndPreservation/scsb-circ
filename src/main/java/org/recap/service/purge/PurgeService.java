@@ -1,7 +1,7 @@
 package org.recap.service.purge;
 
 import org.recap.ReCAPConstants;
-import org.recap.model.RequestTypeEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.AccessionDetailsRepository;
 import org.recap.repository.RequestItemDetailsRepository;
 import org.recap.repository.RequestTypeDetailsRepository;
@@ -55,9 +55,9 @@ public class PurgeService {
             List<Integer> eddRequestTypeIdList = new ArrayList();
             for (RequestTypeEntity requestTypeEntity : requestTypeEntityList) {
                 if (requestTypeEntity.getRequestTypeCode().equals(ReCAPConstants.EDD_REQUEST)) {
-                    eddRequestTypeIdList.add(requestTypeEntity.getRequestTypeId());
+                    eddRequestTypeIdList.add(requestTypeEntity.getId());
                 } else {
-                    physicalRequestTypeIdList.add(requestTypeEntity.getRequestTypeId());
+                    physicalRequestTypeIdList.add(requestTypeEntity.getId());
                 }
             }
             int noOfUpdatedRecordsForEddRequest = requestItemDetailsRepository.purgeEmailId(eddRequestTypeIdList, new Date(), purgeEmailEddRequestDayLimit,ReCAPConstants.REFILED_REQUEST);

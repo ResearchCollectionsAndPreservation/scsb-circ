@@ -6,11 +6,11 @@ import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
 import org.recap.model.BibliographicEntity;
 import org.recap.model.HoldingsEntity;
-import org.recap.model.InstitutionEntity;
 import org.recap.model.ItemEntity;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
+import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.model.submitcollection.BarcodeBibliographicEntityObject;
 import org.recap.model.submitcollection.BoundWithBibliographicEntityObject;
@@ -94,10 +94,10 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
         logger.info("boundWithBibliographicEntityObjectList size--->{}",boundWithBibliographicEntityObjectList.size());
         logger.info("nonBoundWithBibliographicEntityList size--->{}",nonBoundWithBibliographicEntityList.size());
         if (!nonBoundWithBibliographicEntityObjectList.isEmpty()) {
-            processRecordsInBatchesForNonBoundWith(nonBoundWithBibliographicEntityObjectList,institutionEntity.getInstitutionId(),submitCollectionReportInfoMap,processedBibIds,idMapToRemoveIndexList);
+            processRecordsInBatchesForNonBoundWith(nonBoundWithBibliographicEntityObjectList,institutionEntity.getId(),submitCollectionReportInfoMap,processedBibIds,idMapToRemoveIndexList);
         }
         if (!boundwithBibliographicEntityList.isEmpty()) {
-            processRecordsInBatchesForBoundWith(boundWithBibliographicEntityObjectList,institutionEntity.getInstitutionId(),submitCollectionReportInfoMap,processedBibIds,idMapToRemoveIndexList,bibIdMapToRemoveIndexList,updatedDummyRecordOwnInstBibIdSet);//updatedDummyRecordOwnInstBibIdSet is required only for boundwith
+            processRecordsInBatchesForBoundWith(boundWithBibliographicEntityObjectList,institutionEntity.getId(),submitCollectionReportInfoMap,processedBibIds,idMapToRemoveIndexList,bibIdMapToRemoveIndexList,updatedDummyRecordOwnInstBibIdSet);//updatedDummyRecordOwnInstBibIdSet is required only for boundwith
         }
     }
 

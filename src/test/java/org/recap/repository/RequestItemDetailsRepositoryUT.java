@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.model.*;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +64,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         try {
             RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode("PULTST54333", ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
             if (requestItemEntity != null) {
-                logger.info(""+requestItemEntity.getRequestId());
+                logger.info(""+requestItemEntity.getId());
                 logger.info(requestItemEntity.getRequestTypeEntity().getRequestTypeDesc());
                 //logger.info(requestItemEntity.getRequestStatusId());
                 logger.info(requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
@@ -100,7 +102,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getRequestTypeId());
+        requestItemEntity.setRequestTypeId(savedrequestTypeEntity.getId());
         requestItemEntity.setRequestingInstitutionId(1);
         requestItemEntity.setRequestStatusId(1);
         requestItemEntity.setCreatedBy("test");
@@ -166,7 +168,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
 
     @Test
     public void testRequestItem() throws Exception {
-        RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(202);
+        RequestItemEntity requestItemEntity = requestItemDetailsRepository.findById(202);
         assertNotNull(requestItemEntity);;
     }
 }

@@ -3,6 +3,8 @@ package org.recap.service;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.*;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.RequestItemDetailsRepository;
 import org.recap.repository.RequestItemStatusDetailsRepository;
 import org.recap.repository.RequestTypeDetailsRepository;
@@ -47,7 +49,7 @@ public class EncryptEmailAddressUT extends BaseTestCase {
         String encryptedValue = securityUtil.getEncryptedValue("test@gmail.com");
         encryptEmailAddressService.encryptEmailAddress();
         System.out.println(requestItem.getRequestId());
-        RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(requestItem.getRequestId());
+        RequestItemEntity requestItemEntity = requestItemDetailsRepository.findById(requestItem.getRequestId());
         assertEquals(requestItemEntity.getEmailId(),encryptedValue);
         String decryptedValue = securityUtil.getDecryptedValue(encryptedValue);
         assertEquals("test@gmail.com",decryptedValue);
@@ -70,7 +72,7 @@ public class EncryptEmailAddressUT extends BaseTestCase {
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getRequestTypeId());
+        requestItemEntity.setRequestTypeId(savedrequestTypeEntity.getId());
         requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         requestItemEntity.setRequestingInstitutionId(2);
         requestItemEntity.setStopCode("test");

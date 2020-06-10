@@ -1,20 +1,19 @@
 package org.recap.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.recap.model.jpa.AbstractEntity;
 
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "PENDING_REQUEST_T", schema = "recap", catalog = "")
-public class PendingRequestEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PENDING_ID")
-    private Integer pendingId;
-
+@AttributeOverride(name = "id", column = @Column(name = "PENDING_ID"))
+public class PendingRequestEntity extends AbstractEntity<Integer>  {
     @Column(name = "REQUEST_ID")
     private Integer requestId;
 
@@ -32,5 +31,4 @@ public class PendingRequestEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ITEM_ID", referencedColumnName = "ITEM_ID", insertable = false, updatable = false)
     private ItemEntity itemEntity;
-
 }

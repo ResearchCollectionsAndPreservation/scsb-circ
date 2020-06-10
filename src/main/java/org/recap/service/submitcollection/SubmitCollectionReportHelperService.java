@@ -4,6 +4,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
 import org.recap.model.*;
+import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.repository.ItemDetailsRepository;
 import org.recap.service.common.RepositoryService;

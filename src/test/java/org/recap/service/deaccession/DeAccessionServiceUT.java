@@ -10,6 +10,8 @@ import org.recap.model.*;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.RequestItemDetailsRepository;
@@ -211,22 +213,22 @@ public class DeAccessionServiceUT extends BaseTestCase {
 
     private List<RequestItemEntity> getMockRequestItemEntities() {
         InstitutionEntity institutionEntity1 = new InstitutionEntity();
-        institutionEntity1.setInstitutionId(1);
+        institutionEntity1.setId(1);
         institutionEntity1.setInstitutionCode("PUL");
         institutionEntity1.setInstitutionName("Princeton");
 
         InstitutionEntity institutionEntity2 = new InstitutionEntity();
-        institutionEntity2.setInstitutionId(2);
+        institutionEntity2.setId(2);
         institutionEntity2.setInstitutionCode("CUL");
         institutionEntity2.setInstitutionName("Columbia");
 
         RequestTypeEntity requestTypeEntity1 = new RequestTypeEntity();
-        requestTypeEntity1.setRequestTypeId(1);
+        requestTypeEntity1.setId(1);
         requestTypeEntity1.setRequestTypeCode("RETRIEVAL");
         requestTypeEntity1.setRequestTypeDesc("RETRIEVAL");
 
         RequestTypeEntity requestTypeEntity2 = new RequestTypeEntity();
-        requestTypeEntity2.setRequestTypeId(2);
+        requestTypeEntity2.setId(2);
         requestTypeEntity2.setRequestTypeCode("RECALL");
         requestTypeEntity2.setRequestTypeDesc("RECALL");
 

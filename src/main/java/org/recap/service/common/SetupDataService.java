@@ -1,9 +1,9 @@
 package org.recap.service.common;
 
 import org.recap.ReCAPConstants;
-import org.recap.model.CollectionGroupEntity;
-import org.recap.model.InstitutionEntity;
-import org.recap.model.ItemStatusEntity;
+import org.recap.model.jpa.CollectionGroupEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemStatusEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class SetupDataService {
                 Iterable<ItemStatusEntity> itemStatusEntities = repositoryService.getItemStatusDetailsRepository().findAll();
                 for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
                     ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
-                    itemStatusIdCodeMap.put(itemStatusEntity.getItemStatusId(), itemStatusEntity.getStatusCode());
+                    itemStatusIdCodeMap.put(itemStatusEntity.getId(), itemStatusEntity.getStatusCode());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);
@@ -67,7 +67,7 @@ public class SetupDataService {
                 Iterable<ItemStatusEntity> itemStatusEntities = repositoryService.getItemStatusDetailsRepository().findAll();
                 for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
                     ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
-                    itemStatusCodeIdMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getItemStatusId());
+                    itemStatusCodeIdMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);
@@ -88,7 +88,7 @@ public class SetupDataService {
                 Iterable<InstitutionEntity> institutionEntities = repositoryService.getInstitutionDetailsRepository().findAll();
                 for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
                     InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
-                    institutionEntityMap.put(institutionEntity.getInstitutionId(), institutionEntity.getInstitutionCode());
+                    institutionEntityMap.put(institutionEntity.getId(), institutionEntity.getInstitutionCode());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);
@@ -104,7 +104,7 @@ public class SetupDataService {
                 Iterable<InstitutionEntity> institutionEntities = repositoryService.getInstitutionDetailsRepository().findAll();
                 for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
                     InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
-                    institutionCodeIdMap.put(institutionEntity.getInstitutionCode(),institutionEntity.getInstitutionId());
+                    institutionCodeIdMap.put(institutionEntity.getInstitutionCode(),institutionEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);
@@ -120,7 +120,7 @@ public class SetupDataService {
                 Iterable<CollectionGroupEntity> collectionGroupEntities = repositoryService.getCollectionGroupDetailsRepository().findAll();
                 for (Iterator iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
                     CollectionGroupEntity collectionGroupEntity = (CollectionGroupEntity) iterator.next();
-                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getCollectionGroupId());
+                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);

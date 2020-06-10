@@ -3,7 +3,6 @@ package org.recap.converter;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.BibliographicEntity;
-import org.recap.model.InstitutionEntity;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.repository.InstitutionDetailsRepository;

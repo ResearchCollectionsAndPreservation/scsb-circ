@@ -3,6 +3,7 @@ package org.recap.repository;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.*;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
@@ -48,7 +49,7 @@ public class PatronDetailsRepositoryUT extends BaseTestCase {
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getRequestTypeId());
+        requestItemEntity.setRequestTypeId(savedrequestTypeEntity.getId());
         requestItemEntity.setRequestingInstitutionId(1);
         requestItemEntity.setPatronId("45678912");
         requestItemEntity.setStopCode("test");
@@ -60,7 +61,7 @@ public class PatronDetailsRepositoryUT extends BaseTestCase {
         requestItemEntity.setRequestStatusId(4);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         assertNotNull(savedRequestItemEntity);
-        assertNotNull(savedRequestItemEntity.getRequestId());
+        assertNotNull(savedRequestItemEntity.getId());
     }
 
     public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {

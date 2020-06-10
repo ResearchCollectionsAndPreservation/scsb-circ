@@ -50,7 +50,7 @@ public class EncryptEmailAddressService {
                 for (RequestItemEntity requestItemEntity : requestItemEntityList) {
                     if (StringUtils.isNotBlank(requestItemEntity.getEmailId())){
                         String encryptedEmailId = securityUtil.getEncryptedValue(requestItemEntity.getEmailId());
-                        logger.info("Going to update email address for request id: {} , old email address: {} and encrypted email address: {}",requestItemEntity.getRequestId(),requestItemEntity.getEmailId(),encryptedEmailId);
+                        logger.info("Going to update email address for request id: {} , old email address: {} and encrypted email address: {}",requestItemEntity.getId(),requestItemEntity.getEmailId(),encryptedEmailId);
                         requestItemEntity.setEmailId(encryptedEmailId);
                         requestItemEntityListToSave.add(requestItemEntity);
                         ++count;

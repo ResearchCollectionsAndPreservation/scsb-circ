@@ -12,6 +12,9 @@ import org.recap.model.*;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ReportDataEntity;
+import org.recap.model.jpa.ReportEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.model.submitcollection.SubmitCollectionResponse;
 import org.recap.service.common.RepositoryService;
@@ -221,7 +224,7 @@ public class SubmitCollectionService {
     }
 
     public BibliographicEntity loadData(Object record, String format, Map<String,List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap, List<Map<String,String>> idMapToRemoveIndexList
-            ,boolean isCGDProtected,InstitutionEntity institutionEntity,Set<String> processedBarcodeSetForDummyRecords){
+            , boolean isCGDProtected, InstitutionEntity institutionEntity, Set<String> processedBarcodeSetForDummyRecords){
         BibliographicEntity savedBibliographicEntity = null;
         BibliographicEntity bibliographicEntity = null;
         try {
@@ -373,7 +376,7 @@ public class SubmitCollectionService {
                         reportEntity.setReportDataEntities(reportDataEntities);
                         ReportEntity savedReportEntity = getRepositoryService().getReportDetailRepository().save(reportEntity);
                         count ++;
-                        reportRecordNumberList.add(savedReportEntity.getRecordNumber());
+                        reportRecordNumberList.add(savedReportEntity.getId());
                     }
                     logger.info("Processed completed report for record {}",count);
                 }

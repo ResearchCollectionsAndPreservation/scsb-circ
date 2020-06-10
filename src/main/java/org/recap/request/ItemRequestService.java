@@ -16,6 +16,9 @@ import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.ils.model.response.ItemRecallResponse;
 import org.recap.model.*;
+import org.recap.model.CustomerCodeEntity;
+import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.RequestStatusEntity;
 import org.recap.repository.*;
 import org.recap.service.RestHeaderService;
 import org.recap.util.ItemRequestServiceUtil;
@@ -329,7 +332,7 @@ public class ItemRequestService {
         String itemBarcode;
         ItemEntity itemEntity;
         List<String> requestItemStatusList = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD);
-        List<RequestItemEntity> requestEntities = requestItemDetailsRepository.findByRequestIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList);
+        List<RequestItemEntity> requestEntities = requestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList);
         List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes());
         if (requestEntities != null && !requestEntities.isEmpty()) {
             for (RequestItemEntity requestItemEntity : requestEntities) {
@@ -346,7 +349,7 @@ public class ItemRequestService {
                     itemRequestInfo.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
                     RequestItemEntity requestItemEntityRecalled = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ReCAPConstants.REQUEST_STATUS_RECALLED);
                     if (requestItemEntityRecalled == null) { // Recall Request Does not Exist
-                        requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                        requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                         requestItemEntity.setLastUpdatedDate(new Date());
                         requestItemDetailsRepository.save(requestItemEntity);
                         rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
@@ -354,9 +357,9 @@ public class ItemRequestService {
                         itemRefileResponse.setSuccess(true);
                     } else { // Recall Request Exist
                         if (requestItemEntityRecalled.getRequestingInstitutionId().intValue() == requestItemEntity.getRequestingInstitutionId().intValue()) { // Borrowed Inst same as Recall Requesting Inst
-                            requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                            requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                             requestItemEntity.setLastUpdatedDate(new Date());
-                            requestItemEntityRecalled.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                            requestItemEntityRecalled.setRequestStatusId(requestStatusEntity.getId());
                             requestItemEntityRecalled.setLastUpdatedDate(new Date());
                             requestItemDetailsRepository.save(requestItemEntity);
                             requestItemDetailsRepository.save(requestItemEntityRecalled);
@@ -365,7 +368,7 @@ public class ItemRequestService {
                             itemRefileResponse.setSuccess(true);
                             itemRefileResponse.setScreenMessage("Successfully Refiled");
                         } else { // Borrowed Inst not same as Recall Requesting Inst, Change Retrieval Order Status to Refiled.
-                            requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                            requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                             requestItemDetailsRepository.save(requestItemEntity);
                             // Checkout the item based on the institution Princeton,Columbia or NYPL for the Recall order
                             if(itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.EDD_REQUEST)) {
@@ -383,7 +386,7 @@ public class ItemRequestService {
                             itemRefileResponse.setSuccess(true);
                         }
                     }
-                    logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getRequestId(), itemBarcode);
+                    logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getId(), itemBarcode);
                     if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.PRINCETON) || itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
                         //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
                         if(itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.EDD_REQUEST)){
@@ -432,8 +435,8 @@ public class ItemRequestService {
                     itemBarcode = itemEntity.getBarcode();
                     String gfaItemStatus = callGfaItemStatusForRefile(itemBarcode);
                     logger.info("Gfa status received during refile : {}",gfaItemStatus);
-                    logger.info("GFA Item Status {} for the barcode {} received on Refile where Request Id : {}", gfaItemStatus, itemEntity.getBarcode(),requestItemEntity.getRequestId());
-                    logger.info("Rejecting the Refile for the barcode {} where Request ID : {} and Request Status : {}", itemEntity.getBarcode(), requestItemEntity.getRequestId(), requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
+                    logger.info("GFA Item Status {} for the barcode {} received on Refile where Request Id : {}", gfaItemStatus, itemEntity.getBarcode(),requestItemEntity.getId());
+                    logger.info("Rejecting the Refile for the barcode {} where Request ID : {} and Request Status : {}", itemEntity.getBarcode(), requestItemEntity.getId(), requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
                     if (gfaItemStatus.contains(":")) {
                         gfaItemStatus = gfaItemStatus.substring(0, gfaItemStatus.indexOf(':') + 1).toUpperCase();
                     } else {
@@ -495,7 +498,7 @@ public class ItemRequestService {
             itemRequestInfo.setRequestType(ReCAPConstants.RETRIEVAL);
         }
         itemRequestInfo.setRequestNotes(requestItemEntity.getNotes());
-        itemRequestInfo.setRequestId(requestItemEntity.getRequestId());
+        itemRequestInfo.setRequestId(requestItemEntity.getId());
         itemRequestInfo.setUsername(requestItemEntity.getCreatedBy());
         itemRequestInfo.setDeliveryLocation(requestItemEntity.getStopCode());
         itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
@@ -655,7 +658,7 @@ public class ItemRequestService {
         for (ItemEntity itemEntity : itemEntities) {
             ItemEntity itemEntityByItemId = itemDetailsRepository.findByItemId(itemEntity.getItemId());
             logger.info("Item status : " + itemEntityByItemId.getItemStatusEntity().getStatusCode());
-            if (itemStatusEntity.getItemStatusId() == itemEntityByItemId.getItemAvailabilityStatusId()) {  //Condition should be checked with equals not == ?
+            if (itemStatusEntity.getId() == itemEntityByItemId.getItemAvailabilityStatusId()) {  //Condition should be checked with equals not == ?
                 return false;
             }
         }
@@ -1015,9 +1018,9 @@ public class ItemRequestService {
 
     private void rollbackAfterGFA(ItemInformationResponse itemResponseInformation) {
         ItemRequestInformation itemRequestInformation = itemRequestDBService.rollbackAfterGFA(itemResponseInformation);
-        RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(itemResponseInformation.getRequestId());
+        Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemResponseInformation.getRequestId());
         if (null != requestItemEntity) {
-            itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
+            itemRequestServiceUtil.updateSolrIndex(requestItemEntity.get().getItemEntity());
         }
         if (itemResponseInformation.isBulk()) {
             requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
@@ -1102,14 +1105,14 @@ public class ItemRequestService {
 
     public boolean executeLasitemCheck(ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation) {
         RequestStatusEntity requestStatusEntity = null;
-        RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(itemRequestInfo.getRequestId());
+        Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemRequestInfo.getRequestId());
         itemResponseInformation = gfaService.executeRetriveOrder(itemRequestInfo, itemResponseInformation);
         logger.info("itemResponseInformation-> " + itemResponseInformation.isSuccess());
         if (itemResponseInformation.isSuccess()) {
             requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_PENDING);
-            requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
-            requestItemEntity.setLastUpdatedDate(new Date());
-            requestItemDetailsRepository.save(requestItemEntity);
+            requestItemEntity.get().setRequestStatusId(requestStatusEntity.getId());
+            requestItemEntity.get().setLastUpdatedDate(new Date());
+            requestItemDetailsRepository.save(requestItemEntity.get());
         } else {
             return false;
         }
@@ -1168,10 +1171,10 @@ public class ItemRequestService {
                 Arrays.stream(replaceRequest.getRequestIds().split(",")).forEach(requestId -> requestIds.add(Integer.valueOf(requestId.trim())));
                 resultMap.put(ReCAPConstants.TOTAL_REQUESTS_IDS, String.valueOf(requestIds.size()));
                 if (ReCAPConstants.REQUEST_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
-                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestIdsAndStatusCodes(requestIds, Arrays.asList(ReCAPConstants.REQUEST_STATUS_PENDING));
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Arrays.asList(ReCAPConstants.REQUEST_STATUS_PENDING));
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (ReCAPConstants.REQUEST_STATUS_EXCEPTION.equalsIgnoreCase(requestStatus)) {
-                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestIdsAndStatusCodes(requestIds, Arrays.asList(ReCAPConstants.REQUEST_STATUS_EXCEPTION));
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Arrays.asList(ReCAPConstants.REQUEST_STATUS_EXCEPTION));
                     resultMap = buildRequestInfoAndReplaceToSCSB(requestItemEntities);
                 } else {
                     resultMap.put(ReCAPConstants.INVALID_REQUEST, ReCAPConstants.REQUEST_STATUS_INVALID);
@@ -1239,7 +1242,7 @@ public class ItemRequestService {
                 } else {
                     message = ReCAPConstants.IGNORE_REQUEST_TYPE_NOT_VALID + requestTypeCode;
                 }
-                resultMap.put(String.valueOf(requestItemEntity.getRequestId()), message);
+                resultMap.put(String.valueOf(requestItemEntity.getId()), message);
             }
         } else {
             resultMap.put(ReCAPConstants.INVALID_REQUEST, ReCAPConstants.NO_REQUESTS_FOUND);
@@ -1266,7 +1269,7 @@ public class ItemRequestService {
                 } else {
                     message = ReCAPConstants.IGNORE_REQUEST_TYPE_NOT_VALID + requestTypeCode;
                 }
-                resultMap.put(String.valueOf(requestItemEntity.getRequestId()), message);
+                resultMap.put(String.valueOf(requestItemEntity.getId()), message);
             }
         } else {
             resultMap.put(ReCAPConstants.INVALID_REQUEST, ReCAPConstants.NO_REQUESTS_FOUND);
@@ -1321,7 +1324,7 @@ public class ItemRequestService {
             else {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
-                requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                 requestItemDetailsRepository.save(requestItemEntity);
             }
         } catch (Exception exception) {
@@ -1369,7 +1372,7 @@ public class ItemRequestService {
             else {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
-                requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                 requestItemDetailsRepository.save(requestItemEntity);
             }
         } catch (Exception exception) {

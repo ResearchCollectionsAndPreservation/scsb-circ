@@ -13,6 +13,7 @@ import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.model.deaccession.DeAccessionSolrRequest;
+import org.recap.model.jpa.*;
 import org.recap.repository.*;
 import org.recap.request.GFAService;
 import org.recap.service.RestHeaderService;
@@ -453,14 +454,14 @@ public class DeAccessionService {
      */
     private void updateRequestAsCanceled(RequestItemEntity requestItemEntity, String username) {
         RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_CANCELED);
-        requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+        requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
         requestItemEntity.setLastUpdatedDate(new Date());
         requestItemEntity.getItemEntity().setItemAvailabilityStatusId(2);
         String requestNotes = requestItemEntity.getNotes();
         requestNotes = requestNotes + "\n" + "SCSB : " + ReCAPConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION;
         requestItemEntity.setNotes(requestNotes);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
-        saveDeAccessionItemChangeLogEntity(savedRequestItemEntity.getRequestId(), username, ReCAPConstants.REQUEST_ITEM_CANCEL_DEACCESSION_ITEM, ReCAPConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION + savedRequestItemEntity.getItemId());
+        saveDeAccessionItemChangeLogEntity(savedRequestItemEntity.getId(), username, ReCAPConstants.REQUEST_ITEM_CANCEL_DEACCESSION_ITEM, ReCAPConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION + savedRequestItemEntity.getItemId());
         itemRequestServiceUtil.updateSolrIndex(savedRequestItemEntity.getItemEntity());
     }
 

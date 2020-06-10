@@ -70,7 +70,7 @@ public class IdentifyPendingRequestService {
 
     private PendingRequestEntity getPendingRequestEntityFromRequestEntity(RequestItemEntity requestItemEntity){
         PendingRequestEntity pendingRequestEntity = new PendingRequestEntity();
-        pendingRequestEntity.setRequestId(requestItemEntity.getRequestId());
+        pendingRequestEntity.setId(requestItemEntity.getId());
         pendingRequestEntity.setItemId(requestItemEntity.getItemId());
         pendingRequestEntity.setRequestItemEntity(requestItemEntity);
         pendingRequestEntity.setRequestCreatedDate(new Date());

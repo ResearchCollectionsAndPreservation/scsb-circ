@@ -9,6 +9,9 @@ import org.recap.ReCAPConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.*;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +71,7 @@ public class ItemRequestServiceUT extends BaseTestCase {
     public void testUpdateRecapRqstItem() throws Exception {
         RequestItemEntity requestItemEntity = createRequestItem();
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
-        itemInformationResponse.setRequestId(requestItemEntity.getRequestId());
+        itemInformationResponse.setRequestId(requestItemEntity.getId());
         ItemInformationResponse response = itemRequestService.updateRecapRequestItem(itemInformationResponse);
         assertNotNull(response);
     }
@@ -77,7 +80,7 @@ public class ItemRequestServiceUT extends BaseTestCase {
     public void testUpdateRecapRequestStatus() throws Exception {
         RequestItemEntity requestItemEntity = createRequestItem();
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
-        itemInformationResponse.setRequestId(requestItemEntity.getRequestId());
+        itemInformationResponse.setRequestId(requestItemEntity.getId());
         ItemInformationResponse response = itemRequestService.updateRecapRequestStatus(itemInformationResponse);
         assertNotNull(response);
     }
@@ -205,7 +208,7 @@ public class ItemRequestServiceUT extends BaseTestCase {
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getRequestTypeId());
+        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getId());
         requestItemEntity.setRequestingInstitutionId(1);
         requestItemEntity.setPatronId("123");
         requestItemEntity.setStopCode("test");

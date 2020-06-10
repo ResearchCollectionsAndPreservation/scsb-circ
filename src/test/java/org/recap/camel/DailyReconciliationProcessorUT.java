@@ -10,6 +10,9 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.camel.dailyreconciliation.DailyReconciliationProcessor;
 import org.recap.model.*;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.RequestItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -66,7 +69,7 @@ public class DailyReconciliationProcessorUT extends BaseTestCase {
         ItemEntity itemEntity = bibliographicEntity.getItemEntities().get(0);
         RequestItemEntity requestItemEntity = saveRequestItemEntity(itemEntity.getItemId(),itemEntity);
         XSSFCellStyle xssfCellStyleForDate = dailyReconciliationProcessor.getXssfCellStyleForDate(xssfWorkbook);
-        dailyReconciliationProcessor.buildRequestsRows(xssfWorkbook,testSheet,xssfCellStyleForDate,0, String.valueOf(requestItemEntity.getRequestId()));
+        dailyReconciliationProcessor.buildRequestsRows(xssfWorkbook,testSheet,xssfCellStyleForDate,0, String.valueOf(requestItemEntity.getId()));
         XSSFSheet test = xssfWorkbook.getSheet("test");
         XSSFRow testRow = test.getRow(0);
         assertNotNull(testRow);
@@ -80,7 +83,7 @@ public class DailyReconciliationProcessorUT extends BaseTestCase {
         Cell cell9 = dailyReconciliationProcessor.getRowValuesForCompare(testRow, 9);
         Cell cell10 = dailyReconciliationProcessor.getRowValuesForCompare(testRow, 10);
 
-        assertEquals(String.valueOf(requestItemEntity.getRequestId()),cell0.getStringCellValue());
+        assertEquals(String.valueOf(requestItemEntity.getId()),cell0.getStringCellValue());
         assertEquals(String.valueOf(itemEntity.getBarcode()),cell1.getStringCellValue());
         assertEquals(String.valueOf(itemEntity.getCustomerCode()),cell2.getStringCellValue());
         assertEquals(String.valueOf(requestItemEntity.getStopCode()),cell3.getStringCellValue());
@@ -211,7 +214,7 @@ public class DailyReconciliationProcessorUT extends BaseTestCase {
 
     private RequestTypeEntity getRequestTypeEntity() {
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
-        requestTypeEntity.setRequestTypeId(1);
+        requestTypeEntity.setId(1);
         requestTypeEntity.setRequestTypeCode("EDD");
         requestTypeEntity.setRequestTypeDesc("EDD");
         return requestTypeEntity;
@@ -219,7 +222,7 @@ public class DailyReconciliationProcessorUT extends BaseTestCase {
 
     private ItemStatusEntity getItemStatusEntity() {
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
-        itemStatusEntity.setItemStatusId(1);
+        itemStatusEntity.setId(1);
         itemStatusEntity.setStatusCode("Available");
         itemStatusEntity.setStatusDescription("Available");
         return itemStatusEntity;

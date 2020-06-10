@@ -1,6 +1,6 @@
 package org.recap.repository;
 
-import org.recap.model.ItemStatusEntity;
+import org.recap.model.jpa.ItemStatusEntity;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -16,13 +16,4 @@ public interface ItemStatusDetailsRepository extends PagingAndSortingRepository<
      * @return the item status entity
      */
     ItemStatusEntity findByStatusCode(String statusCode);
-
-    /**
-     * Find by item status id item status entity.
-     *
-     * @param itemStatusId the item status id
-     * @return the item status entity
-     */
-    @Cacheable("Reference")
-    ItemStatusEntity findByItemStatusId(Integer itemStatusId);
 }

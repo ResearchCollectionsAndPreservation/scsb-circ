@@ -2,6 +2,9 @@ package org.recap.model;
 
 import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
+import org.recap.model.jpa.CollectionGroupEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemStatusEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;

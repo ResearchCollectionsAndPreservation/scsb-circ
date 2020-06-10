@@ -1,6 +1,6 @@
 package org.recap.repository;
 
-import org.recap.model.RequestTypeEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

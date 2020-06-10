@@ -1,5 +1,7 @@
 package org.recap.model;
 
+import org.recap.model.jpa.InstitutionEntity;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;

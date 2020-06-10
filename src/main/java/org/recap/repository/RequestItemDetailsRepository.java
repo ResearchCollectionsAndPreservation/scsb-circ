@@ -20,16 +20,8 @@ import java.util.List;
  */
 public interface RequestItemDetailsRepository extends JpaRepository<RequestItemEntity, Integer>, JpaSpecificationExecutor {
 
-    /**
-     * Find by request id request item entity.
-     *
-     * @param requestId the request id
-     * @return the request item entity
-     */
-    RequestItemEntity findByRequestId(@Param("requestId") Integer requestId);
-
-    @Query(value = "select requestItemEntity from RequestItemEntity requestItemEntity inner join requestItemEntity.requestStatusEntity as rse where requestItemEntity.requestId =?1")
-    RequestItemEntity findRequestItemByRequestId(@Param("requestId") Integer requestId);
+    @Query(value = "select requestItemEntity from RequestItemEntity requestItemEntity inner join requestItemEntity.requestStatusEntity as rse where requestItemEntity.id =?1")
+    RequestItemEntity findRequestItemById(@Param("requestId") Integer requestId);
 
     /**
      * Find by request id in list.
@@ -37,7 +29,7 @@ public interface RequestItemDetailsRepository extends JpaRepository<RequestItemE
      * @param requestIds the request ids
      * @return the list
      */
-    List<RequestItemEntity> findByRequestIdIn(List<Integer> requestIds);
+    List<RequestItemEntity> findByIdIn(List<Integer> requestIds);
 
     /**
      * Find by item barcode page.
@@ -52,8 +44,8 @@ public interface RequestItemDetailsRepository extends JpaRepository<RequestItemE
     @Query(value = "select request from RequestItemEntity request inner join request.requestStatusEntity as rse where rse.requestStatusCode = :requestStatusCode")
     List<RequestItemEntity> findByRequestStatusCode(@Param("requestStatusCode") List<String> requestStatusCode);
 
-    @Query(value = "select request from RequestItemEntity request inner join request.requestStatusEntity as rse where request.requestId in(?1) and rse.requestStatusCode in(?2)")
-    List<RequestItemEntity> findByRequestIdsAndStatusCodes(@Param("itemBarcode") List<Integer> requestIds, @Param("requestStatusCode") List<String> requestStatusCodes);
+    @Query(value = "select request from RequestItemEntity request inner join request.requestStatusEntity as rse where request.id in(?1) and rse.requestStatusCode in(?2)")
+    List<RequestItemEntity> findByIdsAndStatusCodes(@Param("itemBarcode") List<Integer> requestIds, @Param("requestStatusCode") List<String> requestStatusCodes);
 
     /**
      * Find by item barcode and request sta code request item entity.
@@ -94,7 +86,7 @@ public interface RequestItemDetailsRepository extends JpaRepository<RequestItemE
      * @param requestIdTo
      * @return
      */
-    @Query(value = "SELECT request FROM RequestItemEntity as request inner join request.requestStatusEntity as rse WHERE rse.requestStatusCode= :requestStatusCode AND request.requestId BETWEEN :requestIdFrom and :requestIdTo")
+    @Query(value = "SELECT request FROM RequestItemEntity as request inner join request.requestStatusEntity as rse WHERE rse.requestStatusCode= :requestStatusCode AND request.id BETWEEN :requestIdFrom and :requestIdTo")
     List<RequestItemEntity> getRequestsBasedOnRequestIdRangeAndRequestStatusCode(@Param("requestIdFrom") Integer requestIdFrom, @Param("requestIdTo")Integer requestIdTo, @Param("requestStatusCode") String requestStatusCode);
 
     /**
@@ -107,6 +99,7 @@ public interface RequestItemDetailsRepository extends JpaRepository<RequestItemE
     List<RequestItemEntity> getRequestsBasedOnDateRangeAndRequestStatusCode(@Param("createdDateFrom") Date createdDateFrom, @Param("createdDateTo") Date createdDateTo, @Param("requestStatusCode") String requestStatusCode);
 
     /**
+     *
      *Gets request id based on the day limit,item id and request status codes.
      *
      * @param itemId
@@ -123,7 +116,6 @@ public interface RequestItemDetailsRepository extends JpaRepository<RequestItemE
     @Query(value = "select request from RequestItemEntity request inner join request.itemEntity item where item.barcode in :itemBarcodes")
     List<RequestItemEntity> findByItemBarcodes(@Param("itemBarcodes")List<String> itemBarcodes);
 
-
-    @Query(value =  "SELECT request FROM RequestItemEntity as request inner join request.requestStatusEntity as rse WHERE rse.requestStatusCode in :pendingLASStatusList AND request.requestId not in (select requestId from PendingRequestEntity)")
+    @Query(value =  "SELECT request FROM RequestItemEntity as request inner join request.requestStatusEntity as rse WHERE rse.requestStatusCode in :pendingLASStatusList AND request.id not in (select requestId from PendingRequestEntity)")
     List<RequestItemEntity> findPendingAndLASReqNotNotified(@Param("pendingLASStatusList")List<String> pendingLASStatusList);
 }

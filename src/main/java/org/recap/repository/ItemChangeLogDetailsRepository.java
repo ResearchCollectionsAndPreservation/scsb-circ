@@ -1,7 +1,7 @@
 package org.recap.repository;
 
 
-import org.recap.model.ItemChangeLogEntity;
+import org.recap.model.jpa.ItemChangeLogEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

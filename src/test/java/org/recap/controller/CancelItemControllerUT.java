@@ -3,6 +3,8 @@ package org.recap.controller;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.*;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.InstitutionDetailsRepository;
 import org.recap.repository.RequestItemDetailsRepository;
 import org.recap.repository.RequestItemStatusDetailsRepository;
@@ -43,7 +45,7 @@ public class CancelItemControllerUT extends BaseTestCase{
     @Test
     public void testCancelRequest() throws Exception {
         RequestItemEntity requestItemEntity = createRequestItem();
-        CancelRequestResponse cancelRequestResponse = cancelItemController.cancelRequest(requestItemEntity.getRequestId());
+        CancelRequestResponse cancelRequestResponse = cancelItemController.cancelRequest(requestItemEntity.getId());
         assertNotNull(cancelRequestResponse);
         assertEquals(cancelRequestResponse.getScreenMessage(),"EDD request cancellation successfully processed.");
         assertTrue(cancelRequestResponse.isSuccess());
@@ -75,7 +77,7 @@ public class CancelItemControllerUT extends BaseTestCase{
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getRequestTypeId());
+        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getId());
         requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         requestItemEntity.setRequestingInstitutionId(2);
         requestItemEntity.setStopCode("test");

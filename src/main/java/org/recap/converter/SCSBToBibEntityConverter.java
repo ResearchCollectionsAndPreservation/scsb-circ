@@ -11,6 +11,10 @@ import org.recap.model.jaxb.Holding;
 import org.recap.model.jaxb.Holdings;
 import org.recap.model.jaxb.Items;
 import org.recap.model.jaxb.marc.CollectionType;
+import org.recap.model.jpa.CollectionGroupEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.ReportEntity;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.repository.BibliographicDetailsRepository;
 import org.recap.repository.CollectionGroupDetailsRepository;
@@ -82,7 +86,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
             Record bibRecordObject = bibMarcRecord.getBibRecord();
             String institutionName = bibRecord.getBib().getOwningInstitutionId();
 
-            Integer owningInstitutionId = institutionEntity.getInstitutionId();
+            Integer owningInstitutionId = institutionEntity.getId();
             Date currentDate = new Date();
             Map<String, Object> bibMap = processAndValidateBibliographicEntity(bibRecordObject, owningInstitutionId, institutionName, owningInstitutionBibId,currentDate,errorMessage);
             BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get(ReCAPConstants.BIBLIOGRAPHIC_ENTITY);
@@ -311,7 +315,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 Iterable<ItemStatusEntity> itemStatusEntities = itemStatusDetailsRepository.findAll();
                 for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
                     ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
-                    itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getItemStatusId());
+                    itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);
@@ -332,7 +336,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
                 for (Iterator iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
                     CollectionGroupEntity collectionGroupEntity = (CollectionGroupEntity) iterator.next();
-                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getCollectionGroupId());
+                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);
@@ -353,7 +357,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 Iterable<InstitutionEntity> institutionEntities = institutionDetailsRepository.findAll();
                 for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
                     InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
-                    institutionEntityMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getInstitutionId());
+                    institutionEntityMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);

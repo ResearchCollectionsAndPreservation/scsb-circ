@@ -3,19 +3,17 @@ package org.recap.model;
 import javax.persistence.*;
 import java.util.List;
 
+import org.recap.model.jpa.AbstractEntity;
+import org.recap.model.jpa.InstitutionEntity;
+
 /**
  * Created by harikrishnanv on 3/4/17.
  */
 
 @Entity
 @Table(name="delivery_restriction_cross_partner_t",schema="recap",catalog="")
-public class DeliveryRestrictionEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="DELIVERY_RESTRICTION_CROSS_PARTNER_ID")
-    private Integer deliveryRestrictionId;
-
+@AttributeOverride(name = "id", column = @Column(name = "DELIVERY_RESTRICTION_CROSS_PARTNER_ID"))
+public class DeliveryRestrictionEntity extends AbstractEntity<Integer>  {
     @Column(name="DELIVERY_RESTRICTIONS")
     private String deliveryRestriction;
 
@@ -25,14 +23,6 @@ public class DeliveryRestrictionEntity {
 
     @ManyToMany(mappedBy = "deliveryRestrictionEntityList")
     private List<CustomerCodeEntity> customerCodeEntityList;
-
-    public Integer getDeliveryRestrictionId() {
-        return deliveryRestrictionId;
-    }
-
-    public void setDeliveryRestrictionId(Integer deliveryRestrictionId) {
-        this.deliveryRestrictionId = deliveryRestrictionId;
-    }
 
     public String getDeliveryRestriction() {
         return deliveryRestriction;

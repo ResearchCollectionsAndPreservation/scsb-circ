@@ -6,7 +6,7 @@ import org.recap.ReCAPConstants;
 import org.recap.model.BibliographicEntity;
 import org.recap.model.HoldingsEntity;
 import org.recap.model.ItemEntity;
-import org.recap.model.ReportDataEntity;
+import org.recap.model.jpa.ReportDataEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;

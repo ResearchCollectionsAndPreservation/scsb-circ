@@ -6,6 +6,7 @@ import org.marc4j.marc.Leader;
 import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
 import org.recap.model.*;
+import org.recap.model.jpa.*;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.model.marc.HoldingsMarcRecord;
 import org.recap.model.marc.ItemMarcRecord;
@@ -73,7 +74,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             Integer owningInstitutionId;
             if(institutionEntity == null){
                 owningInstitutionId = getOwningInstitutionId(bibMarcRecord);
-                institutionEntity = institutionDetailsRepository.findByInstitutionId(owningInstitutionId);
+                institutionEntity = institutionDetailsRepository.findById(owningInstitutionId).orElse(institutionEntity);
             }
             Date currentDate = new Date();
             Map<String, Object> bibMap = processAndValidateBibliographicEntity(bibRecord, institutionEntity,currentDate,errorMessage);
@@ -151,7 +152,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             errorMessage.append(" Owning Institution Bib Id cannot be null");
         }
         if (institutionEntity != null) {
-            bibliographicEntity.setOwningInstitutionId(institutionEntity.getInstitutionId());
+            bibliographicEntity.setOwningInstitutionId(institutionEntity.getId());
         } else {
             errorMessage.append(" Owning Institution Id cannot be null");
         }
@@ -232,7 +233,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             itemEntity.setCopyNumber(Integer.valueOf(copyNumber));
         }
         if (institutionEntity != null) {
-            itemEntity.setOwningInstitutionId(institutionEntity.getInstitutionId());
+            itemEntity.setOwningInstitutionId(institutionEntity.getId());
         } else {
             errorMessage.append(" Owning Institution Id cannot be null");
         }
@@ -289,7 +290,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 Iterable<ItemStatusEntity> itemStatusEntities = itemStatusDetailsRepository.findAll();
                 for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
                     ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
-                    itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getItemStatusId());
+                    itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);
@@ -310,7 +311,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
                 for (Iterator iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
                     CollectionGroupEntity collectionGroupEntity = (CollectionGroupEntity) iterator.next();
-                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getCollectionGroupId());
+                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);
@@ -331,7 +332,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 Iterable<InstitutionEntity> institutionEntities = institutionDetailsRepository.findAll();
                 for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
                     InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
-                    institutionEntityMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getInstitutionId());
+                    institutionEntityMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(ReCAPConstants.LOG_ERROR,e);

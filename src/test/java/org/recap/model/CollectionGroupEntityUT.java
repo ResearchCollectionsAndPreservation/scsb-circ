@@ -2,6 +2,7 @@ package org.recap.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.repository.CollectionGroupDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +27,7 @@ public class CollectionGroupEntityUT extends BaseTestCase{
         collectionGroupEntity.setLastUpdatedDate(new Date());
         CollectionGroupEntity savedCollectionGroupEntity = collectionGroupDetailsRepository.save(collectionGroupEntity);
         assertNotNull(savedCollectionGroupEntity);
-        assertNotNull(savedCollectionGroupEntity.getCollectionGroupId());
+        assertNotNull(savedCollectionGroupEntity.getId());
         assertNotNull(savedCollectionGroupEntity.getCollectionGroupCode());
         assertNotNull(savedCollectionGroupEntity.getCollectionGroupDescription());
         assertNotNull(savedCollectionGroupEntity.getCreatedDate());

@@ -73,7 +73,7 @@ public class BulkItemRequestProcessService {
                     BulkRequestItem bulkRequestItem = new BulkRequestItem();
                     bulkRequestItem.setItemBarcode(requestItemEntity.getItemEntity().getBarcode());
                     bulkRequestItem.setCustomerCode(requestItemEntity.getItemEntity().getCustomerCode());
-                    bulkRequestItem.setRequestId(String.valueOf(requestItemEntity.getRequestId()));
+                    bulkRequestItem.setRequestId(String.valueOf(requestItemEntity.getId()));
                     bulkRequestItem.setRequestStatus(requestItemEntity.getRequestStatusEntity().getRequestStatusDescription());
                     if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)
                             || requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(ReCAPConstants.REQUEST_STATUS_PENDING)) {
@@ -122,19 +122,19 @@ public class BulkItemRequestProcessService {
                 }
                 else if (itemInformationResponse.isSuccess()) {
                     itemInformationResponse.setScreenMessage(ReCAPConstants.SUCCESSFULLY_PROCESSED_REQUEST_ITEM);
-                    itemRequestInformation.setRequestNotes(itemRequestInformation.getRequestNotes() + "\n" + ReCAPConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getBulkRequestId());
+                    itemRequestInformation.setRequestNotes(itemRequestInformation.getRequestNotes() + "\n" + ReCAPConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
                     if (!gfaService.isUseQueueLasCall()) {
                         itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, bulkRequestItemEntity);
                     }
                 } else {
                     requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
                     itemRequestDBService.rollbackUpdateItemAvailabilutyStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
-                    itemRequestInformation.setRequestNotes(ReCAPConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + ReCAPConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getBulkRequestId() + "\n" + itemInformationResponse.getScreenMessage());
+                    itemRequestInformation.setRequestNotes(ReCAPConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + ReCAPConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + itemInformationResponse.getScreenMessage());
                     itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ReCAPConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
                 }
             } else {
                 itemRequestDBService.rollbackUpdateItemAvailabilutyStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
-                itemRequestInformation.setRequestNotes(ReCAPConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + ReCAPConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getBulkRequestId() + "\n" + ReCAPConstants.REQUEST_ILS_EXCEPTION + itemCheckoutResponse.getScreenMessage());
+                itemRequestInformation.setRequestNotes(ReCAPConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + ReCAPConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + ReCAPConstants.REQUEST_ILS_EXCEPTION + itemCheckoutResponse.getScreenMessage());
                 itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ReCAPConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
             }
             itemRequestServiceUtil.updateSolrIndex(itemEntity);

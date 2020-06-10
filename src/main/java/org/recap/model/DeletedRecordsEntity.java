@@ -1,5 +1,9 @@
 package org.recap.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.recap.model.jpa.AbstractEntity;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -8,13 +12,10 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "DELETED_RECORDS_T", schema = "recap", catalog = "")
-public class DeletedRecordsEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "DELETED_RECORDS_ID")
-    private Integer deletedRecordsId;
-
+@AttributeOverride(name = "id", column = @Column(name = "DELETED_RECORDS_ID"))
+@Getter
+@Setter
+public class DeletedRecordsEntity extends AbstractEntity<Integer>  {
     @Column(name = "RECORDS_TABLE")
     private String Records_Table;
 
@@ -33,60 +34,4 @@ public class DeletedRecordsEntity {
 
     @Column(name = "RECORDS_LOG")
     private String recordsLog;
-
-    public Integer getDeletedRecordsId() {
-        return deletedRecordsId;
-    }
-
-    public void setDeletedRecordsId(Integer deletedRecordsId) {
-        this.deletedRecordsId = deletedRecordsId;
-    }
-
-    public String getRecords_Table() {
-        return Records_Table;
-    }
-
-    public void setRecords_Table(String records_Table) {
-        Records_Table = records_Table;
-    }
-
-    public String getRecordsPrimaryKey() {
-        return recordsPrimaryKey;
-    }
-
-    public void setRecordsPrimaryKey(String recordsPrimaryKey) {
-        this.recordsPrimaryKey = recordsPrimaryKey;
-    }
-
-    public String getDeletedReportedStatus() {
-        return deletedReportedStatus;
-    }
-
-    public void setDeletedReportedStatus(String deletedReportedStatus) {
-        this.deletedReportedStatus = deletedReportedStatus;
-    }
-
-    public String getDeletedBy() {
-        return deletedBy;
-    }
-
-    public void setDeletedBy(String deletedBy) {
-        this.deletedBy = deletedBy;
-    }
-
-    public Date getDeletedDate() {
-        return deletedDate;
-    }
-
-    public void setDeletedDate(Date deletedDate) {
-        this.deletedDate = deletedDate;
-    }
-
-    public String getRecordsLog() {
-        return recordsLog;
-    }
-
-    public void setRecordsLog(String recordsLog) {
-        this.recordsLog = recordsLog;
-    }
 }

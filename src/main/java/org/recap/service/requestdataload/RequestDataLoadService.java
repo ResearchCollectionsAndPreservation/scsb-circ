@@ -5,7 +5,7 @@ import org.recap.ReCAPConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.model.ItemEntity;
 import org.recap.model.RequestItemEntity;
-import org.recap.model.RequestTypeEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.RequestItemDetailsRepository;
 import org.recap.repository.RequestTypeDetailsRepository;
@@ -146,7 +146,7 @@ public class RequestDataLoadService {
         Integer requestTypeId = 0;
         if(deliveyMethod.equalsIgnoreCase(ReCAPConstants.REQUEST_DATA_LOAD_REQUEST_TYPE)){
             RequestTypeEntity requestTypeEntity = requestTypeDetailsRepository.findByrequestTypeCode(ReCAPConstants.RETRIEVAL);
-            requestTypeId = requestTypeEntity.getRequestTypeId();
+            requestTypeId = requestTypeEntity.getId();
         }
         return requestTypeId;
     }

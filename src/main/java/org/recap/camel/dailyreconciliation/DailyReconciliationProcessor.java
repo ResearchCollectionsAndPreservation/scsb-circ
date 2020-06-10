@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.recap.ReCAPConstants.getGFAStatusAvailableList;
 import static org.recap.ReCAPConstants.getGFAStatusNotAvailableList;
@@ -158,18 +159,18 @@ public class DailyReconciliationProcessor {
         CellStyle cellStyle = xssfWorkbook.createCellStyle();
         cellStyle.setAlignment(HorizontalAlignment.LEFT);
         if(StringUtils.isNotBlank(requestId)){
-            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByRequestId(Integer.valueOf(requestId));
+            Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(Integer.valueOf(requestId));
             if(requestItemEntity != null){
-                ItemEntity itemEntity = requestItemEntity.getItemEntity();
-                createCell(xssfWorkbook, row,cellStyle, String.valueOf(requestItemEntity.getRequestId()), 0);
+                ItemEntity itemEntity = requestItemEntity.get().getItemEntity();
+                createCell(xssfWorkbook, row,cellStyle, String.valueOf(requestItemEntity.get().getId()), 0);
                 createCell(xssfWorkbook, row,cellStyle, itemEntity.getBarcode(), 1);
                 createCell(xssfWorkbook, row,cellStyle, itemEntity.getCustomerCode(), 2);
-                createCell(xssfWorkbook, row,cellStyle, requestItemEntity.getStopCode(), 3);
-                createCell(xssfWorkbook, row,cellStyle, requestItemEntity.getPatronId(), 4);
-                getCreatedAndLastUpdatedDate(dateCellStyle, requestItemEntity.getCreatedDate(), requestItemEntity.getLastUpdatedDate(), row);
-                createCell(xssfWorkbook, row,cellStyle, String.valueOf(requestItemEntity.getInstitutionEntity().getInstitutionCode()), 7);
+                createCell(xssfWorkbook, row,cellStyle, requestItemEntity.get().getStopCode(), 3);
+                createCell(xssfWorkbook, row,cellStyle, requestItemEntity.get().getPatronId(), 4);
+                getCreatedAndLastUpdatedDate(dateCellStyle, requestItemEntity.get().getCreatedDate(), requestItemEntity.get().getLastUpdatedDate(), row);
+                createCell(xssfWorkbook, row,cellStyle, String.valueOf(requestItemEntity.get().getInstitutionEntity().getInstitutionCode()), 7);
                 createCell(xssfWorkbook, row,cellStyle, String.valueOf(itemEntity.getInstitutionEntity().getInstitutionCode()), 8);
-                createCell(xssfWorkbook, row,cellStyle, requestItemEntity.getRequestTypeEntity().getRequestTypeCode(), 9);
+                createCell(xssfWorkbook, row,cellStyle, requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode(), 9);
                 createCell(xssfWorkbook, row,cellStyle, itemEntity.getItemStatusEntity().getStatusCode(), 10);
 
             }

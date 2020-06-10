@@ -10,6 +10,9 @@ import org.recap.camel.statusreconciliation.StatusReconciliationErrorCSVRecord;
 import org.recap.gfa.model.*;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.*;
+import org.recap.model.jpa.ItemChangeLogEntity;
+import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.RequestStatusEntity;
 import org.recap.processor.LasItemStatusCheckPollingProcessor;
 import org.recap.repository.*;
 import org.recap.util.ItemRequestServiceUtil;
@@ -28,10 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -336,31 +336,31 @@ public class GFAService {
         StatusReconciliationCSVRecord statusReconciliationCSVRecord = new StatusReconciliationCSVRecord();
         List<String> requestStatusCodes = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD);
         List<RequestStatusEntity> requestStatusEntityList = requestItemStatusDetailsRepository.findByRequestStatusCodeIn(requestStatusCodes);
-        List<Integer> requestStatusIds = requestStatusEntityList.stream().map(RequestStatusEntity::getRequestStatusId).collect(Collectors.toList());
+        List<Integer> requestStatusIds = requestStatusEntityList.stream().map(RequestStatusEntity::getId).collect(Collectors.toList());
         List<Integer> requestid = getRequestItemDetailsRepository().getRequestItemEntitiesBasedOnDayLimit(itemEntity.getItemId(),requestStatusIds,statusReconciliationDayLimit);
-        List<RequestItemEntity> requestItemEntityList = getRequestItemDetailsRepository().findByRequestIdIn(requestid);
+        List<RequestItemEntity> requestItemEntityList = getRequestItemDetailsRepository().findByIdIn(requestid);
         List<String> barcodeList = new ArrayList<>();
         List<Integer> requestIdList = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
-        ItemStatusEntity itemStatusEntity = getItemStatusDetailsRepository().findByItemStatusId(itemEntity.getItemAvailabilityStatusId());
+        Optional<ItemStatusEntity> itemStatusEntity = getItemStatusDetailsRepository().findById(itemEntity.getItemAvailabilityStatusId());
         if (!requestItemEntityList.isEmpty()) {
             for (RequestItemEntity requestItemEntity : requestItemEntityList) {
                 if (!requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(ReCAPConstants.REQUEST_STATUS_CANCELED)){
-                    statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity, requestItemEntity);
+                    statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity.get(), requestItemEntity);
                 }else {
                     if (StringUtils.containsIgnoreCase(requestItemEntity.getNotes(),"Cancel requested")){
-                        statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity, requestItemEntity);
+                        statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity.get(), requestItemEntity);
                     }else{
                         RequestStatusEntity byRequestStatusCode = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_REFILED);
-                        requestItemEntity.setRequestStatusId(byRequestStatusCode.getRequestStatusId());
+                        requestItemEntity.setRequestStatusId(byRequestStatusCode.getId());
                         requestItemEntity.setLastUpdatedDate(new Date());
                         requestItemDetailsRepository.save(requestItemEntity);
-                        logger.info("request status updated from cancel to refile for the request id : {}",requestItemEntity.getRequestId());
+                        logger.info("request status updated from cancel to refile for the request id : {}",requestItemEntity.getId());
                     }
                 }
             }
         } else {
-            statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(itemEntity.getBarcode(), "No", null, lasStatus, simpleDateFormat.format(new Date()), itemStatusEntity);
+            statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(itemEntity.getBarcode(), "No", null, lasStatus, simpleDateFormat.format(new Date()), itemStatusEntity.get());
             getItemDetailsRepository().updateAvailabilityStatus(1, ReCAPConstants.GUEST_USER, itemEntity.getBarcode());
             ItemChangeLogEntity itemChangeLogEntity = saveItemChangeLogEntity(itemEntity.getItemId(), ReCAPConstants.GUEST_USER, ReCAPConstants.STATUS_RECONCILIATION_CHANGE_LOG_OPERATION_TYPE, itemEntity.getBarcode());
             itemChangeLogEntityList.add(itemChangeLogEntity);
@@ -378,9 +378,9 @@ public class GFAService {
     }
 
     private StatusReconciliationCSVRecord getStatusReconciliationCSVRecord(String lasStatus, ItemEntity itemEntity, List<String> barcodeList, List<Integer> requestIdList, SimpleDateFormat simpleDateFormat, ItemStatusEntity itemStatusEntity, RequestItemEntity requestItemEntity) {
-        StatusReconciliationCSVRecord statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(itemEntity.getBarcode(), "yes", requestItemEntity.getRequestId().toString(), lasStatus, simpleDateFormat.format(new Date()), itemStatusEntity);
+        StatusReconciliationCSVRecord statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(itemEntity.getBarcode(), "yes", requestItemEntity.getId().toString(), lasStatus, simpleDateFormat.format(new Date()), itemStatusEntity);
         barcodeList.add(itemEntity.getBarcode());
-        requestIdList.add(requestItemEntity.getRequestId());
+        requestIdList.add(requestItemEntity.getId());
         logger.info("found mismatch in item status and refilled for the item id :{}", requestItemEntity.getItemId());
         return statusReconciliationCSVRecord;
     }
@@ -870,8 +870,8 @@ public class GFAService {
         // Update Request_item_t table with new status - each Item
         try {
             RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
-            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findRequestItemByRequestId(itemRequestInfo.getRequestId());
-            requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findRequestItemById(itemRequestInfo.getRequestId());
+            requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
             requestItemEntity.setLastUpdatedDate(new Date());
             requestItemDetailsRepository.save(requestItemEntity);
             logger.info("lasPolling Saved " + requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
@@ -926,7 +926,7 @@ public class GFAService {
             else {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
-                requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                 requestItemDetailsRepository.save(requestItemEntity);
             }
         } catch (Exception exception) {
@@ -953,7 +953,7 @@ public class GFAService {
             else {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
-                requestItemEntity.setRequestStatusId(requestStatusEntity.getRequestStatusId());
+                requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                 requestItemDetailsRepository.save(requestItemEntity);
             }
         } catch (Exception exception) {
@@ -974,7 +974,7 @@ public class GFAService {
         ttitem001.setCustomerCode(requestItemEntity.getItemEntity().getCustomerCode());
         ttitem001.setItemBarcode(requestItemEntity.getItemEntity().getBarcode());
         ttitem001.setDestination(requestItemEntity.getStopCode());
-        ttitem001.setRequestId(String.valueOf(requestItemEntity.getRequestId()));
+        ttitem001.setRequestId(String.valueOf(requestItemEntity.getId()));
         ttitem001.setRequestor(requestItemEntity.getPatronId());
         RetrieveItemRequest retrieveItem = new RetrieveItemRequest();
         retrieveItem.setTtitem(Arrays.asList(ttitem001));
@@ -993,7 +993,7 @@ public class GFAService {
         TtitemEDDResponse ttitem001 = new TtitemEDDResponse();
         ttitem001.setCustomerCode(itemEntity.getCustomerCode());
         ttitem001.setItemBarcode(itemEntity.getBarcode());
-        ttitem001.setRequestId(requestItemEntity.getRequestId());
+        ttitem001.setRequestId(requestItemEntity.getId());
         ttitem001.setRequestor(requestItemEntity.getPatronId());
         ttitem001.setRequestorEmail(requestItemEntity.getEmailId());
 

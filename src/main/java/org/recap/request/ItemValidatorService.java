@@ -4,6 +4,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.recap.ReCAPConstants;
 import org.recap.controller.ItemController;
 import org.recap.model.*;
+import org.recap.model.CustomerCodeEntity;
+import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.repository.CustomerCodeDetailsRepository;
 import org.recap.repository.ItemDetailsRepository;
 import org.recap.repository.ItemStatusDetailsRepository;
@@ -15,10 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -159,10 +158,9 @@ public class ItemValidatorService {
      */
     public String getItemStatus(Integer itemAvailabilityStatusId) {
         String status = "";
-        ItemStatusEntity itemStatusEntity;
-        itemStatusEntity = itemStatusDetailsRepository.findByItemStatusId(itemAvailabilityStatusId);
+        Optional<ItemStatusEntity> itemStatusEntity = itemStatusDetailsRepository.findById(itemAvailabilityStatusId);
         if (itemStatusEntity != null) {
-            status = itemStatusEntity.getStatusCode();
+            status = itemStatusEntity.get().getStatusCode();
         }
         return status;
     }
@@ -245,7 +243,7 @@ public class ItemValidatorService {
 
     private boolean checkRequestItemStatus(String barcode, String requestItemStatus) {
         RequestItemEntity requestItemList = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(barcode, requestItemStatus);
-        if (requestItemList != null && requestItemList.getRequestId() > 0) {
+        if (requestItemList != null && requestItemList.getId() > 0) {
             return false;
         } else {
             return true;

@@ -2,6 +2,8 @@ package org.recap.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.SearchItemResultRow;
+import org.recap.model.jpa.SearchResultRow;
 
 import java.util.Arrays;
 import java.util.Date;

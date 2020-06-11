@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.ReCAPConstants;
 import org.recap.ils.JSIPConnectorFactory;
 import org.recap.ils.model.response.*;
-import org.recap.model.*;
+import org.recap.model.jpa.*;
 import org.recap.request.ItemRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

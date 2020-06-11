@@ -2,6 +2,8 @@ package org.recap.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.CustomerCodeEntity;
+import org.recap.model.jpa.DeliveryRestrictionEntity;
 
 import java.util.Arrays;
 

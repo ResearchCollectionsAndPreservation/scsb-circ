@@ -9,11 +9,8 @@ import org.apache.poi.xssf.usermodel.*;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.camel.dailyreconciliation.DailyReconciliationProcessor;
-import org.recap.model.*;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.RequestTypeEntity;
-import org.recap.repository.RequestItemDetailsRepository;
+import org.recap.model.jpa.*;
+import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;

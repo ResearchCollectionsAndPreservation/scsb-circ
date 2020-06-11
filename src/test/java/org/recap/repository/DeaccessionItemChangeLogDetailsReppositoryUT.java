@@ -2,7 +2,8 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.DeaccessionItemChangeLog;
+import org.recap.model.jpa.DeaccessionItemChangeLog;
+import org.recap.repository.jpa.DeaccesionItemChangeLogDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;

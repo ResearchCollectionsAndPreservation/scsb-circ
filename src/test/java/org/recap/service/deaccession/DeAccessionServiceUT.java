@@ -2,24 +2,18 @@ package org.recap.service.deaccession;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.gfa.model.*;
-import org.recap.model.*;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.RequestTypeEntity;
-import org.recap.repository.BibliographicDetailsRepository;
-import org.recap.repository.ItemDetailsRepository;
-import org.recap.repository.RequestItemDetailsRepository;
+import org.recap.model.jpa.*;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

@@ -3,7 +3,7 @@ package org.recap.model;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.CollectionGroupEntity;
-import org.recap.repository.CollectionGroupDetailsRepository;
+import org.recap.repository.jpa.CollectionGroupDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;

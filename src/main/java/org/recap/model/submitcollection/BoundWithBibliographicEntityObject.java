@@ -2,7 +2,7 @@ package org.recap.model.submitcollection;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.recap.model.BibliographicEntity;
+import org.recap.model.jpa.BibliographicEntity;
 
 import java.util.List;
 

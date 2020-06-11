@@ -8,11 +8,11 @@ import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.converter.MarcToBibEntityConverter;
-import org.recap.model.BibliographicEntity;
-import org.recap.model.HoldingsEntity;
-import org.recap.model.ItemEntity;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
-import org.recap.repository.InstitutionDetailsRepository;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;

@@ -1,8 +1,8 @@
 package org.recap.controller;
 
-import org.recap.model.BibliographicEntity;
-import org.recap.model.ItemEntity;
-import org.recap.repository.ItemDetailsRepository;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.repository.jpa.ItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

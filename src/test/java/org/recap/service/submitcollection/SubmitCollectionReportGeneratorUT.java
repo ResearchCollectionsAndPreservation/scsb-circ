@@ -4,8 +4,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
-import org.recap.model.ReportDataRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.recap.model.jpa.ReportDataRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 

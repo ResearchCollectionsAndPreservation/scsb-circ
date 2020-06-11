@@ -1,6 +1,6 @@
 package org.recap.service.common;
 
-import org.recap.repository.*;
+import org.recap.repository.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

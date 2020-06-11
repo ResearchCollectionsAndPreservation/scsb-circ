@@ -1,6 +1,6 @@
 package org.recap.service.submitcollection;
 
-import org.recap.model.ReportDataRequest;
+import org.recap.model.jpa.ReportDataRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

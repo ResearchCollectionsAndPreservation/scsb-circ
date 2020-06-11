@@ -9,7 +9,7 @@ import org.recap.ils.model.nypl.response.*;
 import org.recap.ils.model.response.*;
 import org.recap.ils.service.NyplApiResponseUtil;
 import org.recap.ils.service.NyplOauthTokenApiService;
-import org.recap.model.ItemRefileResponse;
+import org.recap.model.jpa.ItemRefileResponse;
 import org.recap.processor.NyplJobResponsePollingProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -3,7 +3,8 @@ package org.recap.repository;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.model.BulkRequestItemEntity;
+import org.recap.model.jpa.BulkRequestItemEntity;
+import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;

@@ -1,8 +1,8 @@
 package org.recap.model;
 
-import io.swagger.annotations.ApiModelProperty;
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.SearchItemResultRow;
 
 import static org.junit.Assert.*;
 

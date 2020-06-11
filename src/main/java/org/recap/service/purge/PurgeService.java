@@ -2,9 +2,9 @@ package org.recap.service.purge;
 
 import org.recap.ReCAPConstants;
 import org.recap.model.jpa.RequestTypeEntity;
-import org.recap.repository.AccessionDetailsRepository;
-import org.recap.repository.RequestItemDetailsRepository;
-import org.recap.repository.RequestTypeDetailsRepository;
+import org.recap.repository.jpa.AccessionDetailsRepository;
+import org.recap.repository.jpa.RequestItemDetailsRepository;
+import org.recap.repository.jpa.RequestTypeDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

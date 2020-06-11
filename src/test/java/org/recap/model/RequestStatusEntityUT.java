@@ -2,7 +2,7 @@ package org.recap.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.repository.RequestItemStatusDetailsRepository;
+import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;

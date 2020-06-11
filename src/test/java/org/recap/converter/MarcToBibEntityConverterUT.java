@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
-import org.recap.model.BibliographicEntity;
-import org.recap.repository.InstitutionDetailsRepository;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.util.MarcUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 

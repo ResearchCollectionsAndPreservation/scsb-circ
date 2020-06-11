@@ -1,6 +1,5 @@
 package org.recap.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.ProducerTemplate;
@@ -11,11 +10,11 @@ import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.gfa.model.*;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.ItemRequestInformation;
-import org.recap.repository.ItemChangeLogDetailsRepository;
-import org.recap.repository.ItemDetailsRepository;
-import org.recap.repository.ItemStatusDetailsRepository;
-import org.recap.repository.RequestItemDetailsRepository;
+import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.repository.jpa.ItemStatusDetailsRepository;
+import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,7 +2,7 @@ package org.recap.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.repository.ItemChangeLogDetailsRepository;
+import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;

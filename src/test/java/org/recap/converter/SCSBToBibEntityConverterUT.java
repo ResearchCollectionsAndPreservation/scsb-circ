@@ -2,10 +2,10 @@ package org.recap.converter;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.BibliographicEntity;
+import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
-import org.recap.repository.InstitutionDetailsRepository;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.JAXBException;

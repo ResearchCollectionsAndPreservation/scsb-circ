@@ -3,11 +3,11 @@ package org.recap.controller;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.model.BibliographicEntity;
-import org.recap.model.HoldingsEntity;
-import org.recap.model.ItemEntity;
-import org.recap.model.ItemRequestInformation;
-import org.recap.repository.BibliographicDetailsRepository;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 

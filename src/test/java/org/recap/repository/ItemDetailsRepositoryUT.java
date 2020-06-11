@@ -3,9 +3,11 @@ package org.recap.repository;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.controller.ItemController;
-import org.recap.model.BibliographicEntity;
-import org.recap.model.HoldingsEntity;
-import org.recap.model.ItemEntity;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;

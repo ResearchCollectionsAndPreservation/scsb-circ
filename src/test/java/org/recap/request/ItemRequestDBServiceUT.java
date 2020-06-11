@@ -2,10 +2,9 @@ package org.recap.request;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.*;
-import org.recap.model.jpa.RequestTypeEntity;
-import org.recap.repository.InstitutionDetailsRepository;
-import org.recap.repository.RequestTypeDetailsRepository;
+import org.recap.model.jpa.*;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
+import org.recap.repository.jpa.RequestTypeDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;

@@ -3,7 +3,7 @@ package org.recap.model;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.repository.ItemStatusDetailsRepository;
+import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;

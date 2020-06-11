@@ -3,7 +3,7 @@ package org.recap.request;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.model.ItemRequestInformation;
+import org.recap.model.jpa.ItemRequestInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 

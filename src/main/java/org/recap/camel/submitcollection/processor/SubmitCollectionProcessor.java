@@ -4,7 +4,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.recap.camel.EmailPayLoad;
-import org.recap.model.ReportDataRequest;
+import org.recap.model.jpa.ReportDataRequest;
 import org.recap.service.common.SetupDataService;
 import org.recap.service.submitcollection.SubmitCollectionBatchService;
 import org.recap.service.submitcollection.SubmitCollectionReportGenerator;

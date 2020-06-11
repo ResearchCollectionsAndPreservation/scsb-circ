@@ -2,8 +2,10 @@ package org.recap.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.repository.CustomerCodeDetailsRepository;
-import org.recap.repository.InstitutionDetailsRepository;
+import org.recap.model.jpa.CustomerCodeEntity;
+import org.recap.model.jpa.DeliveryRestrictionEntity;
+import org.recap.repository.jpa.CustomerCodeDetailsRepository;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;

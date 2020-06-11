@@ -3,9 +3,9 @@ package org.recap.util;
 import org.junit.Test;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
-import org.recap.model.BibliographicEntity;
-import org.recap.model.HoldingsEntity;
-import org.recap.model.ItemEntity;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ReportDataEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 

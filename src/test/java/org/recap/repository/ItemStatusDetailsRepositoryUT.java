@@ -3,6 +3,7 @@ package org.recap.repository;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

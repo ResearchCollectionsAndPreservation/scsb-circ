@@ -2,7 +2,7 @@ package org.recap.controller;
 
 import org.recap.ReCAPConstants;
 import org.recap.ils.JSIPConnectorFactory;
-import org.recap.model.ItemRequestInformation;
+import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.request.ItemValidatorService;
 import org.recap.request.RequestParamaterValidatorService;
 import org.slf4j.Logger;

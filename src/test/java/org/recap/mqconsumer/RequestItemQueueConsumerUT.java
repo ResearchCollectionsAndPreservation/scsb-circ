@@ -6,18 +6,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
-import org.recap.model.ItemRequestInformation;
+import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.request.ItemEDDRequestService;
 import org.recap.request.ItemRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.util.Arrays;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by hemalathas on 14/3/17.

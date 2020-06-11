@@ -15,11 +15,8 @@ import org.recap.ils.model.response.ItemCreateBibResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.ils.model.response.ItemRecallResponse;
-import org.recap.model.*;
-import org.recap.model.CustomerCodeEntity;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.repository.*;
+import org.recap.model.jpa.*;
+import org.recap.repository.jpa.*;
 import org.recap.service.RestHeaderService;
 import org.recap.util.ItemRequestServiceUtil;
 import org.recap.util.SecurityUtil;
@@ -324,7 +321,7 @@ public class ItemRequestService {
      * @param itemRefileRequest the item refile request
      * @return the boolean
      */
-    public ItemRefileResponse reFileItem(ItemRefileRequest itemRefileRequest,ItemRefileResponse itemRefileResponse) {
+    public ItemRefileResponse reFileItem(ItemRefileRequest itemRefileRequest, ItemRefileResponse itemRefileResponse) {
 
         logger.info("Processing received Refile request");
         logger.info("Refile Request Information : Barcodes {} , Request Id's : {}", itemRefileRequest.getItemBarcodes(), itemRefileRequest.getRequestIds());

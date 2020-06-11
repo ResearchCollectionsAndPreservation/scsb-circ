@@ -1,7 +1,7 @@
 package org.recap.service.DeletedRecords;
 
 import org.recap.ReCAPConstants;
-import org.recap.repository.DeletedRecordsRepository;
+import org.recap.repository.jpa.DeletedRecordsRepository;
 import org.recap.request.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

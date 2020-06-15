@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by hemalathas on 22/6/16.
  */
-public interface RequestItemStatusDetailsRepository extends PagingAndSortingRepository<RequestStatusEntity, Integer> {
+public interface RequestItemStatusDetailsRepository extends BaseRepository<RequestStatusEntity> {
 
     /**
      * Find by request status code request status entity.

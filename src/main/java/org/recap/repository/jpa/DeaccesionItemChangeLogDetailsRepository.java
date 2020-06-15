@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
  * Created by akulak on 26/2/18 .
  */
 @Repository
-public interface DeaccesionItemChangeLogDetailsRepository extends JpaRepository<DeaccessionItemChangeLog,Integer> {
+public interface DeaccesionItemChangeLogDetailsRepository extends BaseRepository<DeaccessionItemChangeLog> {
 
 }

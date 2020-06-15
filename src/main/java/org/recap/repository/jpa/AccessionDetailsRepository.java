@@ -12,7 +12,7 @@ import java.util.Date;
 /**
  * Created by rajeshbabuk on 8/5/17.
  */
-public interface AccessionDetailsRepository extends JpaRepository<AccessionEntity, Integer> {
+public interface AccessionDetailsRepository extends BaseRepository<AccessionEntity> {
 
     @Transactional
     @Modifying(clearAutomatically = true)

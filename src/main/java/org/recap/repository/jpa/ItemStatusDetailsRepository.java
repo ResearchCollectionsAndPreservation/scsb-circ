@@ -7,7 +7,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 /**
  * Created by hemalathas on 22/6/16.
  */
-public interface ItemStatusDetailsRepository extends PagingAndSortingRepository<ItemStatusEntity, Integer> {
+public interface ItemStatusDetailsRepository extends BaseRepository<ItemStatusEntity> {
 
     /**
      * Find by status code item status entity.

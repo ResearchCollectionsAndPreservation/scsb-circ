@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PendingRequestDetailsRespository extends JpaRepository<PendingRequestEntity,Integer> {
+public interface PendingRequestDetailsRespository extends BaseRepository<PendingRequestEntity> {
 
     List<PendingRequestEntity> save(List<RequestItemEntity> pendingRequestItemEntities);
 

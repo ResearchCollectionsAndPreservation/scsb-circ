@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by SheikS on 8/8/2016.
  */
-public interface ReportDetailRepository extends JpaRepository<ReportEntity, Integer> {
+public interface ReportDetailRepository extends BaseRepository<ReportEntity> {
 
     /**
      * Find by file name list.

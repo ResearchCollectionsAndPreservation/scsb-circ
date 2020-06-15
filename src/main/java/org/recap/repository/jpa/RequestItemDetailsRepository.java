@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by rajeshbabuk on 26/10/16.
  */
-public interface RequestItemDetailsRepository extends JpaRepository<RequestItemEntity, Integer>, JpaSpecificationExecutor {
+public interface RequestItemDetailsRepository extends BaseRepository<RequestItemEntity>, JpaSpecificationExecutor {
 
     @Query(value = "select requestItemEntity from RequestItemEntity requestItemEntity inner join requestItemEntity.requestStatusEntity as rse where requestItemEntity.id =?1")
     RequestItemEntity findRequestItemById(@Param("requestId") Integer requestId);

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by rajeshbabuk on 8/5/17.
  */
-public interface DeletedRecordsRepository extends JpaRepository<DeletedRecordsEntity, Integer> {
+public interface DeletedRecordsRepository extends BaseRepository<DeletedRecordsEntity> {
 
     List<DeletedRecordsEntity> findByDeletedReportedStatus(@Param("deletedReportedStatus") String customerCode);
     Long countByDeletedReportedStatus(@Param("deletedReportedStatus") String customerCode);

@@ -6,7 +6,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 /**
  * Created by hemalathas on 22/6/16.
  */
-public interface InstitutionDetailsRepository extends PagingAndSortingRepository<InstitutionEntity,Integer> {
+public interface InstitutionDetailsRepository extends BaseRepository<InstitutionEntity> {
 
     /**
      * Find by institution code institution entity.

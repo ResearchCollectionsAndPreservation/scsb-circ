@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * The interface Customer code details repository.
  */
-public interface CustomerCodeDetailsRepository extends JpaRepository<CustomerCodeEntity, Integer> {
+public interface CustomerCodeDetailsRepository extends BaseRepository<CustomerCodeEntity> {
 
     /**
      * Find by customer code customer code entity.

@@ -4,12 +4,12 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.collections4.ListUtils;
 import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
+import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
-import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.model.submitcollection.BarcodeBibliographicEntityObject;
@@ -24,7 +24,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
 import javax.xml.bind.JAXBException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -147,8 +152,8 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
         BibRecords bibRecords = null;
         try {
             bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(inputRecords, BibRecords.class);
-            logger.info("bibrecord size {}", bibRecords.getBibRecords().size());
-            if (checkLimit && bibRecords.getBibRecords().size() > inputLimit) {
+            logger.info("bibrecord size {}", bibRecords.getBibRecordList().size());
+            if (checkLimit && bibRecords.getBibRecordList().size() > inputLimit) {
                 return ReCAPConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + " " + inputLimit;
             }
         } catch (JAXBException e) {
@@ -158,11 +163,11 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
         }
 
         List<BibliographicEntity> validBibliographicEntityList = new ArrayList<>();
-        for (BibRecord bibRecord : bibRecords.getBibRecords()) {
+        for (BibRecord bibRecord : bibRecords.getBibRecordList()) {
             BibliographicEntity bibliographicEntity = prepareBibliographicEntity(bibRecord, format, submitCollectionReportInfoMap,idMapToRemoveIndexList,isCGDProtected,institutionEntity);
             validBibliographicEntityList.add(bibliographicEntity);
         }
-        logger.info("Total incoming scsb records for processing--->{}",bibRecords.getBibRecords().size());
+        logger.info("Total incoming scsb records for processing--->{}",bibRecords.getBibRecordList().size());
         processConvertedBibliographicEntityFromIncomingRecords(processedBibIds, submitCollectionReportInfoMap, idMapToRemoveIndexList, bibIdMapToRemoveIndexList, institutionEntity, updatedDummyRecordOwnInstBibIdSet, validBibliographicEntityList);
         stopWatch.stop();
         logger.info("Total time take for process SCSB--->{}",stopWatch.getTotalTimeSeconds());

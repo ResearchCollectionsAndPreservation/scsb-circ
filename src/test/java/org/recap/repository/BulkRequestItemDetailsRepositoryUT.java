@@ -39,7 +39,7 @@ public class BulkRequestItemDetailsRepositoryUT extends BaseTestCase {
     @Test
     public void testBulkRequestItemEntity(){
         BulkRequestItemEntity bulkRequestItemEntity = new BulkRequestItemEntity();
-        bulkRequestItemEntity.setBulkRequestId(1);
+        bulkRequestItemEntity.setId(1);
         bulkRequestItemEntity.setBulkRequestName("TestFirstBulkRequest");
         bulkRequestItemEntity.setBulkRequestFileName("bulkItemUpload");
         bulkRequestItemEntity.setBulkRequestFileData("BARCODE\tCUSTOMER_CODE\n32101075852275\tPK".getBytes());
@@ -49,8 +49,7 @@ public class BulkRequestItemDetailsRepositoryUT extends BaseTestCase {
         bulkRequestItemEntity.setCreatedDate(new Date());
         bulkRequestItemEntity.setStopCode("PA");
         bulkRequestItemEntity.setPatronId("45678915");
-
-        assertNotNull(bulkRequestItemEntity.getBulkRequestId());
+        assertNotNull(bulkRequestItemEntity.getId());
         assertNotNull(bulkRequestItemEntity.getBulkRequestName());
         assertNotNull(bulkRequestItemEntity.getBulkRequestFileName());
         assertNotNull(bulkRequestItemEntity.getBulkRequestFileData());

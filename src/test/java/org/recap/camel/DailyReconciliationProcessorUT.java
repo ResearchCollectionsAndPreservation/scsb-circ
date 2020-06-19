@@ -5,11 +5,21 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.camel.dailyreconciliation.DailyReconciliationProcessor;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -191,7 +201,7 @@ public class DailyReconciliationProcessorUT extends BaseTestCase {
     public RequestItemEntity saveRequestItemEntity(Integer itemId,ItemEntity itemEntity){
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(itemId);
-        requestItemEntity.setRequestId(new Random().nextInt());
+        requestItemEntity.setId(new Random().nextInt());
         requestItemEntity.setRequestTypeId(1);
         requestItemEntity.setCreatedBy("test");
         requestItemEntity.setStopCode("PA");
@@ -227,7 +237,7 @@ public class DailyReconciliationProcessorUT extends BaseTestCase {
 
     private InstitutionEntity getInstitutionEntity() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
-        institutionEntity.setInstitutionId(1);
+        institutionEntity.setId(1);
         institutionEntity.setInstitutionCode("PUL");
         institutionEntity.setInstitutionName("PUL");
         return institutionEntity;

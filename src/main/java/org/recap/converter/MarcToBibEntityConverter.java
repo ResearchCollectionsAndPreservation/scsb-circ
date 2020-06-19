@@ -5,11 +5,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.marc4j.marc.Leader;
 import org.marc4j.marc.Record;
 import org.recap.ReCAPConstants;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.CollectionGroupEntity;
+import org.recap.model.jpa.CustomerCodeEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.ReportEntity;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.model.marc.HoldingsMarcRecord;
 import org.recap.model.marc.ItemMarcRecord;
-import org.recap.repository.jpa.*;
+import org.recap.repository.jpa.CollectionGroupDetailsRepository;
+import org.recap.repository.jpa.CustomerCodeDetailsRepository;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.recap.util.DBReportUtil;
 import org.recap.util.MarcUtil;
 import org.slf4j.Logger;
@@ -17,7 +28,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by chenchulakshmig on 17/10/16.

@@ -2,7 +2,14 @@ package org.recap.controller;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jpa.*;
+import org.recap.model.CancelRequestResponse;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
@@ -15,7 +22,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by hemalathas on 17/2/17.
@@ -71,7 +80,7 @@ public class CancelItemControllerUT extends BaseTestCase{
         RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
         assertNotNull(savedRequestTypeEntity);
 
-        RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusId(3);
+        RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findById(3).orElse(null);
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());

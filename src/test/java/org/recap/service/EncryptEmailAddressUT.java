@@ -2,7 +2,13 @@ package org.recap.service;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
@@ -46,8 +52,8 @@ public class EncryptEmailAddressUT extends BaseTestCase {
         RequestItemEntity requestItem = createRequestItem();
         String encryptedValue = securityUtil.getEncryptedValue("test@gmail.com");
         encryptEmailAddressService.encryptEmailAddress();
-        System.out.println(requestItem.getRequestId());
-        RequestItemEntity requestItemEntity = requestItemDetailsRepository.findById(requestItem.getRequestId());
+        System.out.println(requestItem.getId());
+        RequestItemEntity requestItemEntity = requestItemDetailsRepository.findById(requestItem.getId()).orElse(null);
         assertEquals(requestItemEntity.getEmailId(),encryptedValue);
         String decryptedValue = securityUtil.getDecryptedValue(encryptedValue);
         assertEquals("test@gmail.com",decryptedValue);
@@ -66,11 +72,11 @@ public class EncryptEmailAddressUT extends BaseTestCase {
         RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
         assertNotNull(savedRequestTypeEntity);
 
-        RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusId(3);
+        RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findById(3).orElse(null);
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        requestItemEntity.setRequestTypeId(savedrequestTypeEntity.getId());
+        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getId());
         requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         requestItemEntity.setRequestingInstitutionId(2);
         requestItemEntity.setStopCode("test");

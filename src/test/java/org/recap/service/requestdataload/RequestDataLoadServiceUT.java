@@ -6,6 +6,7 @@ import org.recap.ReCAPConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
@@ -13,9 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by hemalathas on 21/7/17.
@@ -68,7 +74,7 @@ public class RequestDataLoadServiceUT extends BaseTestCase{
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionId(entity.getInstitutionId());
+        bibliographicEntity.setOwningInstitutionId(entity.getId());
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings".getBytes());

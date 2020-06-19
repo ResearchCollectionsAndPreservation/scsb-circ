@@ -1,6 +1,11 @@
 package org.recap.camel.submitcollection;
 
-import org.apache.camel.*;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
+import org.apache.camel.Processor;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.ShutdownRoute;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;

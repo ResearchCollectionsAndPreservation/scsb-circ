@@ -8,7 +8,8 @@ import org.recap.model.jpa.SearchResultRow;
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by hemalathas on 14/3/17.

@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.RequestInstitutionBibPK;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 23/3/17.

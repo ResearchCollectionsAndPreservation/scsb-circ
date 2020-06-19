@@ -6,7 +6,8 @@ import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 14/3/17.

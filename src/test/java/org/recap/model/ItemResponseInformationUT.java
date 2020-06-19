@@ -6,7 +6,7 @@ import org.recap.model.jpa.ItemResponseInformation;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 20/3/17.

@@ -2,12 +2,19 @@ package org.recap.model.jaxb;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jaxb.marc.*;
+import org.recap.model.jaxb.marc.CollectionType;
+import org.recap.model.jaxb.marc.ContentType;
+import org.recap.model.jaxb.marc.ControlFieldType;
+import org.recap.model.jaxb.marc.DataFieldType;
+import org.recap.model.jaxb.marc.LeaderFieldType;
+import org.recap.model.jaxb.marc.RecordType;
+import org.recap.model.jaxb.marc.RecordTypeType;
+import org.recap.model.jaxb.marc.SubfieldatafieldType;
 
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 23/3/17.

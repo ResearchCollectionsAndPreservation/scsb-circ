@@ -2,7 +2,12 @@ package org.recap.request;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +18,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 21/2/17.
@@ -74,7 +79,7 @@ public class ItemRequestDBServiceUT extends BaseTestCase{
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionId(entity.getInstitutionId());
+        bibliographicEntity.setOwningInstitutionId(entity.getId());
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings".getBytes());

@@ -11,7 +11,12 @@ import org.recap.converter.XmlToBibEntityConverterInterface;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ReportDataEntity;
+import org.recap.model.jpa.ReportEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.model.submitcollection.SubmitCollectionResponse;
 import org.recap.service.common.RepositoryService;
@@ -29,7 +34,13 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
 import javax.xml.bind.JAXBException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by premkb on 20/12/16.
@@ -188,8 +199,8 @@ public class SubmitCollectionService {
         BibRecords bibRecords = null;
         try {
             bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(inputRecords, BibRecords.class);
-            logger.info("bibrecord size {}", bibRecords.getBibRecords().size());
-            if (checkLimit && bibRecords.getBibRecords().size() > inputLimit) {
+            logger.info("bibrecord size {}", bibRecords.getBibRecordList().size());
+            if (checkLimit && bibRecords.getBibRecordList().size() > inputLimit) {
                 return ReCAPConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + " " + inputLimit;
             }
         } catch (JAXBException e) {
@@ -199,7 +210,7 @@ public class SubmitCollectionService {
         }
         int count = 1;
         Set<String> processedBarcodeSetForDummyRecords = new HashSet<>();
-        for (BibRecord bibRecord : bibRecords.getBibRecords()) {
+        for (BibRecord bibRecord : bibRecords.getBibRecordList()) {
             logger.info("Processing Bib record no: {}",count);
             try {
                 BibliographicEntity bibliographicEntity = loadData(bibRecord, format, submitCollectionReportInfoMap, idMapToRemoveIndexList,isCGDProtected,institutionEntity,processedBarcodeSetForDummyRecords);

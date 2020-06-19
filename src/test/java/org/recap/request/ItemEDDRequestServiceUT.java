@@ -9,7 +9,12 @@ import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.controller.RequestItemValidatorController;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.model.jpa.SearchResultRow;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
@@ -22,9 +27,13 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
@@ -148,7 +157,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCase{
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionId(entity.getInstitutionId());
+        bibliographicEntity.setOwningInstitutionId(entity.getId());
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings".getBytes());

@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by hemalathas on 23/3/17.
@@ -79,7 +80,7 @@ public class ReportEntityUT extends BaseTestCase{
 
         ReportEntity savedReportEntity = reportDetailRepository.save(reportEntity);
         assertNotNull(savedReportEntity);
-        assertNotNull(savedReportEntity.getRecordNumber());
+        assertNotNull(savedReportEntity.getId());
         assertNotNull(savedReportEntity.getCreatedDate());
         assertNotNull(savedReportEntity.getFileName());
         assertNotNull(savedReportEntity.getInstitutionName());
@@ -88,7 +89,7 @@ public class ReportEntityUT extends BaseTestCase{
         assertNotNull(savedReportEntity.getReportDataEntities().get(0).getHeaderName());
         assertNull(savedReportEntity.getReportDataEntities().get(0).getRecordNum());
         assertNotNull(savedReportEntity.getReportDataEntities().get(0).getHeaderValue());
-        assertNotNull(savedReportEntity.getReportDataEntities().get(0).getReportDataId());
+        assertNotNull(savedReportEntity.getReportDataEntities().get(0).getId());
     }
 
 }

@@ -1,6 +1,10 @@
 package org.recap.controller;
 
-import org.apache.camel.*;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
+import org.apache.camel.PollingConsumer;
+import org.apache.camel.ProducerTemplate;
 import org.recap.ReCAPConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -32,12 +32,12 @@ public class AccessionDetailsRepositoryUT extends BaseTestCase {
     @Test
     public void testAccessionEntity(){
         AccessionEntity accessionEntity = new AccessionEntity();
-        accessionEntity.setAccessionId(1);
+        accessionEntity.setId(1);
         accessionEntity.setAccessionRequest("[{\"customerCode\":\"PA\",\"itemBarcode\":\"123\"}]");
         accessionEntity.setCreatedDate(new Date());
         accessionEntity.setAccessionStatus(ReCAPConstants.COMPLETE);
 
-        assertNotNull(accessionEntity.getAccessionId());
+        assertNotNull(accessionEntity.getId());
         assertNotNull(accessionEntity.getAccessionRequest());
         assertNotNull(accessionEntity.getAccessionStatus());
         assertNotNull(accessionEntity.getCreatedDate());

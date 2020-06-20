@@ -7,7 +7,14 @@ import org.recap.ReCAPConstants;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ReportEntity;
+import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
@@ -20,9 +27,18 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -227,12 +243,12 @@ public class DeAccessionServiceUT extends BaseTestCase {
         requestTypeEntity2.setRequestTypeDesc("RECALL");
 
         RequestStatusEntity requestStatusEntity1 = new RequestStatusEntity();
-        requestStatusEntity1.setRequestStatusId(1);
+        requestStatusEntity1.setId(1);
         requestStatusEntity1.setRequestStatusCode("RETRIEVAL_ORDER_PLACED");
         requestStatusEntity1.setRequestStatusDescription("RETRIEVAL_ORDER_PLACED");
 
         RequestStatusEntity requestStatusEntity2 = new RequestStatusEntity();
-        requestStatusEntity2.setRequestStatusId(2);
+        requestStatusEntity2.setId(2);
         requestStatusEntity2.setRequestStatusCode("RECALL_ORDER_PLACED");
         requestStatusEntity2.setRequestStatusDescription("RECALL_ORDER_PLACED");
 
@@ -249,7 +265,7 @@ public class DeAccessionServiceUT extends BaseTestCase {
         List<RequestItemEntity> requestItemEntities = new ArrayList<>();
 
         RequestItemEntity requestItemEntity1 = new RequestItemEntity();
-        requestItemEntity1.setRequestId(1);
+        requestItemEntity1.setId(1);
         requestItemEntity1.setItemId(2);
         requestItemEntity1.setRequestTypeId(1);
         requestItemEntity1.setRequestingInstitutionId(1);
@@ -268,7 +284,7 @@ public class DeAccessionServiceUT extends BaseTestCase {
         requestItemEntities.add(requestItemEntity1);
 
         RequestItemEntity requestItemEntity2 = new RequestItemEntity();
-        requestItemEntity2.setRequestId(2);
+        requestItemEntity2.setId(2);
         requestItemEntity2.setItemId(2);
         requestItemEntity2.setRequestTypeId(2);
         requestItemEntity2.setRequestingInstitutionId(1);

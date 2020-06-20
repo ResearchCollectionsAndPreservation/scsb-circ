@@ -6,7 +6,14 @@ import org.mockito.Mock;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
@@ -22,7 +29,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by hemalathas on 20/3/17.
@@ -148,7 +156,7 @@ public class ItemRequestServiceUT extends BaseTestCase {
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionId(entity.getInstitutionId());
+        bibliographicEntity.setOwningInstitutionId(entity.getId());
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
         bibliographicEntity.setCatalogingStatus("Complete");
         HoldingsEntity holdingsEntity = new HoldingsEntity();

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * This controller is intended to be used from scsb-schduler project, The methods are used for deleting information from certain columns or records from certain tables, after certain period.

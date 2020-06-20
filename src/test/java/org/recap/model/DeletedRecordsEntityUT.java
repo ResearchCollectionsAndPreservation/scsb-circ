@@ -6,7 +6,7 @@ import org.recap.model.jpa.DeletedRecordsEntity;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 13/7/17.
@@ -16,7 +16,7 @@ public class DeletedRecordsEntityUT extends BaseTestCase{
     @Test
     public void testDeletedRecordsEntity(){
         DeletedRecordsEntity deletedRecordsEntity = new DeletedRecordsEntity();
-        deletedRecordsEntity.setDeletedRecordsId(1);
+        deletedRecordsEntity.setId(1);
         deletedRecordsEntity.setRecords_Table("Test");
         deletedRecordsEntity.setRecordsPrimaryKey("Test");
         deletedRecordsEntity.setDeletedReportedStatus("Deleted");
@@ -26,7 +26,7 @@ public class DeletedRecordsEntityUT extends BaseTestCase{
 
         assertNotNull(deletedRecordsEntity.getDeletedBy());
         assertNotNull(deletedRecordsEntity.getDeletedDate());
-        assertNotNull(deletedRecordsEntity.getDeletedRecordsId());
+        assertNotNull(deletedRecordsEntity.getId());
         assertNotNull(deletedRecordsEntity.getDeletedReportedStatus());
         assertNotNull(deletedRecordsEntity.getRecords_Table());
         assertNotNull(deletedRecordsEntity.getRecordsLog());

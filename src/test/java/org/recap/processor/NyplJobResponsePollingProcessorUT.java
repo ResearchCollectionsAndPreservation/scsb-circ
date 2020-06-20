@@ -5,7 +5,7 @@ import org.recap.BaseTestCase;
 import org.recap.ils.model.nypl.response.JobResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 21/2/17.

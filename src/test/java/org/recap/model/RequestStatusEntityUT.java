@@ -2,10 +2,11 @@ package org.recap.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.model.jpa.RequestStatusEntity;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 17/2/17.
@@ -22,7 +23,7 @@ public class RequestStatusEntityUT extends BaseTestCase{
         requestStatusEntity.setRequestStatusDescription("Refile");
         RequestStatusEntity savedRequestStatusEntity = requestItemStatusDetailsRepository.save(requestStatusEntity);
         assertNotNull(savedRequestStatusEntity);
-        assertNotNull(savedrequestStatusEntity.getId());
+        assertNotNull(savedRequestStatusEntity.getId());
     }
 
 }

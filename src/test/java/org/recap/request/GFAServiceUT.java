@@ -8,7 +8,26 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.ReCAPConstants;
-import org.recap.gfa.model.*;
+import org.recap.gfa.model.GFAPwdDsItemRequest;
+import org.recap.gfa.model.GFAPwdDsItemResponse;
+import org.recap.gfa.model.GFAPwdRequest;
+import org.recap.gfa.model.GFAPwdResponse;
+import org.recap.gfa.model.GFAPwdTtItemRequest;
+import org.recap.gfa.model.GFAPwdTtItemResponse;
+import org.recap.gfa.model.GFAPwiDsItemRequest;
+import org.recap.gfa.model.GFAPwiDsItemResponse;
+import org.recap.gfa.model.GFAPwiRequest;
+import org.recap.gfa.model.GFAPwiResponse;
+import org.recap.gfa.model.GFAPwiTtItemRequest;
+import org.recap.gfa.model.GFAPwiTtItemResponse;
+import org.recap.gfa.model.GFARetrieveEDDItemRequest;
+import org.recap.gfa.model.GFARetrieveItemRequest;
+import org.recap.gfa.model.GFARetrieveItemResponse;
+import org.recap.gfa.model.ProdsBefore;
+import org.recap.gfa.model.RetrieveItem;
+import org.recap.gfa.model.RetrieveItemRequest;
+import org.recap.gfa.model.TtitemEDDResponse;
+import org.recap.gfa.model.TtitemRequest;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
@@ -20,7 +39,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
@@ -29,7 +53,10 @@ import java.sql.Time;
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by hemalathas on 21/2/17.

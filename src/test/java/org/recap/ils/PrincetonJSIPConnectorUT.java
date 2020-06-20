@@ -7,14 +7,22 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
-import org.recap.ils.model.response.*;
+import org.recap.ils.model.response.ItemCheckinResponse;
+import org.recap.ils.model.response.ItemCheckoutResponse;
+import org.recap.ils.model.response.ItemCreateBibResponse;
+import org.recap.ils.model.response.ItemHoldResponse;
+import org.recap.ils.model.response.ItemInformationResponse;
+import org.recap.ils.model.response.ItemRecallResponse;
+import org.recap.ils.model.response.PatronInformationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by saravanakumarp on 28/9/16.

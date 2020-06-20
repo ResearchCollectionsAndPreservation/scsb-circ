@@ -2,7 +2,12 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
@@ -51,7 +56,7 @@ public class PatronDetailsRepositoryUT extends BaseTestCase {
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        requestItemEntity.setRequestTypeId(savedrequestTypeEntity.getId());
+        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getId());
         requestItemEntity.setRequestingInstitutionId(1);
         requestItemEntity.setPatronId("45678912");
         requestItemEntity.setStopCode("test");

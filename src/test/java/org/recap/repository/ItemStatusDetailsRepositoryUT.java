@@ -22,7 +22,7 @@ public class ItemStatusDetailsRepositoryUT extends BaseTestCase{
 
     @Test
     public void testItemStatus(){
-        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByItemStatusId(1);
+        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findById(1).orElse(null);
         logger.info(itemStatusEntity.getStatusCode());
         assertNotNull(itemStatusEntity);
         assertEquals(itemStatusEntity.getStatusCode(),"Available");

@@ -5,7 +5,8 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.PollingConsumer;
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +40,15 @@ public class SubmitCollectionJobController {
     public String startSubmitCollection() throws Exception{
 
 
-        camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE);
+        camelContext.getRouteController().startRoute(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE);
 
-        Endpoint endpoint = camelContext.getEndpoint(ReCAPConstants.SUBMIT_COLLECTION_COMPLETION_QUEUE_TO);
+        Endpoint endpoint = camelContext.getEndpoint(RecapConstants.SUBMIT_COLLECTION_COMPLETION_QUEUE_TO);
         PollingConsumer consumer = endpoint.createPollingConsumer();
         Exchange exchange = consumer.receive();
 
         logger.info("Message Received : {}", exchange.getIn().getBody());
 
         logger.info("Submit Collection Job ends");
-        return ReCAPConstants.SUCCESS;
+        return RecapCommonConstants.SUCCESS;
     }
 }

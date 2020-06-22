@@ -3,7 +3,8 @@ package org.recap.ils.service;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.ils.model.nypl.CancelHoldData;
 import org.recap.ils.model.nypl.CheckinData;
 import org.recap.ils.model.nypl.CheckoutData;
@@ -112,7 +113,7 @@ public class NyplApiResponseUtil {
                 reformattedStr = requiredFormat.format(sipFormat.parse(sipDate));
             }
         } catch (ParseException e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return reformattedStr;
     }
@@ -126,7 +127,7 @@ public class NyplApiResponseUtil {
                 reformattedStr = requiredFormat.format(sipFormat.parse(sipDate));
             }
         } catch (ParseException e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return reformattedStr;
     }
@@ -232,7 +233,7 @@ public class NyplApiResponseUtil {
         ItemRefileResponse itemRefileResponse = new ItemRefileResponse();
         RefileData refileData = refileResponse.getData();
         itemRefileResponse.setItemBarcode(refileData.getItemBarcode());
-        itemRefileResponse.setItemOwningInstitution(ReCAPConstants.NYPL);
+        itemRefileResponse.setItemOwningInstitution(RecapCommonConstants.NYPL);
         itemRefileResponse.setJobId(refileData.getJobId());
         return itemRefileResponse;
     }
@@ -264,11 +265,11 @@ public class NyplApiResponseUtil {
     public String getNyplSource(String institutionId) {
         String nyplSource = null;
         if (StringUtils.isNotBlank(institutionId)) {
-            if (institutionId.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+            if (institutionId.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
                 nyplSource = nyplSourceNYPL;
-            } else if (institutionId.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+            } else if (institutionId.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
                 nyplSource = nyplSourcePUL;
-            } else if (institutionId.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+            } else if (institutionId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
                 nyplSource = nyplSourceCUL;
             }
         }
@@ -290,7 +291,7 @@ public class NyplApiResponseUtil {
             if (null != itemEntity.getInstitutionEntity()) {
                 String institutionCode = itemEntity.getInstitutionEntity().getInstitutionCode();
                 itemId = itemEntity.getOwningInstitutionItemId();
-                if (ReCAPConstants.NYPL.equalsIgnoreCase(institutionCode)) {
+                if (RecapCommonConstants.NYPL.equalsIgnoreCase(institutionCode)) {
                     itemId = itemId.replace(".i", ""); // Remove prefix .i
                     itemId = StringUtils.chop(itemId); // Remove last check digit or char
                 }
@@ -307,7 +308,7 @@ public class NyplApiResponseUtil {
      */
     public String getExpirationDateForNypl() throws Exception {
         Date expirationDate = DateUtils.addYears(new Date(), 1);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ReCAPConstants.NYPL_HOLD_DATE_FORMAT);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.NYPL_HOLD_DATE_FORMAT);
         return simpleDateFormat.format(expirationDate);
     }
 

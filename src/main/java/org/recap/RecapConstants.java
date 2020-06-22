@@ -2,36 +2,23 @@ package org.recap;
 
 import java.util.Arrays;
 import java.util.List;
+import org.recap.RecapCommonConstants;
 
 /**
  * Created by premkb on 19/8/16.
  */
-public final class ReCAPConstants {
+public final class RecapConstants {
 
-    public static final String FAILURE = "Failure";
-    public static final String SUCCESS = "Success";
-
-    public static final String COLUMBIA = "CUL";
-    public static final String PRINCETON = "PUL";
-    public static final String NYPL = "NYPL";
     public static final String GFA = "GFA";
 
-    public static final String RESPONSE_DATE = "Date";
-
-    public static final String REGEX_FOR_EMAIL_ADDRESS = "^[A-Za-z0-9+_.-]+@(.+)$";
     public static final String INVALID_REQUEST_INSTITUTION = "Please enter valid Institution PUL/CUL/NYPL for requestingInstitution";
     public static final String INVALID_EMAIL_ADDRESS = "Please enter valid emailAddress";
     public static final String START_PAGE_AND_END_PAGE_REQUIRED = "Start page and end page required.";
     public static final String DELIVERY_LOCATION_REQUIRED = "Delivery Location is required for request type Recall/hold/retrieval";
     public static final String INVALID_REQUEST_TYPE = "Please enter the valid request type";
-    public static final String RETRIEVAL = "RETRIEVAL";
     public static final String EDD_REQUEST = "EDD";
     public static final String REFILED_REQUEST = "REFILED";
-    public static final String BORROW_DIRECT = "BORROW DIRECT";
-    public static final String VALID_REQUEST = "All request parameters are valid.Patron is eligible to raise a request";
     public static final String INVALID_PATRON = "Patron not on file in ILS";
-    public static final String AVAILABLE = "Available";
-    public static final String NOT_AVAILABLE = "Not Available";
     public static final String ITEMBARCODE_WITH_DIFFERENT_BIB = "All items must be attached to the same bibliographic record, have the same customer code, and the same availability.";
     public static final String INVALID_CUSTOMER_CODE = "Please enter the valid delivery Code";
     public static final String INVALID_DELIVERY_CODE = "Delivery location not valid for this item.";
@@ -63,17 +50,11 @@ public final class ReCAPConstants {
     public static final String DELETED_RECORDS_EMAIL_TEMPLATE = "deleted_records_email_body.vm";
 
     // Retrieval,EDD, Hold, Recall, Borrow Direct
-    public static final String REQUEST_TYPE_RETRIEVAL = "RETRIEVAL";
-    public static final String REQUEST_TYPE_EDD = "EDD";
-    public static final String REQUEST_TYPE_RECALL = "RECALL";
-    public static final String REQUEST_TYPE_BORROW_DIRECT = "BORROW DIRECT";
     public static final String REQUEST_TYPE_PW_INDIRECT = "PWI";
     public static final String REQUEST_TYPE_PW_DIRECT = "PWD";
 
-
     // MQ URI
     public static final String REQUEST_ITEM_QUEUE = "scsbactivemq:queue:RequestItemQ?asyncConsumer=true&concurrentConsumers=10&destination.consumer.prefetchSize=20";
-    public static final String BULK_REQUEST_ITEM_QUEUE = "scsbactivemq:queue:BulkRequestItemQ";
     public static final String BULK_REQUEST_ITEM_PROCESSING_QUEUE = "scsbactivemq:queue:BulkRequestItemProcessingQ";
     public static final String ASYNC_CONCURRENT_CONSUMERS = "?asyncConsumer=true&concurrentConsumers=";
     public static final String EMAIL_Q = "scsbactivemq:queue:CircEmailQ";
@@ -96,9 +77,6 @@ public final class ReCAPConstants {
     public static final String NYPL_EDD_TOPIC = "scsbactivemq:topic:NYPL.EDDT";
     public static final String NYPL_RECALL_TOPIC = "scsbactivemq:topic:NYPL.RecallT";
     public static final String NYPL_BORROW_DIRECT_TOPIC = "scsbactivemq:topic:NYPL.BorrowDirectT";
-
-    // Queue Header
-    public static final String REQUEST_TYPE_QUEUE_HEADER = "RequestType";
 
     //RoutId
     public static final String REQUEST_ITEM_QUEUE_ROUTEID = "RequestItemRouteId";
@@ -139,35 +117,11 @@ public final class ReCAPConstants {
     public static final String REQUEST_ITEM_NYPL_RECALL_TOPIC = "RequestItem-nyplRecallTopic";
     public static final String REQUEST_ITEM_NYPL_BORROW_DIRECT_TOPIC = "RequestItem-nyplBorrowDirectTopic";
 
-
-    public static final String OWNING_INSTITUTION = "OwningInstitution";
-    public static final String OWNING_INSTITUTION_BIB_ID = "OwningInstitutionBibId";
-    public static final String TITLE = "Title";
-    public static final String OWNING_INSTITUTION_HOLDINGS_ID = "OwningInstitutionHoldingsId";
-    public static final String LOCAL_ITEM_ID = "LocalItemId";
-    public static final String ITEM_BARCODE = "ItemBarcode";
-    public static final String CUSTOMER_CODE = "CustomerCode";
-    public static final String CREATE_DATE_ITEM = "CreateDateItem";
-    public static final String LAST_UPDATED_DATE_ITEM = "LastUpdatedDateItem";
-    public static final String ERROR_DESCRIPTION = "ErrorDescription";
-    public static final String COLLECTION_GROUP_DESIGNATION = "CollectionGroupDesignation";
-    public static final String FILE_NAME = "FileName";
-
     public static final String FORMAT_MARC = "marc";
     public static final String FORMAT_SCSB = "scsb";
 
-    public static final String SUBMIT_COLLECTION_REPORT = "Submit_Coll";
-    public static final String SUBMIT_COLLECTION_REJECTION_REPORT = "Submit_Collection_Rejection_Report";
-    public static final String SUBMIT_COLLECTION_EXCEPTION_REPORT = "Submit_Collection_Exception_Report";
-    public static final String SUBMIT_COLLECTION_SUCCESS_REPORT = "Submit_Collection_Success_Report";
-    public static final String SUBMIT_COLLECTION_FAILURE_REPORT = "SubmitCollection_Failure_Report";
-    public static final String SUBMIT_COLLECTION_ITEM_BARCODE = "ItemBarcode";
-    public static final String HYPHEN = " - ";
-
-
     public static final String SUBMIT_COLLECTION_COMPLETION_QUEUE_FROM = "scsbactivemq:queue:submitCollectionCompletionFromQueue";
     public static final String SUBMIT_COLLECTION_COMPLETION_QUEUE_TO = "scsbactivemq:queue:submitCollectionCompletionToQueue";
-    public static final String CAMEL_BATCH_COMPLETE = "CamelBatchComplete";
     public static final String PROCESS = "process";
     public static final String SEND_EMAIL_FOR_EMPTY_DIRECTORY = "sendEmailForEmptyDirectory";
 
@@ -176,22 +130,12 @@ public final class ReCAPConstants {
     public static final String INVALID_SCSB_XML_FORMAT_MESSAGE = "Invalid SCSB xml format";
     public static final String INVALID_MARC_XML_FORMAT_MESSAGE = "Invalid Marc xml format";
     public static final String INVALID_MARC_XML_FORMAT_IN_SCSBXML_MESSAGE = "Invalid Marc xml content with in SCSB xml";
-    public static final String SCSB_SOLR_CLIENT_SERVICE_UNAVAILABLE = "Scsb Solr Client Service is Unavailable.";
     public static final String SUBMIT_COLLECTION_INTERNAL_ERROR = "Internal error occured during submit collection";
     public static final String SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE = "Maximum allowed input record is ";
-    public static final String COMPLETE_STATUS = "Complete";
-    public static final String INCOMPLETE_STATUS = "Incomplete";
     public static final String BIBRECORD_TAG = "<bibRecords>";
     public static final String SUBMIT_COLLECTION = "submitCollection";
     public static final String SUBMIT_COLLECTION_FOR_NO_FILES = "submitCollectionForNoFiles";
-    public static final String MESSAGE = "Message";
-    public static final String NOT_AVAILABLE_CGD = "NA";
 
-    public static final String BIB_ID = "BibId";
-    public static final String HOLDING_ID = "HoldingId";
-    public static final String ITEM_ID = "ItemId";
-    public static final String ROOT = "_root_";
-    public static final String IS_DELETED_BIB = "IsDeletedBib";
     public static final String BIBLIOGRAPHIC_ENTITY = "bibliographicEntity";
 
     public static final String GUEST_USER = "Guest";
@@ -209,8 +153,6 @@ public final class ReCAPConstants {
     public static final String REQUEST_ITEM_TITLE_SUFFIX = " [RECAP]";
     public static final String REQUEST_USE_RESTRICTIONS = "No Restrictions";
 
-    public static final String API_KEY = "api_key";
-    public static final String RECAP = "recap";
     public static final String UPDATE_ITEM_STATUS_SOLR = "/updateItem/updateItemAvailablityStatus";
     public static final String UPDATE_ITEM_STATUS_SOLR_PARAM_ITEM_ID = "itemBarcode";
     public static final String CIRCULATION_STATUS_CHARGED = "CHARGED";
@@ -227,15 +169,9 @@ public final class ReCAPConstants {
     public static final int ESIPEXPIRATION_DATE_DAY = 1;
     public static final int ESIPEXPIRATION_DATE_MONTH = 6;
 
-    public static final String REQUEST_STATUS_RETRIEVAL_ORDER_PLACED = "RETRIEVAL_ORDER_PLACED";
-    public static final String REQUEST_STATUS_RECALLED = "RECALL_ORDER_PLACED";
-    public static final String REQUEST_STATUS_EDD = "EDD_ORDER_PLACED";
-    public static final String REQUEST_STATUS_REFILED = "REFILED";
-    public static final String REQUEST_STATUS_CANCELED = "CANCELED";
     public static final String REQUEST_STATUS_EXCEPTION = "EXCEPTION";
     public static final String REQUEST_STATUS_PENDING = "PENDING";
     public static final String REQUEST_STATUS_PROCESSING = "PROCESSING";
-    public static final String REQUEST_STATUS_INITIAL_LOAD = "INITIAL_LOAD";
     public static final String REQUEST_STATUS_LAS_ITEM_STATUS_PENDING = "LAS_ITEM_STATUS_PENDING";
     public static final String LAS_REFILE_REQUEST_PLACED = "LAS_REFILE_REQUEST_PLACED";
 
@@ -246,8 +182,6 @@ public final class ReCAPConstants {
     public static final String DEFAULT_PICK_UP_LOCATION_PUL = "rcpcirc";
     public static final String DEFAULT_PICK_UP_LOCATION_CUL = "CIRCrecap";
 
-    public static final String REQUEST_EXCEPTION_REST = "RestClient : ";
-    public static final String REQUEST_EXCEPTION = "Exception : ";
     public static final String REQUEST_PARSE_EXCEPTION = "ParseException : ";
     public static final String REQUEST_INVALID_SIP2_RESPONSE = "InvalidSIP2Response ";
     public static final String REQUEST_INVALID_SIP2_RESPONSE_VALUE = "InvalidSIP2ResponseValue ";
@@ -283,7 +217,7 @@ public final class ReCAPConstants {
     protected static final List<String> GFA_STATUS_NOT_AVAILABLE_LIST = Arrays.asList(GFA_STATUS_SCH_ON_REFILE_WORK_ORDER, GFA_STATUS_NOT_ON_FILE, GFA_STATUS_OUT_ON_RETRIVAL_WORK_ORDER, GFA_STATUS_PW_INDIRECT_WORK_ORDER, GFA_STATUS_PW_DIRECT_WORK_ORDER,
             GFA_STATUS_SCH_ON_RET_WORK_ORDER, GFA_STATUS_VER_ON_PW_INDIRECT_WORK_ORDER, GFA_STATUS_VER_ON_PW_DIRECT_WORK_ORDER, GFA_STATUS_VER_ON_RET_WORK_ORDER, GFA_STATUS_VER_ON_WORK_ORDER, GFA_STATUS_REFILE_ON_WORK_ORDER, GFA_STATUS_OUT_ON_EDD_WORK_ORDER, GFA_STATUS_VER_ON_EDD_WORK_ORDER, GFA_STATUS_SCH_ON_EDD_WORK_ORDER);
 
-    protected static final List<String> REQUEST_TYPE_LIST = Arrays.asList(ReCAPConstants.RETRIEVAL, ReCAPConstants.REQUEST_TYPE_EDD, ReCAPConstants.BORROW_DIRECT, ReCAPConstants.REQUEST_TYPE_RECALL);
+    protected static final List<String> REQUEST_TYPE_LIST = Arrays.asList(RecapCommonConstants.RETRIEVAL, RecapCommonConstants.REQUEST_TYPE_EDD, RecapCommonConstants.BORROW_DIRECT, RecapCommonConstants.REQUEST_TYPE_RECALL);
 
     public static final String SUCCESSFULLY_PROCESSED_REQUEST_ITEM = "Successfully Processed Request Item";
     public static final String REQUEST_ITEM_BARCODE_NOT_FOUND = "ITEM BARCODE NOT FOUND.";
@@ -308,16 +242,6 @@ public final class ReCAPConstants {
     public static final String REQUEST_REFILE_SUBJECT = "Request for Item on Refile WO - ";
 
     //Deaccession
-    public static final String REQUESTED_ITEM_DEACCESSIONED = "The requested item has already been deaccessioned.";
-    public static final String ITEM_BARCDE_DOESNOT_EXIST = "Item barcode doesn't exist in SCSB database.";
-    public static final String DEACCESSION_REPORT = "DeAccession_Report";
-    public static final String DEACCESSION_SUMMARY_REPORT = "DeAccession_Summary_Report";
-    public static final String DATE_OF_DEACCESSION = "DateOfDeAccession";
-    public static final String BARCODE = "Barcode";
-    public static final String OWNING_INST_BIB_ID = "OwningInstitutionBibId";
-    public static final String COLLECTION_GROUP_CODE = "CollectionGroupCode";
-    public static final String REASON_FOR_FAILURE = "ReasonForFailure";
-    public static final String STATUS = "Status";
     public static final String DEACCESSION_IN_SOLR_URL = "deaccessionInSolrService/deaccessionInSolr";
     public static final String DEACCESSION_NO_BARCODE_ERROR = "Provide one or more barcodes to deaccession";
     public static final String DEACCESSION_NO_BARCODE_PROVIDED_ERROR = "No barcode provided for deaccession";
@@ -328,15 +252,11 @@ public final class ReCAPConstants {
 
     public static final String DATE_FORMAT_FOR_FILE_NAME = "yyyyMMdd_HHmmss";
 
-
     //Logger
-    public static final String LOG_ERROR = "error-->";
     public static final String GFA_ITEM_STATUS_MISMATCH = "There is a mismatch in item status between SCSB and LAS. Please contact ReCAP staff (<a href=\"mailto:{0}\">{1}</a>) for further assistance.";
     public static final String GFA_SERVER_DOWN = "LAS item status check failed to give valid response or LAS is down. Please contact ReCAP staff (<a href=\"mailto:{0}\">{1}</a>) for further assistance.";
     public static final String LAS_DEACCESSION_REJECT_ERROR = "LAS has rejected the {0} request with Error code : \"{1}\" and Error note : \"{2}\".";
-    public static final String LAS_REJECTED = "LAS has rejected";
     public static final String LAS_SERVER_NOT_REACHABLE_ERROR = "LAS server is not reachable. Please contact ReCAP staff (<a href=\"mailto:{0}\">{1}</a>) for further assistance.";
-    public static final String LAS_SERVER_NOT_REACHABLE = "LAS server is not reachable";
     public static final String CREATING_A_BIB_RECORD_FAILED_IN_ILS = "Creating a Bib record failed in ILS";
     public static final String INVALID_NO_RESPONSE_FROM_ILS = "Invalid/No Response from ILS";
     public static final String CHECK_IN_REQUEST_FAILED = "Check In Request Failed";
@@ -356,23 +276,13 @@ public final class ReCAPConstants {
     public static final String SUBMIT_COLLECTION_REJECTION_RECORD = "Rejection record - Only use restriction and cgd not updated because the item is in use";
     public static final String SUBMIT_COLLECTION_SUCCESS_RECORD = "Success record";
     public static final String SUBMIT_COLLECTION_FAILED_RECORD = "Failed record";
-    public static final String ALL_INST = "ALL";
-    public static final String FTP = "FTP";
-    public static final String SUBMIT_COLLECTION_SUMMARY = "SubmitCollectionSummary";
     public static final String REST = "rest-api";
     public static final String SUBMIT_COLLECTION_EMAIL_BODY_VM = "submit_collection_email_body.vm";
     public static final String SUBMIT_COLLECTION_EMAIL_BODY_FOR_EMPTY_DIRECTORY_VM = "submit_collection_email_body_for_emptyDirectory.vm";
-    public static final String SFTP = "sftp://";
-    public static final String AT = "@";
-    public static final String PRIVATE_KEY_FILE = "?privateKeyFile=";
-    public static final String KNOWN_HOST_FILE = "&knownHostsFile=";
     public static final String PROCESS_INPUT = "processInput";
     public static final String SUBMIT_COLLECTION_SFTP_OPTIONS = "&sendEmptyMessageWhenIdle=true&move=.done&sortBy=file:modified&localWorkDirectory=";
     public static final String SUBMIT_COLLECTION_COMPLETE_RECORD_UPDATE = "Complete item record info updated through submit collection";
     public static final String SUBMIT_COLLECTION_DUMMY_RECORD_UPDATE = "Dummy item record removed and actual record added through submit collection";
-
-    public static final String PURGE_EDD_REQUEST = "noOfUpdatedRecordsForEddRequest";
-    public static final String PURGE_PHYSICAL_REQUEST = "noOfUpdatedRecordsForPhysicalRequest";
 
     public static final String DEACCESSION_ROLLBACK = "Deaccession Rollback";
     public static final String DEACCESSION_ROLLBACK_NOTES = " Hence, the transaction of deaccessioning item is rolled back.";
@@ -410,7 +320,7 @@ public final class ReCAPConstants {
     public static final String DAILY_RR = "DailyReconciliation_";
     public static final String DATE_CELL_STYLE_FORMAT = "MM/dd/yyyy HH:mm:ss.S";
     public static final String DAILY_RR_REQUEST_ID = "RequestId";
-    public static final String DAILY_RR_BARCODE = BARCODE;
+    public static final String DAILY_RR_BARCODE = "Barcode";
     public static final String DAILY_RR_CUSTOMER_CODE = "CustomerCode";
     public static final String DAILY_RR_STOP_CODE = "StopCode";
     public static final String DAILY_RR_PATRON_ID = "PatronId";
@@ -431,7 +341,6 @@ public final class ReCAPConstants {
 
     public static final String STATUS_RECONCILIATION_REPORT = "scsbactivemq:queue:statusReconciliationReportQ";
     public static final String STATUS_RECONCILIATION_REPORT_ID = "statusReconciliationReportRoute";
-    public static final String REPORT_FILE_NAME = "fileName";
 
     public static final String COMPLETE = "Complete";
 
@@ -496,12 +405,6 @@ public final class ReCAPConstants {
     public static final String NYPL_HOLD_REQUEST_URL = "/hold-requests";
     public static final String NYPL_PATRON_BY_BARCODE_URL = "/patrons?barcode=";
 
-    public static final String INPUT_RECORDS = "inputRecords";
-    public static final String INSTITUTION = "institution";
-    public static final String IS_CGD_PROTECTED = "isCGDProtected";
-    public static final String OWN_INST_BIBID_LIST = "owningInstBibIdList";
-    public static final String OWN_INSTITUTION_ID = "institutionId";
-
     //Date Pattern
     public static final String FILE_DATE_FORMAT = "yyyyMMdd_HHmmss";
     public static final String CHECK_IN_REQUEST_SUCCESSFUL = "Check In Request Successful";
@@ -521,13 +424,11 @@ public final class ReCAPConstants {
     public static final String REQUEST_INITIAL_LOAD_CUL_DIRECT_ROUTE = "requestInitialLoadCulDirectRoute";
     public static final String REQUEST_INITIAL_LOAD_NYPL_DIRECT_ROUTE = "requestInitialLoadNyplDirectRoute";
     public static final String ACCESSION_RECONCILIATION_HEADER = "Barcodes not present in SCSB";
-    public static final String DIRECT_ROUTE_FOR_EXCEPTION = "direct:Exception";
 
     public static final String LAS = "LAS";
     public static final String USER = "User";
     public static final String REQUEST_RECALL = "RequestItem-Recall";
     public static final String REQUEST_RETRIEVAL = "RequestItem-Retrieval";
-    public static final String BULK_REQUEST_ID = "bulkRequestId";
     public static final String PROCESSED = "PROCESSED";
     public static final String BULK_REQUEST_EMAIL_QUEUE = "BulkRequestEmailQueue";
     public static final String BULK_REQUEST_EMAIL_BODY_VM = "bulkRequestEmailBody.vm";
@@ -536,9 +437,7 @@ public final class ReCAPConstants {
 
     public static final String BARCODE_RECONCILIATION_FILE_DATE_FORMAT = "yyyyMMdd";
 
-    public static final String SUBMIT_COLLECTION_JOB_INITIATE_QUEUE = "scsbactivemq:queue:submitCollectionInitiateQ";
     public static final String SUBMIT_COLLECTION_JOB_INITIATE_ROUTE_ID = "scsbactivemq:queue:submitCollectionInitiateRoute";
-    public static final String SUBMIT_COLLECTION_JOB_COMPLETION_OUTGOING_QUEUE = "scsbactivemq:queue:submitCollectionCompletionOutgoingQ";
     public static final String BARCODE_NOT_FOUND_IN_LAS = "Barcode not found in LAS";
     public static final String CUSTOMER_CODE_HEADER = "Customer Code mentioned in LAS";
     public static final String TAB = "\t";
@@ -546,13 +445,8 @@ public final class ReCAPConstants {
     public static String LAS_ITEM_STATUS_REST_SERVICE = "http://recapgfa-dev.princeton.edu:9092/lasapi/rest/lasapiSvc/itemStatus";
 
     public static final String DEFAULT_DATE_FORMAT = "dd-MM-yyyy hh:mm";
-    public static final String REQUEST_STATUS = "RequestStatus";
-    public static final String REQUEST_IDS = "RequestIds";
     public static final String REQUEST_IDS_RANGE = "RangeOfRequestIds";
     public static final String REQUEST_DATES_RANGE = "RangeOfRequestDates";
-    public static final String TOTAL_REQUESTS_FOUND = "TotalRequestsFound";
-    public static final String TOTAL_REQUESTS_IDS = "TotalRequestIds";
-    public static final String INVALID_REQUEST = "InvalidRequest";
     public static final String NO_REQUESTS_FOUND = "No requests found.";
     public static final String IGNORE_REQUEST_TYPE_NOT_VALID = "Ignored as the request type is ";
     public static final String REQUEST_STATUS_INVALID = "Provide request status value. Allowed values are : PENDING, EXCEPTION";
@@ -561,9 +455,7 @@ public final class ReCAPConstants {
     public static final String REQUEST_DATES_INVALID = "Provide request from date and to date or Provide request status value. Allowed values are : PENDING, EXCEPTION.";
     public static final String REQUEST_REPLACE_BY_TYPE_INVALID = "Invalid replace request type. Allowed values for \"replaceRequestByType\" are :  RequestStatus, RequestIds, RangeOfRequestIds, RangeOfRequestDates";
     public static final String REQUEST_REPLACE_BY_TYPE_NOT_SELECTED = "Provide one of the values to \"replaceRequestByType\" :  RequestStatus, RequestIds, RangeOfRequestIds, RangeOfRequestDates";
-    public static final String REQUEST_MESSAGE_RECEVIED = "Message received, your request will be processed";
-    public static final String DEACCESSION = "Deaccession";
-    
+
     public static final String EMAIL_HEADER_REQUEST_STATUS_PENDING = "Requests in pending status";
     public static final String EMAIL_SUBJECT_FOR_PENDING_STATUS = "Requests stuck in PENDING status";
     public static final String EMAIL_SUBJECT_FOR_LAS_PENDING_STATUS = "Requests in LAS ITEM STATUS PENDING status";
@@ -581,7 +473,7 @@ public final class ReCAPConstants {
 
     public static final String ITEM_STATUS_NOT_AVAILABLE = "Not Available";
 
-    private ReCAPConstants() {
+    private RecapConstants() {
     }
 
     public static final List getGFAStatusAvailableList() {

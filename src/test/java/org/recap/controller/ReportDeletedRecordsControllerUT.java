@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.service.DeletedRecords.DeletedRecordsService;
 import org.springframework.http.ResponseEntity;
 
@@ -30,7 +30,7 @@ public class ReportDeletedRecordsControllerUT extends BaseTestCase{
         Mockito.when(reportDeletedRecordsController.deletedRecords()).thenCallRealMethod();
         ResponseEntity responseEntity = reportDeletedRecordsController.deletedRecords();
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), ReCAPConstants.DELETED_RECORDS_SUCCESS_MSG);
+        assertEquals(responseEntity.getBody(), RecapConstants.DELETED_RECORDS_SUCCESS_MSG);
         Mockito.when(reportDeletedRecordsController.getDeletedRecordsService()).thenCallRealMethod();
         assertNotEquals(reportDeletedRecordsController.getDeletedRecordsService(),deletedRecordsService);
     }

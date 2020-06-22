@@ -2,7 +2,8 @@ package org.recap.ils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.ils.model.nypl.CancelHoldData;
 import org.recap.ils.model.nypl.CheckinData;
 import org.recap.ils.model.nypl.CheckoutData;
@@ -248,11 +249,11 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
             ItemResponse itemResponse = responseEntity.getBody();
             itemInformationResponse = getNyplApiResponseUtil().buildItemInformationResponse(itemResponse);
         } catch (HttpClientErrorException httpException) {
-            logger.error(ReCAPConstants.LOG_ERROR,httpException);
+            logger.error(RecapCommonConstants.LOG_ERROR,httpException);
             itemInformationResponse.setSuccess(false);
             itemInformationResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
             itemInformationResponse.setSuccess(false);
             itemInformationResponse.setScreenMessage(e.getMessage());
         }
@@ -271,7 +272,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         getLogger().info("Item barcode {} received for a checkout in NYPL for patron {}", itemIdentifier, patronIdentifier);
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         try {
-            String apiUrl = getNyplDataApiUrl() + ReCAPConstants.NYPL_CHECKOUT_REQUEST_URL;
+            String apiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_CHECKOUT_REQUEST_URL;
 
             CheckoutRequest checkoutRequest = getCheckOutRequest();
             checkoutRequest.setPatronBarcode(patronIdentifier);
@@ -306,11 +307,11 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            logger.error(ReCAPConstants.LOG_ERROR,httpException);
+            logger.error(RecapCommonConstants.LOG_ERROR,httpException);
             itemCheckoutResponse.setSuccess(false);
             itemCheckoutResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
             itemCheckoutResponse.setSuccess(false);
             itemCheckoutResponse.setScreenMessage(e.getMessage());
         }
@@ -329,7 +330,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         getLogger().info("Item barcode {} received for a checkin in NYPL for patron {}", itemIdentifier, patronIdentifier);
         ItemCheckinResponse itemCheckinResponse = new ItemCheckinResponse();
         try {
-            String apiUrl = getNyplDataApiUrl() + ReCAPConstants.NYPL_CHECKIN_REQUEST_URL;
+            String apiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_CHECKIN_REQUEST_URL;
 
             CheckinRequest checkinRequest = getCheckInRequest();
             checkinRequest.setItemBarcode(itemIdentifier);
@@ -362,11 +363,11 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,httpException);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,httpException);
             itemCheckinResponse.setSuccess(false);
             itemCheckinResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,e);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,e);
             itemCheckinResponse.setSuccess(false);
             itemCheckinResponse.setScreenMessage(e.getMessage());
         }
@@ -394,7 +395,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         getLogger().info("Item barcode {} received for hold request in NYPL for patron {}", itemIdentifier, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         try {
-            String recapHoldApiUrl = getNyplDataApiUrl() + ReCAPConstants.NYPL_RECAP_HOLD_REQUEST_URL;
+            String recapHoldApiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_RECAP_HOLD_REQUEST_URL;
             if (StringUtils.isBlank(trackingId)) {
                 trackingId = initiateNyplHoldRequest(itemIdentifier, patronIdentifier, itemInstitutionId, deliveryLocation);
             }
@@ -404,7 +405,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
             createHoldRequest.setItemBarcode(itemIdentifier);
             createHoldRequest.setPatronBarcode(patronIdentifier);
             Description description = new Description();
-            String titleIdentifier = title.replace("[" + ReCAPConstants.REQUEST_USE_RESTRICTIONS + "]", "[" + ReCAPConstants.NYPL_NO_RESTRICTIONS + "]");
+            String titleIdentifier = title.replace("[" + RecapConstants.REQUEST_USE_RESTRICTIONS + "]", "[" + RecapConstants.NYPL_NO_RESTRICTIONS + "]");
             logger.info("Nypl title identifier : " + titleIdentifier);
             description.setTitle(titleIdentifier);
             description.setAuthor(author);
@@ -443,11 +444,11 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,httpException);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,httpException);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,e);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,e);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(e.getMessage());
         }
@@ -471,7 +472,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         getLogger().info("Item barcode {} received for a canceling a hold in NYPL for patron {}", itemIdentifier, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         try {
-            String apiUrl = getNyplDataApiUrl() + ReCAPConstants.NYPL_RECAP_CANCEL_HOLD_REQUEST_URL;
+            String apiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_RECAP_CANCEL_HOLD_REQUEST_URL;
 
             CancelHoldRequest cancelHoldRequest = getCancelHoldRequest();
             cancelHoldRequest.setTrackingId(trackingId);
@@ -506,11 +507,11 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,httpException);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,httpException);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,e);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,e);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(e.getMessage());
         }
@@ -575,13 +576,13 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
      */
     private String initiateNyplHoldRequest(String itemIdentifier, String patronIdentifier, String itemInstitutionId, String deliveryLocation) throws Exception {
         String trackingId = null;
-        String nyplHoldApiUrl = nyplDataApiUrl + ReCAPConstants.NYPL_HOLD_REQUEST_URL;
+        String nyplHoldApiUrl = nyplDataApiUrl + RecapConstants.NYPL_HOLD_REQUEST_URL;
         String nyplSource = nyplApiResponseUtil.getNyplSource(itemInstitutionId);
         NyplHoldRequest nyplHoldRequest = new NyplHoldRequest();
         nyplHoldRequest.setRecord(nyplApiResponseUtil.getNormalizedItemIdForNypl(itemIdentifier));
         nyplHoldRequest.setPatron(getPatronIdByPatronBarcode(patronIdentifier));
         nyplHoldRequest.setNyplSource(nyplSource);
-        nyplHoldRequest.setRecordType(ReCAPConstants.NYPL_RECORD_TYPE);
+        nyplHoldRequest.setRecordType(RecapConstants.NYPL_RECORD_TYPE);
         nyplHoldRequest.setPickupLocation("");
         nyplHoldRequest.setDeliveryLocation(deliveryLocation);
         nyplHoldRequest.setNumberOfCopies(1);
@@ -624,7 +625,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
      * @throws Exception
      */
     private NyplPatronResponse queryForPatronResponse(String patronIdentifier) throws Exception {
-        String apiUrl = nyplDataApiUrl + ReCAPConstants.NYPL_PATRON_BY_BARCODE_URL + patronIdentifier;
+        String apiUrl = nyplDataApiUrl + RecapConstants.NYPL_PATRON_BY_BARCODE_URL + patronIdentifier;
         getLogger().info("NYPL patron response url :" + apiUrl );
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = new HttpEntity(getHttpHeaders());
@@ -663,7 +664,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         getLogger().info("Item barcode {} received for a recall request in NYPL for patron {}", itemIdentifier, patronIdentifier);
         ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         try {
-            String apiUrl = getNyplDataApiUrl() + ReCAPConstants.NYPL_RECAP_RECALL_REQUEST_URL;
+            String apiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_RECAP_RECALL_REQUEST_URL;
 
             RecallRequest recallRequest = new RecallRequest();
             recallRequest.setOwningInstitutionId(nyplApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemIdentifier));
@@ -696,11 +697,11 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,httpException);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,httpException);
             itemRecallResponse.setSuccess(false);
             itemRecallResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,e);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,e);
             itemRecallResponse.setSuccess(false);
             itemRecallResponse.setScreenMessage(e.getMessage());
         }
@@ -718,7 +719,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         getLogger().info("Item barcode {} received for refiling in NYPL", itemIdentifier);
         ItemRefileResponse itemRefileResponse = new ItemRefileResponse();
         try {
-            String apiUrl = getNyplDataApiUrl() + ReCAPConstants.NYPL_RECAP_REFILE_REQUEST_URL;
+            String apiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_RECAP_REFILE_REQUEST_URL;
 
             RefileRequest refileRequest = new RefileRequest();
             refileRequest.setItemBarcode(itemIdentifier);
@@ -750,11 +751,11 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,httpException);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,httpException);
             itemRefileResponse.setSuccess(false);
             itemRefileResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            getLogger().error(ReCAPConstants.LOG_ERROR,e);
+            getLogger().error(RecapCommonConstants.LOG_ERROR,e);
             itemRefileResponse.setSuccess(false);
             itemRefileResponse.setScreenMessage(e.getMessage());
         }

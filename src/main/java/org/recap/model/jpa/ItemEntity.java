@@ -1,8 +1,7 @@
 package org.recap.model.jpa;
 
 import org.apache.commons.lang3.StringUtils;
-import org.recap.ReCAPConstants;
-
+import org.recap.RecapCommonConstants;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -533,7 +532,7 @@ public class ItemEntity implements Serializable {
      * @return the boolean
      */
     public boolean isComplete() {
-        if (StringUtils.isNotBlank(this.catalogingStatus) && ReCAPConstants.COMPLETE_STATUS.equals(this.catalogingStatus)) {
+        if (StringUtils.isNotBlank(this.catalogingStatus) && RecapCommonConstants.COMPLETE_STATUS.equals(this.catalogingStatus)) {
             return true;
         }
         return false;

@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.model.ItemRefileRequest;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.statusreconciliation.StatusReconciliationCSVRecord;
 import org.recap.camel.statusreconciliation.StatusReconciliationErrorCSVRecord;
 import org.recap.gfa.model.GFAEddItemResponse;
@@ -295,7 +296,7 @@ public class GFAService {
 
             RestTemplate restTemplate = getRestTemplate();
             HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getGfaItemStatus()).queryParam(ReCAPConstants.GFA_SERVICE_PARAM, filterParamValue);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getGfaItemStatus()).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(getGfaServerResponseTimeOutMilliseconds());
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(getGfaServerResponseTimeOutMilliseconds());
             ResponseEntity<GFAItemStatusCheckResponse> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFAItemStatusCheckResponse.class);
@@ -306,9 +307,9 @@ public class GFAService {
                 logger.info("Item status check response during Refile process :" + responseEntity.getStatusCode());
             }
         } catch (JsonProcessingException e) {
-            logger.error(ReCAPConstants.REQUEST_PARSE_EXCEPTION, e);
+            logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION + " " + e.getMessage());
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION + " " + e.getMessage());
         }
 
         return gfaItemStatusCheckResponse;
@@ -325,7 +326,7 @@ public class GFAService {
         List<StatusReconciliationCSVRecord> statusReconciliationCSVRecordList = new ArrayList<>();
         List<ItemChangeLogEntity> itemChangeLogEntityList = new ArrayList<>();
         for (List<ItemEntity> itemEntities : itemEntityChunkList) {
-            List<String> lasNotAvailableStatusList = ReCAPConstants.getGFAStatusNotAvailableList();
+            List<String> lasNotAvailableStatusList = RecapConstants.getGFAStatusNotAvailableList();
             GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGFAItemStatusCheckResponse(itemEntities);
             if (gfaItemStatusCheckResponse != null && gfaItemStatusCheckResponse.getDsitem() != null && gfaItemStatusCheckResponse.getDsitem().getTtitem() != null) {
                 List<Ttitem> ttitemList = gfaItemStatusCheckResponse.getDsitem().getTtitem();
@@ -355,7 +356,7 @@ public class GFAService {
                     if (!isBarcodeAvailableForErrorReport) {
                         statusReconciliationErrorCSVRecord.setBarcode(itemEntity.getBarcode());
                         statusReconciliationErrorCSVRecord.setInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
-                        statusReconciliationErrorCSVRecord.setReasonForFailure(ReCAPConstants.BARCODE_NOT_FOUND_IN_LAS);
+                        statusReconciliationErrorCSVRecord.setReasonForFailure(RecapConstants.BARCODE_NOT_FOUND_IN_LAS);
                         statusReconciliationErrorCSVRecordList.add(statusReconciliationErrorCSVRecord);
                     }
                 }
@@ -368,7 +369,7 @@ public class GFAService {
 
     private void processMismatchStatus(List<StatusReconciliationCSVRecord> statusReconciliationCSVRecordList, List<ItemChangeLogEntity> itemChangeLogEntityList, String lasStatus, ItemEntity itemEntity) {
         StatusReconciliationCSVRecord statusReconciliationCSVRecord = new StatusReconciliationCSVRecord();
-        List<String> requestStatusCodes = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD);
+        List<String> requestStatusCodes = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         List<RequestStatusEntity> requestStatusEntityList = requestItemStatusDetailsRepository.findByRequestStatusCodeIn(requestStatusCodes);
         List<Integer> requestStatusIds = requestStatusEntityList.stream().map(RequestStatusEntity::getId).collect(Collectors.toList());
         List<Integer> requestid = getRequestItemDetailsRepository().getRequestItemEntitiesBasedOnDayLimit(itemEntity.getItemId(),requestStatusIds,statusReconciliationDayLimit);
@@ -379,13 +380,13 @@ public class GFAService {
         Optional<ItemStatusEntity> itemStatusEntity = getItemStatusDetailsRepository().findById(itemEntity.getItemAvailabilityStatusId());
         if (!requestItemEntityList.isEmpty()) {
             for (RequestItemEntity requestItemEntity : requestItemEntityList) {
-                if (!requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(ReCAPConstants.REQUEST_STATUS_CANCELED)){
+                if (!requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_STATUS_CANCELED)){
                     statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity.get(), requestItemEntity);
                 }else {
                     if (StringUtils.containsIgnoreCase(requestItemEntity.getNotes(),"Cancel requested")){
                         statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity.get(), requestItemEntity);
                     }else{
-                        RequestStatusEntity byRequestStatusCode = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_REFILED);
+                        RequestStatusEntity byRequestStatusCode = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED);
                         requestItemEntity.setRequestStatusId(byRequestStatusCode.getId());
                         requestItemEntity.setLastUpdatedDate(new Date());
                         requestItemDetailsRepository.save(requestItemEntity);
@@ -395,8 +396,8 @@ public class GFAService {
             }
         } else {
             statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(itemEntity.getBarcode(), "No", null, lasStatus, simpleDateFormat.format(new Date()), itemStatusEntity.get());
-            getItemDetailsRepository().updateAvailabilityStatus(1, ReCAPConstants.GUEST_USER, itemEntity.getBarcode());
-            ItemChangeLogEntity itemChangeLogEntity = saveItemChangeLogEntity(itemEntity.getItemId(), ReCAPConstants.GUEST_USER, ReCAPConstants.STATUS_RECONCILIATION_CHANGE_LOG_OPERATION_TYPE, itemEntity.getBarcode());
+            getItemDetailsRepository().updateAvailabilityStatus(1, RecapConstants.GUEST_USER, itemEntity.getBarcode());
+            ItemChangeLogEntity itemChangeLogEntity = saveItemChangeLogEntity(itemEntity.getItemId(), RecapConstants.GUEST_USER, RecapConstants.STATUS_RECONCILIATION_CHANGE_LOG_OPERATION_TYPE, itemEntity.getBarcode());
             itemChangeLogEntityList.add(itemChangeLogEntity);
             itemRequestServiceUtil.updateSolrIndex(itemEntity);
             logger.info("found mismatch in item status and updated availability status for the item barcode:{}", itemEntity.getBarcode());
@@ -468,7 +469,7 @@ public class GFAService {
 
     private ItemChangeLogEntity saveItemChangeLogEntity(Integer requestId, String deaccessionUser, String operationType, String barcode) {
         ItemChangeLogEntity itemChangeLogEntity = new ItemChangeLogEntity();
-        String notes = "ItemBarcode:" + barcode + " , " + "ItemAvailabilityStatusChange" + ReCAPConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK;
+        String notes = "ItemBarcode:" + barcode + " , " + "ItemAvailabilityStatusChange" + RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK;
         itemChangeLogEntity.setUpdatedBy(deaccessionUser);
         itemChangeLogEntity.setUpdatedDate(new Date());
         itemChangeLogEntity.setOperationType(operationType);
@@ -498,15 +499,15 @@ public class GFAService {
                 gfaRetrieveItemResponse.setSuccess(false);
             }
         } catch (HttpServerErrorException | HttpClientErrorException e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             gfaRetrieveItemResponse = new GFARetrieveItemResponse();
             gfaRetrieveItemResponse.setSuccess(false);
-            gfaRetrieveItemResponse.setScrenMessage(ReCAPConstants.REQUEST_LAS_EXCEPTION + ReCAPConstants.LAS_SERVER_NOT_REACHABLE);
+            gfaRetrieveItemResponse.setScrenMessage(RecapConstants.REQUEST_LAS_EXCEPTION + RecapCommonConstants.LAS_SERVER_NOT_REACHABLE);
         } catch (Exception e) {
             gfaRetrieveItemResponse = new GFARetrieveItemResponse();
             gfaRetrieveItemResponse.setSuccess(false);
-            gfaRetrieveItemResponse.setScrenMessage(ReCAPConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            gfaRetrieveItemResponse.setScrenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return gfaRetrieveItemResponse;
     }
@@ -567,22 +568,22 @@ public class GFAService {
                 } else {
                     gfaRetrieveItemResponse = new GFARetrieveItemResponse();
                     gfaRetrieveItemResponse.setSuccess(false);
-                    gfaRetrieveItemResponse.setScrenMessage(ReCAPConstants.REQUEST_LAS_EXCEPTION + "HTTP Error response from LAS");
+                    gfaRetrieveItemResponse.setScrenMessage(RecapConstants.REQUEST_LAS_EXCEPTION + "HTTP Error response from LAS");
                 }
             } else {
                 gfaRetrieveItemResponse.setSuccess(false);
-                gfaRetrieveItemResponse.setScrenMessage(ReCAPConstants.GFA_ITEM_STATUS_CHECK_FAILED);
+                gfaRetrieveItemResponse.setScrenMessage(RecapConstants.GFA_ITEM_STATUS_CHECK_FAILED);
             }
         } catch (HttpServerErrorException | HttpClientErrorException e) {
             gfaRetrieveItemResponse = new GFARetrieveItemResponse();
             gfaRetrieveItemResponse.setSuccess(false);
-            gfaRetrieveItemResponse.setScrenMessage(ReCAPConstants.REQUEST_LAS_EXCEPTION + ReCAPConstants.LAS_SERVER_NOT_REACHABLE);
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            gfaRetrieveItemResponse.setScrenMessage(RecapConstants.REQUEST_LAS_EXCEPTION + RecapCommonConstants.LAS_SERVER_NOT_REACHABLE);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         } catch (Exception e) {
             gfaRetrieveItemResponse = new GFARetrieveItemResponse();
             gfaRetrieveItemResponse.setSuccess(false);
-            gfaRetrieveItemResponse.setScrenMessage(ReCAPConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            gfaRetrieveItemResponse.setScrenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return gfaRetrieveItemResponse;
     }
@@ -627,22 +628,22 @@ public class GFAService {
 
                 logger.info("Item status check before executing Retrieval Order.Status received : {}",gfaOnlyStatus);
                 // Call Retrival Order
-                if (ReCAPConstants.getGFAStatusAvailableList().contains(gfaOnlyStatus)) {
-                    if (itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_EDD)) {
+                if (RecapConstants.getGFAStatusAvailableList().contains(gfaOnlyStatus)) {
+                    if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
                         itemResponseInformation = callItemEDDRetrivate(itemRequestInfo, itemResponseInformation);
-                    } else if (itemRequestInfo.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RETRIEVAL)) {
+                    } else if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
                         itemResponseInformation = callItemRetrivate(itemRequestInfo, itemResponseInformation);
                     }
                 }
-                else if (ReCAPConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.toLowerCase().contains(gfaOnlyStatus.toLowerCase())){
+                else if (RecapConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.toLowerCase().contains(gfaOnlyStatus.toLowerCase())){
                     logger.info("Request Received while GFA status is Sch on Refile WO");
                     itemResponseInformation.setRequestTypeForScheduledOnWO(true);
                     itemResponseInformation.setSuccess(true);
-                    itemResponseInformation.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                    itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
                 }
                 else {
                     itemResponseInformation.setSuccess(false);
-                    itemResponseInformation.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ITEM_NOT_AVAILABLE);
+                    itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ITEM_NOT_AVAILABLE);
                 }
             } else {
                 lasPolling(itemRequestInfo, itemResponseInformation);
@@ -651,8 +652,8 @@ public class GFAService {
             }
         } catch (Exception e) {
             itemResponseInformation.setSuccess(false);
-            itemResponseInformation.setScreenMessage(ReCAPConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            itemResponseInformation.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemResponseInformation;
     }
@@ -676,23 +677,23 @@ public class GFAService {
             if (isUseQueueLasCall()) { // Queue
                 ObjectMapper objectMapper = new ObjectMapper();
                 String json = objectMapper.writeValueAsString(gfaRetrieveItemRequest);
-                getProducer().sendBodyAndHeader(ReCAPConstants.SCSB_OUTGOING_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
+                getProducer().sendBodyAndHeader(RecapConstants.SCSB_OUTGOING_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
                 itemResponseInformation.setSuccess(true);
-                itemResponseInformation.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 GFARetrieveItemResponse gfaRetrieveItemResponse = itemRetrival(gfaRetrieveItemRequest);
                 if (gfaRetrieveItemResponse.isSuccess()) {
                     itemResponseInformation.setSuccess(true);
-                    itemResponseInformation.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                    itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
                 } else {
                     itemResponseInformation.setSuccess(false);
                     itemResponseInformation.setScreenMessage(gfaRetrieveItemResponse.getScrenMessage());
                 }
             }
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             itemResponseInformation.setSuccess(false);
-            itemResponseInformation.setScreenMessage(ReCAPConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            itemResponseInformation.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
         }
         return itemResponseInformation;
     }
@@ -738,14 +739,14 @@ public class GFAService {
             if (isUseQueueLasCall()) { // Queue
                 ObjectMapper objectMapper = getObjectMapper();
                 String json = objectMapper.writeValueAsString(gfaRetrieveEDDItemRequest);
-                getProducer().sendBodyAndHeader(ReCAPConstants.SCSB_OUTGOING_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
+                getProducer().sendBodyAndHeader(RecapConstants.SCSB_OUTGOING_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
                 itemResponseInformation.setSuccess(true);
-                itemResponseInformation.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 gfaRetrieveItemResponse = itemEDDRetrival(gfaRetrieveEDDItemRequest);
                 if (gfaRetrieveItemResponse.isSuccess()) {
                     itemResponseInformation.setSuccess(true);
-                    itemResponseInformation.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                    itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
                 } else {
                     itemResponseInformation.setSuccess(false);
                     itemResponseInformation.setScreenMessage(gfaRetrieveItemResponse.getScrenMessage());
@@ -753,8 +754,8 @@ public class GFAService {
             }
         } catch (Exception e) {
             itemResponseInformation.setSuccess(false);
-            itemResponseInformation.setScreenMessage(ReCAPConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            itemResponseInformation.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemResponseInformation;
     }
@@ -779,7 +780,7 @@ public class GFAService {
             logger.info("GFA PWD Response : {}", convertJsontoString(responseEntity.getBody()));
             logger.info("GFA PWD item status processed");
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return gfaPwdResponse;
     }
@@ -804,7 +805,7 @@ public class GFAService {
             logger.info("GFA PWI Response : {}", convertJsontoString(responseEntity.getBody()));
             logger.info("GFA PWI item status processed");
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return gfaPwiResponse;
     }
@@ -824,14 +825,14 @@ public class GFAService {
             if (gfaRetrieveItemResponse.isSuccess()) {
                 itemInformationResponse.setRequestId(gfaRetrieveItemResponse.getRetrieveItem().getTtitem().get(0).getRequestId());
                 itemInformationResponse.setSuccess(true);
-                itemInformationResponse.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemInformationResponse.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 itemInformationResponse.setRequestId(gfaRetrieveItemResponse.getRetrieveItem().getTtitem().get(0).getRequestId());
                 itemInformationResponse.setSuccess(false);
                 itemInformationResponse.setScreenMessage(gfaRetrieveItemResponse.getScrenMessage());
             }
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemInformationResponse;
     }
@@ -851,14 +852,14 @@ public class GFAService {
             if (gfaEddItemResponse.isSuccess()) {
                 itemInformationResponse.setRequestId(gfaEddItemResponse.getRetrieveEDD().getTtitem().get(0).getRequestId());
                 itemInformationResponse.setSuccess(true);
-                itemInformationResponse.setScreenMessage(ReCAPConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemInformationResponse.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 itemInformationResponse.setRequestId(gfaEddItemResponse.getRetrieveEDD().getTtitem().get(0).getRequestId());
                 itemInformationResponse.setSuccess(false);
                 itemInformationResponse.setScreenMessage(gfaEddItemResponse.getScrenMessage());
             }
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemInformationResponse;
     }
@@ -903,7 +904,7 @@ public class GFAService {
     private void lasPolling(ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation) {
         // Update Request_item_t table with new status - each Item
         try {
-            RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
+            RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
             RequestItemEntity requestItemEntity = requestItemDetailsRepository.findRequestItemById(itemRequestInfo.getRequestId());
             requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
             requestItemEntity.setLastUpdatedDate(new Date());
@@ -916,13 +917,13 @@ public class GFAService {
             requestInformation.setItemResponseInformation(itemResponseInformation);
             json = objectMapper.writeValueAsString(requestInformation);
             logger.info(json);
-            logger.info("Rest Service Status -> " + ReCAPConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS);
-            if (ReCAPConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
-                getProducer().getCamelContext().getRouteController().stopRoute(ReCAPConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
+            logger.info("Rest Service Status -> " + RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS);
+            if (RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
+                getProducer().getCamelContext().getRouteController().stopRoute(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
             }
-            getProducer().sendBodyAndHeader(ReCAPConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
+            getProducer().sendBodyAndHeader(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
             itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
-            if (ReCAPConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
+            if (RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
                 // Start Polling program - Once
                 startPolling(itemRequestInfo.getItemBarcodes().get(0));
             }
@@ -936,7 +937,7 @@ public class GFAService {
     public void startPolling(String barcode) {
         try {
             logger.info("Start Polling Process Once");
-            ReCAPConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS = 1;
+            RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS = 1;
             getLasItemStatusCheckPollingProcessor().pollLasItemStatusJobResponse(barcode, getProducer().getCamelContext());
         } catch (Exception e) {
             logger.error("Exception ", e);
@@ -954,20 +955,20 @@ public class GFAService {
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(gfaRetrieveItemRequest);
             String itemStatus=itemRequestService.callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
-            if(ReCAPConstants.getGFAStatusAvailableList().contains(itemStatus)) {
-                getProducer().sendBodyAndHeader(ReCAPConstants.SCSB_OUTGOING_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+            if(RecapConstants.getGFAStatusAvailableList().contains(itemStatus)) {
+                getProducer().sendBodyAndHeader(RecapConstants.SCSB_OUTGOING_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
             }
             else {
-                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                 requestItemDetailsRepository.save(requestItemEntity);
             }
         } catch (Exception exception) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, exception);
-            return ReCAPConstants.FAILURE + ":" + exception.getMessage();
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, exception);
+            return RecapCommonConstants.FAILURE + ":" + exception.getMessage();
         }
-        return ReCAPConstants.SUCCESS;
+        return RecapCommonConstants.SUCCESS;
     }
 
     /**
@@ -981,20 +982,20 @@ public class GFAService {
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(gfaRetrieveEDDItemRequest);
             String itemStatus=itemRequestService.callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
-            if(ReCAPConstants.getGFAStatusAvailableList().contains(itemStatus)) {
-                getProducer().sendBodyAndHeader(ReCAPConstants.SCSB_OUTGOING_QUEUE, json, ReCAPConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+            if(RecapConstants.getGFAStatusAvailableList().contains(itemStatus)) {
+                getProducer().sendBodyAndHeader(RecapConstants.SCSB_OUTGOING_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
             }
             else {
-                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                 requestItemDetailsRepository.save(requestItemEntity);
             }
         } catch (Exception exception) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, exception);
-            return ReCAPConstants.FAILURE + ":" + exception.getMessage();
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, exception);
+            return RecapCommonConstants.FAILURE + ":" + exception.getMessage();
         }
-        return ReCAPConstants.SUCCESS;
+        return RecapCommonConstants.SUCCESS;
     }
 
     /**

@@ -3,7 +3,8 @@ package org.recap.camel.route;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -29,13 +30,13 @@ public class StopRouteProcessor implements Processor {
             @Override
             public void run() {
                 try {
-                    if (routeId.equalsIgnoreCase(ReCAPConstants.ACCESSION_RECONCILATION_FTP_PUL_ROUTE) ||
-                            routeId.equalsIgnoreCase(ReCAPConstants.ACCESSION_RECONCILATION_FTP_CUL_ROUTE) ||
-                            routeId.equalsIgnoreCase(ReCAPConstants.ACCESSION_RECONCILATION_FTP_NYPL_ROUTE)) {
+                    if (routeId.equalsIgnoreCase(RecapConstants.ACCESSION_RECONCILATION_FTP_PUL_ROUTE) ||
+                            routeId.equalsIgnoreCase(RecapConstants.ACCESSION_RECONCILATION_FTP_CUL_ROUTE) ||
+                            routeId.equalsIgnoreCase(RecapConstants.ACCESSION_RECONCILATION_FTP_NYPL_ROUTE)) {
                         stopRouteWithTimeOutOption();
-                    } else if (routeId.equalsIgnoreCase(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL_FTP_ROUTE) ||
-                            routeId.equalsIgnoreCase(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FTP_ROUTE) ||
-                            routeId.equalsIgnoreCase(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE)) {
+                    } else if (routeId.equalsIgnoreCase(RecapConstants.REQUEST_INITIAL_LOAD_PUL_FTP_ROUTE) ||
+                            routeId.equalsIgnoreCase(RecapConstants.REQUEST_INITIAL_LOAD_CUL_FTP_ROUTE) ||
+                            routeId.equalsIgnoreCase(RecapConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE)) {
                         stopRouteWithTimeOutOption();
                     } else {
                         exchange.getContext().getRouteController().stopRoute(routeId);
@@ -43,7 +44,7 @@ public class StopRouteProcessor implements Processor {
                     logger.info("Stop Route " + routeId);
                 } catch (Exception e) {
                     logger.error("Exception while stop route : " + routeId);
-                    logger.error(ReCAPConstants.LOG_ERROR + e);
+                    logger.error(RecapCommonConstants.LOG_ERROR + e);
 
                 }
             }

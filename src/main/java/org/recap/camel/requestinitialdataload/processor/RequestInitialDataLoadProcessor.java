@@ -2,7 +2,8 @@ package org.recap.camel.requestinitialdataload.processor;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.service.requestdataload.RequestDataLoadService;
 import org.slf4j.Logger;
@@ -63,12 +64,12 @@ public class RequestInitialDataLoadProcessor {
      */
     public void processInput(Exchange exchange) throws ParseException {
         List<RequestDataLoadCSVRecord> requestDataLoadCSVRecordList = (List<RequestDataLoadCSVRecord>)exchange.getIn().getBody();
-        Integer index = (Integer) exchange.getProperty(ReCAPConstants.CAMEL_SPLIT_INDEX);
+        Integer index = (Integer) exchange.getProperty(RecapConstants.CAMEL_SPLIT_INDEX);
         logger.info("count from ftp" + requestDataLoadCSVRecordList.size());
         try {
             Set<String> barcodesNotInScsb = requestDataLoadService.process(requestDataLoadCSVRecordList,barcodeSet);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMMyyyy");
-            Path filePath = Paths.get(requestInitialLoadFilePath+"/"+institutionCode+"/"+ReCAPConstants.REQUEST_INITIAL_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
+            Path filePath = Paths.get(requestInitialLoadFilePath+"/"+institutionCode+"/"+ RecapConstants.REQUEST_INITIAL_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
             if (!filePath.toFile().exists()) {
                 Files.createDirectories(filePath.getParent());
                 Files.createFile(filePath);
@@ -76,7 +77,7 @@ public class RequestInitialDataLoadProcessor {
             }
             if(index == 0){
                 Set<String> headerSet = new HashSet<>();
-                headerSet.add(ReCAPConstants.REQUEST_INITIAL_LOAD_HEADER);
+                headerSet.add(RecapConstants.REQUEST_INITIAL_LOAD_HEADER);
                 Files.write(filePath,headerSet, StandardOpenOption.APPEND);
             }
 
@@ -85,7 +86,7 @@ public class RequestInitialDataLoadProcessor {
         catch (Exception e){
             barcodeSet.clear();
             totalCount=0;
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         }
         barcodeSet.clear();
         totalCount = totalCount + requestDataLoadCSVRecordList.size();
@@ -96,23 +97,23 @@ public class RequestInitialDataLoadProcessor {
     }
 
     private void startFileSystemRoutesForAccessionReconciliation(Exchange exchange, Integer index) {
-        if ((boolean)exchange.getProperty(ReCAPConstants.CAMEL_SPLIT_COMPLETE)){
+        if ((boolean)exchange.getProperty(RecapConstants.CAMEL_SPLIT_COMPLETE)){
             logger.info("split last index-->{}",index);
             try {
-                if(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL.equalsIgnoreCase(institutionCode)){
-                    logger.info(ReCAPConstants.STARTING+ReCAPConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
-                    camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
+                if(RecapConstants.REQUEST_INITIAL_LOAD_PUL.equalsIgnoreCase(institutionCode)){
+                    logger.info(RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
+                    camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
                 }
-                if(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL.equalsIgnoreCase(institutionCode)){
-                    logger.info(ReCAPConstants.STARTING+ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
-                    camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
+                if(RecapConstants.REQUEST_INITIAL_LOAD_CUL.equalsIgnoreCase(institutionCode)){
+                    logger.info(RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
+                    camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
                 }
-                if(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL.equalsIgnoreCase(institutionCode)){
-                    logger.info(ReCAPConstants.STARTING+ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
-                    camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
+                if(RecapConstants.REQUEST_INITIAL_LOAD_NYPL.equalsIgnoreCase(institutionCode)){
+                    logger.info(RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
+                    camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
                 }
             } catch (Exception e) {
-                logger.error(ReCAPConstants.LOG_ERROR+e);
+                logger.error(RecapCommonConstants.LOG_ERROR+e);
             }
         }
     }

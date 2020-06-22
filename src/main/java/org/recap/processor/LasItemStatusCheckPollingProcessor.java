@@ -1,7 +1,8 @@
 package org.recap.processor;
 
 import org.apache.camel.CamelContext;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.callable.LasItemStatusCheckPollingCallable;
 import org.recap.gfa.model.GFAItemStatusCheckResponse;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
@@ -50,15 +51,15 @@ public class LasItemStatusCheckPollingProcessor {
                     && gfaItemStatusCheckResponse.getDsitem() != null
                     && gfaItemStatusCheckResponse.getDsitem().getTtitem() != null && !gfaItemStatusCheckResponse.getDsitem().getTtitem().isEmpty()) {
                 logger.info("Start Route");
-                camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
+                camelContext.getRouteController().startRoute(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
             }
             executor.shutdown();
         } catch (InterruptedException e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         } catch (ExecutionException e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return gfaItemStatusCheckResponse;
     }

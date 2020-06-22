@@ -3,7 +3,8 @@ package org.recap.request;
 import org.junit.Before;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -62,10 +63,10 @@ public class ItemValidatorServiceUT extends BaseTestCase{
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(itemBarcodes);
         itemRequestInformation.setDeliveryLocation("PB");
-        itemRequestInformation.setRequestType(ReCAPConstants.RETRIEVAL);
+        itemRequestInformation.setRequestType(RecapCommonConstants.RETRIEVAL);
         ResponseEntity responseEntity = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals("Item Validation ",ReCAPConstants.VALID_REQUEST,responseEntity.getBody());
+        assertEquals("Item Validation ", RecapCommonConstants.VALID_REQUEST,responseEntity.getBody());
     }
 
     @Test
@@ -77,12 +78,12 @@ public class ItemValidatorServiceUT extends BaseTestCase{
         itemBarcodes.add("11123");
         itemBarcodes.add("0325");
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setRequestType(ReCAPConstants.RETRIEVAL);
+        itemRequestInformation.setRequestType(RecapCommonConstants.RETRIEVAL);
         itemRequestInformation.setItemBarcodes(itemBarcodes);
         itemRequestInformation.setDeliveryLocation("PB");
         ResponseEntity responseEntity = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), ReCAPConstants.ITEMBARCODE_WITH_DIFFERENT_BIB);
+        assertEquals(responseEntity.getBody(), RecapConstants.ITEMBARCODE_WITH_DIFFERENT_BIB);
     }
 
     public void saveBibSingleHoldingsMultipleItem() throws Exception {

@@ -4,7 +4,7 @@ import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseException;
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
 import com.pkrete.jsip2.messages.SIP2MessageResponse;
 import com.pkrete.jsip2.messages.responses.SIP2RecallResponse;
-import org.recap.ReCAPConstants;
+import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class SIP2RecallResponseParser extends  SIP2ResponseParser{
 
             response.setCheckSum(this.parseChecksum(data));
         } catch (InvalidSIP2ResponseValueException e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION,e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION,e);
         }
         return response;
     }

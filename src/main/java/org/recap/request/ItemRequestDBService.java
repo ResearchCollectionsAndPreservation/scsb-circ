@@ -1,7 +1,8 @@
 package org.recap.request;
 
 import org.apache.commons.lang3.StringUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.BulkRequestItemEntity;
 import org.recap.model.jpa.CustomerCodeEntity;
@@ -121,13 +122,13 @@ public class ItemRequestDBService {
             savedItemRequest = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
             if (savedItemRequest != null) {
                 requestId = savedItemRequest.getId();
-                saveItemChangeLogEntity(savedItemRequest.getId(), getUser(itemRequestInformation.getUsername()), ReCAPConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
+                saveItemChangeLogEntity(savedItemRequest.getId(), getUser(itemRequestInformation.getUsername()), RecapConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
             }
             logger.info("SCSB DB Update Successful");
         } catch (ParseException e) {
-            logger.error(ReCAPConstants.REQUEST_PARSE_EXCEPTION, e);
+            logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return requestId;
     }
@@ -146,14 +147,14 @@ public class ItemRequestDBService {
         Integer requestId = 0;
         try {
             if (!itemInformationResponse.isSuccess()) {
-                requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_EXCEPTION);
+                requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_EXCEPTION);
             }else {
-                if (itemInformationResponse.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RETRIEVAL)){
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
-                }else if (itemInformationResponse.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_EDD)){
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_EDD);
-                }else if (itemInformationResponse.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RECALL)){
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_RECALLED);
+                if (itemInformationResponse.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)){
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
+                }else if (itemInformationResponse.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)){
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_EDD);
+                }else if (itemInformationResponse.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)){
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RECALLED);
                 }
             }
 
@@ -189,14 +190,14 @@ public class ItemRequestDBService {
             savedItemRequest = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
             if (savedItemRequest != null) {
                 requestId = savedItemRequest.getId();
-                saveItemChangeLogEntity(savedItemRequest.getId(), getUser(itemInformationResponse.getUsername()), ReCAPConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
+                saveItemChangeLogEntity(savedItemRequest.getId(), getUser(itemInformationResponse.getUsername()), RecapConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
             }
             itemInformationResponse.setRequestId(requestId);
             logger.info("SCSB DB Update Successful");
         } catch (ParseException e) {
-            logger.error(ReCAPConstants.REQUEST_PARSE_EXCEPTION, e);
+            logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemInformationResponse;
     }
@@ -212,27 +213,27 @@ public class ItemRequestDBService {
         Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemInformationResponse.getRequestId());
         if(requestItemEntity != null) {
             BulkRequestItemEntity bulkRequestItemEntity = requestItemEntity.get().getBulkRequestItemEntity();
-            String notes = ReCAPConstants.USER + " : " + requestItemEntity.get().getNotes();
+            String notes = RecapConstants.USER + " : " + requestItemEntity.get().getNotes();
             if (null != bulkRequestItemEntity) {
                 itemInformationResponse.setBulk(true);
-                notes = notes + "\n" + ReCAPConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId();
+                notes = notes + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId();
             }
             requestItemEntity.get().setNotes(notes);
             if (itemInformationResponse.isSuccess()) {
-                if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RETRIEVAL)) {
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
-                } else if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_EDD)) {
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_EDD);
-                } else if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RECALL)) {
+                if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
+                } else if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_EDD);
+                } else if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
                     // This change is to update the Recall order to Retrieval order upon refile of the existing retrieval order from LAS.
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
                 }
             } else {
-                requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ReCAPConstants.REQUEST_STATUS_EXCEPTION);
+                requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_EXCEPTION);
                 if (itemInformationResponse.isBulk()) {
-                    requestItemEntity.get().setNotes(notes + "\n" + ReCAPConstants.REQUEST_LAS_EXCEPTION + ReCAPConstants.REQUEST_ITEM_GFA_FAILURE + " with error note - " + itemInformationResponse.getScreenMessage() + "\n" + ReCAPConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
+                    requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + " with error note - " + itemInformationResponse.getScreenMessage() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
                 }
-                requestItemEntity.get().setNotes(notes + "\n" + ReCAPConstants.REQUEST_LAS_EXCEPTION + ReCAPConstants.REQUEST_ITEM_GFA_FAILURE + " with error note - " + itemInformationResponse.getScreenMessage());
+                requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + " with error note - " + itemInformationResponse.getScreenMessage());
             }
             requestItemEntity.get().setRequestStatusId(requestStatusEntity.getId());
             requestItemDetailsRepository.save(requestItemEntity.get());
@@ -247,12 +248,12 @@ public class ItemRequestDBService {
      * @param userName     the user name
      */
     public void updateItemAvailabilutyStatus(List<ItemEntity> itemEntities, String userName) {
-        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(ReCAPConstants.NOT_AVAILABLE);
+        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE);
         for (ItemEntity itemEntity : itemEntities) {
             itemEntity.setItemAvailabilityStatusId(itemStatusEntity.getId()); // Not Available
             itemEntity.setLastUpdatedBy(getUser(userName));
 
-            saveItemChangeLogEntity(itemEntity.getItemId(), getUser(userName), ReCAPConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, ReCAPConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
+            saveItemChangeLogEntity(itemEntity.getItemId(), getUser(userName), RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
         }
         // Not Available
         itemDetailsRepository.saveAll(itemEntities);
@@ -266,11 +267,11 @@ public class ItemRequestDBService {
      * @param userName   the user name
      */
     public void rollbackUpdateItemAvailabilutyStatus(ItemEntity itemEntity, String userName) {
-        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(ReCAPConstants.AVAILABLE);
+        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.AVAILABLE);
         itemEntity.setItemAvailabilityStatusId(itemStatusEntity.getId()); // Available
         itemEntity.setLastUpdatedBy(getUser(userName));
         itemDetailsRepository.save(itemEntity);
-        saveItemChangeLogEntity(itemEntity.getItemId(), getUser(userName), ReCAPConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, ReCAPConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK);
+        saveItemChangeLogEntity(itemEntity.getItemId(), getUser(userName), RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK);
     }
 
     /**
@@ -311,7 +312,7 @@ public class ItemRequestDBService {
             try {
                 return simpleDateFormat.parse(expirationDate);
             } catch (Exception ex) {
-                logger.error(ReCAPConstants.REQUEST_EXCEPTION, ex);
+                logger.error(RecapCommonConstants.REQUEST_EXCEPTION, ex);
             }
         }
         return null;
@@ -328,8 +329,8 @@ public class ItemRequestDBService {
         Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemInformationResponse.getRequestId());
         if(requestItemEntity != null) {
             CustomerCodeEntity customerCodeEntity= customerCodeDetailsRepository.findByCustomerCode(requestItemEntity.get().getItemEntity().getCustomerCode());
-            rollbackUpdateItemAvailabilutyStatus(requestItemEntity.get().getItemEntity(), ReCAPConstants.GUEST_USER);
-            saveItemChangeLogEntity(itemInformationResponse.getRequestId(), requestItemEntity.get().getCreatedBy(), ReCAPConstants.REQUEST_ITEM_GFA_FAILURE, ReCAPConstants.REQUEST_ITEM_GFA_FAILURE + itemInformationResponse.getScreenMessage());
+            rollbackUpdateItemAvailabilutyStatus(requestItemEntity.get().getItemEntity(), RecapConstants.GUEST_USER);
+            saveItemChangeLogEntity(itemInformationResponse.getRequestId(), requestItemEntity.get().getCreatedBy(), RecapConstants.REQUEST_ITEM_GFA_FAILURE, RecapConstants.REQUEST_ITEM_GFA_FAILURE + itemInformationResponse.getScreenMessage());
             itemRequestInformation.setBibId(requestItemEntity.get().getItemEntity().getBibliographicEntities().get(0).getOwningInstitutionBibId());
             itemRequestInformation.setPatronBarcode(requestItemEntity.get().getPatronId());
             itemRequestInformation.setItemBarcodes(Arrays.asList(requestItemEntity.get().getItemEntity().getBarcode()));

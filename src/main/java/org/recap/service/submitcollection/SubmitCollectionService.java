@@ -4,7 +4,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.MarcException;
 import org.marc4j.marc.Record;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.converter.MarcToBibEntityConverter;
 import org.recap.converter.SCSBToBibEntityConverter;
 import org.recap.converter.XmlToBibEntityConverterInterface;
@@ -103,26 +104,26 @@ public class SubmitCollectionService {
             InstitutionEntity institutionEntity = getRepositoryService().getInstitutionDetailsRepository().findByInstitutionCode(institutionCode);
             try {
                 if (!"".equals(inputRecords)) {
-                    if (inputRecords.contains(ReCAPConstants.BIBRECORD_TAG)) {
+                    if (inputRecords.contains(RecapConstants.BIBRECORD_TAG)) {
                         response = processSCSB(inputRecords, processedBibIds, submitCollectionReportInfoMap, idMapToRemoveIndexList, bibIdMapToRemoveIndexList, checkLimit,isCGDProtected,institutionEntity,updatedDummyRecordOwnInstBibIdSet);
                     } else {
                         response = processMarc(inputRecords, processedBibIds, submitCollectionReportInfoMap, idMapToRemoveIndexList, bibIdMapToRemoveIndexList, checkLimit,isCGDProtected,institutionEntity,updatedDummyRecordOwnInstBibIdSet);
                     }
                     if (response != null){//This happens when there is a failure
                         setResponse(response, submitCollectionResponseList);
-                        getSubmitCollectionReportHelperService().setSubmitCollectionReportInfoForInvalidXml(institutionCode,submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST),response);
-                        generateSubmitCollectionReport(submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST), ReCAPConstants.SUBMIT_COLLECTION_REPORT, ReCAPConstants.SUBMIT_COLLECTION_FAILURE_REPORT, xmlFileName,reportRecordNumberList);
+                        getSubmitCollectionReportHelperService().setSubmitCollectionReportInfoForInvalidXml(institutionCode,submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),response);
+                        generateSubmitCollectionReport(submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST), RecapCommonConstants.SUBMIT_COLLECTION_REPORT, RecapCommonConstants.SUBMIT_COLLECTION_FAILURE_REPORT, xmlFileName,reportRecordNumberList);
                         return submitCollectionResponseList;
                     }
-                    generateSubmitCollectionReport(submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_SUCCESS_LIST), ReCAPConstants.SUBMIT_COLLECTION_REPORT, ReCAPConstants.SUBMIT_COLLECTION_SUCCESS_REPORT, xmlFileName,reportRecordNumberList);
-                    generateSubmitCollectionReport(submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST), ReCAPConstants.SUBMIT_COLLECTION_REPORT, ReCAPConstants.SUBMIT_COLLECTION_FAILURE_REPORT, xmlFileName,reportRecordNumberList);
-                    generateSubmitCollectionReport(submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_REJECTION_LIST), ReCAPConstants.SUBMIT_COLLECTION_REPORT, ReCAPConstants.SUBMIT_COLLECTION_REJECTION_REPORT, xmlFileName,reportRecordNumberList);
-                    generateSubmitCollectionReport(submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_EXCEPTION_LIST), ReCAPConstants.SUBMIT_COLLECTION_REPORT, ReCAPConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT, xmlFileName,reportRecordNumberList);
+                    generateSubmitCollectionReport(submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_SUCCESS_LIST), RecapCommonConstants.SUBMIT_COLLECTION_REPORT, RecapCommonConstants.SUBMIT_COLLECTION_SUCCESS_REPORT, xmlFileName,reportRecordNumberList);
+                    generateSubmitCollectionReport(submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST), RecapCommonConstants.SUBMIT_COLLECTION_REPORT, RecapCommonConstants.SUBMIT_COLLECTION_FAILURE_REPORT, xmlFileName,reportRecordNumberList);
+                    generateSubmitCollectionReport(submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_REJECTION_LIST), RecapCommonConstants.SUBMIT_COLLECTION_REPORT, RecapCommonConstants.SUBMIT_COLLECTION_REJECTION_REPORT, xmlFileName,reportRecordNumberList);
+                    generateSubmitCollectionReport(submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_LIST), RecapCommonConstants.SUBMIT_COLLECTION_REPORT, RecapCommonConstants.SUBMIT_COLLECTION_EXCEPTION_REPORT, xmlFileName,reportRecordNumberList);
                     getResponseMessage(submitCollectionReportInfoMap,submitCollectionResponseList);
                 }
             }catch (Exception e) {
-                logger.error(ReCAPConstants.LOG_ERROR, e);
-                response = ReCAPConstants.SUBMIT_COLLECTION_INTERNAL_ERROR;
+                logger.error(RecapCommonConstants.LOG_ERROR, e);
+                response = RecapConstants.SUBMIT_COLLECTION_INTERNAL_ERROR;
             }
             setResponse(response, submitCollectionResponseList);
             stopWatch.stop();
@@ -160,17 +161,17 @@ public class SubmitCollectionService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String format;
-        format = ReCAPConstants.FORMAT_MARC;
+        format = RecapConstants.FORMAT_MARC;
         List<Record> records = null;
         try {
             records = getMarcUtil().convertMarcXmlToRecord(inputRecords);
             if(checkLimit && records.size() > inputLimit){
-                return ReCAPConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + inputLimit;
+                return RecapConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + inputLimit;
             }
         } catch (Exception e) {
             logger.info(String.valueOf(e.getCause()));
-            logger.error(ReCAPConstants.LOG_ERROR,e);
-            return ReCAPConstants.INVALID_MARC_XML_FORMAT_MESSAGE;
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
+            return RecapConstants.INVALID_MARC_XML_FORMAT_MESSAGE;
         }
         if (CollectionUtils.isNotEmpty(records)) {
             int count = 1;
@@ -195,18 +196,18 @@ public class SubmitCollectionService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String format;
-        format = ReCAPConstants.FORMAT_SCSB;
+        format = RecapConstants.FORMAT_SCSB;
         BibRecords bibRecords = null;
         try {
             bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(inputRecords, BibRecords.class);
             logger.info("bibrecord size {}", bibRecords.getBibRecordList().size());
             if (checkLimit && bibRecords.getBibRecordList().size() > inputLimit) {
-                return ReCAPConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + " " + inputLimit;
+                return RecapConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + " " + inputLimit;
             }
         } catch (JAXBException e) {
             logger.info(String.valueOf(e.getCause()));
-            logger.error(ReCAPConstants.LOG_ERROR, e);
-            return ReCAPConstants.INVALID_SCSB_XML_FORMAT_MESSAGE;
+            logger.error(RecapCommonConstants.LOG_ERROR, e);
+            return RecapConstants.INVALID_SCSB_XML_FORMAT_MESSAGE;
         }
         int count = 1;
         Set<String> processedBarcodeSetForDummyRecords = new HashSet<>();
@@ -218,11 +219,11 @@ public class SubmitCollectionService {
                     processedBibIds.add(bibliographicEntity.getBibliographicId());
                 }
             } catch (MarcException me) {
-                logger.error(ReCAPConstants.LOG_ERROR,me);
-                return ReCAPConstants.INVALID_MARC_XML_FORMAT_IN_SCSBXML_MESSAGE;
+                logger.error(RecapCommonConstants.LOG_ERROR,me);
+                return RecapConstants.INVALID_MARC_XML_FORMAT_IN_SCSBXML_MESSAGE;
             } catch (ResourceAccessException rae){
-                logger.error(ReCAPConstants.LOG_ERROR,rae);
-                return ReCAPConstants.SCSB_SOLR_CLIENT_SERVICE_UNAVAILABLE;
+                logger.error(RecapCommonConstants.LOG_ERROR,rae);
+                return RecapCommonConstants.SCSB_SOLR_CLIENT_SERVICE_UNAVAILABLE;
             }
             logger.info("Process completed for Bib record no: {}",count);
             count ++;
@@ -247,12 +248,12 @@ public class SubmitCollectionService {
             } else {
                 logger.error("Error while parsing xml for a barcode in submit collection");
                 getSubmitCollectionReportHelperService().setSubmitCollectionFailureReportForUnexpectedException(bibliographicEntity,
-                        submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST),"Failed record - Item not updated - "+errorMessage.toString(),institutionEntity);
+                        submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),"Failed record - Item not updated - "+errorMessage.toString(),institutionEntity);
             }
         } catch (Exception e) {
             getSubmitCollectionReportHelperService().setSubmitCollectionFailureReportForUnexpectedException(bibliographicEntity,
-                    submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST),"Failed record - Item not updated - "+e.getMessage(),institutionEntity);
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+                    submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),"Failed record - Item not updated - "+e.getMessage(),institutionEntity);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         }
         return savedBibliographicEntity;
     }
@@ -281,8 +282,8 @@ public class SubmitCollectionService {
 
     public String indexDataUsingOwningInstBibId(List<String> owningInstBibliographicIdList,Integer owningInstId){
         MultiValueMap<String,Object> requestParameter = getLinkedMultiValueMap();
-        requestParameter.add(ReCAPConstants.OWN_INST_BIBID_LIST,owningInstBibliographicIdList);
-        requestParameter.add(ReCAPConstants.OWN_INSTITUTION_ID,owningInstId);
+        requestParameter.add(RecapCommonConstants.OWN_INST_BIBID_LIST,owningInstBibliographicIdList);
+        requestParameter.add(RecapCommonConstants.OWN_INSTITUTION_ID,owningInstId);
         return getRestTemplate().postForObject(scsbSolrClientUrl + "solrIndexer/indexByOwningInstBibliographicIdList", requestParameter, String.class);
 
     }
@@ -323,9 +324,9 @@ public class SubmitCollectionService {
     }
 
     public XmlToBibEntityConverterInterface getConverter(String format){
-        if(format.equalsIgnoreCase(ReCAPConstants.FORMAT_MARC)){
+        if(format.equalsIgnoreCase(RecapConstants.FORMAT_MARC)){
             return getMarcToBibEntityConverter();
-        } else if(format.equalsIgnoreCase(ReCAPConstants.FORMAT_SCSB)){
+        } else if(format.equalsIgnoreCase(RecapConstants.FORMAT_SCSB)){
             return getScsbToBibEntityConverter();
         }
         return null;
@@ -362,22 +363,22 @@ public class SubmitCollectionService {
                     if(submitCollectionReportInfo.getItemBarcode() != null){
 
                         ReportDataEntity itemBarcodeReportDataEntity = new ReportDataEntity();
-                        itemBarcodeReportDataEntity.setHeaderName(ReCAPConstants.SUBMIT_COLLECTION_ITEM_BARCODE);
+                        itemBarcodeReportDataEntity.setHeaderName(RecapCommonConstants.SUBMIT_COLLECTION_ITEM_BARCODE);
                         itemBarcodeReportDataEntity.setHeaderValue(submitCollectionReportInfo.getItemBarcode());
                         reportDataEntities.add(itemBarcodeReportDataEntity);
 
                         ReportDataEntity customerCodeReportDataEntity = new ReportDataEntity();
-                        customerCodeReportDataEntity.setHeaderName(ReCAPConstants.CUSTOMER_CODE);
+                        customerCodeReportDataEntity.setHeaderName(RecapCommonConstants.CUSTOMER_CODE);
                         customerCodeReportDataEntity.setHeaderValue(submitCollectionReportInfo.getCustomerCode()!=null?submitCollectionReportInfo.getCustomerCode():"");
                         reportDataEntities.add(customerCodeReportDataEntity);
 
                         ReportDataEntity owningInstitutionReportDataEntity = new ReportDataEntity();
-                        owningInstitutionReportDataEntity.setHeaderName(ReCAPConstants.OWNING_INSTITUTION);
+                        owningInstitutionReportDataEntity.setHeaderName(RecapCommonConstants.OWNING_INSTITUTION);
                         owningInstitutionReportDataEntity.setHeaderValue(owningInstitution);
                         reportDataEntities.add(owningInstitutionReportDataEntity);
 
                         ReportDataEntity messageReportDataEntity = new ReportDataEntity();
-                        messageReportDataEntity.setHeaderName(ReCAPConstants.MESSAGE);
+                        messageReportDataEntity.setHeaderName(RecapCommonConstants.MESSAGE);
                         messageReportDataEntity.setHeaderValue(submitCollectionReportInfo.getMessage());
                         reportDataEntities.add(messageReportDataEntity);
 
@@ -389,7 +390,7 @@ public class SubmitCollectionService {
                     logger.info("Processed completed report for record {}",count);
                 }
             } catch (Exception e) {
-                logger.error(ReCAPConstants.LOG_ERROR,e);
+                logger.error(RecapCommonConstants.LOG_ERROR,e);
             }
         }
     }
@@ -439,10 +440,10 @@ public class SubmitCollectionService {
         List<SubmitCollectionReportInfo> submitCollectionRejectionInfoList = new ArrayList<>();
         List<SubmitCollectionReportInfo> submitCollectionExceptionInfoList = new ArrayList<>();
         Map<String,List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
-        submitCollectionReportInfoMap.put(ReCAPConstants.SUBMIT_COLLECTION_SUCCESS_LIST,submitCollectionSuccessInfoList);
-        submitCollectionReportInfoMap.put(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST,submitCollectionFailureInfoList);
-        submitCollectionReportInfoMap.put(ReCAPConstants.SUBMIT_COLLECTION_REJECTION_LIST,submitCollectionRejectionInfoList);
-        submitCollectionReportInfoMap.put(ReCAPConstants.SUBMIT_COLLECTION_EXCEPTION_LIST,submitCollectionExceptionInfoList);
+        submitCollectionReportInfoMap.put(RecapConstants.SUBMIT_COLLECTION_SUCCESS_LIST,submitCollectionSuccessInfoList);
+        submitCollectionReportInfoMap.put(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST,submitCollectionFailureInfoList);
+        submitCollectionReportInfoMap.put(RecapConstants.SUBMIT_COLLECTION_REJECTION_LIST,submitCollectionRejectionInfoList);
+        submitCollectionReportInfoMap.put(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_LIST,submitCollectionExceptionInfoList);
         return submitCollectionReportInfoMap;
     }
 

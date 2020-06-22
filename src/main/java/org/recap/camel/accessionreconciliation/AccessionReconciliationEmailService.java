@@ -2,7 +2,8 @@ package org.recap.camel.accessionreconciliation;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.EmailPayLoad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class AccessionReconciliationEmailService {
      */
     public void processInput(Exchange exchange) {
         logger.info("accession email started for"+institutionCode);
-        producerTemplate.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(exchange), ReCAPConstants.EMAIL_BODY_FOR,"AccessionReconcilation");
+        producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(exchange), RecapConstants.EMAIL_BODY_FOR,"AccessionReconcilation");
     }
 
     /**
@@ -84,13 +85,13 @@ public class AccessionReconciliationEmailService {
      * @return the string
      */
     public String emailIdTo(String institution, EmailPayLoad emailPayLoad) {
-        if (ReCAPConstants.NYPL.equalsIgnoreCase(institution)) {
+        if (RecapCommonConstants.NYPL.equalsIgnoreCase(institution)) {
             emailPayLoad.setCc(nyplEmailCC);
             emailPayLoad.setTo(nyplEmailTo);
-        } else if (ReCAPConstants.COLUMBIA.equalsIgnoreCase(institution)) {
+        } else if (RecapCommonConstants.COLUMBIA.equalsIgnoreCase(institution)) {
             emailPayLoad.setCc(culEmailCC);
             emailPayLoad.setTo(culEmailTo);
-        } else if (ReCAPConstants.PRINCETON.equalsIgnoreCase(institution)) {
+        } else if (RecapCommonConstants.PRINCETON.equalsIgnoreCase(institution)) {
             emailPayLoad.setCc(pulEmailCC);
             emailPayLoad.setTo(pulEmailTo);
         }

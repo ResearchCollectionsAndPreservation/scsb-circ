@@ -13,7 +13,7 @@ import com.pkrete.jsip2.variables.CurrencyTypeFactory;
 import com.pkrete.jsip2.variables.FeeTypeFactory;
 import com.pkrete.jsip2.variables.MediaTypeFactory;
 import com.pkrete.jsip2.variables.SecurityMarkerFactory;
-import org.recap.ReCAPConstants;
+import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,7 @@ public class SIP2ItemInformationResponseParser extends SIP2ResponseParser {
             response.setCheckSum(this.parseChecksum(data));
             return response;
         } catch (InvalidSIP2ResponseValueException var4) {
-            logger.error(ReCAPConstants.LOG_ERROR,var4);
+            logger.error(RecapCommonConstants.LOG_ERROR,var4);
             throw new InvalidSIP2ResponseValueException(var4.getMessage() + " Response message string: \"" + data + "\"");
         }
     }

@@ -1,7 +1,8 @@
 package org.recap.request;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.EmailPayLoad;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,7 +75,7 @@ public class EmailService {
         emailPayLoad.setMessageDisplay(messageDisplay);
         emailPayLoad.setPatronBarcode(patronBarcode);
         emailPayLoad.setSubject(subject + itemBarcode);
-        producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad, ReCAPConstants.EMAIL_BODY_FOR, ReCAPConstants.REQUEST_RECALL_MAIL_QUEUE);
+        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.REQUEST_RECALL_MAIL_QUEUE);
     }
 
     /**
@@ -91,7 +92,7 @@ public class EmailService {
         emailPayLoad.setMessageDisplay(messageDisplay);
         emailPayLoad.setPatronBarcode(patronBarcode);
         emailPayLoad.setSubject(subject);
-        producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad, ReCAPConstants.EMAIL_BODY_FOR, ReCAPConstants.DELETED_MAIL_QUEUE);
+        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.DELETED_MAIL_QUEUE);
     }
 
     public void sendEmail(String itemBarcode, String toInstitution, String subject) {
@@ -99,7 +100,7 @@ public class EmailService {
         emailPayLoad.setTo(refileEmailIdTo(toInstitution));
         emailPayLoad.setItemBarcode(itemBarcode);
         emailPayLoad.setSubject(subject);
-        producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad, ReCAPConstants.EMAIL_BODY_FOR, ReCAPConstants.REQUEST_LAS_STATUS_MAIL_QUEUE);
+        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.REQUEST_LAS_STATUS_MAIL_QUEUE);
     }
 
     /**
@@ -120,17 +121,17 @@ public class EmailService {
         emailPayLoad.setBulkRequestStatus(bulkRequestStatus);
         emailPayLoad.setBulkRequestCsvFileData(bulkRequestCsvFileData);
         emailPayLoad.setSubject(subject);
-        producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad, ReCAPConstants.EMAIL_BODY_FOR, ReCAPConstants.BULK_REQUEST_EMAIL_QUEUE);
+        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.BULK_REQUEST_EMAIL_QUEUE);
     }
 
     private String refileEmailIdTo(String institution) {
-        if (institution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+        if (institution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
             return refileNyplMailTo;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
             return refileCulMailTo;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
             return refilePulMailTo;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.GFA)) {
+        } else if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
             return refileRecapMailTo;
         }
         return null;
@@ -141,28 +142,28 @@ public class EmailService {
      * @return
      */
     private String emailIdTo(String institution) {
-        if (institution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+        if (institution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
             return nyplMailTo;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
             return culMailTo;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
             return pulMailTo;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.GFA)) {
+        } else if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
             return recapMailTo;
-        } else if(institution.equalsIgnoreCase(ReCAPConstants.DELETED_MAIl_TO)){
+        } else if(institution.equalsIgnoreCase(RecapConstants.DELETED_MAIl_TO)){
             return deletedRecordsMailTo;
         }
         return null;
     }
 
     private String emailIdCC(String institution) {
-        if (institution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+        if (institution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
             return nyplMailCC;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
             return culMailCC;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
             return pulMailCC;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.GFA)) {
+        } else if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
             return recapMailCC;
         }
         return null;

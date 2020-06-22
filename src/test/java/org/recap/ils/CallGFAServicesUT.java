@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.gfa.model.GFAItemStatus;
 import org.recap.gfa.model.GFAItemStatusCheckRequest;
 import org.recap.gfa.model.GFAItemStatusCheckResponse;
@@ -27,7 +27,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -188,7 +187,7 @@ public class CallGFAServicesUT extends BaseTestCase {
             gfaOnlyStaus = gfaStaus.toUpperCase();
         }
         logger.info(gfaOnlyStaus);
-        if (ReCAPConstants.getGFAStatusAvailableList().contains(gfaOnlyStaus)) {
+        if (RecapConstants.getGFAStatusAvailableList().contains(gfaOnlyStaus)) {
             logger.info("Staus Match");
         }else{
             logger.info("Does Not Match");

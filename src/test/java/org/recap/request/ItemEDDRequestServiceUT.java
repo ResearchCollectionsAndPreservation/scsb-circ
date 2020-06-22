@@ -6,7 +6,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.controller.RequestItemValidatorController;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.BibliographicEntity;
@@ -88,7 +89,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCase{
     public void testEddRequestItem() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
-        ResponseEntity res = new ResponseEntity(ReCAPConstants.WRONG_ITEM_BARCODE,HttpStatus.CONTINUE);
+        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE,HttpStatus.CONTINUE);
         ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
         itemRequestInfo.setItemBarcodes(Arrays.asList("23"));
         itemRequestInfo.setItemOwningInstitution("PUL");
@@ -118,7 +119,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCase{
         Mockito.when(itemEDDRequestService.getItemRequestService().removeDiacritical(searchResultRow.getTitle().replaceAll("[^\\x00-\\x7F]", "?"))).thenReturn("Title Of the Book");
         Mockito.when(itemEDDRequestService.getItemInformationResponse()).thenReturn(itemResponseInformation);
         Mockito.when(itemEDDRequestService.getItemRequestService().getGfaService().isUseQueueLasCall()).thenReturn(false);
-        Mockito.when(itemEDDRequestService.getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_EDD)).thenReturn(1);
+        Mockito.when(itemEDDRequestService.getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapCommonConstants.REQUEST_STATUS_EDD)).thenReturn(1);
         Mockito.when(itemEDDRequestService.getItemRequestService().searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemEDDRequestService.getItemRequestService().getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity,getSearchResultRowList())).thenCallRealMethod();
         Mockito.when(itemEDDRequestService.getItemDetailsRepository().findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());

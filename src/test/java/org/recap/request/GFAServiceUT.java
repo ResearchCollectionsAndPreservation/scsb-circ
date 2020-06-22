@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.gfa.model.GFAPwdDsItemRequest;
 import org.recap.gfa.model.GFAPwdDsItemResponse;
 import org.recap.gfa.model.GFAPwdRequest;
@@ -246,7 +246,7 @@ public class GFAServiceUT extends BaseTestCase{
         Mockito.when(gfaService.callItemEDDRetrivate(itemRequestInformation,itemInformationResponse)).thenCallRealMethod();
         ItemInformationResponse response = gfaService.callItemEDDRetrivate(itemRequestInformation,itemInformationResponse);
         assertNotNull(response);
-        assertEquals(ReCAPConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL,response.getScreenMessage());
+        assertEquals(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL,response.getScreenMessage());
 
     }
 

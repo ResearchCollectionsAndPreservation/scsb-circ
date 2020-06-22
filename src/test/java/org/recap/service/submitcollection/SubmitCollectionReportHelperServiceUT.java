@@ -6,7 +6,7 @@ import org.marc4j.MarcReader;
 import org.marc4j.MarcXmlReader;
 import org.marc4j.marc.Record;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.converter.MarcToBibEntityConverter;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -54,8 +54,8 @@ public class SubmitCollectionReportHelperServiceUT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem(1,"32101095533293","PA","24252","PUL","9919400","9734816", "7453441",true);
         BibliographicEntity incomingBibliographicEntity = getConvertedBibliographicEntity("MarcRecord.xml","PUL");
         submitCollectionReportHelperService.buildSubmitCollectionReportInfo(submitCollectionReportInfoMap,bibliographicEntity,incomingBibliographicEntity);
-        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_SUCCESS_LIST);
-        assertEquals(ReCAPConstants.SUBMIT_COLLECTION_SUCCESS_RECORD,submitCollectionReportInfoList.get(0).getMessage());
+        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_SUCCESS_LIST);
+        assertEquals(RecapConstants.SUBMIT_COLLECTION_SUCCESS_RECORD,submitCollectionReportInfoList.get(0).getMessage());
     }
 
     @Test
@@ -64,8 +64,8 @@ public class SubmitCollectionReportHelperServiceUT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem(1,"32101095533293","PA","24252","PUL","9919400","9734816", "7453441",true);
         BibliographicEntity incomingBibliographicEntity = getConvertedBibliographicEntity("MarcRecord.xml","PUL");
         submitCollectionReportHelperService.buildSubmitCollectionReportInfo(submitCollectionReportInfoMap,bibliographicEntity,incomingBibliographicEntity);
-        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_SUCCESS_LIST);
-        assertEquals(ReCAPConstants.SUBMIT_COLLECTION_SUCCESS_RECORD,submitCollectionReportInfoList.get(0).getMessage());
+        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_SUCCESS_LIST);
+        assertEquals(RecapConstants.SUBMIT_COLLECTION_SUCCESS_RECORD,submitCollectionReportInfoList.get(0).getMessage());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class SubmitCollectionReportHelperServiceUT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem(1,"32101095533293","PA","24252","PUL","9919400","222420", "7453441",true);
         BibliographicEntity incomingBibliographicEntity = getConvertedBibliographicEntity("MarcRecord.xml","PUL");
         submitCollectionReportHelperService.buildSubmitCollectionReportInfo(submitCollectionReportInfoMap,bibliographicEntity,incomingBibliographicEntity);
-        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST);
+        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST);
         assertEquals("Failed record - Owning institution holding id 9734816 for the incoming barcode 32101095533293, owning institution item id 7453441 is unavailable in the existing bib - owning institution bib id - 9919400",submitCollectionReportInfoList.get(0).getMessage());
     }
 
@@ -84,7 +84,7 @@ public class SubmitCollectionReportHelperServiceUT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem(1,"32101095533293","PA","24252","PUL","9919400","9734816", "7453442",true);
         BibliographicEntity incomingBibliographicEntity = getConvertedBibliographicEntity("MarcRecord.xml","PUL");
         submitCollectionReportHelperService.buildSubmitCollectionReportInfo(submitCollectionReportInfoMap,bibliographicEntity,incomingBibliographicEntity);
-        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST);
+        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST);
         assertEquals("Failed record - Incoming item 32101095533293, owning institution item id 7453441 is not matched with the existing item 32101095533293, owning institution item id 7453442, owning institution holding id 9734816, owning institution bib id 9919400",submitCollectionReportInfoList.get(0).getMessage());
     }
 
@@ -94,8 +94,8 @@ public class SubmitCollectionReportHelperServiceUT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem(1,"32101095533293","PA","24252","PUL","9919400","9734816", "7453441",false);
         BibliographicEntity incomingBibliographicEntity = getConvertedBibliographicEntity("MarcRecord.xml","PUL");
         submitCollectionReportHelperService.buildSubmitCollectionReportInfo(submitCollectionReportInfoMap,bibliographicEntity,incomingBibliographicEntity);
-        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_REJECTION_LIST);
-        assertEquals(ReCAPConstants.SUBMIT_COLLECTION_REJECTION_RECORD,submitCollectionReportInfoList.get(0).getMessage());
+        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_REJECTION_LIST);
+        assertEquals(RecapConstants.SUBMIT_COLLECTION_REJECTION_RECORD,submitCollectionReportInfoList.get(0).getMessage());
     }
 
     public BibliographicEntity saveBibSingleHoldingsSingleItem(Integer itemCount,String itemBarcode, String customerCode, String callnumber, String institution,String owningInstBibId,String owningInstHoldingId, String owningInstItemId,boolean availableItem) throws Exception {
@@ -185,10 +185,10 @@ public class SubmitCollectionReportHelperServiceUT extends BaseTestCase {
         List<SubmitCollectionReportInfo> submitCollectionRejectionInfoList = new ArrayList<>();
         List<SubmitCollectionReportInfo> submitCollectionExceptionInfoList = new ArrayList<>();
         Map<String,List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
-        submitCollectionReportInfoMap.put(ReCAPConstants.SUBMIT_COLLECTION_SUCCESS_LIST,submitCollectionSuccessInfoList);
-        submitCollectionReportInfoMap.put(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST,submitCollectionFailureInfoList);
-        submitCollectionReportInfoMap.put(ReCAPConstants.SUBMIT_COLLECTION_REJECTION_LIST,submitCollectionRejectionInfoList);
-        submitCollectionReportInfoMap.put(ReCAPConstants.SUBMIT_COLLECTION_EXCEPTION_LIST,submitCollectionExceptionInfoList);
+        submitCollectionReportInfoMap.put(RecapConstants.SUBMIT_COLLECTION_SUCCESS_LIST,submitCollectionSuccessInfoList);
+        submitCollectionReportInfoMap.put(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST,submitCollectionFailureInfoList);
+        submitCollectionReportInfoMap.put(RecapConstants.SUBMIT_COLLECTION_REJECTION_LIST,submitCollectionRejectionInfoList);
+        submitCollectionReportInfoMap.put(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_LIST,submitCollectionExceptionInfoList);
         return submitCollectionReportInfoMap;
     }
 

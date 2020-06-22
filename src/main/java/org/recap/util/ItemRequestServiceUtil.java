@@ -2,7 +2,8 @@ package org.recap.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.gfa.model.TtitemEDDResponse;
 import org.recap.model.jpa.BulkRequestItem;
 import org.recap.model.jpa.BulkRequestItemEntity;
@@ -58,11 +59,11 @@ public class ItemRequestServiceUtil {
         try {
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity requestEntity = new HttpEntity<>(getRestHeaderService().getHttpHeaders());
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ReCAPConstants.UPDATE_ITEM_STATUS_SOLR).queryParam(ReCAPConstants.UPDATE_ITEM_STATUS_SOLR_PARAM_ITEM_ID, itemEntity.getBarcode());
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.UPDATE_ITEM_STATUS_SOLR).queryParam(RecapConstants.UPDATE_ITEM_STATUS_SOLR_PARAM_ITEM_ID, itemEntity.getBarcode());
             ResponseEntity<String> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, String.class);
             logger.info(responseEntity.getBody());
         } catch (Exception e) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         }
     }
 

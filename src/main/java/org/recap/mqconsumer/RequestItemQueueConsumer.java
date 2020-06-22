@@ -3,7 +3,8 @@ package org.recap.mqconsumer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.RequestInformation;
@@ -179,7 +180,7 @@ public class RequestItemQueueConsumer {
      * @throws IOException the io exception
      */
     public void bulkRequestProcessItemOnMessage(@Body String body, Exchange exchange) throws IOException {
-        Integer bulkRequestId = (Integer) exchange.getIn().getHeaders().get(ReCAPConstants.BULK_REQUEST_ID);
+        Integer bulkRequestId = (Integer) exchange.getIn().getHeaders().get(RecapCommonConstants.BULK_REQUEST_ID);
         getLogger().info("Bulk item request barcode received for bulk request id -> {} is -> {}", bulkRequestId, body);
         getBulkItemRequestProcessService().processBulkRequestItem(body, bulkRequestId);
     }
@@ -235,7 +236,7 @@ public class RequestItemQueueConsumer {
      */
     public void pulRequestTopicOnMessage(@Body String body) {
         getLogger().info("PUL Request Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_PUL_REQUEST_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_PUL_REQUEST_TOPIC);
     }
 
     /**
@@ -245,7 +246,7 @@ public class RequestItemQueueConsumer {
      */
     public void pulEDDTopicOnMessage(@Body String body) {
         getLogger().info("PUL EDD Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_PUL_EDD_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_PUL_EDD_TOPIC);
     }
 
     /**
@@ -255,7 +256,7 @@ public class RequestItemQueueConsumer {
      */
     public void pulRecalTopicOnMessage(@Body String body) {
         getLogger().info("PUL Recall Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_PUL_RECALL_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_PUL_RECALL_TOPIC);
     }
 
     /**
@@ -265,7 +266,7 @@ public class RequestItemQueueConsumer {
      */
     public void pulBorrowDirectTopicOnMessage(@Body String body) {
         getLogger().info("PUL BorrowDirect Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_PUL_BORROW_DIRECT_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_PUL_BORROW_DIRECT_TOPIC);
     }
 
     /**
@@ -275,7 +276,7 @@ public class RequestItemQueueConsumer {
      */
     public void culRequestTopicOnMessage(@Body String body) {
         getLogger().info("CUL Request Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_CUL_REQUEST_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_CUL_REQUEST_TOPIC);
     }
 
     /**
@@ -285,7 +286,7 @@ public class RequestItemQueueConsumer {
      */
     public void culEDDTopicOnMessage(@Body String body) {
         getLogger().info("CUL EDD Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_CUL_EDD_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_CUL_EDD_TOPIC);
     }
 
     /**
@@ -295,7 +296,7 @@ public class RequestItemQueueConsumer {
      */
     public void culRecalTopicOnMessage(@Body String body) {
         getLogger().info("CUL Recall Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_CUL_RECALL_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_CUL_RECALL_TOPIC);
     }
 
     /**
@@ -305,7 +306,7 @@ public class RequestItemQueueConsumer {
      */
     public void culBorrowDirectTopicOnMessage(@Body String body) {
         getLogger().info("CUL Borrow Direct Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_CUL_BORROW_DIRECT_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_CUL_BORROW_DIRECT_TOPIC);
     }
 
     /**
@@ -315,7 +316,7 @@ public class RequestItemQueueConsumer {
      */
     public void nyplRequestTopicOnMessage(@Body String body) {
         getLogger().info("NYPL Request Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_NYPL_REQUEST_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_NYPL_REQUEST_TOPIC);
     }
 
     /**
@@ -325,7 +326,7 @@ public class RequestItemQueueConsumer {
      */
     public void nyplEDDTopicOnMessage(@Body String body) {
         getLogger().info("NYPL EDD Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_NYPL_EDD_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_NYPL_EDD_TOPIC);
     }
 
     /**
@@ -335,7 +336,7 @@ public class RequestItemQueueConsumer {
      */
     public void nyplRecalTopicOnMessage(@Body String body) {
         getLogger().info("NYPL Recall Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_NYPL_RECALL_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_NYPL_RECALL_TOPIC);
     }
 
     /**
@@ -345,7 +346,7 @@ public class RequestItemQueueConsumer {
      */
     public void nyplBorrowDirectTopicOnMessage(@Body String body) {
         getLogger().info("NYPL Borrow Direct Topic - Lisinting to messages");
-        setTopicMessageToDb(body, ReCAPConstants.REQUEST_ITEM_NYPL_BORROW_DIRECT_TOPIC);
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_NYPL_BORROW_DIRECT_TOPIC);
     }
 
     /**
@@ -412,7 +413,7 @@ public class RequestItemQueueConsumer {
                 itemInformationResponse = om.readValue(body, ItemInformationResponse.class);
                 getItemRequestService().updateChangesToDb(itemInformationResponse, operationType);
             } catch (Exception e) {
-                logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+                logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             }
         }
     }

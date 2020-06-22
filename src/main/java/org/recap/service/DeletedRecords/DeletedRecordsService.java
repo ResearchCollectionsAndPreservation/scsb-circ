@@ -1,6 +1,6 @@
 package org.recap.service.DeletedRecords;
 
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.repository.jpa.DeletedRecordsRepository;
 import org.recap.request.EmailService;
 import org.slf4j.Logger;
@@ -29,14 +29,14 @@ public class DeletedRecordsService {
         boolean bReturnMsg = false;
 
         try {
-            long lCountDeleted = deletedRecordsRepository.countByDeletedReportedStatus(ReCAPConstants.DELETED_STATUS_NOT_REPORTED);
+            long lCountDeleted = deletedRecordsRepository.countByDeletedReportedStatus(RecapConstants.DELETED_STATUS_NOT_REPORTED);
             logger.info("Count : " + lCountDeleted);
             if (lCountDeleted > 0) {
                 // Change Status
-                int statusChange = deletedRecordsRepository.updateDeletedReportedStatus(ReCAPConstants.DELETED_STATUS_REPORTED, ReCAPConstants.DELETED_STATUS_NOT_REPORTED);
+                int statusChange = deletedRecordsRepository.updateDeletedReportedStatus(RecapConstants.DELETED_STATUS_REPORTED, RecapConstants.DELETED_STATUS_NOT_REPORTED);
                 logger.info("Delete Count : " + statusChange);
                 // Send Email
-                emailService.sendEmail(ReCAPConstants.EMAIL_DELETED_RECORDS_DISPLAY_MESSAGE + lCountDeleted, "", ReCAPConstants.DELETED_MAIl_TO, ReCAPConstants.EMAIL_SUBJECT_DELETED_RECORDS);
+                emailService.sendEmail(RecapConstants.EMAIL_DELETED_RECORDS_DISPLAY_MESSAGE + lCountDeleted, "", RecapConstants.DELETED_MAIl_TO, RecapConstants.EMAIL_SUBJECT_DELETED_RECORDS);
                 bReturnMsg = true;
             } else {
                 logger.info("No records to delete" );

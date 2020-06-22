@@ -1,6 +1,6 @@
 package org.recap.processor;
 
-import org.recap.ReCAPConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.callable.NyplJobResponsePollingCallable;
 import org.recap.ils.NyplApiServiceConnector;
 import org.recap.ils.model.nypl.JobData;
@@ -66,25 +66,25 @@ public class NyplJobResponsePollingProcessor {
             return jobResponse;
         } catch (InterruptedException e) {
             logger.error("Nypl job response interrupted for job id -> " + jobId);
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             executor.shutdownNow();
             jobResponse.setStatusMessage("Nypl job response interrupted : " + e.getMessage());
             return jobResponse;
         } catch (ExecutionException e) {
             logger.error("Nypl job response execution failed for job id -> " + jobId);
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             executor.shutdownNow();
             jobResponse.setStatusMessage("Nypl job response execution failed : " + e.getMessage());
             return jobResponse;
         } catch (TimeoutException e) {
             logger.error("Nypl job response polling timed out for job id -> " + jobId);
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             executor.shutdownNow();
             jobResponse.setStatusMessage("Nypl job response polling timed out : " + e.getMessage());
             return jobResponse;
         } catch (Exception e) {
             logger.error("Nypl job response polling failed for job id -> " + jobId);
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, e);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             executor.shutdownNow();
             jobResponse.setStatusMessage("Nypl job response polling failed : " + e.getMessage());
             return jobResponse;

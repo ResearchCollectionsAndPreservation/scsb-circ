@@ -2,7 +2,8 @@ package org.recap.request;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +31,12 @@ public class RequestParamaterValidatorServiceUT extends BaseTestCase{
         itemBarcodeList.add("33433012968222");
         itemRequestInformation.setItemBarcodes(itemBarcodeList);
         itemRequestInformation.setPatronBarcode("45678915");
-        itemRequestInformation.setRequestType(ReCAPConstants.REQUEST_TYPE_BORROW_DIRECT);
+        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT);
         itemRequestInformation.setRequestingInstitution("PULd");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), ReCAPConstants.INVALID_REQUEST_INSTITUTION+"\n");
+        assertEquals(responseEntity.getBody(), RecapConstants.INVALID_REQUEST_INSTITUTION+"\n");
     }
 
     @Test
@@ -46,12 +47,12 @@ public class RequestParamaterValidatorServiceUT extends BaseTestCase{
         itemBarcodeList.add("33433012968222");
         itemRequestInformation.setItemBarcodes(itemBarcodeList);
         itemRequestInformation.setPatronBarcode("45678915");
-        itemRequestInformation.setRequestType(ReCAPConstants.REQUEST_TYPE_BORROW_DIRECT);
+        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT);
         itemRequestInformation.setRequestingInstitution("PUL");
         itemRequestInformation.setEmailAddress("hemalatha.shtcindia.com");
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), ReCAPConstants.INVALID_EMAIL_ADDRESS+"\n");
+        assertEquals(responseEntity.getBody(), RecapConstants.INVALID_EMAIL_ADDRESS+"\n");
     }
 
     @Test
@@ -67,7 +68,7 @@ public class RequestParamaterValidatorServiceUT extends BaseTestCase{
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), ReCAPConstants.INVALID_REQUEST_TYPE+"\n");
+        assertEquals(responseEntity.getBody(), RecapConstants.INVALID_REQUEST_TYPE+"\n");
     }
 
     @Test
@@ -78,7 +79,7 @@ public class RequestParamaterValidatorServiceUT extends BaseTestCase{
         itemRequestInformation.setItemBarcodes(itemBarcodeList);
         itemRequestInformation.setPatronBarcode("45678915");
         itemRequestInformation.setChapterTitle("title");
-        itemRequestInformation.setRequestType(ReCAPConstants.EDD_REQUEST);
+        itemRequestInformation.setRequestType(RecapConstants.EDD_REQUEST);
         itemRequestInformation.setDeliveryLocation("AC");
         itemRequestInformation.setRequestingInstitution("PUL");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");

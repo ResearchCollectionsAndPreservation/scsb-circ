@@ -2,7 +2,7 @@ package org.recap.service.requestdataload;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -46,7 +46,7 @@ public class RequestDataLoadServiceUT extends BaseTestCase{
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = new RequestDataLoadCSVRecord();
         requestDataLoadCSVRecord.setBarcode(bibliographicEntity.getItemEntities().get(0).getBarcode());
         requestDataLoadCSVRecord.setCustomerCode("PB");
-        requestDataLoadCSVRecord.setDeliveryMethod(ReCAPConstants.REQUEST_DATA_LOAD_REQUEST_TYPE);
+        requestDataLoadCSVRecord.setDeliveryMethod(RecapConstants.REQUEST_DATA_LOAD_REQUEST_TYPE);
         requestDataLoadCSVRecord.setCreatedDate("05/12/2017 00:00:27.124");
         requestDataLoadCSVRecord.setLastUpdatedDate("05/12/2017 00:00:27.124");
         requestDataLoadCSVRecord.setPatronId("0000000");

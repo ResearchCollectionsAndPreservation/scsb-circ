@@ -1,7 +1,8 @@
 package org.recap.request;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.controller.ItemController;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.CustomerCodeEntity;
@@ -80,55 +81,55 @@ public class ItemValidatorService {
             if (itemEntityList != null && !itemEntityList.isEmpty()) {
                 if (!itemEntityList.isEmpty()) {
                     for (ItemEntity itemEntity1 : itemEntityList) {
-                        if (!checkRequestItemStatus(itemEntity1.getBarcode(), ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD)) {
-                            return new ResponseEntity(ReCAPConstants.INITIAL_LOAD_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)) {
+                            return new ResponseEntity(RecapConstants.INITIAL_LOAD_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                         }
                         String availabilityStatus = getItemStatus(itemEntity1.getItemAvailabilityStatusId());
-                        if (availabilityStatus.equalsIgnoreCase(ReCAPConstants.NOT_AVAILABLE) && (itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.RETRIEVAL)
-                                || itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_EDD)
-                                || itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.BORROW_DIRECT))) {
-                            return new ResponseEntity(ReCAPConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
-                        } else if (availabilityStatus.equalsIgnoreCase(ReCAPConstants.AVAILABLE) && itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RECALL)) {
-                            return new ResponseEntity(ReCAPConstants.RECALL_NOT_FOR_AVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        if (availabilityStatus.equalsIgnoreCase(RecapCommonConstants.NOT_AVAILABLE) && (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.RETRIEVAL)
+                                || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)
+                                || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.BORROW_DIRECT))) {
+                            return new ResponseEntity(RecapConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        } else if (availabilityStatus.equalsIgnoreCase(RecapCommonConstants.AVAILABLE) && itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+                            return new ResponseEntity(RecapConstants.RECALL_NOT_FOR_AVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                         }
 
-                        if(itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RECALL)) {
-                            if (!checkRequestItemStatus(itemEntity1.getBarcode(), ReCAPConstants.REQUEST_STATUS_EDD)) {
-                                return new ResponseEntity(ReCAPConstants.RECALL_FOR_EDD_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
-                            }else if (!checkRequestItemStatus(itemEntity1.getBarcode(), ReCAPConstants.REQUEST_STATUS_CANCELED)) {
-                                return new ResponseEntity(ReCAPConstants.RECALL_FOR_CANCELLED_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        if(itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+                            if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_EDD)) {
+                                return new ResponseEntity(RecapConstants.RECALL_FOR_EDD_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                            }else if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_CANCELED)) {
+                                return new ResponseEntity(RecapConstants.RECALL_FOR_CANCELLED_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                             }
                         }
 
-                        if (!checkRequestItemStatus(itemEntity1.getBarcode(), ReCAPConstants.REQUEST_STATUS_RECALLED)) {
-                            return new ResponseEntity(ReCAPConstants.RECALL_FOR_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)) {
+                            return new ResponseEntity(RecapConstants.RECALL_FOR_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                         }
 
-                        if (itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_EDD)) {
+                        if (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
                             CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndRecapDeliveryRestrictionLikeEDD(itemEntity1.getCustomerCode());
                             if (customerCodeEntity == null) {
-                                return new ResponseEntity(ReCAPConstants.EDD_REQUEST_NOT_ALLOWED, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                                return new ResponseEntity(RecapConstants.EDD_REQUEST_NOT_ALLOWED, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                             }
                         }
                     }
                 }
                 ItemEntity itemEntity = itemEntityList.get(0);
                 ResponseEntity responseEntity1 = null;
-                if (itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RETRIEVAL) || itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RECALL)) {
+                if (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL) || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
                     int validateCustomerCode = checkDeliveryLocation(itemEntity.getCustomerCode(), itemRequestInformation);
                     if (validateCustomerCode == 1) {
-                        responseEntity1 = new ResponseEntity(ReCAPConstants.VALID_REQUEST, getHttpHeaders(), HttpStatus.OK);
+                        responseEntity1 = new ResponseEntity(RecapCommonConstants.VALID_REQUEST, getHttpHeaders(), HttpStatus.OK);
                     } else if (validateCustomerCode == 0) {
-                        responseEntity1 = new ResponseEntity(ReCAPConstants.INVALID_CUSTOMER_CODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        responseEntity1 = new ResponseEntity(RecapConstants.INVALID_CUSTOMER_CODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                     } else if (validateCustomerCode == -1) {
-                        responseEntity1 = new ResponseEntity(ReCAPConstants.INVALID_DELIVERY_CODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        responseEntity1 = new ResponseEntity(RecapConstants.INVALID_DELIVERY_CODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                     }
                 } else {
-                    responseEntity1 = new ResponseEntity(ReCAPConstants.VALID_REQUEST, getHttpHeaders(), HttpStatus.OK);
+                    responseEntity1 = new ResponseEntity(RecapCommonConstants.VALID_REQUEST, getHttpHeaders(), HttpStatus.OK);
                 }
                 return responseEntity1;
             } else {
-                return new ResponseEntity(ReCAPConstants.WRONG_ITEM_BARCODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
             }
         } else if (itemRequestInformation.getItemBarcodes().size() > 1) {
             Set<Integer> bibliographicIds = new HashSet<>();
@@ -140,7 +141,7 @@ public class ItemValidatorService {
             }
             return multipleRequestItemValidation(itemEntityList, bibliographicIds, itemRequestInformation);
         }
-        return new ResponseEntity(ReCAPConstants.VALID_REQUEST, getHttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity(RecapCommonConstants.VALID_REQUEST, getHttpHeaders(), HttpStatus.OK);
     }
 
     private List<ItemEntity> getItemEntities(List<String> itemBarcodes) {
@@ -153,7 +154,7 @@ public class ItemValidatorService {
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add(ReCAPConstants.RESPONSE_DATE, new Date().toString());
+        responseHeaders.add(RecapCommonConstants.RESPONSE_DATE, new Date().toString());
         return responseHeaders;
     }
 
@@ -177,20 +178,20 @@ public class ItemValidatorService {
         List<BibliographicEntity> bibliographicList;
 
         for (ItemEntity itemEntity : itemEntityList) {
-            if (!checkRequestItemStatus(itemEntity.getBarcode(), ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD)) {
-                return new ResponseEntity(ReCAPConstants.INITIAL_LOAD_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+            if (!checkRequestItemStatus(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)) {
+                return new ResponseEntity(RecapConstants.INITIAL_LOAD_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
             }
-            if (itemEntity.getItemAvailabilityStatusId() == 2 && (itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.RETRIEVAL)
-                    || itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_EDD))) {
-                return new ResponseEntity(ReCAPConstants.INVALID_ITEM_BARCODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
-            } else if (itemEntity.getItemAvailabilityStatusId() == 1 && itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_RECALL)) {
-                return new ResponseEntity(ReCAPConstants.RECALL_NOT_FOR_AVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+            if (itemEntity.getItemAvailabilityStatusId() == 2 && (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.RETRIEVAL)
+                    || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD))) {
+                return new ResponseEntity(RecapConstants.INVALID_ITEM_BARCODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+            } else if (itemEntity.getItemAvailabilityStatusId() == 1 && itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+                return new ResponseEntity(RecapConstants.RECALL_NOT_FOR_AVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
             }
-            if (!checkRequestItemStatus(itemEntity.getBarcode(), ReCAPConstants.REQUEST_STATUS_RECALLED)) {
-                return new ResponseEntity(ReCAPConstants.RECALL_FOR_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+            if (!checkRequestItemStatus(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)) {
+                return new ResponseEntity(RecapConstants.RECALL_FOR_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
             }
 
-            if (!(itemRequestInformation.getRequestType().equalsIgnoreCase(ReCAPConstants.REQUEST_TYPE_EDD))) {
+            if (!(itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD))) {
                 int validateCustomerCode = checkDeliveryLocation(itemEntity.getCustomerCode(), itemRequestInformation);
                 if (validateCustomerCode == 1) {
                     if (itemEntity.getBibliographicEntities().size() == bibliographicIds.size()) {
@@ -198,19 +199,19 @@ public class ItemValidatorService {
                         for (BibliographicEntity bibliographicEntity : bibliographicList) {
                             Integer bibliographicId = bibliographicEntity.getBibliographicId();
                             if (!bibliographicIds.contains(bibliographicId)) {
-                                return new ResponseEntity(ReCAPConstants.ITEMBARCODE_WITH_DIFFERENT_BIB, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                                return new ResponseEntity(RecapConstants.ITEMBARCODE_WITH_DIFFERENT_BIB, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                             } else {
-                                status = ReCAPConstants.VALID_REQUEST;
+                                status = RecapCommonConstants.VALID_REQUEST;
                             }
                         }
                     } else {
-                        return new ResponseEntity(ReCAPConstants.ITEMBARCODE_WITH_DIFFERENT_BIB, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity(RecapConstants.ITEMBARCODE_WITH_DIFFERENT_BIB, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                     }
                 } else {
                     if (validateCustomerCode == 0) {
-                        return new ResponseEntity(ReCAPConstants.INVALID_CUSTOMER_CODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity(RecapConstants.INVALID_CUSTOMER_CODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                     } else if (validateCustomerCode == -1) {
-                        return new ResponseEntity(ReCAPConstants.INVALID_DELIVERY_CODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity(RecapConstants.INVALID_DELIVERY_CODE, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                     }
                 }
             }

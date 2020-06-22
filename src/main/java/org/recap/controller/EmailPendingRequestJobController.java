@@ -1,7 +1,8 @@
 package org.recap.controller;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.service.ActiveMqQueuesInfo;
 import org.slf4j.Logger;
@@ -51,9 +52,9 @@ public class EmailPendingRequestJobController {
             logger.info("Pending Request : {}", pendingRequests);
             EmailPayLoad emailPayLoad = new EmailPayLoad();
             emailPayLoad.setPendingRequestLimit(String.valueOf(pendingRequestLimit));
-            producerTemplate.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, emailPayLoad, ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.EMAIL_HEADER_REQUEST_PENDING);
+            producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.EMAIL_HEADER_REQUEST_PENDING);
         }
-        return ReCAPConstants.SUCCESS;
+        return RecapCommonConstants.SUCCESS;
     }
 
 }

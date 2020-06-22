@@ -1,6 +1,7 @@
 package org.recap.controller;
 
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.model.submitcollection.SubmitCollectionResponse;
 import org.recap.service.common.SetupDataService;
@@ -65,10 +66,10 @@ public class SharedCollectionRestController {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         ResponseEntity responseEntity;
-        String inputRecords = (String) requestParameters.get(ReCAPConstants.INPUT_RECORDS);
-        String institution = (String) requestParameters.get(ReCAPConstants.INSTITUTION);
+        String inputRecords = (String) requestParameters.get(RecapCommonConstants.INPUT_RECORDS);
+        String institution = (String) requestParameters.get(RecapCommonConstants.INSTITUTION);
         Integer institutionId = (Integer) setupDataService.getInstitutionCodeIdMap().get(institution);
-        Boolean isCGDProtection = Boolean.valueOf((String) requestParameters.get(ReCAPConstants.IS_CGD_PROTECTED));
+        Boolean isCGDProtection = Boolean.valueOf((String) requestParameters.get(RecapCommonConstants.IS_CGD_PROTECTED));
 
         List<Integer> reportRecordNumberList = new ArrayList<>();
         Set<Integer> processedBibIdSet = new HashSet<>();
@@ -97,8 +98,8 @@ public class SharedCollectionRestController {
             submitCollectionBatchService.generateSubmitCollectionReportFile(reportRecordNumberList);
             responseEntity = new ResponseEntity(submitCollectionResponseList,getHttpHeaders(), HttpStatus.OK);
         } catch (Exception e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
-            responseEntity = new ResponseEntity(ReCAPConstants.SUBMIT_COLLECTION_INTERNAL_ERROR,getHttpHeaders(), HttpStatus.OK);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
+            responseEntity = new ResponseEntity(RecapConstants.SUBMIT_COLLECTION_INTERNAL_ERROR,getHttpHeaders(), HttpStatus.OK);
         }
         stopWatch.stop();
         logger.info("Total time taken to process submit collection through rest api--->{} sec",stopWatch.getTotalTimeSeconds());
@@ -123,7 +124,7 @@ public class SharedCollectionRestController {
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add(ReCAPConstants.RESPONSE_DATE, new Date().toString());
+        responseHeaders.add(RecapCommonConstants.RESPONSE_DATE, new Date().toString());
         return responseHeaders;
     }
 }

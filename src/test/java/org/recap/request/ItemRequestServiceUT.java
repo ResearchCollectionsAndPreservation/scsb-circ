@@ -4,7 +4,7 @@ import org.apache.camel.Exchange;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -182,7 +182,7 @@ public class ItemRequestServiceUT extends BaseTestCase {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setCatalogingStatus(ReCAPConstants.COMPLETE_STATUS);
+        itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));

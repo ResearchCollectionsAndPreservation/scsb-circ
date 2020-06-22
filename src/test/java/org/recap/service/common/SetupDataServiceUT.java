@@ -2,7 +2,7 @@ package org.recap.service.common;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapCommonConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
@@ -23,14 +23,14 @@ public class SetupDataServiceUT extends BaseTestCase {
         Map<Integer,String> itemStatusIdCodeMap = setupDataService.getItemStatusIdCodeMap();
         assertNotNull(itemStatusIdCodeMap);
         String itemStatusCode = itemStatusIdCodeMap.get(1);
-        assertEquals(ReCAPConstants.AVAILABLE,itemStatusCode);
+        assertEquals(RecapCommonConstants.AVAILABLE,itemStatusCode);
     }
 
     @Test
     public void getItemStatusCodeIdMap(){
         Map<String,Integer> itemStatusCodeIdMap = setupDataService.getItemStatusCodeIdMap();
         assertNotNull(itemStatusCodeIdMap);
-        Integer itemStatusId = itemStatusCodeIdMap.get(ReCAPConstants.AVAILABLE);
+        Integer itemStatusId = itemStatusCodeIdMap.get(RecapCommonConstants.AVAILABLE);
         assertEquals(new Integer(1),itemStatusId);
     }
 
@@ -39,7 +39,7 @@ public class SetupDataServiceUT extends BaseTestCase {
         Map<Integer,String> institutionEntityMap = setupDataService.getInstitutionIdCodeMap();
         assertNotNull(institutionEntityMap);
         String institutionCode = institutionEntityMap.get(1);
-        assertEquals(ReCAPConstants.PRINCETON,institutionCode);
+        assertEquals(RecapCommonConstants.PRINCETON,institutionCode);
 
     }
 }

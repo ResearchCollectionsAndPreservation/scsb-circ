@@ -2,7 +2,7 @@ package org.recap.camel.statusreconciliation;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class StatusReconciliationEmailService {
      */
     public void processInput(Exchange exchange) {
         String fileLocation = (String) exchange.getIn().getHeaders().get("CamelFileNameProduced");
-        producerTemplate.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(fileLocation), ReCAPConstants.EMAIL_BODY_FOR,"StatusReconcilation");
+        producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(fileLocation), RecapConstants.EMAIL_BODY_FOR,"StatusReconcilation");
     }
 
     private EmailPayLoad getEmailPayLoad(String FileLocation){

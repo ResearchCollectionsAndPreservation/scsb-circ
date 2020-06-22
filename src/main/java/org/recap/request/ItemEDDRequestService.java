@@ -2,7 +2,8 @@ package org.recap.request;
 
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -147,22 +148,22 @@ public class ItemEDDRequestService {
                     // Change Item Availablity
                     isItemStatusAvailable = getItemRequestService().updateItemAvailabilutyStatus(itemEntities, itemRequestInfo.getUsername());
                 }
-                requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PROCESSING);
+                requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING);
                 itemRequestInfo.setRequestId(requestId);
                 itemResponseInformation.setRequestId(requestId);
 
                 if (requestId == 0) {
-                    itemResponseInformation.setScreenMessage(ReCAPConstants.INTERNAL_ERROR_DURING_REQUEST);
+                    itemResponseInformation.setScreenMessage(RecapConstants.INTERNAL_ERROR_DURING_REQUEST);
                     itemResponseInformation.setSuccess(false);
-                    getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity,ReCAPConstants.GUEST_USER);
+                    getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, RecapConstants.GUEST_USER);
                 } else if (!isItemStatusAvailable) {
-                    itemResponseInformation.setScreenMessage(ReCAPConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM);
+                    itemResponseInformation.setScreenMessage(RecapConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM);
                     itemResponseInformation.setSuccess(false);
                 } else {
                     // Process
                     String requestInfoPatronBarcode = itemRequestInfo.getPatronBarcode();
                     if (getItemRequestService().getGfaService().isUseQueueLasCall()) {
-                        getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.REQUEST_STATUS_PENDING);
+                        getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING);
                     }
                     itemResponseInformation.setItemId(itemEntity.getItemId());
                     if(itemRequestInfo.isOwningInstitutionItem()){
@@ -175,11 +176,11 @@ public class ItemEDDRequestService {
                     itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
                     if (itemResponseInformation.isRequestTypeForScheduledOnWO()) {
                         logger.info("EDD Request Received on first scan");
-                        requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, ReCAPConstants.LAS_REFILE_REQUEST_PLACED);
+                        requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.LAS_REFILE_REQUEST_PLACED);
                         logger.info("Updated EDD request id {} on first scan", requestId);
                     }
                     if (!itemResponseInformation.isSuccess()) {
-                        getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, ReCAPConstants.GUEST_USER);
+                        getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, RecapConstants.GUEST_USER);
                     }
                     else {
 
@@ -194,7 +195,7 @@ public class ItemEDDRequestService {
                     itemResponseInformation.setPatronBarcode(requestInfoPatronBarcode);
                 }
             } else {
-                itemResponseInformation.setScreenMessage(ReCAPConstants.WRONG_ITEM_BARCODE);
+                itemResponseInformation.setScreenMessage(RecapConstants.WRONG_ITEM_BARCODE);
                 itemResponseInformation.setSuccess(false);
             }
             logger.info("Finish Processing");
@@ -209,8 +210,8 @@ public class ItemEDDRequestService {
             itemResponseInformation.setDeliveryLocation(itemRequestInfo.getDeliveryLocation());
             itemResponseInformation.setUsername(itemRequestInfo.getUsername());
             if (!itemResponseInformation.isSuccess()) {
-                itemResponseInformation.setRequestNotes(itemRequestInfo.getRequestNotes() + "\n" + ReCAPConstants.REQUEST_SCSB_EXCEPTION + itemResponseInformation.getScreenMessage());
-                getItemRequestService().updateChangesToDb(itemResponseInformation, ReCAPConstants.REQUEST_TYPE_EDD + "-" + itemResponseInformation.getRequestingInstitution());
+                itemResponseInformation.setRequestNotes(itemRequestInfo.getRequestNotes() + "\n" + RecapConstants.REQUEST_SCSB_EXCEPTION + itemResponseInformation.getScreenMessage());
+                getItemRequestService().updateChangesToDb(itemResponseInformation, RecapCommonConstants.REQUEST_TYPE_EDD + "-" + itemResponseInformation.getRequestingInstitution());
             } else {
                 itemResponseInformation.setRequestNotes(itemRequestInfo.getRequestNotes());
                 if(itemEntity != null) {
@@ -220,9 +221,9 @@ public class ItemEDDRequestService {
             // Update Topics
             getItemRequestService().sendMessageToTopic(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getRequestType(), itemResponseInformation, exchange);
         } catch (RestClientException ex) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION_REST, ex);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION_REST, ex);
         } catch (Exception ex) {
-            logger.error(ReCAPConstants.REQUEST_EXCEPTION, ex);
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, ex);
         }
         return itemResponseInformation;
     }
@@ -238,11 +239,11 @@ public class ItemEDDRequestService {
 
     public String getPatronIdForOwningInstitutionOnEdd(String owningInstitution){
         String patronId = "";
-        if (owningInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+        if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
                patronId = princetonPatronForEDD;
-        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
                patronId = columbiaPatronForEDD;
-        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
                 patronId = nyplPatronForEDD;
         }
         logger.info(patronId);
@@ -251,22 +252,22 @@ public class ItemEDDRequestService {
 
     public String getPatronIdBorrwingInsttution(String requestingInstitution, String owningInstitution) {
         String patronId = "";
-        if (owningInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
-            if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+        if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
                 patronId = princetonEDDCULPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
                 patronId = princetonEDDNYPLPatron;
             }
-        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
-            if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
                 patronId = columbiaEDDPULPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
                 patronId = columbiaEDDNYPLPatron;
             }
-        } else if (owningInstitution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
-            if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
                 patronId = nyplEDDPrincetonPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
                 patronId = nyplEDDColumbiaPatron;
             }
         }

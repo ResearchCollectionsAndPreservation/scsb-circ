@@ -2,7 +2,8 @@ package org.recap.camel.requestinitialdataload;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.EmailPayLoad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class RequestDataLoadEmailService {
     public void processInput(Exchange exchange) {
         logger.info("ReqeustDataLoad EMailservice started for"+institutionCode);
         String fileNameWithPath = (String)exchange.getIn().getHeader("CamelFileNameProduced");
-        producerTemplate.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(fileNameWithPath), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.REQUEST_INITIAL_DATA_LOAD);
+        producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(fileNameWithPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.REQUEST_INITIAL_DATA_LOAD);
     }
 
     public EmailPayLoad getEmailPayLoad(String fileNameWithPath){
@@ -52,11 +53,11 @@ public class RequestDataLoadEmailService {
     }
 
     public String emailIdTo(String institution) {
-        if (ReCAPConstants.NYPL.equalsIgnoreCase(institution)) {
+        if (RecapCommonConstants.NYPL.equalsIgnoreCase(institution)) {
             return emailToNYPL;
-        } else if (ReCAPConstants.COLUMBIA.equalsIgnoreCase(institution)) {
+        } else if (RecapCommonConstants.COLUMBIA.equalsIgnoreCase(institution)) {
             return emailToCUL;
-        } else if (ReCAPConstants.PRINCETON.equalsIgnoreCase(institution)) {
+        } else if (RecapCommonConstants.PRINCETON.equalsIgnoreCase(institution)) {
             return emailToPUL;
         }
         return null;

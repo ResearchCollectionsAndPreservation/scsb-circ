@@ -1,7 +1,8 @@
 package org.recap.controller;
 
 import org.apache.camel.CamelContext;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,10 @@ public class RequestDataLoadController {
     @RequestMapping(value = "/startRequestInitialLoad",method = RequestMethod.POST)
     public String startAccessionReconcilation() throws Exception{
         logger.info("Request Initial DataLoad Starting.....");
-        camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL_FTP_ROUTE);
-        camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL_FTP_ROUTE);
-        camelContext.getRouteController().startRoute(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL_FTP_ROUTE);
+        camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_PUL_FTP_ROUTE);
+        camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_CUL_FTP_ROUTE);
+        camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_NYPL_FTP_ROUTE);
       //  camelContext.start();
-        return ReCAPConstants.SUCCESS;
+        return RecapCommonConstants.SUCCESS;
     }
 }

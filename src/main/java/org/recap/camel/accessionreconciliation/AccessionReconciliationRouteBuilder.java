@@ -7,7 +7,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.route.StartRouteProcessor;
 import org.recap.camel.route.StopRouteProcessor;
 import org.slf4j.Logger;
@@ -73,34 +74,34 @@ public class AccessionReconciliationRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.SFTP+ ftpUserName +  ReCAPConstants.AT + accessionReconciliationPulFtp + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost+ReCAPConstants.ACCESSION_RR_FTP_OPTIONS+pulWorkDir)
-                            .routeId(ReCAPConstants.ACCESSION_RECONCILATION_FTP_PUL_ROUTE)
+                    from(RecapCommonConstants.SFTP+ ftpUserName +  RecapCommonConstants.AT + accessionReconciliationPulFtp + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost+ RecapConstants.ACCESSION_RR_FTP_OPTIONS+pulWorkDir)
+                            .routeId(RecapConstants.ACCESSION_RECONCILATION_FTP_PUL_ROUTE)
                             .noAutoStartup()
                             .choice()
                                 .when(gzipFile)
                                     .unmarshal().gzipDeflater()
 
                                     .log("PUL Accession Reconciliation FTP Route Unzip Complete")
-                                    .process(new StartRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE))
-                                    .to(ReCAPConstants.DIRECT+ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE)
+                                    .process(new StartRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE))
+                                    .to(RecapConstants.DIRECT+ RecapConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE)
                                 .when(body().isNull())
-                                    .process(new StopRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_FTP_PUL_ROUTE))
+                                    .process(new StopRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_FTP_PUL_ROUTE))
                                     .log("No File To Process For PUL Accession Reconciliation")
                                 .otherwise()
-                                    .process(new StartRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE))
-                                    .to(ReCAPConstants.DIRECT+ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE)
+                                    .process(new StartRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE))
+                                    .to(RecapConstants.DIRECT+ RecapConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE)
                             .endChoice();
 
-                    from(ReCAPConstants.DIRECT+ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE)
-                            .routeId(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE)
+                    from(RecapConstants.DIRECT+ RecapConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE)
+                            .routeId(RecapConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE)
                             .noAutoStartup()
                             .log("accession reconciliation pul started")
                             .split(body().tokenize("\n",1000,true))
                             .unmarshal().bindy(BindyType.Csv,BarcodeReconcilitaionReport.class)
-                            .bean(applicationContext.getBean(AccessionReconciliationProcessor.class,ReCAPConstants.REQUEST_INITIAL_LOAD_PUL),ReCAPConstants.PROCESS_INPUT)
+                            .bean(applicationContext.getBean(AccessionReconciliationProcessor.class, RecapConstants.REQUEST_INITIAL_LOAD_PUL), RecapConstants.PROCESS_INPUT)
                             .end()
                             .onCompletion()
-                            .process(new StopRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE));
+                            .process(new StopRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE));
 
                 }
             });
@@ -108,68 +109,68 @@ public class AccessionReconciliationRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.SFTP+ ftpUserName +  ReCAPConstants.AT + accessionReconciliationCulFtp + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost+ReCAPConstants.ACCESSION_RR_FTP_OPTIONS+culWorkDir)
-                            .routeId(ReCAPConstants.ACCESSION_RECONCILATION_FTP_CUL_ROUTE)
+                    from(RecapCommonConstants.SFTP+ ftpUserName +  RecapCommonConstants.AT + accessionReconciliationCulFtp + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost+ RecapConstants.ACCESSION_RR_FTP_OPTIONS+culWorkDir)
+                            .routeId(RecapConstants.ACCESSION_RECONCILATION_FTP_CUL_ROUTE)
                             .noAutoStartup()
                             .choice()
                                 .when(gzipFile)
                                     .unmarshal()
                                     .gzipDeflater()
                                     .log("CUL Accession Reconciliation FTP Route Unzip Complete")
-                                    .process(new StartRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE))
-                                    .to(ReCAPConstants.DIRECT+ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE)
+                                    .process(new StartRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE))
+                                    .to(RecapConstants.DIRECT+ RecapConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE)
                                 .when(body().isNull())
-                                    .process(new StopRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_FTP_CUL_ROUTE))
+                                    .process(new StopRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_FTP_CUL_ROUTE))
                                     .log("No File To Process For CUL Accession Reconciliation")
                                 .otherwise()
                                     .process(new StartRouteProcessor("ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE"))
-                                    .to(ReCAPConstants.DIRECT+ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE)
+                                    .to(RecapConstants.DIRECT+ RecapConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE)
                             .endChoice();
 
-                    from(ReCAPConstants.DIRECT+ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE)
-                            .routeId(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE)
+                    from(RecapConstants.DIRECT+ RecapConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE)
+                            .routeId(RecapConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE)
                             .noAutoStartup()
                             .log("accession reconciliation cul started")
                             .split(body().tokenize("\n",1000,true))
                             .unmarshal().bindy(BindyType.Csv,BarcodeReconcilitaionReport.class)
-                            .bean(applicationContext.getBean(AccessionReconciliationProcessor.class,ReCAPConstants.REQUEST_INITIAL_LOAD_CUL),ReCAPConstants.PROCESS_INPUT)
+                            .bean(applicationContext.getBean(AccessionReconciliationProcessor.class, RecapConstants.REQUEST_INITIAL_LOAD_CUL), RecapConstants.PROCESS_INPUT)
                             .end()
                             .onCompletion()
-                            .process(new StopRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE));
+                            .process(new StopRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE));
                 }
             });
 
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.SFTP+ ftpUserName +  ReCAPConstants.AT + accessionReconciliationNyplFtp + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost+ReCAPConstants.ACCESSION_RR_FTP_OPTIONS+nyplWorkDir)
-                            .routeId(ReCAPConstants.ACCESSION_RECONCILATION_FTP_NYPL_ROUTE)
+                    from(RecapCommonConstants.SFTP+ ftpUserName +  RecapCommonConstants.AT + accessionReconciliationNyplFtp + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost+ RecapConstants.ACCESSION_RR_FTP_OPTIONS+nyplWorkDir)
+                            .routeId(RecapConstants.ACCESSION_RECONCILATION_FTP_NYPL_ROUTE)
                             .noAutoStartup()
                             .choice()
                                 .when(gzipFile)
                                     .unmarshal()
                                     .gzipDeflater()
                                     .log("NYPL Accession Reconciliation FTP Route Unzip Complete")
-                                    .process(new StartRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE))
-                                    .to(ReCAPConstants.DIRECT+ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE)
+                                    .process(new StartRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE))
+                                    .to(RecapConstants.DIRECT+ RecapConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE)
                                 .when(body().isNull())
-                                    .process(new StopRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_FTP_NYPL_ROUTE))
+                                    .process(new StopRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_FTP_NYPL_ROUTE))
                                     .log("No File To Process For NYPL Accession Reconciliation")
                                 .otherwise()
-                                    .process(new StartRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE))
-                                    .to(ReCAPConstants.DIRECT+ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE)
+                                    .process(new StartRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE))
+                                    .to(RecapConstants.DIRECT+ RecapConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE)
                             .endChoice();
 
-                    from(ReCAPConstants.DIRECT+ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE)
-                            .routeId(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE)
+                    from(RecapConstants.DIRECT+ RecapConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE)
+                            .routeId(RecapConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE)
                             .noAutoStartup()
                             .log("accession reconciliation nypl started")
                             .split(body().tokenize("\n",1000,true))
                             .unmarshal().bindy(BindyType.Csv,BarcodeReconcilitaionReport.class)
-                            .bean(applicationContext.getBean(AccessionReconciliationProcessor.class,ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL),ReCAPConstants.PROCESS_INPUT)
+                            .bean(applicationContext.getBean(AccessionReconciliationProcessor.class, RecapConstants.REQUEST_INITIAL_LOAD_NYPL), RecapConstants.PROCESS_INPUT)
                             .end()
                             .onCompletion()
-                            .process(new StopRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE));
+                            .process(new StopRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE));
 
                 }
             });
@@ -177,13 +178,13 @@ public class AccessionReconciliationRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DAILY_RR_FS_FILE+filePathPul+ReCAPConstants.DAILY_RR_FS_OPTIONS)
-                            .routeId(ReCAPConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE)
+                    from(RecapConstants.DAILY_RR_FS_FILE+filePathPul+ RecapConstants.DAILY_RR_FS_OPTIONS)
+                            .routeId(RecapConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE)
                             .noAutoStartup()
-                            .to(ReCAPConstants.SFTP+ ftpUserName +  ReCAPConstants.AT + accessionReconciliationFtpPulProcessed + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost+"&fileName=BarcodeReconciliation_PUL_${date:now:yyyyMMdd_HHmmss}.csv")
+                            .to(RecapCommonConstants.SFTP+ ftpUserName +  RecapCommonConstants.AT + accessionReconciliationFtpPulProcessed + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost+"&fileName=BarcodeReconciliation_PUL_${date:now:yyyyMMdd_HHmmss}.csv")
                             .onCompletion()
-                            .bean(applicationContext.getBean(AccessionReconciliationEmailService.class,ReCAPConstants.PRINCETON),ReCAPConstants.PROCESS_INPUT)
-                            .process(new StopRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE))
+                            .bean(applicationContext.getBean(AccessionReconciliationEmailService.class, RecapCommonConstants.PRINCETON), RecapConstants.PROCESS_INPUT)
+                            .process(new StopRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE))
                             .log("accession reconciliation pul completed");
 
                 }
@@ -192,13 +193,13 @@ public class AccessionReconciliationRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DAILY_RR_FS_FILE+filePathCul+ReCAPConstants.DAILY_RR_FS_OPTIONS)
-                            .routeId(ReCAPConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE)
+                    from(RecapConstants.DAILY_RR_FS_FILE+filePathCul+ RecapConstants.DAILY_RR_FS_OPTIONS)
+                            .routeId(RecapConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE)
                             .noAutoStartup()
-                            .to(ReCAPConstants.SFTP+ ftpUserName +  ReCAPConstants.AT + accessionReconciliationFtpCulProcessed + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost+"&fileName=BarcodeReconciliation_CUL_${date:now:yyyyMMdd_HHmmss}.csv")
+                            .to(RecapCommonConstants.SFTP+ ftpUserName +  RecapCommonConstants.AT + accessionReconciliationFtpCulProcessed + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost+"&fileName=BarcodeReconciliation_CUL_${date:now:yyyyMMdd_HHmmss}.csv")
                             .onCompletion()
-                            .bean(applicationContext.getBean(AccessionReconciliationEmailService.class,ReCAPConstants.COLUMBIA),ReCAPConstants.PROCESS_INPUT)
-                            .process(new StopRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE))
+                            .bean(applicationContext.getBean(AccessionReconciliationEmailService.class, RecapCommonConstants.COLUMBIA), RecapConstants.PROCESS_INPUT)
+                            .process(new StopRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE))
                             .log("accession reconciliation cul completed");
                 }
             });
@@ -206,19 +207,19 @@ public class AccessionReconciliationRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DAILY_RR_FS_FILE+filePathNypl+ReCAPConstants.DAILY_RR_FS_OPTIONS)
-                            .routeId(ReCAPConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE)
+                    from(RecapConstants.DAILY_RR_FS_FILE+filePathNypl+ RecapConstants.DAILY_RR_FS_OPTIONS)
+                            .routeId(RecapConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE)
                             .noAutoStartup()
-                            .to(ReCAPConstants.SFTP+ ftpUserName +  ReCAPConstants.AT + accessionReconciliationFtpNyplProcessed + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost+"&fileName=BarcodeReconciliation_NYPL_${date:now:yyyyMMdd_HHmmss}.csv")
+                            .to(RecapCommonConstants.SFTP+ ftpUserName +  RecapCommonConstants.AT + accessionReconciliationFtpNyplProcessed + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost+"&fileName=BarcodeReconciliation_NYPL_${date:now:yyyyMMdd_HHmmss}.csv")
                             .onCompletion()
-                            .bean(applicationContext.getBean(AccessionReconciliationEmailService.class,ReCAPConstants.NYPL),ReCAPConstants.PROCESS_INPUT)
-                            .process(new StopRouteProcessor(ReCAPConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE))
+                            .bean(applicationContext.getBean(AccessionReconciliationEmailService.class, RecapCommonConstants.NYPL), RecapConstants.PROCESS_INPUT)
+                            .process(new StopRouteProcessor(RecapConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE))
                             .log("accession reconciliation nypl completed");
                 }
             });
 
         } catch (Exception e) {
-            logger.info(ReCAPConstants.LOG_ERROR+e);
+            logger.info(RecapCommonConstants.LOG_ERROR+e);
         }
 
     }

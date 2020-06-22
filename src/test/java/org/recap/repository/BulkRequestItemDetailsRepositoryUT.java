@@ -2,7 +2,7 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BulkRequestItemEntity;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class BulkRequestItemDetailsRepositoryUT extends BaseTestCase {
         bulkRequestItemEntity.setBulkRequestFileName("bulkItemUpload");
         bulkRequestItemEntity.setBulkRequestFileData("BARCODE\tCUSTOMER_CODE\n32101075852275\tPK".getBytes());
         bulkRequestItemEntity.setRequestingInstitutionId(1);
-        bulkRequestItemEntity.setBulkRequestStatus(ReCAPConstants.PROCESSED);
+        bulkRequestItemEntity.setBulkRequestStatus(RecapConstants.PROCESSED);
         bulkRequestItemEntity.setCreatedBy("TestUser");
         bulkRequestItemEntity.setCreatedDate(new Date());
         bulkRequestItemEntity.setStopCode("PA");
@@ -44,7 +44,7 @@ public class BulkRequestItemDetailsRepositoryUT extends BaseTestCase {
         bulkRequestItemEntity.setBulkRequestFileName("bulkItemUpload");
         bulkRequestItemEntity.setBulkRequestFileData("BARCODE\tCUSTOMER_CODE\n32101075852275\tPK".getBytes());
         bulkRequestItemEntity.setRequestingInstitutionId(1);
-        bulkRequestItemEntity.setBulkRequestStatus(ReCAPConstants.PROCESSED);
+        bulkRequestItemEntity.setBulkRequestStatus(RecapConstants.PROCESSED);
         bulkRequestItemEntity.setCreatedBy("TestUser");
         bulkRequestItemEntity.setCreatedDate(new Date());
         bulkRequestItemEntity.setStopCode("PA");

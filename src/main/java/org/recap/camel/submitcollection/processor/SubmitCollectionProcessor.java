@@ -2,7 +2,8 @@ package org.recap.camel.submitcollection.processor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.model.jpa.ReportDataRequest;
 import org.recap.service.common.SetupDataService;
@@ -127,7 +128,7 @@ public class SubmitCollectionProcessor {
                         submitCollectionBatchService.removeSolrIndex(idMapToRemoveIndexList);
                         logger.info("Removed dummy records from solr");
                     } catch (Exception e) {
-                        logger.error(ReCAPConstants.LOG_ERROR,e);
+                        logger.error(RecapCommonConstants.LOG_ERROR,e);
                     }
                 }).start();
                 stopWatchRemovingDummy.stop();
@@ -135,11 +136,11 @@ public class SubmitCollectionProcessor {
             }
             ReportDataRequest reportRequest = getReportDataRequest(xmlFileName);
             String generatedReportFileName = submitCollectionReportGenerator.generateReport(reportRequest);
-            producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(xmlFileName,generatedReportFileName), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION);
+            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(xmlFileName,generatedReportFileName), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION);
             stopWatch.stop();
             logger.info("Submit Collection : Total time taken for processing through ftp---> {} sec",stopWatch.getTotalTimeSeconds());
         } catch (Exception e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
             exchange.setException(e);
         }
     }
@@ -150,35 +151,35 @@ public class SubmitCollectionProcessor {
         if(exception!=null){
             String fileName = (String)exchange.getIn().getHeader(Exchange.FILE_NAME);
             String filePath = (String)exchange.getIn().getHeader(Exchange.FILE_PARENT);
-            String institutionCode=(String)exchange.getIn().getHeader(ReCAPConstants.INSTITUTION);
-            producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoadForExcepion(institutionCode,fileName,filePath,exception,exception.getMessage()), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION_EXCEPTION);
+            String institutionCode=(String)exchange.getIn().getHeader(RecapCommonConstants.INSTITUTION);
+            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoadForExcepion(institutionCode,fileName,filePath,exception,exception.getMessage()), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_EXCEPTION);
         }
     }
 
     private EmailPayLoad getEmailPayLoadForExcepion(String institutionCode,String name,String filePath,Exception exception,String exceptionMessage) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
-        emailPayLoad.setSubject(ReCAPConstants.SUBJECT_FOR_SUBMIT_COL_EXCEPTION);
+        emailPayLoad.setSubject(RecapConstants.SUBJECT_FOR_SUBMIT_COL_EXCEPTION);
         emailPayLoad.setXmlFileName(name);
-        if(ReCAPConstants.PRINCETON.equalsIgnoreCase(institutionCode)){
+        if(RecapCommonConstants.PRINCETON.equalsIgnoreCase(institutionCode)){
             emailPayLoad.setTo(emailToPUL);
             emailPayLoad.setLocation(getFtpLocation(submitCollectionPULReportLocation));
-            emailPayLoad.setInstitution(ReCAPConstants.PRINCETON);
+            emailPayLoad.setInstitution(RecapCommonConstants.PRINCETON);
             emailPayLoad.setCc(emailCCForPul);
             emailPayLoad.setLocation(filePath);
             emailPayLoad.setException(exception);
             emailPayLoad.setExceptionMessage(exceptionMessage);
-        } else if(ReCAPConstants.COLUMBIA.equalsIgnoreCase(institutionCode)){
+        } else if(RecapCommonConstants.COLUMBIA.equalsIgnoreCase(institutionCode)){
             emailPayLoad.setTo(emailToCUL);
             emailPayLoad.setLocation(getFtpLocation(submitCollectionCULReportLocation));
-            emailPayLoad.setInstitution(ReCAPConstants.COLUMBIA);
+            emailPayLoad.setInstitution(RecapCommonConstants.COLUMBIA);
             emailPayLoad.setCc(emailCCForCul);
             emailPayLoad.setLocation(filePath);
             emailPayLoad.setException(exception);
             emailPayLoad.setExceptionMessage(exceptionMessage);
-        } else if(ReCAPConstants.NYPL.equalsIgnoreCase(institutionCode)){
+        } else if(RecapCommonConstants.NYPL.equalsIgnoreCase(institutionCode)){
             emailPayLoad.setTo(emailToNYPL);
             emailPayLoad.setLocation(getFtpLocation(submitCollectionNYPLReportLocation));
-            emailPayLoad.setInstitution(ReCAPConstants.NYPL);
+            emailPayLoad.setInstitution(RecapCommonConstants.NYPL);
             emailPayLoad.setCc(emailCCForNypl);
             emailPayLoad.setLocation(filePath);
             emailPayLoad.setException(exception);
@@ -190,11 +191,11 @@ public class SubmitCollectionProcessor {
 
     private ReportDataRequest getReportDataRequest(String xmlFileName) {
         ReportDataRequest reportRequest = new ReportDataRequest();
-        logger.info("filename--->{}-{}", ReCAPConstants.SUBMIT_COLLECTION_REPORT,xmlFileName);
-        reportRequest.setFileName(ReCAPConstants.SUBMIT_COLLECTION_REPORT+"-"+xmlFileName);
+        logger.info("filename--->{}-{}", RecapCommonConstants.SUBMIT_COLLECTION_REPORT,xmlFileName);
+        reportRequest.setFileName(RecapCommonConstants.SUBMIT_COLLECTION_REPORT+"-"+xmlFileName);
         reportRequest.setInstitutionCode(institutionCode.toUpperCase());
-        reportRequest.setReportType(ReCAPConstants.SUBMIT_COLLECTION_SUMMARY);
-        reportRequest.setTransmissionType(ReCAPConstants.FTP);
+        reportRequest.setReportType(RecapCommonConstants.SUBMIT_COLLECTION_SUMMARY);
+        reportRequest.setTransmissionType(RecapCommonConstants.FTP);
         return reportRequest;
     }
 
@@ -203,20 +204,20 @@ public class SubmitCollectionProcessor {
         emailPayLoad.setSubject(submitCollectionEmailSubject);
         emailPayLoad.setReportFileName(reportFileName);
         emailPayLoad.setXmlFileName(xmlFileName);
-        if(ReCAPConstants.PRINCETON.equalsIgnoreCase(institutionCode)){
+        if(RecapCommonConstants.PRINCETON.equalsIgnoreCase(institutionCode)){
             emailPayLoad.setTo(emailToPUL);
             emailPayLoad.setLocation(getFtpLocation(submitCollectionPULReportLocation));
-            emailPayLoad.setInstitution(ReCAPConstants.PRINCETON);
+            emailPayLoad.setInstitution(RecapCommonConstants.PRINCETON);
             emailPayLoad.setCc(emailCCForPul);
-        } else if(ReCAPConstants.COLUMBIA.equalsIgnoreCase(institutionCode)){
+        } else if(RecapCommonConstants.COLUMBIA.equalsIgnoreCase(institutionCode)){
             emailPayLoad.setTo(emailToCUL);
             emailPayLoad.setLocation(getFtpLocation(submitCollectionCULReportLocation));
-            emailPayLoad.setInstitution(ReCAPConstants.COLUMBIA);
+            emailPayLoad.setInstitution(RecapCommonConstants.COLUMBIA);
             emailPayLoad.setCc(emailCCForCul);
-        } else if(ReCAPConstants.NYPL.equalsIgnoreCase(institutionCode)){
+        } else if(RecapCommonConstants.NYPL.equalsIgnoreCase(institutionCode)){
             emailPayLoad.setTo(emailToNYPL);
             emailPayLoad.setLocation(getFtpLocation(submitCollectionNYPLReportLocation));
-            emailPayLoad.setInstitution(ReCAPConstants.NYPL);
+            emailPayLoad.setInstitution(RecapCommonConstants.NYPL);
             emailPayLoad.setCc(emailCCForNypl);
         }
         return  emailPayLoad;

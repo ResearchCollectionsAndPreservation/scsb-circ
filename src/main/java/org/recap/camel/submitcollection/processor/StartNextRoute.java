@@ -6,7 +6,8 @@ import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.support.EndpointHelper;
 import org.slf4j.Logger;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.EmailPayLoad;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,22 +55,22 @@ public class StartNextRoute implements Processor{
      */
     @Override
     public void process(Exchange exchange) throws Exception {
-       if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE)){
-           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE);
+       if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE)){
+           camelContext.getRouteController().startRoute(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE);
        }
-       else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE)){
-           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE);
+       else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE)){
+           camelContext.getRouteController().startRoute(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE);
        }
-       else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE)){
-           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE);
+       else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE)){
+           camelContext.getRouteController().startRoute(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE);
        }
-       else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE)){
-           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE);
+       else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE)){
+           camelContext.getRouteController().startRoute(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE);
        }
-       else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE)){
-           camelContext.getRouteController().startRoute(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE);
+       else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE)){
+           camelContext.getRouteController().startRoute(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE);
        }
-       else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE)){
+       else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE)){
            logger.info("SubmitCollection Sequence completed");
        }
     }
@@ -86,24 +87,24 @@ public class StartNextRoute implements Processor{
 
      //   String ftpLocationPath = (String) exchange.getFromEndpoint().getEndpointConfiguration().getParameter("path");
         String ftpLocationPath = EndpointHelper.resolveParameter(camelContext, "path", exchange.getFromEndpoint().getClass()).getEndpointUri();
-        if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE )){
-            producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(ReCAPConstants.PRINCETON,ftpLocationPath), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
+        if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE )){
+            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(RecapCommonConstants.PRINCETON,ftpLocationPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
             logger.info("Email Sent");
         }
-        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE)){
-            producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(ReCAPConstants.PRINCETON, ftpLocationPath), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
+        else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE)){
+            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(RecapCommonConstants.PRINCETON, ftpLocationPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
         }
-        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE)){
-            producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(ReCAPConstants.COLUMBIA, ftpLocationPath), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
+        else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE)){
+            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(RecapCommonConstants.COLUMBIA, ftpLocationPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
         }
-        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE)){
-            producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(ReCAPConstants.COLUMBIA, ftpLocationPath), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
+        else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE)){
+            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(RecapCommonConstants.COLUMBIA, ftpLocationPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
         }
-        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE)){
-            producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(ReCAPConstants.NYPL, ftpLocationPath), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
+        else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE)){
+            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(RecapCommonConstants.NYPL, ftpLocationPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
         }
-        else if(routeId.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE)){
-            producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(ReCAPConstants.NYPL, ftpLocationPath), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
+        else if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE)){
+            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(RecapCommonConstants.NYPL, ftpLocationPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
         }
     }
 
@@ -111,11 +112,11 @@ public class StartNextRoute implements Processor{
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setSubject(submitCollectionEmailSubjectForEmptyDirectory);
         emailPayLoad.setLocation(ftpLocationPath);
-        if(ReCAPConstants.PRINCETON.equalsIgnoreCase(institutionCode)){
+        if(RecapCommonConstants.PRINCETON.equalsIgnoreCase(institutionCode)){
             emailPayLoad.setTo(emailToPUL);
-        } else if(ReCAPConstants.COLUMBIA.equalsIgnoreCase(institutionCode)){
+        } else if(RecapCommonConstants.COLUMBIA.equalsIgnoreCase(institutionCode)){
             emailPayLoad.setTo(emailToCUL);
-        } else if(ReCAPConstants.NYPL.equalsIgnoreCase(institutionCode)){
+        } else if(RecapCommonConstants.NYPL.equalsIgnoreCase(institutionCode)){
             emailPayLoad.setTo(emailToNYPL);
         }
         return  emailPayLoad;

@@ -3,7 +3,8 @@ package org.recap.service.submitcollection;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.collections4.ListUtils;
 import org.marc4j.marc.Record;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -59,17 +60,17 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String format;
-        format = ReCAPConstants.FORMAT_MARC;
+        format = RecapConstants.FORMAT_MARC;
         List<Record> recordList = null;
         try {
             recordList = getMarcUtil().convertMarcXmlToRecord(inputRecords);
             if(checkLimit && recordList.size() > inputLimit){
-                return ReCAPConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + inputLimit;
+                return RecapConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + inputLimit;
             }
         } catch (Exception e) {
             logger.info(String.valueOf(e.getCause()));
-            logger.error(ReCAPConstants.LOG_ERROR,e);
-            return ReCAPConstants.INVALID_MARC_XML_FORMAT_MESSAGE;
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
+            return RecapConstants.INVALID_MARC_XML_FORMAT_MESSAGE;
         }
 
         List<BibliographicEntity> validBibliographicEntityList = new ArrayList<>();
@@ -148,18 +149,18 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         String format;
-        format = ReCAPConstants.FORMAT_SCSB;
+        format = RecapConstants.FORMAT_SCSB;
         BibRecords bibRecords = null;
         try {
             bibRecords = (BibRecords) JAXBHandler.getInstance().unmarshal(inputRecords, BibRecords.class);
             logger.info("bibrecord size {}", bibRecords.getBibRecordList().size());
             if (checkLimit && bibRecords.getBibRecordList().size() > inputLimit) {
-                return ReCAPConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + " " + inputLimit;
+                return RecapConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + " " + inputLimit;
             }
         } catch (JAXBException e) {
             logger.info(String.valueOf(e.getCause()));
-            logger.error(ReCAPConstants.LOG_ERROR, e);
-            return ReCAPConstants.INVALID_SCSB_XML_FORMAT_MESSAGE;
+            logger.error(RecapCommonConstants.LOG_ERROR, e);
+            return RecapConstants.INVALID_SCSB_XML_FORMAT_MESSAGE;
         }
 
         List<BibliographicEntity> validBibliographicEntityList = new ArrayList<>();
@@ -231,11 +232,11 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
             } else {//Invalid bibliographic entity is added to the failure report
                 logger.error("Error while parsing xml for a barcode in submit collection");
                 submitCollectionReportHelperService.setSubmitCollectionFailureReportForUnexpectedException(incomingBibliographicEntity,
-                        submitCollectionReportInfoMap.get(ReCAPConstants.SUBMIT_COLLECTION_FAILURE_LIST),"Failed record - Item not updated - "+errorMessage.toString(),institutionEntity);
+                        submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),"Failed record - Item not updated - "+errorMessage.toString(),institutionEntity);
             }
         } catch (Exception e) {
             logger.error("Exception while preparing bibliographic entity");
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         }
         return incomingBibliographicEntity;
     }

@@ -4,7 +4,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.marc.Leader;
 import org.marc4j.marc.Record;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.CustomerCodeEntity;
@@ -94,7 +95,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             }
             Date currentDate = new Date();
             Map<String, Object> bibMap = processAndValidateBibliographicEntity(bibRecord, institutionEntity,currentDate,errorMessage);
-            BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get(ReCAPConstants.BIBLIOGRAPHIC_ENTITY);
+            BibliographicEntity bibliographicEntity = (BibliographicEntity) bibMap.get(RecapConstants.BIBLIOGRAPHIC_ENTITY);
             ReportEntity bibReportEntity = (ReportEntity) bibMap.get("bibReportEntity");
             if (bibReportEntity != null) {
                 reportEntities.add(bibReportEntity);
@@ -147,10 +148,10 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             }
 
             if (processBib) {
-                map.put(ReCAPConstants.BIBLIOGRAPHIC_ENTITY, bibliographicEntity);
+                map.put(RecapConstants.BIBLIOGRAPHIC_ENTITY, bibliographicEntity);
             }
         } catch (Exception e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
             errorMessage.append(e.getMessage());
         }
         map.put("errorMessage",errorMessage);
@@ -173,9 +174,9 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             errorMessage.append(" Owning Institution Id cannot be null");
         }
         bibliographicEntity.setCreatedDate(currentDate);
-        bibliographicEntity.setCreatedBy(ReCAPConstants.SUBMIT_COLLECTION);
+        bibliographicEntity.setCreatedBy(RecapConstants.SUBMIT_COLLECTION);
         bibliographicEntity.setLastUpdatedDate(currentDate);
-        bibliographicEntity.setLastUpdatedBy(ReCAPConstants.SUBMIT_COLLECTION);
+        bibliographicEntity.setLastUpdatedBy(RecapConstants.SUBMIT_COLLECTION);
 
         String bibContent = marcUtil.writeMarcXml(bibRecord);
         if (StringUtils.isNotBlank(bibContent)) {
@@ -195,7 +196,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                 errorMessage.append(" Leader Field value should be 24 characters");
             }
         }
-        map.put(ReCAPConstants.BIBLIOGRAPHIC_ENTITY, bibliographicEntity);
+        map.put(RecapConstants.BIBLIOGRAPHIC_ENTITY, bibliographicEntity);
         return map;
     }
 
@@ -211,9 +212,9 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             errorMessage.append(" Holdings Content cannot be empty");
         }
         holdingsEntity.setCreatedDate(currentDate);
-        holdingsEntity.setCreatedBy(ReCAPConstants.SUBMIT_COLLECTION);
+        holdingsEntity.setCreatedBy(RecapConstants.SUBMIT_COLLECTION);
         holdingsEntity.setLastUpdatedDate(currentDate);
-        holdingsEntity.setLastUpdatedBy(ReCAPConstants.SUBMIT_COLLECTION);
+        holdingsEntity.setLastUpdatedBy(RecapConstants.SUBMIT_COLLECTION);
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
         holdingsEntity.setOwningInstitutionId(owningInstitutionId);
         String owningInstitutionHoldingsId = marcUtil.getDataFieldValue(holdingsRecord, "852", '0');
@@ -272,9 +273,9 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         }
 
         itemEntity.setCreatedDate(currentDate);
-        itemEntity.setCreatedBy(ReCAPConstants.SUBMIT_COLLECTION);
+        itemEntity.setCreatedBy(RecapConstants.SUBMIT_COLLECTION);
         itemEntity.setLastUpdatedDate(currentDate);
-        itemEntity.setLastUpdatedBy(ReCAPConstants.SUBMIT_COLLECTION);
+        itemEntity.setLastUpdatedBy(RecapConstants.SUBMIT_COLLECTION);
 
         map.put("itemEntity", itemEntity);
         return map;
@@ -309,7 +310,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                     itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getId());
                 }
             } catch (Exception e) {
-                logger.error(ReCAPConstants.LOG_ERROR,e);
+                logger.error(RecapCommonConstants.LOG_ERROR,e);
             }
         }
         return itemStatusMap;
@@ -330,7 +331,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                     collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getId());
                 }
             } catch (Exception e) {
-                logger.error(ReCAPConstants.LOG_ERROR,e);
+                logger.error(RecapCommonConstants.LOG_ERROR,e);
             }
         }
         return collectionGroupMap;
@@ -351,7 +352,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                     institutionEntityMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getId());
                 }
             } catch (Exception e) {
-                logger.error(ReCAPConstants.LOG_ERROR,e);
+                logger.error(RecapCommonConstants.LOG_ERROR,e);
             }
         }
         return institutionEntityMap;

@@ -2,7 +2,7 @@ package org.recap.camel.dailyreconciliation;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class DailyReconciliationEmailService{
 
     public void process(Exchange exchange) throws Exception {
         fileLocation = (String) exchange.getIn().getHeaders().get("CamelFileNameProduced");
-        producerTemplate.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.DAILY_RECONCILIATION);
+        producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(), RecapConstants.EMAIL_BODY_FOR, RecapConstants.DAILY_RECONCILIATION);
         logger.info("Daily Reconciliation file created in the path {}",fileLocation);
     }
 

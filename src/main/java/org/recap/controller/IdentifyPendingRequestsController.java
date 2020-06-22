@@ -1,6 +1,7 @@
 package org.recap.controller;
 
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.service.IdentifyPendingRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +23,10 @@ public class IdentifyPendingRequestsController {
     public String identifyAndNotifyPendingRequests(){
         boolean identifyPendingRequest = pendingRequestService.identifyPendingRequest();
         if(identifyPendingRequest) {
-            return ReCAPConstants.SUCCESS;
+            return RecapCommonConstants.SUCCESS;
         }
         else {
-            return ReCAPConstants.NO_PENDING_REQUESTS_FOUND;
+            return RecapConstants.NO_PENDING_REQUESTS_FOUND;
         }
     }
 }

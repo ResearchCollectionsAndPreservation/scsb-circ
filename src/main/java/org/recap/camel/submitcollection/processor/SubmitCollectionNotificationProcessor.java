@@ -1,7 +1,7 @@
 package org.recap.camel.submitcollection.processor;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class SubmitCollectionNotificationProcessor {
     private ProducerTemplate producer;
 
     public void sendSubmitCollectionNotification(){
-        producer.sendBodyAndHeader(ReCAPConstants.EMAIL_Q, getEmailPayLoad(), ReCAPConstants.EMAIL_BODY_FOR,ReCAPConstants.SUBMIT_COLLECTION);
+        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION);
     }
 
     private EmailPayLoad getEmailPayLoad(){

@@ -2,7 +2,8 @@ package org.recap.camel.statusreconciliation;
 
 import com.google.common.collect.Lists;
 import org.apache.camel.ProducerTemplate;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.model.jpa.RequestStatusEntity;
@@ -160,8 +161,8 @@ public class StatusReconciliationController {
      */
     @RequestMapping(value = "/itemStatusReconciliation", method = RequestMethod.GET)
     public ResponseEntity itemStatusReconciliation(){
-        ItemStatusEntity itemStatusEntity = getItemStatusDetailsRepository().findByStatusCode(ReCAPConstants.ITEM_STATUS_NOT_AVAILABLE);
-        List<String> requestStatusCodes = Arrays.asList(ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ReCAPConstants.REQUEST_STATUS_EDD, ReCAPConstants.REQUEST_STATUS_CANCELED, ReCAPConstants.REQUEST_STATUS_INITIAL_LOAD);
+        ItemStatusEntity itemStatusEntity = getItemStatusDetailsRepository().findByStatusCode(RecapConstants.ITEM_STATUS_NOT_AVAILABLE);
+        List<String> requestStatusCodes = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         List<RequestStatusEntity> requestStatusEntityList = getRequestItemStatusDetailsRepository().findByRequestStatusCodeIn(requestStatusCodes);
         List<Integer> requestStatusIds = requestStatusEntityList.stream().map(RequestStatusEntity::getId).collect(Collectors.toList());
         logger.info("status reconciliation request ids : {} ",requestStatusIds);
@@ -181,8 +182,8 @@ public class StatusReconciliationController {
                 statusReconciliationCSVRecordList1.addAll(statusReconciliationCSVRecordList);
                 getLogger().info("status reconciliation page num:{} and records {} processed",pageNum,from+getBatchSize());
             }
-            getProducer().sendBodyAndHeader(ReCAPConstants.STATUS_RECONCILIATION_REPORT, statusReconciliationCSVRecordList1, ReCAPConstants.FOR,ReCAPConstants.STATUS_RECONCILIATION);
-            getProducer().sendBodyAndHeader(ReCAPConstants.STATUS_RECONCILIATION_REPORT,statusReconciliationErrorCSVRecords,ReCAPConstants.FOR,ReCAPConstants.STATUS_RECONCILIATION_FAILURE);
+            getProducer().sendBodyAndHeader(RecapConstants.STATUS_RECONCILIATION_REPORT, statusReconciliationCSVRecordList1, RecapConstants.FOR, RecapConstants.STATUS_RECONCILIATION);
+            getProducer().sendBodyAndHeader(RecapConstants.STATUS_RECONCILIATION_REPORT,statusReconciliationErrorCSVRecords, RecapConstants.FOR, RecapConstants.STATUS_RECONCILIATION_FAILURE);
         }
         return new ResponseEntity("Success", HttpStatus.OK);
     }

@@ -2,7 +2,8 @@ package org.recap.controller;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -41,7 +42,7 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("45678915");
-        itemRequestInformation.setRequestType(ReCAPConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
         itemRequestInformation.setDeliveryLocation("PB");
         itemRequestInformation.setItemOwningInstitution("PUL");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
@@ -49,7 +50,7 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         itemRequestInformation.setItemBarcodes(Arrays.asList(bibliographicEntity.getItemEntities().get(0).getBarcode()));
         ResponseEntity responseEntity = requestItemValidatorController.validateItemRequestInformations(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), ReCAPConstants.VALID_REQUEST);
+        assertEquals(responseEntity.getBody(), RecapCommonConstants.VALID_REQUEST);
 
     }
 
@@ -58,7 +59,7 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("4567gfdr8915");
-        itemRequestInformation.setRequestType(ReCAPConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
         itemRequestInformation.setDeliveryLocation("PB");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         itemRequestInformation.setItemOwningInstitution("PUL");
@@ -66,7 +67,7 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         itemRequestInformation.setItemBarcodes(Arrays.asList(bibliographicEntity.getItemEntities().get(0).getBarcode()));
         ResponseEntity responseEntity = requestItemValidatorController.validateItemRequestInformations(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), ReCAPConstants.INVALID_PATRON);
+        assertEquals(responseEntity.getBody(), RecapConstants.INVALID_PATRON);
     }
 
     @Test
@@ -74,7 +75,7 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("4567gfdr8915");
-        itemRequestInformation.setRequestType(ReCAPConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
         itemRequestInformation.setDeliveryLocation("PB");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         itemRequestInformation.setItemOwningInstitution("PUL");

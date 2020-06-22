@@ -2,7 +2,8 @@ package org.recap.camel.accessionreconciliation;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,18 +69,18 @@ public class AccessionReconciliationProcessor {
         for (BarcodeReconcilitaionReport barcodeReconcilitaionReport : barcodeReconcilitaionReportArrayList) {
            barcodesAndCustomerCodes.put(barcodeReconcilitaionReport.getBarcode(),barcodeReconcilitaionReport.getCustomerCode());
         }
-        Integer index = (Integer) exchange.getProperty(ReCAPConstants.CAMEL_SPLIT_INDEX);
+        Integer index = (Integer) exchange.getProperty(RecapConstants.CAMEL_SPLIT_INDEX);
         HttpEntity httpEntity = new HttpEntity(barcodesAndCustomerCodes);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> responseEntity = restTemplate.exchange(solrSolrClientUrl+ReCAPConstants.ACCESSION_RECONCILATION_SOLR_CLIENT_URL, HttpMethod.POST, httpEntity,Map.class);
+        ResponseEntity<Map> responseEntity = restTemplate.exchange(solrSolrClientUrl+ RecapConstants.ACCESSION_RECONCILATION_SOLR_CLIENT_URL, HttpMethod.POST, httpEntity,Map.class);
         Map<String,String> body = (HashMap<String, String>) responseEntity.getBody();
         String barcodesAndCustomerCodesForReportFile = body.entrySet().stream().map(Object::toString).collect(Collectors.joining("\n")).replaceAll("=","\t");
         byte[] barcodesAndCustomerCodesForReportFileBytes =barcodesAndCustomerCodesForReportFile.getBytes(Charset.forName("UTF-8"));
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ReCAPConstants.BARCODE_RECONCILIATION_FILE_DATE_FORMAT);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.BARCODE_RECONCILIATION_FILE_DATE_FORMAT);
         try {
-            String line=ReCAPConstants.NEW_LINE;
+            String line= RecapConstants.NEW_LINE;
             byte[] newLine=line.getBytes(Charset.forName("UTF-8"));
-            Path filePath = Paths.get(accessionFilePath+"/"+institutionCode+"/"+ReCAPConstants.ACCESSION_RECONCILATION_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
+            Path filePath = Paths.get(accessionFilePath+"/"+institutionCode+"/"+ RecapConstants.ACCESSION_RECONCILATION_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
             if (!filePath.toFile().exists()) {
                 Files.createDirectories(filePath.getParent());
                 Files.createFile(filePath);
@@ -90,7 +91,7 @@ public class AccessionReconciliationProcessor {
             }
             if(index == 0){
                 ArrayList<String> headerSet = new ArrayList<>();
-                headerSet.add(ReCAPConstants.ACCESSION_RECONCILIATION_HEADER+ReCAPConstants.TAB+ReCAPConstants.CUSTOMER_CODE_HEADER);
+                headerSet.add(RecapConstants.ACCESSION_RECONCILIATION_HEADER+ RecapConstants.TAB+ RecapConstants.CUSTOMER_CODE_HEADER);
                 Files.write(filePath,headerSet, StandardOpenOption.APPEND);
             }
             else if (index > 0 && body.size()>0 && noOfLinesInFile>1){
@@ -101,29 +102,29 @@ public class AccessionReconciliationProcessor {
             }
         }
         catch (Exception e){
-            logger.error(ReCAPConstants.LOG_ERROR+e);
+            logger.error(RecapCommonConstants.LOG_ERROR+e);
         }
         startFileSystemRoutesForAccessionReconciliation(exchange,index);
     }
 
     private void startFileSystemRoutesForAccessionReconciliation(Exchange exchange,Integer index) {
-        if ((boolean)exchange.getProperty(ReCAPConstants.CAMEL_SPLIT_COMPLETE)){
+        if ((boolean)exchange.getProperty(RecapConstants.CAMEL_SPLIT_COMPLETE)){
             logger.info("split last index-->{}",index);
             try {
-                if(ReCAPConstants.REQUEST_INITIAL_LOAD_PUL.equalsIgnoreCase(institutionCode)){
-                    logger.info(ReCAPConstants.STARTING,ReCAPConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE);
-                    camelContext.getRouteController().startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE);
+                if(RecapConstants.REQUEST_INITIAL_LOAD_PUL.equalsIgnoreCase(institutionCode)){
+                    logger.info(RecapConstants.STARTING, RecapConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE);
+                    camelContext.getRouteController().startRoute(RecapConstants.ACCESSION_RECONCILATION_FS_PUL_ROUTE);
                 }
-                if(ReCAPConstants.REQUEST_INITIAL_LOAD_CUL.equalsIgnoreCase(institutionCode)){
-                    logger.info(ReCAPConstants.STARTING,ReCAPConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE);
-                    camelContext.getRouteController().startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE);
+                if(RecapConstants.REQUEST_INITIAL_LOAD_CUL.equalsIgnoreCase(institutionCode)){
+                    logger.info(RecapConstants.STARTING, RecapConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE);
+                    camelContext.getRouteController().startRoute(RecapConstants.ACCESSION_RECONCILATION_FS_CUL_ROUTE);
                 }
-                if(ReCAPConstants.REQUEST_INITIAL_LOAD_NYPL.equalsIgnoreCase(institutionCode)){
-                    logger.info(ReCAPConstants.STARTING,ReCAPConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE);
-                    camelContext.getRouteController().startRoute(ReCAPConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE);
+                if(RecapConstants.REQUEST_INITIAL_LOAD_NYPL.equalsIgnoreCase(institutionCode)){
+                    logger.info(RecapConstants.STARTING, RecapConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE);
+                    camelContext.getRouteController().startRoute(RecapConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE);
                 }
             } catch (Exception e) {
-                logger.error(ReCAPConstants.LOG_ERROR+e);
+                logger.error(RecapCommonConstants.LOG_ERROR+e);
             }
         }
     }

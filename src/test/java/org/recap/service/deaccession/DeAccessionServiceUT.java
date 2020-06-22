@@ -3,7 +3,8 @@ package org.recap.service.deaccession;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
@@ -82,12 +83,12 @@ public class DeAccessionServiceUT extends BaseTestCase {
         assertNotNull(savedBibliographicEntity.getBibliographicId());
         Thread.sleep(3000);
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
-        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap, deAccessionDBResponseEntities, ReCAPConstants.GUEST_USER);
+        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap, deAccessionDBResponseEntities, RecapConstants.GUEST_USER);
         assertNotNull(deAccessionDBResponseEntities);
         assertTrue(deAccessionDBResponseEntities.size()==1);
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = deAccessionDBResponseEntities.get(0);
         assertNotNull(deAccessionDBResponseEntity);
-        assertEquals(deAccessionDBResponseEntity.getStatus(), ReCAPConstants.SUCCESS);
+        assertEquals(deAccessionDBResponseEntity.getStatus(), RecapCommonConstants.SUCCESS);
 
         List<ItemEntity> fetchedItemEntities = itemDetailsRepository.findByBarcodeIn(Arrays.asList(itemBarcode));
         entityManager.refresh(fetchedItemEntities.get(0));
@@ -95,7 +96,7 @@ public class DeAccessionServiceUT extends BaseTestCase {
         assertTrue(fetchedItemEntities.size() == 1);
         assertEquals(Boolean.TRUE, fetchedItemEntities.get(0).isDeleted());
         assertNotNull(fetchedItemEntities.get(0).getLastUpdatedBy());
-        assertEquals(ReCAPConstants.GUEST_USER, fetchedItemEntities.get(0).getLastUpdatedBy());
+        assertEquals(RecapConstants.GUEST_USER, fetchedItemEntities.get(0).getLastUpdatedBy());
         assertNotNull(fetchedItemEntities.get(0).getLastUpdatedDate());
         assertNotNull(savedBibliographicEntity.getHoldingsEntities());
         assertTrue(savedBibliographicEntity.getHoldingsEntities().size() == 1);
@@ -108,8 +109,8 @@ public class DeAccessionServiceUT extends BaseTestCase {
     public void processAndSave() throws Exception {
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
         deAccessionDBResponseEntity.setBarcode("12345");
-        deAccessionDBResponseEntity.setStatus(ReCAPConstants.FAILURE);
-        deAccessionDBResponseEntity.setReasonForFailure(ReCAPConstants.ITEM_BARCDE_DOESNOT_EXIST);
+        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
+        deAccessionDBResponseEntity.setReasonForFailure(RecapCommonConstants.ITEM_BARCDE_DOESNOT_EXIST);
 
         List<ReportEntity> reportEntities = deAccessionService.processAndSaveReportEntities(Arrays.asList(deAccessionDBResponseEntity));
         assertNotNull(reportEntities);

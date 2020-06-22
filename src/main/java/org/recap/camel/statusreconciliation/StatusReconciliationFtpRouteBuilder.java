@@ -3,7 +3,8 @@ package org.recap.camel.statusreconciliation;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,24 +39,24 @@ public class StatusReconciliationFtpRouteBuilder {
             camelContext.addRoutes(new RouteBuilder(){
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.STATUS_RECONCILIATION_REPORT)
-                            .routeId(ReCAPConstants.STATUS_RECONCILIATION_REPORT_ID)
-                            .onCompletion().onWhen(header(ReCAPConstants.FOR).isEqualTo(ReCAPConstants.STATUS_RECONCILIATION))
+                    from(RecapConstants.STATUS_RECONCILIATION_REPORT)
+                            .routeId(RecapConstants.STATUS_RECONCILIATION_REPORT_ID)
+                            .onCompletion().onWhen(header(RecapConstants.FOR).isEqualTo(RecapConstants.STATUS_RECONCILIATION))
                             .log("status reconciliation process finished files generated in ftp")
-                            .bean(applicationContext.getBean(StatusReconciliationEmailService.class),ReCAPConstants.PROCESS_INPUT)
+                            .bean(applicationContext.getBean(StatusReconciliationEmailService.class), RecapConstants.PROCESS_INPUT)
                             .end()
                             .choice()
-                                .when(header(ReCAPConstants.FOR).isEqualTo(ReCAPConstants.STATUS_RECONCILIATION))
+                                .when(header(RecapConstants.FOR).isEqualTo(RecapConstants.STATUS_RECONCILIATION))
                                     .marshal().bindy(BindyType.Csv, StatusReconciliationCSVRecord.class)
-                                    .to(ReCAPConstants.SFTP + ftpUserName + ReCAPConstants.AT + statusReconciliation + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost + "&fileName=StatusReconciliation-${date:now:yyyyMMdd_HHmmss}.csv")
-                                .when(header(ReCAPConstants.FOR).isEqualTo(ReCAPConstants.STATUS_RECONCILIATION_FAILURE))
+                                    .to(RecapCommonConstants.SFTP + ftpUserName + RecapCommonConstants.AT + statusReconciliation + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost + "&fileName=StatusReconciliation-${date:now:yyyyMMdd_HHmmss}.csv")
+                                .when(header(RecapConstants.FOR).isEqualTo(RecapConstants.STATUS_RECONCILIATION_FAILURE))
                                     .marshal().bindy(BindyType.Csv, StatusReconciliationErrorCSVRecord.class)
-                                    .to(ReCAPConstants.SFTP + ftpUserName + ReCAPConstants.AT + statusReconciliation + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost + "&fileName=StatusReconciliationFailure-${date:now:yyyyMMdd_HHmmss}.csv")
+                                    .to(RecapCommonConstants.SFTP + ftpUserName + RecapCommonConstants.AT + statusReconciliation + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost + "&fileName=StatusReconciliationFailure-${date:now:yyyyMMdd_HHmmss}.csv")
                                     .log("status reconciliation failure report generated in ftp");
                 }
             });
         }catch (Exception e){
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         }
     }
 }

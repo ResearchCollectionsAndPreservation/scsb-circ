@@ -1,6 +1,6 @@
 package org.recap.util;
 
-import org.recap.ReCAPConstants;
+import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,15 +37,15 @@ public class SecurityUtil {
             Base64.Encoder encoder = Base64.getEncoder();
             encryptedString = encoder.encodeToString(encrypted);
         } catch (NoSuchAlgorithmException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         } catch (NoSuchPaddingException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         } catch (InvalidKeyException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         } catch (IllegalBlockSizeException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         } catch (BadPaddingException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         }
         logger.info("encryptedString--->{}",encryptedString);
         return encryptedString;
@@ -63,15 +63,15 @@ public class SecurityUtil {
             cipher.init(Cipher.DECRYPT_MODE, aesKey);
             decrypted = new String(cipher.doFinal(decoder.decode(encryptedValue)));
         } catch (NoSuchAlgorithmException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         } catch (NoSuchPaddingException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         } catch (InvalidKeyException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         } catch (IllegalBlockSizeException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         } catch (BadPaddingException e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         }
         logger.info("decryptedString--->{}",decrypted);
         return decrypted;

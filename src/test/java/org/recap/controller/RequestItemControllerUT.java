@@ -7,7 +7,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.ils.ColumbiaJSIPConnector;
 import org.recap.ils.JSIPConnectorFactory;
 import org.recap.ils.NyplApiConnector;
@@ -143,12 +144,12 @@ public class RequestItemControllerUT extends BaseTestCase {
 
     private String getPickupLocation(String institution) {
         String pickUpLocation = "";
-        if (institution.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
-            pickUpLocation = ReCAPConstants.DEFAULT_PICK_UP_LOCATION_PUL;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
-            pickUpLocation = ReCAPConstants.DEFAULT_PICK_UP_LOCATION_CUL;
-        } else if (institution.equalsIgnoreCase(ReCAPConstants.NYPL)) {
-            pickUpLocation = ReCAPConstants.DEFAULT_PICK_UP_LOCATION_NYPL;
+        if (institution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+            pickUpLocation = RecapConstants.DEFAULT_PICK_UP_LOCATION_PUL;
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+            pickUpLocation = RecapConstants.DEFAULT_PICK_UP_LOCATION_CUL;
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+            pickUpLocation = RecapConstants.DEFAULT_PICK_UP_LOCATION_NYPL;
         }
         return pickUpLocation;
     }

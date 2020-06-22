@@ -1,6 +1,6 @@
 package org.recap.ils;
 
-import org.recap.ReCAPConstants;
+import org.recap.RecapCommonConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,11 +54,11 @@ public class JSIPConnectorFactory {
      */
     public IJSIPConnector getJSIPConnector(String institutionId) {
         IJSIPConnector ijsipConnector = null;
-        if (institutionId.equalsIgnoreCase(ReCAPConstants.PRINCETON)) {
+        if (institutionId.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
             ijsipConnector = getPrincetonJSIPConnector();
-        } else if (institutionId.equalsIgnoreCase(ReCAPConstants.COLUMBIA)) {
+        } else if (institutionId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
             ijsipConnector = getColumbiaJSIPConnector();
-        } else if (institutionId.equalsIgnoreCase(ReCAPConstants.NYPL)) {
+        } else if (institutionId.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
             ijsipConnector = getNyplAPIConnector();
         }
         return ijsipConnector;

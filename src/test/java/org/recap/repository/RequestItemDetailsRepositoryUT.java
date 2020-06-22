@@ -2,7 +2,7 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
@@ -70,7 +70,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
     public void testFindByItemBarcodeAndRequestStatusCode() throws Exception {
         getRequestItemEntity();
         try {
-            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode("PULTST54333", ReCAPConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
+            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode("PULTST54333", RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
             if (requestItemEntity != null) {
                 logger.info(""+requestItemEntity.getId());
                 logger.info(requestItemEntity.getRequestTypeEntity().getRequestTypeDesc());

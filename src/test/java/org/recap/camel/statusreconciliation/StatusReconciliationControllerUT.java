@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
 import org.recap.gfa.model.Dsitem;
 import org.recap.gfa.model.GFAItemStatusCheckResponse;
 import org.recap.gfa.model.GFARetrieveItemResponse;
@@ -117,7 +117,7 @@ public class StatusReconciliationControllerUT extends BaseTestCase{
         Mockito.when(statusReconciliationController.getGfaService().itemStatusComparison(Mockito.any(),Mockito.any())).thenCallRealMethod();
         Mockito.when(statusReconciliationController.getItemDetailsRepository().getNotAvailableItems(statusReconciliationDayLimit,Arrays.asList(1,9),from,batchSize,itemStatusEntity.getId())).thenReturn(itemEntityList);
         Mockito.when(statusReconciliationController.getTotalPageCount(Arrays.asList(1,9), itemStatusEntity.getId())).thenCallRealMethod();
-        Mockito.when(statusReconciliationController.getItemStatusDetailsRepository().findByStatusCode(ReCAPConstants.ITEM_STATUS_NOT_AVAILABLE)).thenReturn(itemStatusEntity);
+        Mockito.when(statusReconciliationController.getItemStatusDetailsRepository().findByStatusCode(RecapConstants.ITEM_STATUS_NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(statusReconciliationController.itemStatusReconciliation()).thenCallRealMethod();
         ResponseEntity responseEntity = statusReconciliationController.itemStatusReconciliation();
         assertNotNull(responseEntity);

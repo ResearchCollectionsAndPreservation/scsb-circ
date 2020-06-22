@@ -8,7 +8,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.ReCAPConstants;
+import org.recap.RecapConstants;
+import org.recap.RecapCommonConstants;
 import org.recap.camel.route.StopRouteProcessor;
 import org.recap.model.csv.DailyReconcilationRecord;
 import org.slf4j.Logger;
@@ -61,8 +62,8 @@ public class DailyReconciliationRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.SFTP+ ftpUserName +  ReCAPConstants.AT + dailyReconciliationFtp + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost+ReCAPConstants.DAILY_RR_FTP_OPTIONS+localWorkDir)
-                            .routeId(ReCAPConstants.DAILY_RR_FTP_ROUTE_ID)
+                    from(RecapCommonConstants.SFTP+ ftpUserName +  RecapCommonConstants.AT + dailyReconciliationFtp + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost+ RecapConstants.DAILY_RR_FTP_OPTIONS+localWorkDir)
+                            .routeId(RecapConstants.DAILY_RR_FTP_ROUTE_ID)
                             .noAutoStartup()
                             .log("daily reconciliation started")
                             .choice()
@@ -77,19 +78,19 @@ public class DailyReconciliationRouteBuilder {
                                     exchange.getIn().setHeader(Exchange.FILE_NAME, fileName.replaceFirst(".gz", ".csv"));
                                 }
                             })
-                            .to(ReCAPConstants.DIRECT+ReCAPConstants.PROCESS_DAILY_RECONCILIATION)
+                            .to(RecapConstants.DIRECT+ RecapConstants.PROCESS_DAILY_RECONCILIATION)
                             .otherwise()
-                            .to(ReCAPConstants.DIRECT+ReCAPConstants.PROCESS_DAILY_RECONCILIATION)
+                            .to(RecapConstants.DIRECT+ RecapConstants.PROCESS_DAILY_RECONCILIATION)
                             .end()
                             .onCompletion()
                             .choice()
-                            .when(exchangeProperty(ReCAPConstants.CAMEL_BATCH_COMPLETE))
+                            .when(exchangeProperty(RecapCommonConstants.CAMEL_BATCH_COMPLETE))
                             .log("Stopping DailyReconciliation Process")
-                            .process(new StopRouteProcessor(ReCAPConstants.DAILY_RR_FTP_ROUTE_ID));
+                            .process(new StopRouteProcessor(RecapConstants.DAILY_RR_FTP_ROUTE_ID));
 
-                    from(ReCAPConstants.DIRECT+ReCAPConstants.PROCESS_DAILY_RECONCILIATION)
+                    from(RecapConstants.DIRECT+ RecapConstants.PROCESS_DAILY_RECONCILIATION)
                             .unmarshal().bindy(BindyType.Csv, DailyReconcilationRecord.class)
-                            .bean(applicationContext.getBean(DailyReconciliationProcessor.class),ReCAPConstants.PROCESS_INPUT)
+                            .bean(applicationContext.getBean(DailyReconciliationProcessor.class), RecapConstants.PROCESS_INPUT)
                             .end();
                 }
             });
@@ -99,19 +100,19 @@ public class DailyReconciliationRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(ReCAPConstants.DAILY_RR_FS_FILE+filePath+ReCAPConstants.DAILY_RR_FS_OPTIONS)
-                            .routeId(ReCAPConstants.DAILY_RR_FS_ROUTE_ID)
+                    from(RecapConstants.DAILY_RR_FS_FILE+filePath+ RecapConstants.DAILY_RR_FS_OPTIONS)
+                            .routeId(RecapConstants.DAILY_RR_FS_ROUTE_ID)
                             .noAutoStartup()
-                            .to(ReCAPConstants.SFTP+ ftpUserName +  ReCAPConstants.AT + dailyReconciliationFtpProcessed + ReCAPConstants.PRIVATE_KEY_FILE + ftpPrivateKey + ReCAPConstants.KNOWN_HOST_FILE + ftpKnownHost)
+                            .to(RecapCommonConstants.SFTP+ ftpUserName +  RecapCommonConstants.AT + dailyReconciliationFtpProcessed + RecapCommonConstants.PRIVATE_KEY_FILE + ftpPrivateKey + RecapCommonConstants.KNOWN_HOST_FILE + ftpKnownHost)
                             .onCompletion()
                             .log("email service started for daily reconciliation")
                             .bean(applicationContext.getBean(DailyReconciliationEmailService.class))
-                            .process(new StopRouteProcessor(ReCAPConstants.DAILY_RR_FS_ROUTE_ID));
+                            .process(new StopRouteProcessor(RecapConstants.DAILY_RR_FS_ROUTE_ID));
                 }
             });
 
         } catch (Exception e) {
-            logger.error(ReCAPConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR,e);
         }
 
     }

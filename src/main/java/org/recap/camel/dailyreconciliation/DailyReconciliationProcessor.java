@@ -85,18 +85,8 @@ public class DailyReconciliationProcessor {
                 logger.info("started creating las sheet");
                 for (DailyReconcilationRecord dailyReconcilationRecord : dailyReconcilationRecordList) {
                     XSSFRow row = lasSheet.createRow(i);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getRequestId(), 0);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getBarcode(), 1);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getCustomerCode(), 2);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getStopCode(), 3);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getPatronId(), 4);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getCreateDate(), 5);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getLastUpdatedDate(), 6);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getRequestingInst(), 7);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getOwningInst(), 8);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getDeliveryMethod(), 9);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getStatus(), 10);
-                    createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getErrorCode(), 11);
+                    createCellForEqualRow(row, xssfWorkbook, dailyReconcilationRecord.getCustomerCode(), cellStyle, dailyReconcilationRecord.getRequestId(), 0, dailyReconcilationRecord.getBarcode(), 1, 2, dailyReconcilationRecord.getStopCode(), 3, dailyReconcilationRecord.getPatronId(), 4, dailyReconcilationRecord.getCreateDate(), 5);
+                    createCellForEqualRow(row, xssfWorkbook, dailyReconcilationRecord.getOwningInst(), cellStyle, dailyReconcilationRecord.getLastUpdatedDate(), 6, dailyReconcilationRecord.getRequestingInst(), 7, 8, dailyReconcilationRecord.getDeliveryMethod(), 9, dailyReconcilationRecord.getStatus(), 10, dailyReconcilationRecord.getErrorCode(), 11);
                     createCell(xssfWorkbook, row,cellStyle, dailyReconcilationRecord.getErrorNote(), 12);
                     i++;                         
                 }
@@ -357,21 +347,11 @@ public class DailyReconciliationProcessor {
 
     private void buidComparisionSheet(XSSFRow row3, XSSFWorkbook xssfWorkbook, String sheet1LasStatus, String[] sheet1, String[] sheet2, boolean equalRow,CellStyle cellStyle) {
         if (equalRow){
-            createCell(xssfWorkbook,row3,cellStyle,sheet1[0],0);
-            createCell(xssfWorkbook,row3,cellStyle,sheet1[1],1);
-            createCell(xssfWorkbook,row3,cellStyle,sheet1LasStatus,2);
-            createCell(xssfWorkbook,row3,cellStyle,sheet2[0],3);
-            createCell(xssfWorkbook,row3,cellStyle,sheet2[1],4);
-            createCell(xssfWorkbook,row3,cellStyle,sheet2[2],5);
+            createCellForEqualRow(row3, xssfWorkbook, sheet1LasStatus, cellStyle, sheet1[0], 0, sheet1[1], 1, 2, sheet2[0], 3, sheet2[1], 4, sheet2[2], 5);
             createCell(xssfWorkbook,row3,cellStyle, RecapConstants.DAILY_RR_MATCHED,6);
         }
         else {
-            createCell(xssfWorkbook,row3,cellStyle,sheet1[0],0);
-            createCell(xssfWorkbook,row3,cellStyle,sheet1[1],1);
-            createCell(xssfWorkbook,row3,cellStyle,sheet1LasStatus,2);
-            createCell(xssfWorkbook,row3,cellStyle,sheet2[0],3);
-            createCell(xssfWorkbook,row3,cellStyle,sheet2[1],4);
-            createCell(xssfWorkbook,row3,cellStyle,sheet2[2],5);
+            createCellForEqualRow(row3, xssfWorkbook, sheet1LasStatus, cellStyle, sheet1[0], 0, sheet1[1], 1, 2, sheet2[0], 3, sheet2[1], 4, sheet2[2], 5);
             if (StringUtils.isBlank(sheet1LasStatus) && StringUtils.isNotBlank(sheet2[2])){
                 createCellForNotEqualCells(xssfWorkbook,row3, RecapConstants.DAILY_RR_LAS_NOT_GIVEN_STATUS,6);
             }
@@ -382,6 +362,15 @@ public class DailyReconciliationProcessor {
                 createCellForNotEqualCells(xssfWorkbook,row3, RecapConstants.DAILY_RR_MISMATCH,6);
             }
         }
+    }
+
+    private void createCellForEqualRow(XSSFRow row3, XSSFWorkbook xssfWorkbook, String sheet1LasStatus, CellStyle cellStyle, String s, int i, String s2, int i2, int i3, String s3, int i4, String s4, int i5, String s5, int i6) {
+        createCell(xssfWorkbook, row3, cellStyle, s, i);
+        createCell(xssfWorkbook, row3, cellStyle, s2, i2);
+        createCell(xssfWorkbook, row3, cellStyle, sheet1LasStatus, i3);
+        createCell(xssfWorkbook, row3, cellStyle, s3, i4);
+        createCell(xssfWorkbook, row3, cellStyle, s4, i5);
+        createCell(xssfWorkbook, row3, cellStyle, s5, i6);
     }
 
     private String getLasStatusForCompare(Cell sheet1Status, String[] sheet1) {

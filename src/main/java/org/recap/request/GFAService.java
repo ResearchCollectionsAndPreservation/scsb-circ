@@ -3,55 +3,24 @@ package org.recap.request;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.model.ItemRefileRequest;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.statusreconciliation.StatusReconciliationCSVRecord;
 import org.recap.camel.statusreconciliation.StatusReconciliationErrorCSVRecord;
-import org.recap.gfa.model.GFAEddItemResponse;
-import org.recap.gfa.model.GFAItemStatus;
-import org.recap.gfa.model.GFAItemStatusCheckRequest;
-import org.recap.gfa.model.GFAItemStatusCheckResponse;
-import org.recap.gfa.model.GFAPwdRequest;
-import org.recap.gfa.model.GFAPwdResponse;
-import org.recap.gfa.model.GFAPwiRequest;
-import org.recap.gfa.model.GFAPwiResponse;
-import org.recap.gfa.model.GFARetrieveEDDItemRequest;
-import org.recap.gfa.model.GFARetrieveItemRequest;
-import org.recap.gfa.model.GFARetrieveItemResponse;
-import org.recap.gfa.model.RetrieveItemEDDRequest;
-import org.recap.gfa.model.RetrieveItemRequest;
-import org.recap.gfa.model.Ttitem;
-import org.recap.gfa.model.TtitemEDDResponse;
-import org.recap.gfa.model.TtitemRequest;
+import org.recap.gfa.model.*;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.jpa.ItemChangeLogEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRefileResponse;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.RequestInformation;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.model.jpa.SearchResultRow;
+import org.recap.model.ItemRefileRequest;
+import org.recap.model.jpa.*;
 import org.recap.processor.LasItemStatusCheckPollingProcessor;
-import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
-import org.recap.repository.jpa.RequestItemDetailsRepository;
-import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
+import org.recap.repository.jpa.*;
 import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -62,11 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -945,47 +910,27 @@ public class GFAService {
     }
 
     /**
-     * Builds retrieval request order info and replaces into LAS queue.
+     * Builds request order info based on request type and replaces into LAS queue.
      * @param requestItemEntity
      * @return
      */
-    public String buildRetrieveRequestInfoAndReplaceToLAS(RequestItemEntity requestItemEntity) {
+    public String buildRequestInfoAndReplaceToLAS(RequestItemEntity requestItemEntity) {
         try {
-            GFARetrieveItemRequest gfaRetrieveItemRequest = buildGFARetrieveItemRequest(requestItemEntity);
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(gfaRetrieveItemRequest);
-            String itemStatus=itemRequestService.callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
-            if(RecapConstants.getGFAStatusAvailableList().contains(itemStatus)) {
+            String json = null;
+            String requestTypeCode = requestItemEntity.getRequestTypeEntity().getRequestTypeCode();
+            if (RecapCommonConstants.RETRIEVAL.equalsIgnoreCase(requestTypeCode)) {
+                GFARetrieveItemRequest gfaRetrieveItemRequest = buildGFARetrieveItemRequest(requestItemEntity);
+                ObjectMapper objectMapper = new ObjectMapper();
+                json = objectMapper.writeValueAsString(gfaRetrieveItemRequest);
+            } else if (RecapConstants.EDD_REQUEST.equalsIgnoreCase(requestTypeCode)) {
+                GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = buildGFAEddItemRequest(requestItemEntity);
+                ObjectMapper objectMapper = new ObjectMapper();
+                json = objectMapper.writeValueAsString(gfaRetrieveEDDItemRequest);
+            }
+            String itemStatus = callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
+            if (RecapConstants.getGFAStatusAvailableList().contains(itemStatus)) {
                 getProducer().sendBodyAndHeader(RecapConstants.SCSB_OUTGOING_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-            }
-            else {
-                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);
-                requestItemEntity.setRequestStatusEntity(requestStatusEntity);
-                requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
-                requestItemDetailsRepository.save(requestItemEntity);
-            }
-        } catch (Exception exception) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, exception);
-            return RecapCommonConstants.FAILURE + ":" + exception.getMessage();
-        }
-        return RecapCommonConstants.SUCCESS;
-    }
-
-    /**
-     * Builds edd request order info and replaces into LAS queue.
-     * @param requestItemEntity
-     * @return
-     */
-    public String buildEddRequestInfoAndReplaceToLAS(RequestItemEntity requestItemEntity) {
-        try {
-            GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = buildGFAEddItemRequest(requestItemEntity);
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(gfaRetrieveEDDItemRequest);
-            String itemStatus=itemRequestService.callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
-            if(RecapConstants.getGFAStatusAvailableList().contains(itemStatus)) {
-                getProducer().sendBodyAndHeader(RecapConstants.SCSB_OUTGOING_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-            }
-            else {
+            } else {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
@@ -1047,5 +992,24 @@ public class GFAService {
         retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitem001));
         gfaRetrieveEDDItemRequest.setRetrieveEDD(retrieveItemEDDRequest);
         return gfaRetrieveEDDItemRequest;
+    }
+
+    public String callGfaItemStatus(String itemBarcode) {
+        String gfaItemStatusValue = null;
+        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
+        GFAItemStatus gfaItemStatus = new GFAItemStatus();
+        gfaItemStatus.setItemBarCode(itemBarcode);
+        gfaItemStatusCheckRequest.setItemStatus(Arrays.asList(gfaItemStatus));
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = itemStatusCheck(gfaItemStatusCheckRequest);
+        if (null != gfaItemStatusCheckResponse) {
+            Dsitem dsitem = gfaItemStatusCheckResponse.getDsitem();
+            if (null != dsitem) {
+                List<Ttitem> ttitems = dsitem.getTtitem();
+                if (CollectionUtils.isNotEmpty(ttitems)) {
+                    gfaItemStatusValue = ttitems.get(0).getItemStatus();
+                }
+            }
+        }
+        return gfaItemStatusValue;
     }
 }

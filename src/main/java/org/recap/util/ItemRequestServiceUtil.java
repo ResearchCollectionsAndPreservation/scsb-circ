@@ -2,8 +2,8 @@ package org.recap.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.gfa.model.TtitemEDDResponse;
 import org.recap.model.jpa.BulkRequestItem;
 import org.recap.model.jpa.BulkRequestItemEntity;
@@ -33,6 +33,42 @@ import java.util.Optional;
 public class ItemRequestServiceUtil {
 
     private final Logger logger = LoggerFactory.getLogger(ItemRequestServiceUtil.class);
+
+    @Value("${ils.princeton.cul.patron}")
+    private String princetonCULPatron;
+
+    @Value("${ils.princeton.nypl.patron}")
+    private String princetonNYPLPatron;
+
+    @Value("${ils.columbia.pul.patron}")
+    private String columbiaPULPatron;
+
+    @Value("${ils.columbia.nypl.patron}")
+    private String columbiaNYPLPatron;
+
+    @Value("${ils.nypl.princeton.patron}")
+    private String nyplPrincetonPatron;
+
+    @Value("${ils.nypl.columbia.patron}")
+    private String nyplColumbiaPatron;
+
+    @Value("${ils.princeton.cul.patron.edd}")
+    private String princetonEDDCULPatron;
+
+    @Value("${ils.princeton.nypl.patron.edd}")
+    private String princetonEDDNYPLPatron;
+
+    @Value("${ils.columbia.pul.patron.edd}")
+    private String columbiaEDDPULPatron;
+
+    @Value("${ils.columbia.nypl.patron.edd}")
+    private String columbiaEDDNYPLPatron;
+
+    @Value("${ils.nypl.princeton.patron.edd}")
+    private String nyplEDDPrincetonPatron;
+
+    @Value("${ils.nypl.columbia.patron.edd}")
+    private String nyplEDDColumbiaPatron;
 
     @Value("${scsb.solr.client.url}")
     private String scsbSolrClientUrl;
@@ -157,5 +193,54 @@ public class ItemRequestServiceUtil {
                 itemRequestInformation.setChapterTitle(splitData[1].trim());
             }
         }
+    }
+
+    public String getPatronIdBorrowingInstitution(String requestingInstitution, String owningInstitution, String requestType) {
+        String patronId = "";
+        if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = princetonEDDCULPatron;
+                } else {
+                    patronId = princetonCULPatron;
+                }
+            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = princetonEDDNYPLPatron;
+                } else {
+                    patronId = princetonNYPLPatron;
+                }
+            }
+        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = columbiaEDDPULPatron;
+                } else {
+                    patronId = columbiaPULPatron;
+                }
+            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = columbiaEDDNYPLPatron;
+                } else {
+                    patronId = columbiaNYPLPatron;
+                }
+            }
+        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = nyplEDDPrincetonPatron;
+                } else {
+                    patronId = nyplPrincetonPatron;
+                }
+            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = nyplEDDColumbiaPatron;
+                } else {
+                    patronId = nyplColumbiaPatron;
+                }
+            }
+        }
+        logger.info(patronId);
+        return patronId;
     }
 }

@@ -1,7 +1,6 @@
 package org.recap.converter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.marc4j.marc.Leader;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
@@ -22,6 +21,7 @@ import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.CollectionGroupDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
+import org.recap.util.CommonUtil;
 import org.recap.util.DBReportUtil;
 import org.recap.util.MarcUtil;
 import org.slf4j.Logger;
@@ -47,6 +47,9 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
 
     @Autowired
     private DBReportUtil dbReportUtil;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     @Autowired
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
@@ -193,27 +196,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         bibliographicEntity.setLastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy(RecapConstants.SUBMIT_COLLECTION);
         bibliographicEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
-
-        String bibXmlStringContent = marcUtil.writeMarcXml(bibRecord);
-        if (StringUtils.isNotBlank(bibXmlStringContent)) {
-            bibliographicEntity.setContent(bibXmlStringContent.getBytes());
-        } else {
-            errorMessage.append(" Bib Content cannot be empty");
-        }
-
-        boolean subFieldExistsFor245 = marcUtil.isSubFieldExists(bibRecord, "245");
-        if (!subFieldExistsFor245) {
-            errorMessage.append(" Atleast one subfield should be there for 245 tag");
-        }
-        Leader leader = bibRecord.getLeader();
-        if (leader != null) {
-            String leaderValue = bibRecord.getLeader().toString();
-            if (!(StringUtils.isNotBlank(leaderValue) && leaderValue.length() == 24)) {
-                errorMessage.append(" Leader Field value should be 24 characters");
-            }
-        }
-        map.put(RecapConstants.BIBLIOGRAPHIC_ENTITY, bibliographicEntity);
-        return map;
+        return marcUtil.extractXmlAndSetEntityToMap(bibRecord, errorMessage, map, bibliographicEntity);
     }
 
     /**
@@ -227,20 +210,8 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
     private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, String institutionName, String owningInstitutionHoldingsId,
                                                                  Record holdingsRecord, Date currentDate,StringBuilder errorMessage) {
         Map<String, Object> map = new HashMap<>();
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-
         String holdingsContent = new MarcUtil().writeMarcXml(holdingsRecord);
-        if (StringUtils.isNotBlank(holdingsContent)) {
-            holdingsEntity.setContent(holdingsContent.getBytes());
-        } else {
-            errorMessage.append(" Holdings Content cannot be empty");
-        }
-        holdingsEntity.setCreatedDate(currentDate);
-        holdingsEntity.setCreatedBy(RecapConstants.SUBMIT_COLLECTION);
-        holdingsEntity.setLastUpdatedDate(currentDate);
-        holdingsEntity.setLastUpdatedBy(RecapConstants.SUBMIT_COLLECTION);
-        Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
-        holdingsEntity.setOwningInstitutionId(owningInstitutionId);
+        HoldingsEntity holdingsEntity = commonUtil.buildHoldingsEntity(bibliographicEntity, currentDate, errorMessage, holdingsContent);
         if (StringUtils.isBlank(owningInstitutionHoldingsId)) {
             owningInstitutionHoldingsId = UUID.randomUUID().toString();
         }

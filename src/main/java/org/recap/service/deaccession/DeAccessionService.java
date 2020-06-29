@@ -239,7 +239,7 @@ public class DeAccessionService {
                         } else {
                             String scsbItemStatus = itemEntity.getItemStatusEntity().getStatusCode();
                             logger.info("SCSB Item Status : {}", scsbItemStatus);
-                            String gfaItemStatus = callGfaItemStatus(itemBarcode);
+                            String gfaItemStatus = gfaService.callGfaItemStatus(itemBarcode);
                             logger.info("GFA Item Status : {}", gfaItemStatus);
                             if (StringUtils.isNotBlank(gfaItemStatus)) {
                                 gfaItemStatus = gfaItemStatus.toUpperCase();
@@ -270,25 +270,6 @@ public class DeAccessionService {
         } catch (Exception e) {
             logger.error("Exception : ", e);
         }
-    }
-
-    private String callGfaItemStatus(String itemBarcode) {
-        String gfaItemStatusValue = null;
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
-        GFAItemStatus gfaItemStatus = new GFAItemStatus();
-        gfaItemStatus.setItemBarCode(itemBarcode);
-        gfaItemStatusCheckRequest.setItemStatus(Arrays.asList(gfaItemStatus));
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = gfaService.itemStatusCheck(gfaItemStatusCheckRequest);
-        if (null != gfaItemStatusCheckResponse) {
-            Dsitem dsitem = gfaItemStatusCheckResponse.getDsitem();
-            if (null != dsitem) {
-                List<Ttitem> ttitems = dsitem.getTtitem();
-                if (CollectionUtils.isNotEmpty(ttitems)) {
-                    gfaItemStatusValue = ttitems.get(0).getItemStatus();
-                }
-            }
-        }
-        return gfaItemStatusValue;
     }
 
     private void callGfaDeaccessionService(List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities, String username) {
@@ -448,6 +429,11 @@ public class DeAccessionService {
     }
 
     private ItemInformationResponse getItemInformation(RequestItemEntity activeRetrievalRequest) {
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation(activeRetrievalRequest);
+        return (ItemInformationResponse) requestItemController.itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
+    }
+
+    private ItemRequestInformation getItemRequestInformation(RequestItemEntity activeRetrievalRequest) {
         ItemEntity itemEntity = activeRetrievalRequest.getItemEntity();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Arrays.asList(itemEntity.getBarcode()));
@@ -456,7 +442,7 @@ public class DeAccessionService {
         itemRequestInformation.setRequestingInstitution(activeRetrievalRequest.getInstitutionEntity().getInstitutionCode());
         itemRequestInformation.setPatronBarcode(activeRetrievalRequest.getPatronId());
         itemRequestInformation.setDeliveryLocation(activeRetrievalRequest.getStopCode());
-        return (ItemInformationResponse) requestItemController.itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
+        return itemRequestInformation;
     }
 
     /**
@@ -467,14 +453,7 @@ public class DeAccessionService {
      * @return the item hold response
      */
     public ItemHoldResponse cancelRequest(RequestItemEntity requestItemEntity, String username) {
-        ItemEntity itemEntity = requestItemEntity.getItemEntity();
-        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setItemBarcodes(Arrays.asList(itemEntity.getBarcode()));
-        itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
-        itemRequestInformation.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
-        itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
-        itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
-        itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation(requestItemEntity);
         itemRequestInformation.setUsername(username);
         ItemHoldResponse itemCancelHoldResponse = (ItemHoldResponse) requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
         logger.info("Deaccession Item - Cancel request status : {}", itemCancelHoldResponse.getScreenMessage());

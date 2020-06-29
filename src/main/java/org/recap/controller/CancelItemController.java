@@ -189,17 +189,21 @@ public class CancelItemController {
 
     private ItemHoldResponse processEDD(RequestItemEntity requestItemEntity) {
         ItemHoldResponse itemCanceHoldResponse = new ItemHoldResponse();
+        saveRequestAndChangeLog(requestItemEntity);
+        itemCanceHoldResponse.setSuccess(true);
+        itemCanceHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_EDD_SUCCCESS);
+        sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), requestItemEntity.getItemEntity().getBarcode(), requestItemEntity.getPatronId());
+        makeItemAvailableForFirstScanCancelRequest(requestItemEntity);
+        return itemCanceHoldResponse;
+    }
+
+    private void saveRequestAndChangeLog(RequestItemEntity requestItemEntity) {
         RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED);
         requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
         requestItemEntity.setLastUpdatedDate(new Date());
         requestItemEntity.setNotes(appendCancelMessageToNotes(requestItemEntity));
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         itemRequestService.saveItemChangeLogEntity(savedRequestItemEntity.getId(), RecapConstants.GUEST_USER, RecapConstants.REQUEST_ITEM_CANCEL_ITEM_AVAILABILITY_STATUS, RecapCommonConstants.REQUEST_STATUS_CANCELED + savedRequestItemEntity.getItemId());
-        itemCanceHoldResponse.setSuccess(true);
-        itemCanceHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_EDD_SUCCCESS);
-        sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), requestItemEntity.getItemEntity().getBarcode(), requestItemEntity.getPatronId());
-        makeItemAvailableForFirstScanCancelRequest(requestItemEntity);
-        return itemCanceHoldResponse;
     }
 
     private int getHoldQueueLength(ItemInformationResponse itemInformationResponse) {
@@ -215,12 +219,7 @@ public class CancelItemController {
     }
 
     private void changeRetrievalToCancelStatus(RequestItemEntity requestItemEntity, ItemHoldResponse itemCanceHoldResponse) {
-        RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED);
-        requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
-        requestItemEntity.setLastUpdatedDate(new Date());
-        requestItemEntity.setNotes(appendCancelMessageToNotes(requestItemEntity));
-        RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
-        itemRequestService.saveItemChangeLogEntity(savedRequestItemEntity.getId(), RecapConstants.GUEST_USER, RecapConstants.REQUEST_ITEM_CANCEL_ITEM_AVAILABILITY_STATUS, RecapCommonConstants.REQUEST_STATUS_CANCELED + savedRequestItemEntity.getItemId());
+        saveRequestAndChangeLog(requestItemEntity);
         itemCanceHoldResponse.setSuccess(true);
         itemCanceHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_SUCCCESS);
         logger.info("Send Mail");
@@ -229,12 +228,7 @@ public class CancelItemController {
     }
 
     private void changeRecallToCancelStatus(RequestItemEntity requestItemEntity, ItemHoldResponse itemCanceHoldResponse) {
-        RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED);
-        requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
-        requestItemEntity.setLastUpdatedDate(new Date());
-        requestItemEntity.setNotes(appendCancelMessageToNotes(requestItemEntity));
-        RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
-        itemRequestService.saveItemChangeLogEntity(savedRequestItemEntity.getId(), RecapConstants.GUEST_USER, RecapConstants.REQUEST_ITEM_CANCEL_ITEM_AVAILABILITY_STATUS, RecapCommonConstants.REQUEST_STATUS_CANCELED + savedRequestItemEntity.getItemId());
+        saveRequestAndChangeLog(requestItemEntity);
         itemCanceHoldResponse.setSuccess(true);
         itemCanceHoldResponse.setScreenMessage(RecapConstants.RECALL_CANCELLATION_SUCCCESS);
     }

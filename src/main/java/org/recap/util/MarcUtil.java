@@ -7,16 +7,14 @@ import org.marc4j.MarcReader;
 import org.marc4j.MarcWriter;
 import org.marc4j.MarcXmlReader;
 import org.marc4j.MarcXmlWriter;
-import org.marc4j.marc.DataField;
-import org.marc4j.marc.MarcFactory;
-import org.marc4j.marc.Record;
-import org.marc4j.marc.Subfield;
-import org.marc4j.marc.VariableField;
+import org.marc4j.marc.*;
+import org.recap.RecapConstants;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.Holding;
 import org.recap.model.jaxb.Items;
 import org.recap.model.jaxb.marc.CollectionType;
 import org.recap.model.jaxb.marc.ContentType;
+import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.model.marc.HoldingsMarcRecord;
 import org.recap.model.marc.ItemMarcRecord;
@@ -29,6 +27,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by pvsubrah on 6/15/16.
@@ -492,5 +491,28 @@ public class MarcUtil {
             record = reader.next();
         }
         return record;
+    }
+
+    public Map<String, Object> extractXmlAndSetEntityToMap(Record bibRecord, StringBuilder errorMessage, Map<String, Object> map, BibliographicEntity bibliographicEntity) {
+        String bibContent = writeMarcXml(bibRecord);
+        if (StringUtils.isNotBlank(bibContent)) {
+            bibliographicEntity.setContent(bibContent.getBytes());
+        } else {
+            errorMessage.append(" Bib Content cannot be empty");
+        }
+
+        boolean subFieldExistsFor245 = isSubFieldExists(bibRecord, "245");
+        if (!subFieldExistsFor245) {
+            errorMessage.append(" Atleast one subfield should be there for 245 tag");
+        }
+        Leader leader = bibRecord.getLeader();
+        if (leader != null) {
+            String leaderValue = bibRecord.getLeader().toString();
+            if (!(StringUtils.isNotBlank(leaderValue) && leaderValue.length() == 24)) {
+                errorMessage.append(" Leader Field value should be 24 characters");
+            }
+        }
+        map.put(RecapConstants.BIBLIOGRAPHIC_ENTITY, bibliographicEntity);
+        return map;
     }
 }

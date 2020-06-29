@@ -75,38 +75,10 @@ public class ItemRequestService {
 
     private static final Logger logger = LoggerFactory.getLogger(ItemRequestService.class);
 
-    @Value("${ils.princeton.cul.patron}")
-    private String princetonCULPatron;
-
-    @Value("${ils.princeton.nypl.patron}")
-    private String princetonNYPLPatron;
-
-    @Value("${ils.columbia.pul.patron}")
-    private String columbiaPULPatron;
-
-    @Value("${ils.columbia.nypl.patron}")
-    private String columbiaNYPLPatron;
-
-    @Value("${ils.nypl.princeton.patron}")
-    private String nyplPrincetonPatron;
-
-    @Value("${ils.nypl.columbia.patron}")
-    private String nyplColumbiaPatron;
-
     @Value("${scsb.solr.client.url}")
     private String scsbSolrClientUrl;
 
     //EDD values
-
-    @Value("${ils.princeton.patron.edd}")
-    private String princetonPatronForEDD;
-
-    @Value("${ils.columbia.patron.edd}")
-    private String columbiaPatronForEDD;
-
-    @Value("${ils.nypl.patron.edd}")
-    private String nyplPatronForEDD;
-
     @Value("${ils.princeton.cul.patron.edd}")
     private String princetonCULEDDPatron;
 
@@ -360,7 +332,7 @@ public class ItemRequestService {
             for (RequestItemEntity requestItemEntity : requestEntities) {
                 itemEntity = requestItemEntity.getItemEntity();
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED);
-                String gfaItemStatus = callGfaItemStatusForRefile(itemEntity.getBarcode());
+                String gfaItemStatus = gfaService.callGfaItemStatus(itemEntity.getBarcode());
                 logger.info("GFA Item Status {} for the barcode {} received on Refile", gfaItemStatus, itemEntity.getBarcode());
                 if (itemEntity.getItemAvailabilityStatusId() == 2) { // Only Item Not Availability, Status is Processed
                     itemBarcode = itemEntity.getBarcode();
@@ -395,10 +367,10 @@ public class ItemRequestService {
                             // Checkout the item based on the institution Princeton,Columbia or NYPL for the Recall order
                             if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)) {
                                 //Checkout for EDD patron
-                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution() ,itemRequestInfo.getItemOwningInstitution()));
+                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution() ,itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
                                 requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                             }else {
-                                itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_RETRIEVAL));
                                 requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                             }
                             setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntityRecalled);
@@ -416,7 +388,7 @@ public class ItemRequestService {
                                 itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
                             }else {
                                 //Interchanging the arguments since the checkin call is made based on Requesting Institution.
-                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdBorrwingInsttution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution()));
+                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
                             }
                         }
                         else {
@@ -430,7 +402,7 @@ public class ItemRequestService {
                                 itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
                             }else {
                                 //Interchanging the arguments since the checkin call is made based on Requesting Institution
-                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdBorrwingInsttution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution()));
+                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
                             }
                         }
                         requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
@@ -441,7 +413,7 @@ public class ItemRequestService {
                             itemRequestInfo.setPatronBarcode(getPatronIDForEDDBorrowingInstitution(itemRequestInfo.getRequestingInstitution(),itemRequestInfo.getItemOwningInstitution()));
                         }
                         else {
-                            itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                            itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_RETRIEVAL));
                         }
                         requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                     }
@@ -455,7 +427,7 @@ public class ItemRequestService {
                     ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
                     itemEntity = requestItemEntity.getItemEntity();
                     itemBarcode = itemEntity.getBarcode();
-                    String gfaItemStatus = callGfaItemStatusForRefile(itemBarcode);
+                    String gfaItemStatus = gfaService.callGfaItemStatus(itemBarcode);
                     logger.info("Gfa status received during refile : {}",gfaItemStatus);
                     logger.info("GFA Item Status {} for the barcode {} received on Refile where Request Id : {}", gfaItemStatus, itemEntity.getBarcode(),requestItemEntity.getId());
                     logger.info("Rejecting the Refile for the barcode {} where Request ID : {} and Request Status : {}", itemEntity.getBarcode(), requestItemEntity.getId(), requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
@@ -512,7 +484,7 @@ public class ItemRequestService {
                 itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
             }
             else {
-                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
             }
             setEddInformation(itemRequestInfo, eddNotesMap);
         }
@@ -553,25 +525,6 @@ public class ItemRequestService {
                 itemRequestInfo.setEddNotes(eddNotes.getValue());
             }
         }
-    }
-
-    public String callGfaItemStatusForRefile(String itemBarcode) {
-        String gfaItemStatusValue = null;
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
-        GFAItemStatus gfaItemStatus = new GFAItemStatus();
-        gfaItemStatus.setItemBarCode(itemBarcode);
-        gfaItemStatusCheckRequest.setItemStatus(Arrays.asList(gfaItemStatus));
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = gfaService.itemStatusCheck(gfaItemStatusCheckRequest);
-        if (null != gfaItemStatusCheckResponse) {
-            Dsitem dsitem = gfaItemStatusCheckResponse.getDsitem();
-            if (null != dsitem) {
-                List<Ttitem> ttitems = dsitem.getTtitem();
-                if (CollectionUtils.isNotEmpty(ttitems)) {
-                    gfaItemStatusValue = ttitems.get(0).getItemStatus();
-                }
-            }
-        }
-        return gfaItemStatusValue;
     }
 
     /**
@@ -777,7 +730,7 @@ public class ItemRequestService {
             itemResponseInformation = updateScsbAndGfa(itemRequestInfo, itemResponseInformation, itemEntity);
             logger.info("GFA Response for Retrieval request : {}",itemResponseInformation.isSuccess());
             if(itemResponseInformation.isSuccess()){
-                itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_RETRIEVAL));
                 logger.info("Performing CheckOut using the generic patron : {}",itemRequestInfo.getPatronBarcode());
                 requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
             }
@@ -851,7 +804,7 @@ public class ItemRequestService {
                 if (itemResponseInformation.isSuccess()) { // IF Hold command is successfully
                     itemRequestInfo.setExpirationDate(itemRequestInfo.getExpirationDate());
                     String requestingPatron = itemRequestInfo.getPatronBarcode();
-                    itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), requestItemEntity.getInstitutionEntity().getInstitutionCode()));
+                    itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), requestItemEntity.getInstitutionEntity().getInstitutionCode(), RecapCommonConstants.REQUEST_TYPE_RETRIEVAL));
                     itemRequestInfo.setPickupLocation(getPickupLocation(requestItemEntity.getStopCode()));
                     itemRequestInfo.setBibId(itemInformation.getBibID());
                     ItemRecallResponse itemRecallResponse = (ItemRecallResponse) requestItemController.recallItem(itemRequestInfo, requestItemEntity.getInstitutionEntity().getInstitutionCode());
@@ -907,31 +860,6 @@ public class ItemRequestService {
                 patronId = nyplPrincetonEDDPatron;
             } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
                 patronId = nyplColumbiaEDDPatron;
-            }
-        }
-        logger.info(patronId);
-        return patronId;
-    }
-
-    private String getPatronIdBorrwingInsttution(String requestingInstitution, String owningInstitution) {
-        String patronId = "";
-        if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-                patronId = princetonCULPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-                patronId = princetonNYPLPatron;
-            }
-        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-                patronId = columbiaPULPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-                patronId = columbiaNYPLPatron;
-            }
-        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-                patronId = nyplPrincetonPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-                patronId = nyplColumbiaPatron;
             }
         }
         logger.info(patronId);
@@ -1257,10 +1185,8 @@ public class ItemRequestService {
             String message;
             for (RequestItemEntity requestItemEntity : requestItemEntities) {
                 String requestTypeCode = requestItemEntity.getRequestTypeEntity().getRequestTypeCode();
-                if (RecapCommonConstants.RETRIEVAL.equalsIgnoreCase(requestTypeCode)) {
-                    message = gfaService.buildRetrieveRequestInfoAndReplaceToLAS(requestItemEntity);
-                } else if (RecapConstants.EDD_REQUEST.equalsIgnoreCase(requestTypeCode)) {
-                    message = gfaService.buildEddRequestInfoAndReplaceToLAS(requestItemEntity);
+                if (RecapCommonConstants.RETRIEVAL.equalsIgnoreCase(requestTypeCode) || RecapConstants.EDD_REQUEST.equalsIgnoreCase(requestTypeCode)) {
+                    message = gfaService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
                 } else {
                     message = RecapConstants.IGNORE_REQUEST_TYPE_NOT_VALID + requestTypeCode;
                 }
@@ -1339,7 +1265,7 @@ public class ItemRequestService {
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(itemRequestInformation);
-            String itemStatus=callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
+            String itemStatus=gfaService.callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
             if(RecapConstants.getGFAStatusAvailableList().contains(itemStatus)) {
                 producerTemplate.sendBodyAndHeader(RecapConstants.REQUEST_ITEM_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
             }
@@ -1387,7 +1313,7 @@ public class ItemRequestService {
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(itemRequestInformation);
-            String itemStatus=callGfaItemStatusForRefile(requestItemEntity.getItemEntity().getBarcode());
+            String itemStatus=gfaService.callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
             if(RecapConstants.getGFAStatusAvailableList().contains(itemStatus)) {
                 producerTemplate.sendBodyAndHeader(RecapConstants.REQUEST_ITEM_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
             }

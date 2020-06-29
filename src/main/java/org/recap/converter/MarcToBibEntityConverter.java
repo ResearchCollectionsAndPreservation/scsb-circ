@@ -22,12 +22,14 @@ import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
+import org.recap.util.CommonUtil;
 import org.recap.util.DBReportUtil;
 import org.recap.util.MarcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,6 +52,10 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
 
     @Autowired
     private DBReportUtil dbReportUtil;
+
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     @Autowired
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
@@ -177,46 +183,14 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         bibliographicEntity.setCreatedBy(RecapConstants.SUBMIT_COLLECTION);
         bibliographicEntity.setLastUpdatedDate(currentDate);
         bibliographicEntity.setLastUpdatedBy(RecapConstants.SUBMIT_COLLECTION);
-
-        String bibContent = marcUtil.writeMarcXml(bibRecord);
-        if (StringUtils.isNotBlank(bibContent)) {
-            bibliographicEntity.setContent(bibContent.getBytes());
-        } else {
-            errorMessage.append(" Bib Content cannot be empty");
-        }
-
-        boolean subFieldExistsFor245 = marcUtil.isSubFieldExists(bibRecord, "245");
-        if (!subFieldExistsFor245) {
-            errorMessage.append(" Atleast one subfield should be there for 245 tag");
-        }
-        Leader leader = bibRecord.getLeader();
-        if (leader != null) {
-            String leaderValue = bibRecord.getLeader().toString();
-            if (!(StringUtils.isNotBlank(leaderValue) && leaderValue.length() == 24)) {
-                errorMessage.append(" Leader Field value should be 24 characters");
-            }
-        }
-        map.put(RecapConstants.BIBLIOGRAPHIC_ENTITY, bibliographicEntity);
-        return map;
+        return marcUtil.extractXmlAndSetEntityToMap(bibRecord, errorMessage, map, bibliographicEntity);
     }
 
     private Map<String, Object> processAndValidateHoldingsEntity(BibliographicEntity bibliographicEntity, Record holdingsRecord, Date currentDate
     ,StringBuilder errorMessage) {
         Map<String, Object> map = new HashMap<>();
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-
         String holdingsContent = new MarcUtil().writeMarcXml(holdingsRecord);
-        if (StringUtils.isNotBlank(holdingsContent)) {
-            holdingsEntity.setContent(holdingsContent.getBytes());
-        } else {
-            errorMessage.append(" Holdings Content cannot be empty");
-        }
-        holdingsEntity.setCreatedDate(currentDate);
-        holdingsEntity.setCreatedBy(RecapConstants.SUBMIT_COLLECTION);
-        holdingsEntity.setLastUpdatedDate(currentDate);
-        holdingsEntity.setLastUpdatedBy(RecapConstants.SUBMIT_COLLECTION);
-        Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
-        holdingsEntity.setOwningInstitutionId(owningInstitutionId);
+        HoldingsEntity holdingsEntity = commonUtil.buildHoldingsEntity(bibliographicEntity, currentDate, errorMessage, holdingsContent);
         String owningInstitutionHoldingsId = marcUtil.getDataFieldValue(holdingsRecord, "852", '0');
         if (StringUtils.isBlank(owningInstitutionHoldingsId)) {
             owningInstitutionHoldingsId = UUID.randomUUID().toString();

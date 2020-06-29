@@ -566,18 +566,7 @@ public class SubmitCollectionDAOService {
         if (fetchedItemBasedOnOwningInstitutionItemId.isEmpty() || boundWith) {//To check there should not be existing item record with same own item id and for bound with own item id can be different
             boolean isCheckCGDNotNull = checkIsCGDNotNull(bibliographicEntity);
             if (isCheckCGDNotNull) {
-                updateCustomerCode(fetchBibliographicEntity, bibliographicEntity);//Added to get customer code for existing dummy record, this value is used when the input xml dosent have the customer code in it, this happens mostly for CUL
-                removeDummyRecord(idMapToRemoveIndexList, fetchBibliographicEntity);
-                BibliographicEntity fetchedBibliographicEntity = repositoryService.getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
-                setItemAvailabilityStatus(bibliographicEntity.getItemEntities());
-                BibliographicEntity bibliographicEntityToSave = bibliographicEntity;
-                updateCatalogingStatusForItem(bibliographicEntityToSave);
-                updateCatalogingStatusForBib(bibliographicEntityToSave);
-                if (fetchedBibliographicEntity != null) {//1Bib n holding n item
-                    bibliographicEntityToSave = updateExistingRecordForDummy(fetchedBibliographicEntity, bibliographicEntity);
-                }
-                savedBibliographicEntity = repositoryService.getBibliographicDetailsRepository().saveAndFlush(bibliographicEntityToSave);
-                entityManager.refresh(savedBibliographicEntity);
+                savedBibliographicEntity = saveBibliographicEntity(bibliographicEntity, idMapToRemoveIndexList, fetchBibliographicEntity);
                 saveItemChangeLogEntity(RecapConstants.SUBMIT_COLLECTION, RecapConstants.SUBMIT_COLLECTION_DUMMY_RECORD_UPDATE, savedBibliographicEntity.getItemEntities());
                 setProcessedBarcode(bibliographicEntity, processedBarcodeSet);
                 submitCollectionReportHelperService.buildSubmitCollectionReportInfo(submitCollectionReportInfoMap, savedBibliographicEntity, bibliographicEntity);
@@ -587,6 +576,23 @@ public class SubmitCollectionDAOService {
         } else if (!fetchedItemBasedOnOwningInstitutionItemId.isEmpty()) {
                 submitCollectionReportHelperService.setSubmitCollectionReportInfoForInvalidDummyRecordBasedOnOwnInstItemId(bibliographicEntity,submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),fetchedItemBasedOnOwningInstitutionItemId);
         }
+        return savedBibliographicEntity;
+    }
+
+    private BibliographicEntity saveBibliographicEntity(BibliographicEntity bibliographicEntity, List<Map<String, String>> idMapToRemoveIndexList, BibliographicEntity fetchBibliographicEntity) {
+        BibliographicEntity savedBibliographicEntity;
+        updateCustomerCode(fetchBibliographicEntity, bibliographicEntity);//Added to get customer code for existing dummy record, this value is used when the input xml dosent have the customer code in it, this happens mostly for CUL
+        removeDummyRecord(idMapToRemoveIndexList, fetchBibliographicEntity);
+        BibliographicEntity fetchedBibliographicEntity = repositoryService.getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(bibliographicEntity.getOwningInstitutionId(), bibliographicEntity.getOwningInstitutionBibId());
+        setItemAvailabilityStatus(bibliographicEntity.getItemEntities());
+        BibliographicEntity bibliographicEntityToSave = bibliographicEntity;
+        updateCatalogingStatusForItem(bibliographicEntityToSave);
+        updateCatalogingStatusForBib(bibliographicEntityToSave);
+        if (fetchedBibliographicEntity != null) {//1Bib n holding n item
+            bibliographicEntityToSave = updateExistingRecordForDummy(fetchedBibliographicEntity, bibliographicEntity);
+        }
+        savedBibliographicEntity = repositoryService.getBibliographicDetailsRepository().saveAndFlush(bibliographicEntityToSave);
+        entityManager.refresh(savedBibliographicEntity);
         return savedBibliographicEntity;
     }
 
@@ -609,18 +615,7 @@ public class SubmitCollectionDAOService {
         if (fetchedItemBasedOnOwningInstitutionItemId.isEmpty()) {//To check there should not be existing item record with same own item id and for bound with own item id can be different
             boolean isCheckCGDNotNull = checkIsCGDNotNull(incomingBibliographicEntity);
             if (isCheckCGDNotNull) {
-                updateCustomerCode(fetchBibliographicEntity, incomingBibliographicEntity);//Added to get customer code for existing dummy record, this value is used when the input xml dosent have the customer code in it, this happens mostly for CUL
-                removeDummyRecord(idMapToRemoveIndexList, fetchBibliographicEntity);
-                BibliographicEntity fetchedBibliographicEntity = repositoryService.getBibliographicDetailsRepository().findByOwningInstitutionIdAndOwningInstitutionBibId(incomingBibliographicEntity.getOwningInstitutionId(), incomingBibliographicEntity.getOwningInstitutionBibId());
-                setItemAvailabilityStatus(incomingBibliographicEntity.getItemEntities());
-                BibliographicEntity bibliographicEntityToSave = incomingBibliographicEntity;
-                updateCatalogingStatusForItem(bibliographicEntityToSave);
-                updateCatalogingStatusForBib(bibliographicEntityToSave);
-                if (fetchedBibliographicEntity != null) {//1Bib n holding n item
-                    bibliographicEntityToSave = updateExistingRecordForDummy(fetchedBibliographicEntity, incomingBibliographicEntity);
-                }
-                savedBibliographicEntity = repositoryService.getBibliographicDetailsRepository().saveAndFlush(bibliographicEntityToSave);
-                entityManager.refresh(savedBibliographicEntity);
+                savedBibliographicEntity = saveBibliographicEntity(incomingBibliographicEntity, idMapToRemoveIndexList, fetchBibliographicEntity);
                 List<ItemChangeLogEntity> preparedItemChangeLogEntityList = prepareItemChangeLogEntity(RecapConstants.SUBMIT_COLLECTION, RecapConstants.SUBMIT_COLLECTION_DUMMY_RECORD_UPDATE, savedBibliographicEntity.getItemEntities());
                 itemChangeLogEntityList.addAll(preparedItemChangeLogEntityList);
                 setProcessedBarcode(incomingBibliographicEntity, processedBarcodeSet);

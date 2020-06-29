@@ -21,6 +21,7 @@ import org.recap.model.jpa.ReportEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.model.submitcollection.SubmitCollectionResponse;
 import org.recap.service.common.RepositoryService;
+import org.recap.util.CommonUtil;
 import org.recap.util.MarcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,9 @@ public class SubmitCollectionService {
 
     @Autowired
     private MarcUtil marcUtil;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     private RestTemplate restTemplate;
 

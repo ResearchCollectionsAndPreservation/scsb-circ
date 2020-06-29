@@ -58,23 +58,7 @@ public class ItemEDDRequestService {
     @Value("${ils.nypl.patron.edd}")
     private String nyplPatronForEDD;
 
-    @Value("${ils.princeton.cul.patron.edd}")
-    private String princetonEDDCULPatron;
 
-    @Value("${ils.princeton.nypl.patron.edd}")
-    private String princetonEDDNYPLPatron;
-
-    @Value("${ils.columbia.pul.patron.edd}")
-    private String columbiaEDDPULPatron;
-
-    @Value("${ils.columbia.nypl.patron.edd}")
-    private String columbiaEDDNYPLPatron;
-
-    @Value("${ils.nypl.princeton.patron.edd}")
-    private String nyplEDDPrincetonPatron;
-
-    @Value("${ils.nypl.columbia.patron.edd}")
-    private String nyplEDDColumbiaPatron;
 
     /**
      * Gets item details repository.
@@ -170,7 +154,7 @@ public class ItemEDDRequestService {
                         itemRequestInfo.setPatronBarcode(getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
                     }
                     else {
-                        itemRequestInfo.setPatronBarcode(getPatronIdBorrwingInsttution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution()));
+                        itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
                     }
 
                     itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
@@ -250,28 +234,4 @@ public class ItemEDDRequestService {
         return patronId;
     }
 
-    public String getPatronIdBorrwingInsttution(String requestingInstitution, String owningInstitution) {
-        String patronId = "";
-        if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-                patronId = princetonEDDCULPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-                patronId = princetonEDDNYPLPatron;
-            }
-        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-                patronId = columbiaEDDPULPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-                patronId = columbiaEDDNYPLPatron;
-            }
-        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-                patronId = nyplEDDPrincetonPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-                patronId = nyplEDDColumbiaPatron;
-            }
-        }
-        logger.info(patronId);
-        return patronId;
-    }
 }

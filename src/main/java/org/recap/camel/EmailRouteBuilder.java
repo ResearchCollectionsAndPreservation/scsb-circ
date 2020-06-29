@@ -2,12 +2,12 @@ package org.recap.camel;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.attachment.AttachmentMessage;
 import org.apache.camel.Processor;
+import org.apache.camel.attachment.AttachmentMessage;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.activation.DataHandler;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 /**
  * Created by chenchulakshmig on 13/9/16.
@@ -188,83 +184,19 @@ public class EmailRouteBuilder {
                 }
 
                 private String loadEmailLasStatus(String emailTemplate) {
-                    InputStream inputStream = getClass().getResourceAsStream(emailTemplate);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder out = new StringBuilder();
-                    String line;
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            if (line.isEmpty()) {
-                                out.append("\n");
-                            } else {
-                                out.append(line);
-                                out.append("\n");
-                            }
-                        }
-                    } catch (IOException e) {
-                        logger.error(RecapCommonConstants.LOG_ERROR,e);
-                    }
-                    return out.toString();
+                    return getEmailBodyString(emailTemplate).toString();
                 }
 
                 private void loadEmailBodyTemplateForNoData() {
-                    InputStream inputStream = getClass().getResourceAsStream(RecapConstants.SUBMIT_COLLECTION_EMAIL_BODY_VM);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder out = new StringBuilder();
-                    String line;
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            if (line.isEmpty()) {
-                                out.append("\n");
-                            } else {
-                                out.append(line);
-                                out.append("\n");
-                            }
-                        }
-                    } catch (IOException e) {
-                        logger.error(RecapCommonConstants.LOG_ERROR,e);
-                    }
-                    emailBodyForSubmitCollection = out.toString();
+                    emailBodyForSubmitCollection = getEmailBodyString(RecapConstants.SUBMIT_COLLECTION_EMAIL_BODY_VM).toString();
                 }
 
                 private void loadEmailBodyTemplateForSubmitCollectionEmptyDirectory() {
-                    InputStream inputStream = getClass().getResourceAsStream(RecapConstants.SUBMIT_COLLECTION_EMAIL_BODY_FOR_EMPTY_DIRECTORY_VM);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder out = new StringBuilder();
-                    String line;
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            if (line.isEmpty()) {
-                                out.append("\n");
-                            } else {
-                                out.append(line);
-                                out.append("\n");
-                            }
-                        }
-                    } catch (IOException e) {
-                        logger.error(RecapCommonConstants.LOG_ERROR,e);
-                    }
-                    emailBodyForSubmitCollectionEmptyDirectory = out.toString();
+                    emailBodyForSubmitCollectionEmptyDirectory = getEmailBodyString(RecapConstants.SUBMIT_COLLECTION_EMAIL_BODY_FOR_EMPTY_DIRECTORY_VM).toString();
                 }
 
                 private void loadEmailBodyTemplateForExceptionInSubmitCollection() {
-                    InputStream inputStream = getClass().getResourceAsStream(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_BODY_VM);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder out = new StringBuilder();
-                    String line;
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            if (line.isEmpty()) {
-                                out.append("\n");
-                            } else {
-                                out.append(line);
-                                out.append("\n");
-                            }
-                        }
-                    } catch (IOException e) {
-                        logger.error(RecapCommonConstants.LOG_ERROR,e);
-                    }
-                    emailBodyForExceptionInSubmitColletion = out.toString();
+                    emailBodyForExceptionInSubmitColletion = getEmailBodyString(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_BODY_VM).toString();
                 }
 
                 private void loadEmailPassword() {
@@ -279,27 +211,15 @@ public class EmailRouteBuilder {
                 }
 
                 private void loadEmailBodyForRequestPending() {
-                    InputStream inputStream = getClass().getResourceAsStream(RecapConstants.REQUEST_PENDING_EMAIL_BODY_VM);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder out = new StringBuilder();
-                    String line;
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            if (line.isEmpty()) {
-                                out.append("\n");
-                            } else {
-                                out.append(line);
-                                out.append("\n");
-                            }
-                        }
-                    } catch (IOException e) {
-                        logger.error(RecapCommonConstants.LOG_ERROR,e);
-                    }
-                    emailBodyForRequestPending = out.toString();
+                    emailBodyForRequestPending = getEmailBodyString(RecapConstants.REQUEST_PENDING_EMAIL_BODY_VM).toString();
                 }
 
                 private void loadEmailBodyForBulkRequest() {
-                    InputStream inputStream = getClass().getResourceAsStream(RecapConstants.BULK_REQUEST_EMAIL_BODY_VM);
+                    emailBodyForBulkRequestProcess = getEmailBodyString(RecapConstants.BULK_REQUEST_EMAIL_BODY_VM).toString();
+                }
+
+                private StringBuilder getEmailBodyString(String vmFileName) {
+                    InputStream inputStream = getClass().getResourceAsStream(vmFileName);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                     StringBuilder out = new StringBuilder();
                     String line;
@@ -315,7 +235,7 @@ public class EmailRouteBuilder {
                     } catch (IOException e) {
                         logger.error(RecapCommonConstants.LOG_ERROR, e);
                     }
-                    emailBodyForBulkRequestProcess = out.toString();
+                    return out;
                 }
             });
         } catch (Exception e) {

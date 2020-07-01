@@ -109,24 +109,24 @@ public class IdentifyPendingRequestService {
         StringBuilder stringBuilder=new StringBuilder();
         if(!pendingRequestEntities.isEmpty()) {
             stringBuilder.append("Below are the request in PENDING:");
-            pendingRequestEntities.forEach(pendingReq -> {
-                stringBuilder.append("\nBarcode : ").append(pendingReq.getItemEntity().getBarcode())
-                        .append("\t\t Request Created Date : ").append(pendingReq.getCreatedDate())
-                        .append("\t\t Request Type :").append(pendingReq.getRequestTypeEntity().getRequestTypeCode());
-            });
+            appendItemEntityInfo(pendingRequestEntities, stringBuilder);
         }
         if(!lasRequestEntities.isEmpty()) {
             if(stringBuilder.length()>0){
                 stringBuilder.append("\n\n");
             }
             stringBuilder.append("Below are the request in LAS ITEM STATUS PENDING:");
-            lasRequestEntities.forEach(lasRequest -> {
-                stringBuilder.append("\nBarcode : ").append(lasRequest.getItemEntity().getBarcode())
-                        .append("\t\t Request Created Date : ").append(lasRequest.getCreatedDate())
-                        .append("\t\t Request Type :").append(lasRequest.getRequestTypeEntity().getRequestTypeCode());
-            });
+            appendItemEntityInfo(lasRequestEntities, stringBuilder);
         }
         return stringBuilder.toString();
+    }
+
+    private void appendItemEntityInfo(List<RequestItemEntity> pendingRequestEntities, StringBuilder stringBuilder) {
+        pendingRequestEntities.forEach(pendingReq -> {
+            stringBuilder.append("\nBarcode : ").append(pendingReq.getItemEntity().getBarcode())
+                    .append("\t\t Request Created Date : ").append(pendingReq.getCreatedDate())
+                    .append("\t\t Request Type :").append(pendingReq.getRequestTypeEntity().getRequestTypeCode());
+        });
     }
 
     private void sendEmailNotificationForPendingRequests(EmailPayLoad emailPayLoad, String message, String subject) {

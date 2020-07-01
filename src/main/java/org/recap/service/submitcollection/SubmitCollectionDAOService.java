@@ -1024,22 +1024,13 @@ public class SubmitCollectionDAOService {
     }
 
     private void saveItemChangeLogEntity(String operationType, String message, List<ItemEntity> itemEntityList) {
-        List<ItemChangeLogEntity> itemChangeLogEntityList = new ArrayList<>();
-        for (ItemEntity itemEntity:itemEntityList) {
-            ItemChangeLogEntity itemChangeLogEntity = new ItemChangeLogEntity();
-            itemChangeLogEntity.setOperationType(RecapConstants.SUBMIT_COLLECTION);
-            itemChangeLogEntity.setUpdatedBy(operationType);
-            itemChangeLogEntity.setUpdatedDate(new Date());
-            itemChangeLogEntity.setRecordId(itemEntity.getItemId());
-            itemChangeLogEntity.setNotes(message);
-            itemChangeLogEntityList.add(itemChangeLogEntity);
-        }
+        List<ItemChangeLogEntity> itemChangeLogEntityList = getItemChangeLogEntities(operationType, message, itemEntityList);
         repositoryService.getItemChangeLogDetailsRepository().saveAll(itemChangeLogEntityList);
     }
 
-    private List<ItemChangeLogEntity> prepareItemChangeLogEntity(String operationType, String message, List<ItemEntity> itemEntityList) {
+    private List<ItemChangeLogEntity> getItemChangeLogEntities(String operationType, String message, List<ItemEntity> itemEntityList) {
         List<ItemChangeLogEntity> itemChangeLogEntityList = new ArrayList<>();
-        for (ItemEntity itemEntity:itemEntityList) {
+        for (ItemEntity itemEntity : itemEntityList) {
             ItemChangeLogEntity itemChangeLogEntity = new ItemChangeLogEntity();
             itemChangeLogEntity.setOperationType(RecapConstants.SUBMIT_COLLECTION);
             itemChangeLogEntity.setUpdatedBy(operationType);
@@ -1048,6 +1039,11 @@ public class SubmitCollectionDAOService {
             itemChangeLogEntity.setNotes(message);
             itemChangeLogEntityList.add(itemChangeLogEntity);
         }
+        return itemChangeLogEntityList;
+    }
+
+    private List<ItemChangeLogEntity> prepareItemChangeLogEntity(String operationType, String message, List<ItemEntity> itemEntityList) {
+        List<ItemChangeLogEntity> itemChangeLogEntityList = getItemChangeLogEntities(operationType, message, itemEntityList);
         return itemChangeLogEntityList;
     }
 

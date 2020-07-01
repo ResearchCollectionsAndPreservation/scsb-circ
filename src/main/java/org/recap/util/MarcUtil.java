@@ -8,6 +8,7 @@ import org.marc4j.MarcWriter;
 import org.marc4j.MarcXmlReader;
 import org.marc4j.MarcXmlWriter;
 import org.marc4j.marc.*;
+import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.Holding;
@@ -18,6 +19,9 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.model.marc.HoldingsMarcRecord;
 import org.recap.model.marc.ItemMarcRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -34,6 +38,11 @@ import java.util.Map;
  */
 @Service
 public class MarcUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(MarcUtil.class);
+
+    @Value("${submit.collection.input.limit}")
+    private Integer inputLimit;
 
     /**
      * Convert marc xml to record list.
@@ -514,5 +523,19 @@ public class MarcUtil {
         }
         map.put(RecapConstants.BIBLIOGRAPHIC_ENTITY, bibliographicEntity);
         return map;
+    }
+
+    public String convertAndValidateXml(String inputRecords, boolean checkLimit, List<Record> records) {
+        try {
+            records.addAll(convertMarcXmlToRecord(inputRecords));
+            if (checkLimit && records.size() > inputLimit) {
+                return RecapConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + inputLimit;
+            }
+        } catch (Exception e) {
+            logger.info(String.valueOf(e.getCause()));
+            logger.error(RecapCommonConstants.LOG_ERROR, e);
+            return RecapConstants.INVALID_MARC_XML_FORMAT_MESSAGE;
+        }
+        return null;
     }
 }

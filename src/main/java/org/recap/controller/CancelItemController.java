@@ -7,7 +7,6 @@ import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.CancelRequestResponse;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.model.jpa.RequestItemEntity;
 import org.recap.model.jpa.RequestStatusEntity;
 import org.recap.repository.jpa.ItemDetailsRepository;
@@ -16,6 +15,7 @@ import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.request.ItemRequestDBService;
 import org.recap.request.ItemRequestService;
+import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,16 +54,10 @@ public class CancelItemController {
     private ItemRequestService itemRequestService;
 
     @Autowired
-    private ItemStatusDetailsRepository itemStatusDetailsRepository;
-
-    @Autowired
-    private ItemDetailsRepository itemDetailsRepository;
-
-    @Autowired
-    private ItemRequestDBService itemRequestDBService;
-
-    @Autowired
     private ItemRequestServiceUtil itemRequestServiceUtil;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     /**
      * This is rest service  method, for cancel requested item.
@@ -149,25 +143,11 @@ public class CancelItemController {
 
     private void makeItemAvailableForFirstScanCancelRequest(RequestItemEntity requestItemEntity) {
         if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.LAS_REFILE_REQUEST_PLACED)) {
-            rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
+            commonUtil.rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
             itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
         }
     }
 
-    public void rollbackUpdateItemAvailabilutyStatus(ItemEntity itemEntity, String userName) {
-        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.AVAILABLE);
-        itemEntity.setItemAvailabilityStatusId(itemStatusEntity.getId()); // Available
-        itemEntity.setLastUpdatedBy(getUser(userName));
-        itemDetailsRepository.save(itemEntity);
-        saveItemChangeLogEntity(itemEntity.getItemId(), getUser(userName), RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK);
-    }
-    public String getUser(String userId) {
-        return itemRequestDBService.getUser(userId);
-    }
-
-    public void saveItemChangeLogEntity(Integer recordId, String userName, String operationType, String notes) {
-        itemRequestDBService.saveItemChangeLogEntity(recordId, userName, operationType, notes);
-    }
     private ItemHoldResponse processRecall(ItemRequestInformation itemRequestInformation, ItemInformationResponse itemInformationResponse, RequestItemEntity requestItemEntity) {
         ItemHoldResponse itemCanceHoldResponse;
         if (getHoldQueueLength(itemInformationResponse) > 0 || (itemInformationResponse.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_ON_HOLDSHELF) || itemInformationResponse.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_IN_TRANSIT_NYPL))) {

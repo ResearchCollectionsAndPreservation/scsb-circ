@@ -108,13 +108,7 @@ public class SubmitCollectionValidationService {
                 for(Map.Entry<String,ItemEntity> incomingOwningItemIdBarcodeMapEntry:incomingOwningItemIdEntityMap.entrySet()) {
                     ItemEntity incomingItemEntity = incomingOwningItemIdBarcodeMapEntry.getValue();
                     if (incomingItemEntity.getCollectionGroupId()==null) {
-                        SubmitCollectionReportInfo submitCollectionReportInfo = new SubmitCollectionReportInfo();
-                        submitCollectionReportInfo.setItemBarcode(incomingItemEntity.getBarcode());
-                        submitCollectionReportInfo.setCustomerCode(incomingItemEntity.getCustomerCode());
-                        submitCollectionReportInfo.setOwningInstitution(owningInstitution);
-                        submitCollectionReportInfo.setMessage(RecapConstants.SUBMIT_COLLECTION_FAILED_RECORD+" - "+"Unable to update dummy record, CGD is unavailable in the incoming xml record - incoming owning institution bib id - "+incomingBibliographicEntity.getOwningInstitutionBibId()
-                                +", incoming owning institution item id - "+incomingItemEntity.getOwningInstitutionItemId());
-                        failureSubmitCollectionReportInfoList.add(submitCollectionReportInfo);
+                        commonUtil.buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(incomingBibliographicEntity, failureSubmitCollectionReportInfoList, owningInstitution, incomingItemEntity);
                         isValid = false;
                         isValidToProcess &= isValid;
                     } else {

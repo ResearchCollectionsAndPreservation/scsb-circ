@@ -2,26 +2,21 @@ package org.recap.converter;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.marc4j.marc.Leader;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.CustomerCodeEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.model.marc.HoldingsMarcRecord;
 import org.recap.model.marc.ItemMarcRecord;
-import org.recap.repository.jpa.CollectionGroupDetailsRepository;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.recap.util.CommonUtil;
 import org.recap.util.DBReportUtil;
 import org.recap.util.MarcUtil;
@@ -29,12 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -58,13 +50,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
     private CommonUtil commonUtil;
 
     @Autowired
-    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
-
-    @Autowired
     private InstitutionDetailsRepository institutionDetailsRepository;
-
-    @Autowired
-    private ItemStatusDetailsRepository itemStatusDetailsRepository;
 
     @Autowired
     private CustomerCodeDetailsRepository customerCodeDetailsRepository;
@@ -72,10 +58,6 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;
 
-    private Map itemStatusMap;
-    private Map collectionGroupMap;
-    private Map institutionEntityMap;
-    
     @Override
     public Map convert(Object marcRecord, InstitutionEntity institutionEntity) {
         Map<String, Object> map = new HashMap<>();
@@ -86,8 +68,8 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         List<ItemEntity> itemEntities = new ArrayList<>();
         List<ReportEntity> reportEntities = new ArrayList<>();
 
-        getDbReportUtil().setInstitutionEntitiesMap(getInstitutionEntityMap());
-        getDbReportUtil().setCollectionGroupMap(getCollectionGroupMap());
+        getDbReportUtil().setInstitutionEntitiesMap(commonUtil.getInstitutionEntityMap());
+        getDbReportUtil().setCollectionGroupMap(commonUtil.getCollectionGroupMap());
 
         StringBuilder errorMessage = new StringBuilder();
 
@@ -134,17 +116,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
                         for (ItemMarcRecord itemMarcRecord : itemMarcRecordList) {
                             Record itemRecord = itemMarcRecord.getItemRecord();
                             Map<String, Object> itemMap = processAndValidateItemEntity(institutionEntity, holdingsCallNumber, holdingsCallNumberType, itemRecord,currentDate,errorMessage);
-                            ItemEntity itemEntity = (ItemEntity) itemMap.get("itemEntity");
-                            ReportEntity itemReportEntity = (ReportEntity) itemMap.get("itemReportEntity");
-                            if (itemReportEntity != null) {
-                                reportEntities.add(itemReportEntity);
-                            } else if (processHoldings) {
-                                if (holdingsEntity.getItemEntities() == null) {
-                                    holdingsEntity.setItemEntities(new ArrayList<>());
-                                }
-                                holdingsEntity.getItemEntities().add(itemEntity);
-                                itemEntities.add(itemEntity);
-                            }
+                            commonUtil.addItemAndReportEntities(itemEntities, reportEntities, processHoldings, holdingsEntity, itemMap);
                         }
                     }
 
@@ -229,8 +201,8 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             errorMessage.append(" Owning Institution Id cannot be null");
         }
         String collectionGroupCode = marcUtil.getDataFieldValue(itemRecord, "876", 'x');
-        if (StringUtils.isNotBlank(collectionGroupCode) && getCollectionGroupMap().containsKey(collectionGroupCode)) {
-            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(collectionGroupCode));
+        if (StringUtils.isNotBlank(collectionGroupCode) && commonUtil.getCollectionGroupMap().containsKey(collectionGroupCode)) {
+            itemEntity.setCollectionGroupId((Integer) commonUtil.getCollectionGroupMap().get(collectionGroupCode));
         }
 
         String useRestrictions = marcUtil.getDataFieldValue(itemRecord, "876", 'h');
@@ -267,69 +239,6 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
             List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcode(barcode);
             return itemEntityList.get(0).getOwningInstitutionId();
         }
-    }
-
-    /**
-     * Gets item status map.
-     *
-     * @return the item status map
-     */
-    public Map getItemStatusMap() {
-        if (null == itemStatusMap) {
-            itemStatusMap = new HashMap();
-            try {
-                Iterable<ItemStatusEntity> itemStatusEntities = itemStatusDetailsRepository.findAll();
-                for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
-                    ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
-                    itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getId());
-                }
-            } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
-            }
-        }
-        return itemStatusMap;
-    }
-
-    /**
-     * Gets collection group map.
-     *
-     * @return the collection group map
-     */
-    public Map getCollectionGroupMap() {
-        if (null == collectionGroupMap) {
-            collectionGroupMap = new HashMap();
-            try {
-                Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
-                for (Iterator iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
-                    CollectionGroupEntity collectionGroupEntity = (CollectionGroupEntity) iterator.next();
-                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getId());
-                }
-            } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
-            }
-        }
-        return collectionGroupMap;
-    }
-
-    /**
-     * Gets institution entity map.
-     *
-     * @return the institution entity map
-     */
-    public Map getInstitutionEntityMap() {
-        if (null == institutionEntityMap) {
-            institutionEntityMap = new HashMap();
-            try {
-                Iterable<InstitutionEntity> institutionEntities = institutionDetailsRepository.findAll();
-                for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
-                    InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
-                    institutionEntityMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getId());
-                }
-            } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
-            }
-        }
-        return institutionEntityMap;
     }
 
     /**

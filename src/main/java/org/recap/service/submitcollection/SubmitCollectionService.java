@@ -4,20 +4,15 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.MarcException;
 import org.marc4j.marc.Record;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.converter.MarcToBibEntityConverter;
 import org.recap.converter.SCSBToBibEntityConverter;
 import org.recap.converter.XmlToBibEntityConverterInterface;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ReportDataEntity;
-import org.recap.model.jpa.ReportEntity;
+import org.recap.model.jpa.*;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.model.submitcollection.SubmitCollectionResponse;
 import org.recap.service.common.RepositoryService;
@@ -36,13 +31,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
 import javax.xml.bind.JAXBException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by premkb on 20/12/16.
@@ -164,35 +153,29 @@ public class SubmitCollectionService {
             ,boolean isCGDProtection,InstitutionEntity institutionEntity,Set<String> updatedDummyRecordOwnInstBibIdSet) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        String format;
-        format = RecapConstants.FORMAT_MARC;
-        List<Record> records = null;
-        try {
-            records = getMarcUtil().convertMarcXmlToRecord(inputRecords);
-            if(checkLimit && records.size() > inputLimit){
-                return RecapConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + inputLimit;
-            }
-        } catch (Exception e) {
-            logger.info(String.valueOf(e.getCause()));
-            logger.error(RecapCommonConstants.LOG_ERROR,e);
-            return RecapConstants.INVALID_MARC_XML_FORMAT_MESSAGE;
-        }
-        if (CollectionUtils.isNotEmpty(records)) {
-            int count = 1;
-            Set<String> processedBarcodeSetForDummyRecords = new HashSet<>();
-            for (Record record : records) {
-                logger.info("Processing record no: {}",count);
-                BibliographicEntity bibliographicEntity = loadData(record, format, submitCollectionReportInfoMap,idMapToRemoveIndexList,isCGDProtection,institutionEntity,processedBarcodeSetForDummyRecords);
-                if (null!=bibliographicEntity && null != bibliographicEntity.getBibliographicId()) {
-                    processedBibIds.add(bibliographicEntity.getBibliographicId());
+        String format = RecapConstants.FORMAT_MARC;
+        List<Record> records = new ArrayList<>();
+        String invalidMessage = getMarcUtil().convertAndValidateXml(inputRecords, checkLimit, records);
+        if (invalidMessage == null) {
+            if (CollectionUtils.isNotEmpty(records)) {
+                int count = 1;
+                Set<String> processedBarcodeSetForDummyRecords = new HashSet<>();
+                for (Record record : records) {
+                    logger.info("Processing record no: {}", count);
+                    BibliographicEntity bibliographicEntity = loadData(record, format, submitCollectionReportInfoMap, idMapToRemoveIndexList, isCGDProtection, institutionEntity, processedBarcodeSetForDummyRecords);
+                    if (null != bibliographicEntity && null != bibliographicEntity.getBibliographicId()) {
+                        processedBibIds.add(bibliographicEntity.getBibliographicId());
+                    }
+                    logger.info("Processing completed for record no: {}", count);
+                    count++;
                 }
-                logger.info("Processing completed for record no: {}",count);
-                count ++;
             }
+            stopWatch.stop();
+            logger.info("Total time take {}", stopWatch.getTotalTimeSeconds());
+            return null;
+        } else {
+            return invalidMessage;
         }
-        stopWatch.stop();
-        logger.info("Total time take {}",stopWatch.getTotalTimeSeconds());
-        return null;
     }
 
     public String processSCSB(String inputRecords, Set<Integer> processedBibIds, Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap,

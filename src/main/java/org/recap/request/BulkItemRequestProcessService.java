@@ -14,6 +14,7 @@ import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.RequestItemEntity;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,9 @@ public class BulkItemRequestProcessService {
 
     @Autowired
     private GFAService gfaService;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     /**
      * Process bulk request item.
@@ -133,12 +137,12 @@ public class BulkItemRequestProcessService {
                     }
                 } else {
                     requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
-                    itemRequestDBService.rollbackUpdateItemAvailabilutyStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
+                    commonUtil.rollbackUpdateItemAvailabilutyStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
                     itemRequestInformation.setRequestNotes(RecapConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + itemInformationResponse.getScreenMessage());
                     itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
                 }
             } else {
-                itemRequestDBService.rollbackUpdateItemAvailabilutyStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
+                commonUtil.rollbackUpdateItemAvailabilutyStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
                 itemRequestInformation.setRequestNotes(RecapConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + RecapConstants.REQUEST_ILS_EXCEPTION + itemCheckoutResponse.getScreenMessage());
                 itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
             }

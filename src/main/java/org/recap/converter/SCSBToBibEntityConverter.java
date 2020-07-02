@@ -10,11 +10,9 @@ import org.recap.model.jaxb.Holdings;
 import org.recap.model.jaxb.Items;
 import org.recap.model.jaxb.marc.CollectionType;
 import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
@@ -28,11 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,15 +48,6 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
     private CommonUtil commonUtil;
 
     @Autowired
-    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
-
-    @Autowired
-    private InstitutionDetailsRepository institutionDetailsRepository;
-
-    @Autowired
-    private ItemStatusDetailsRepository itemStatusDetailsRepository;
-
-    @Autowired
     private MarcUtil marcUtil;
 
     /**
@@ -68,9 +55,6 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
      */
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
-    private Map itemStatusMap;
-    private Map collectionGroupMap;
-    private Map institutionEntityMap;
 
     /**
      *
@@ -86,8 +70,8 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         List<ItemEntity> itemEntities = new ArrayList<>();
         List<ReportEntity> reportEntities = new ArrayList<>();
 
-        getDbReportUtil().setInstitutionEntitiesMap(getInstitutionEntityMap());
-        getDbReportUtil().setCollectionGroupMap(getCollectionGroupMap());
+        getDbReportUtil().setInstitutionEntitiesMap(commonUtil.getInstitutionEntityMap());
+        getDbReportUtil().setCollectionGroupMap(commonUtil.getCollectionGroupMap());
 
         BibRecord bibRecord = (BibRecord) scsbRecord;
         String owningInstitutionBibId = bibRecord.getBib().getOwningInstitutionBibId();
@@ -137,17 +121,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
                         List<Record> itemRecordList = marcUtil.convertMarcXmlToRecord(itemContent);
                         for (Record itemRecord : itemRecordList) {
                             Map<String, Object> itemMap = processAndValidateItemEntity(owningInstitutionId, holdingsCallNumber, holdingsCallNumberType, itemRecord, institutionName, currentDate,errorMessage);
-                            ItemEntity itemEntity = (ItemEntity) itemMap.get("itemEntity");
-                            ReportEntity itemReportEntity = (ReportEntity) itemMap.get("itemReportEntity");
-                            if (itemReportEntity != null) {
-                                reportEntities.add(itemReportEntity);
-                            } else if (processHoldings) {
-                                if (holdingsEntity.getItemEntities() == null) {
-                                    holdingsEntity.setItemEntities(new ArrayList<>());
-                                }
-                                holdingsEntity.getItemEntities().add(itemEntity);
-                                itemEntities.add(itemEntity);
-                            }
+                            commonUtil.addItemAndReportEntities(itemEntities, reportEntities, processHoldings, holdingsEntity, itemMap);
                         }
                     }
                 }
@@ -257,8 +231,8 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
             errorMessage.append(" Owning Institution Id cannot be null");
         }
         String collectionGroupCode = marcUtil.getDataFieldValue(itemRecord, "900", 'a');
-        if (StringUtils.isNotBlank(collectionGroupCode) && getCollectionGroupMap().containsKey(collectionGroupCode)) {
-            itemEntity.setCollectionGroupId((Integer) getCollectionGroupMap().get(collectionGroupCode));
+        if (StringUtils.isNotBlank(collectionGroupCode) && commonUtil.getCollectionGroupMap().containsKey(collectionGroupCode)) {
+            itemEntity.setCollectionGroupId((Integer) commonUtil.getCollectionGroupMap().get(collectionGroupCode));
         }
 
         String useRestrictions = marcUtil.getDataFieldValue(itemRecord, "876", 'h');
@@ -280,69 +254,6 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         itemEntity.setLastUpdatedBy(RecapConstants.SUBMIT_COLLECTION);
         map.put("itemEntity", itemEntity);
         return map;
-    }
-
-    /**
-     * Gets item status map.
-     *
-     * @return the item status map
-     */
-    public Map getItemStatusMap() {
-        if (null == itemStatusMap) {
-            itemStatusMap = new HashMap();
-            try {
-                Iterable<ItemStatusEntity> itemStatusEntities = itemStatusDetailsRepository.findAll();
-                for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
-                    ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
-                    itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getId());
-                }
-            } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
-            }
-        }
-        return itemStatusMap;
-    }
-
-    /**
-     * Gets collection group map.
-     *
-     * @return the collection group map
-     */
-    public Map getCollectionGroupMap() {
-        if (null == collectionGroupMap) {
-            collectionGroupMap = new HashMap();
-            try {
-                Iterable<CollectionGroupEntity> collectionGroupEntities = collectionGroupDetailsRepository.findAll();
-                for (Iterator iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
-                    CollectionGroupEntity collectionGroupEntity = (CollectionGroupEntity) iterator.next();
-                    collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getId());
-                }
-            } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
-            }
-        }
-        return collectionGroupMap;
-    }
-
-    /**
-     * Gets institution entity map.
-     *
-     * @return the institution entity map
-     */
-    public Map getInstitutionEntityMap() {
-        if (null == institutionEntityMap) {
-            institutionEntityMap = new HashMap();
-            try {
-                Iterable<InstitutionEntity> institutionEntities = institutionDetailsRepository.findAll();
-                for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
-                    InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
-                    institutionEntityMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getId());
-                }
-            } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
-            }
-        }
-        return institutionEntityMap;
     }
 
     /**

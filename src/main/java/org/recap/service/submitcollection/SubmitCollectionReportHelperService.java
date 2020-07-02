@@ -268,13 +268,7 @@ public class SubmitCollectionReportHelperService {
                 for(Map.Entry<String,ItemEntity> incomingOwningItemIdBarcodeMapEntry:incomingOwningItemIdEntityMap.entrySet()) {
                     ItemEntity incomingItemEntity = incomingOwningItemIdBarcodeMapEntry.getValue();
                     if (incomingItemEntity.getCollectionGroupId()==null) {
-                        SubmitCollectionReportInfo submitCollectionReportInfo = new SubmitCollectionReportInfo();
-                        submitCollectionReportInfo.setItemBarcode(incomingItemEntity.getBarcode());
-                        submitCollectionReportInfo.setCustomerCode(incomingItemEntity.getCustomerCode());
-                        submitCollectionReportInfo.setOwningInstitution(owningInstitution);
-                        submitCollectionReportInfo.setMessage(RecapConstants.SUBMIT_COLLECTION_FAILED_RECORD+" - "+"Unable to update dummy record, CGD is unavailable in the incoming xml record - incoming owning institution bib id - "+incomingBibliographicEntity.getOwningInstitutionBibId()
-                                +", incoming owning institution item id - "+incomingItemEntity.getOwningInstitutionItemId());
-                        failureSubmitCollectionReportInfoList.add(submitCollectionReportInfo);
+                        commonUtil.buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(incomingBibliographicEntity, failureSubmitCollectionReportInfoList, owningInstitution, incomingItemEntity);
                     } else {
                         commonUtil.buildSubmitCollectionReportInfoAndAddFailures(fetchedBibliographicEntity, failureSubmitCollectionReportInfoList, owningInstitution, incomingHoldingItemMapEntry, incomingItemEntity);
                     }
@@ -451,14 +445,8 @@ public class SubmitCollectionReportHelperService {
                 .append(", bib count after update ").append(incomingBibliographicEntityList.size());
         List<SubmitCollectionReportInfo> successSubmitCollectionReportInfoList = submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_SUCCESS_LIST);
         List<SubmitCollectionReportInfo> rejectionSubmitCollectionReportInfoList = submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_REJECTION_LIST);
-        boolean isSuccessMessageAdded = false;
+        boolean isSuccessMessageAdded = isSuccessMessageAdded(barcode, message, successSubmitCollectionReportInfoList);
         boolean isRejectedMessageAdded = false;
-        for (SubmitCollectionReportInfo submitCollectionReportInfo : successSubmitCollectionReportInfoList) {//Added to update the success message with added bibs for bound-with items
-            if (submitCollectionReportInfo.getItemBarcode().equals(barcode)) {
-                submitCollectionReportInfo.setMessage(RecapConstants.SUBMIT_COLLECTION_SUCCESS_RECORD + RecapCommonConstants.HYPHEN + message);
-                isSuccessMessageAdded = true;
-            }
-        }
         for (SubmitCollectionReportInfo submitCollectionReportInfo : rejectionSubmitCollectionReportInfoList) {//Added to update the success message with added bibs for bound-with items
             if (submitCollectionReportInfo.getItemBarcode().equals(barcode)) {
                 submitCollectionReportInfo.setMessage(RecapConstants.SUBMIT_COLLECTION_REJECTION_RECORD + RecapCommonConstants.HYPHEN + message);
@@ -495,14 +483,8 @@ public class SubmitCollectionReportHelperService {
                 .append(unlinkedOwningInstBibIdsString).append(", bib count before update ").append(existingBibliographicEntityList.size())
                 .append(", bib count after update ").append(incomingBibliographicEntityList.size());
         List<SubmitCollectionReportInfo> successSubmitCollectionReportInfoList = submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_SUCCESS_LIST);
-        boolean isMessageAdded = false;
-        for(SubmitCollectionReportInfo submitCollectionReportInfo:successSubmitCollectionReportInfoList){
-            if(submitCollectionReportInfo.getItemBarcode().equals(barcode)){
-                submitCollectionReportInfo.setMessage(RecapConstants.SUBMIT_COLLECTION_SUCCESS_RECORD+ RecapCommonConstants.HYPHEN+message);
-                isMessageAdded = true;
-            }
-        }
-        if(!isMessageAdded){//Added to add the success message if there were no success message already for the bound-with item
+        boolean isSuccessMessageAdded = isSuccessMessageAdded(barcode, message, successSubmitCollectionReportInfoList);
+        if(!isSuccessMessageAdded){//Added to add the success message if there were no success message already for the bound-with item
             SubmitCollectionReportInfo submitCollectionReportInfo = new SubmitCollectionReportInfo();
             submitCollectionReportInfo.setItemBarcode(barcode);
             submitCollectionReportInfo.setOwningInstitution(existingItemEntity.getInstitutionEntity().getInstitutionCode());
@@ -512,6 +494,17 @@ public class SubmitCollectionReportHelperService {
 
         }
         return message.toString();
+    }
+
+    private boolean isSuccessMessageAdded(String barcode, StringBuilder message, List<SubmitCollectionReportInfo> successSubmitCollectionReportInfoList) {
+        boolean isSuccessMessageAdded = false;
+        for(SubmitCollectionReportInfo submitCollectionReportInfo:successSubmitCollectionReportInfoList){ //Added to update the success message with added bibs for bound-with items
+            if(submitCollectionReportInfo.getItemBarcode().equals(barcode)){
+                submitCollectionReportInfo.setMessage(RecapConstants.SUBMIT_COLLECTION_SUCCESS_RECORD+ RecapCommonConstants.HYPHEN+message);
+                isSuccessMessageAdded = true;
+            }
+        }
+        return isSuccessMessageAdded;
     }
 
     private List<String> getNewlyAddedOwningInstBibIdList(Map<String, BibliographicEntity> incomingBibliographicEntityMap, Map<String, BibliographicEntity> existingBibliographicEntityMap) {

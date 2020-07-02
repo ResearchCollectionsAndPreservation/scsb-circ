@@ -59,30 +59,23 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
         logger.info("inside SubmitCollectionBatchService");
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        String format;
-        format = RecapConstants.FORMAT_MARC;
-        List<Record> recordList = null;
-        try {
-            recordList = getMarcUtil().convertMarcXmlToRecord(inputRecords);
-            if(checkLimit && recordList.size() > inputLimit){
-                return RecapConstants.SUBMIT_COLLECTION_LIMIT_EXCEED_MESSAGE + inputLimit;
+        String format = RecapConstants.FORMAT_MARC;
+        List<Record> recordList = new ArrayList<>();
+        String invalidMessage = getMarcUtil().convertAndValidateXml(inputRecords, checkLimit, recordList);
+        if (invalidMessage == null) {
+            List<BibliographicEntity> validBibliographicEntityList = new ArrayList<>();
+            for(Record record:recordList){
+                BibliographicEntity bibliographicEntity = prepareBibliographicEntity(record, format, submitCollectionReportInfoMap,idMapToRemoveIndexList,isCGDProtection,institutionEntity);
+                validBibliographicEntityList.add(bibliographicEntity);
             }
-        } catch (Exception e) {
-            logger.info(String.valueOf(e.getCause()));
-            logger.error(RecapCommonConstants.LOG_ERROR,e);
-            return RecapConstants.INVALID_MARC_XML_FORMAT_MESSAGE;
+            logger.info("Total incoming marc records for processing--->{}",recordList.size());
+            processConvertedBibliographicEntityFromIncomingRecords(processedBibIds, submitCollectionReportInfoMap, idMapToRemoveIndexList, bibIdMapToRemoveIndexList, institutionEntity, updatedDummyRecordOwnInstBibIdSet, validBibliographicEntityList);
+            stopWatch.stop();
+            logger.info("Total time take for processMarc--->{}",stopWatch.getTotalTimeSeconds());
+            return null;
+        } else {
+            return invalidMessage;
         }
-
-        List<BibliographicEntity> validBibliographicEntityList = new ArrayList<>();
-        for(Record record:recordList){
-            BibliographicEntity bibliographicEntity = prepareBibliographicEntity(record, format, submitCollectionReportInfoMap,idMapToRemoveIndexList,isCGDProtection,institutionEntity);
-            validBibliographicEntityList.add(bibliographicEntity);
-        }
-        logger.info("Total incoming marc records for processing--->{}",recordList.size());
-        processConvertedBibliographicEntityFromIncomingRecords(processedBibIds, submitCollectionReportInfoMap, idMapToRemoveIndexList, bibIdMapToRemoveIndexList, institutionEntity, updatedDummyRecordOwnInstBibIdSet, validBibliographicEntityList);
-        stopWatch.stop();
-        logger.info("Total time take for processMarc--->{}",stopWatch.getTotalTimeSeconds());
-        return null;
     }
 
     private void processConvertedBibliographicEntityFromIncomingRecords(Set<Integer> processedBibIds, Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap, List<Map<String, String>> idMapToRemoveIndexList, List<Map<String, String>> bibIdMapToRemoveIndexList, InstitutionEntity institutionEntity, Set<String> updatedDummyRecordOwnInstBibIdSet, List<BibliographicEntity> validBibliographicEntityList) {

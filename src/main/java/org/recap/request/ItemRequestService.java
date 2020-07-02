@@ -36,6 +36,7 @@ import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.service.RestHeaderService;
+import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
 import org.recap.util.SecurityUtil;
 import org.slf4j.Logger;
@@ -141,6 +142,9 @@ public class ItemRequestService {
 
     @Autowired
     private SecurityUtil securityUtil;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     @Autowired
     private ItemEDDRequestService itemEDDRequestService;
@@ -642,7 +646,7 @@ public class ItemRequestService {
     }
 
     public void rollbackUpdateItemAvailabilutyStatus(ItemEntity itemEntity, String username) {
-        itemRequestDBService.rollbackUpdateItemAvailabilutyStatus(itemEntity, username);
+        commonUtil.rollbackUpdateItemAvailabilutyStatus(itemEntity, username);
     }
 
     /**
@@ -654,7 +658,7 @@ public class ItemRequestService {
      * @param notes         the notes
      */
     public void saveItemChangeLogEntity(Integer recordId, String userName, String operationType, String notes) {
-        itemRequestDBService.saveItemChangeLogEntity(recordId, userName, operationType, notes);
+        commonUtil.saveItemChangeLogEntity(recordId, userName, operationType, notes);
     }
 
     /**
@@ -664,7 +668,7 @@ public class ItemRequestService {
      * @return the user
      */
     public String getUser(String userId) {
-        return itemRequestDBService.getUser(userId);
+        return commonUtil.getUser(userId);
     }
 
     /**

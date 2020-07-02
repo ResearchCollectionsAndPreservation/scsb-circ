@@ -32,15 +32,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
  * Created by hemalathas on 17/2/17.
  */
-public class ItemEDDRequestServiceUT extends BaseTestCase{
+public class ItemEDDRequestServiceUT extends BaseTestCase {
 
     private static final Logger logger = LoggerFactory.getLogger(ItemEDDRequestServiceUT.class);
 
@@ -89,7 +87,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCase{
     public void testEddRequestItem() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
-        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE,HttpStatus.CONTINUE);
+        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
         ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
         itemRequestInfo.setItemBarcodes(Arrays.asList("23"));
         itemRequestInfo.setItemOwningInstitution("PUL");
@@ -121,26 +119,33 @@ public class ItemEDDRequestServiceUT extends BaseTestCase{
         Mockito.when(itemEDDRequestService.getItemRequestService().getGfaService().isUseQueueLasCall()).thenReturn(false);
         Mockito.when(itemEDDRequestService.getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapCommonConstants.REQUEST_STATUS_EDD)).thenReturn(1);
         Mockito.when(itemEDDRequestService.getItemRequestService().searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
-        Mockito.when(itemEDDRequestService.getItemRequestService().getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity,getSearchResultRowList())).thenCallRealMethod();
+        Mockito.when(itemEDDRequestService.getItemRequestService().getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, getSearchResultRowList())).thenCallRealMethod();
         Mockito.when(itemEDDRequestService.getItemDetailsRepository().findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
         Mockito.when(itemEDDRequestService.getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation)).thenReturn(itemResponseInformation);
-        Mockito.when(itemEDDRequestService.eddRequestItem(itemRequestInfo,exchange)).thenCallRealMethod();
-        ItemInformationResponse itemInfoResponse = itemEDDRequestService.eddRequestItem(itemRequestInfo,exchange);
+        Mockito.when(itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange)).thenCallRealMethod();
+        ItemInformationResponse itemInfoResponse = itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange);
         assertNotNull(itemInfoResponse);
-        assertEquals(itemInfoResponse.getTitleIdentifier(),"Title Of the Book");
+        assertEquals(itemInfoResponse.getTitleIdentifier(), "Title Of the Book");
+
+        String resC = itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd("CUL");
+        String resN = itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd("NYPLL");
+        String resP = itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd("PUL");
+        assertNull(resC);
+        assertNull(resN);
+        assertNull(resP);
     }
 
     @Test
-    public void checkGetterServices(){
+    public void checkGetterServices() {
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
         Mockito.when(itemEDDRequestService.getItemDetailsRepository()).thenCallRealMethod();
         Mockito.when(itemEDDRequestService.getRequestTypeDetailsRepository()).thenCallRealMethod();
         Mockito.when(itemEDDRequestService.getItemRequestService()).thenCallRealMethod();
         Mockito.when(itemEDDRequestService.getItemInformationResponse()).thenCallRealMethod();
-        assertNotEquals(itemEDDRequestService.getItemDetailsRepository(),itemDetailsRepository);
-        assertNotEquals(itemEDDRequestService.getRequestTypeDetailsRepository(),requestTypeDetailsRepository);
-        assertNotEquals(itemEDDRequestService.getItemRequestService(),itemRequestService);
-        assertNotEquals(itemEDDRequestService.getItemInformationResponse(),itemInformationResponse);
+        assertNotEquals(itemEDDRequestService.getItemDetailsRepository(), itemDetailsRepository);
+        assertNotEquals(itemEDDRequestService.getRequestTypeDetailsRepository(), requestTypeDetailsRepository);
+        assertNotEquals(itemEDDRequestService.getItemRequestService(), itemRequestService);
+        assertNotEquals(itemEDDRequestService.getItemInformationResponse(), itemInformationResponse);
     }
 
     public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
@@ -194,7 +199,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCase{
 
     }
 
-    public SearchResultRow getSearchResultRowList(){
+    public SearchResultRow getSearchResultRowList() {
         SearchResultRow searchItemResultRow = new SearchResultRow();
         searchItemResultRow.setTitle("Title Of the Book");
         searchItemResultRow.setAuthor("AuthorBook");

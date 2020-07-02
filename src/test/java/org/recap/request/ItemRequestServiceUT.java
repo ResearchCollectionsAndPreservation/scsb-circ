@@ -1,19 +1,16 @@
 package org.recap.request;
 
+import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
+import org.apache.camel.PollingConsumer;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.recap.BaseTestCase;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.model.jpa.RequestTypeEntity;
+import org.recap.model.ItemRefileRequest;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
@@ -25,9 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.text.Normalizer;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -66,11 +61,109 @@ public class ItemRequestServiceUT extends BaseTestCase {
     @Mock
     Exchange exchange;
 
-    @Test
+    @Test // Test Cases RequestIds
     public void testUpdateRecapRequestItem() throws Exception {
         BibliographicEntity bibliographicEntity = getBibliographicEntity();
         Integer response = itemRequestService.updateRecapRequestItem(getItemRequestInformation(), bibliographicEntity.getItemEntities().get(0), "REFILED");
         assertTrue(response != 0);
+        itemRequestService.getEmailService();
+        itemRequestService.getGfaService();
+        //updateItemAvailabilutyStatus
+        Random random = new Random();
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setInstitutionCode("UC");
+        institutionEntity.setInstitutionName("University of Chicago");
+        InstitutionEntity entity = institutionDetailsRepository.save(institutionEntity);
+
+        bibliographicEntity.setContent("mock Content".getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
+        bibliographicEntity.setOwningInstitutionId(entity.getId());
+        bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
+        bibliographicEntity.setCatalogingStatus("Complete");
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setContent("mock holdings".getBytes());
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
+        holdingsEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
+
+        ItemEntity itemEntity = new ItemEntity();
+        ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
+        itemStatusEntity.setStatusCode("Not Available");
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setBarcode("7020");
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("PB");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("tst");
+        itemEntity.setLastUpdatedBy("tst");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        List<ItemEntity> list = new ArrayList<ItemEntity>();
+        list.add(itemEntity);
+        try {
+            boolean status = itemRequestService.updateItemAvailabilutyStatus(list, "recap");
+            assertTrue(status);
+        } catch (Exception e) {
+        }
+        try {
+            ItemInformationResponse itemInformationResponse = itemRequestService.recallItem(getItemRequestInformation(), exchange);
+            assertNotNull(itemInformationResponse);
+        } catch (Exception e) {
+        }
+
+        ItemInformationResponse itemInformationResponse = itemRequestService.updateGFA(getItemRequestInformation(), getItemInformationResponse());
+        assertNotNull(itemInformationResponse);
+        String body = getItemInformationResponse().toString();
+        try {
+            itemRequestService.processLASRetrieveResponse(body);
+            itemRequestService.processLASEddRetrieveResponse(body);
+            itemRequestService.removeDiacritical("tests");
+        } catch (Exception e) {
+
+        }
+        try {
+            boolean bstatus = itemRequestService.executeLasitemCheck(getItemRequestInformation(), getItemInformationResponse());
+            assertTrue(bstatus);
+        } catch (Exception e) {}
+        ReplaceRequest replaceRequest = new ReplaceRequest();
+        replaceRequest.setReplaceRequestByType("RequestStatus");
+        replaceRequest.setEndRequestId("320");
+        replaceRequest.setFromDate(new Date().toString());
+        replaceRequest.setToDate(new Date().toString());
+        replaceRequest.setRequestIds("2");
+        replaceRequest.setStartRequestId("1");
+        replaceRequest.setRequestStatus("test");
+        Map<String, String> listMap = new HashMap<>();
+        listMap = itemRequestService.replaceRequestsToLASQueue(replaceRequest);
+        assertNotNull(listMap);
+
+        try { itemRequestService.sendMessageToTopic("PUL","RETRIEVAL",getItemInformationResponse(),exchange);} catch (Exception e) {}
+        try { itemRequestService.sendMessageToTopic("PUL","EDD",getItemInformationResponse(),exchange);} catch (Exception e) {}
+        try { itemRequestService.sendMessageToTopic("PUL","RECALL",getItemInformationResponse(),exchange);} catch (Exception e) {}
+        try { itemRequestService.sendMessageToTopic("PUL","BORROW DIRECT",getItemInformationResponse(),exchange);} catch (Exception e) {}
+
+        try { itemRequestService.sendMessageToTopic("CUL","RETRIEVAL",getItemInformationResponse(),exchange);} catch (Exception e) {}
+        try { itemRequestService.sendMessageToTopic("CUL","EDD",getItemInformationResponse(),exchange);} catch (Exception e) {}
+        try { itemRequestService.sendMessageToTopic("CUL","RECALL",getItemInformationResponse(),exchange);} catch (Exception e) {}
+        try { itemRequestService.sendMessageToTopic("CUL","BORROW DIRECT",getItemInformationResponse(),exchange);} catch (Exception e) {}
+
+        try { itemRequestService.sendMessageToTopic("NYPLL","RETRIEVAL",getItemInformationResponse(),exchange);} catch (Exception e) {}
+        try { itemRequestService.sendMessageToTopic("NYPLL","EDD",getItemInformationResponse(),exchange);} catch (Exception e) {}
+        try { itemRequestService.sendMessageToTopic("NYPLL","RECALL",getItemInformationResponse(),exchange);} catch (Exception e) {}
+        try { itemRequestService.sendMessageToTopic("NYPLL","BORROW DIRECT",getItemInformationResponse(),exchange);} catch (Exception e) {}
+
     }
 
     @Test
@@ -91,6 +184,29 @@ public class ItemRequestServiceUT extends BaseTestCase {
         assertNotNull(response);
     }
 
+   /* @Test
+    public void testupdateChangesToDb() {
+        itemRequestService.updateChangesToDb(getItemInformationResponse(), "test");
+        assertTrue(true);
+        try {
+            camelContext.getRouteController().startRoute(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Endpoint endpoint = camelContext.getEndpoint(RecapConstants.SUBMIT_COLLECTION_COMPLETION_QUEUE_TO);
+        PollingConsumer consumer = null;
+        try {
+            consumer = endpoint.createPollingConsumer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Exchange exchange = consumer.receive();
+
+        ItemInformationResponse itemInformationResponse = itemRequestService.recallItem(getItemRequestInformation(), exchange);
+        assertNotNull(itemInformationResponse);
+    }*/
+
     @Test
     public void testRequestItem() throws Exception {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
@@ -98,6 +214,19 @@ public class ItemRequestServiceUT extends BaseTestCase {
         itemRequestInformation.setItemBarcodes(Arrays.asList(bibliographicEntity.getItemEntities().get(0).getBarcode()));
         ItemInformationResponse response = itemRequestService.requestItem(itemRequestInformation, exchange);
         assertNotNull(response);
+        ItemRefileRequest itemRefileRequest = new ItemRefileRequest();
+        itemRefileRequest.setItemBarcodes(Arrays.asList("123"));
+        List<Integer> requestIds = new ArrayList<>();
+        requestIds.add(1);
+        requestIds.add(2);
+        itemRefileRequest.setRequestIds(requestIds);
+
+        ItemRefileResponse itemRefileResponse = new ItemRefileResponse();
+        itemRefileResponse = new ItemRefileResponse();
+        itemRefileResponse.setSuccess(false);
+        itemRefileResponse.setScreenMessage(RecapConstants.REQUEST_ITEM_BARCODE_NOT_FOUND);
+        ItemRefileResponse refileResponse = itemRequestService.reFileItem(itemRefileRequest, itemRefileResponse);
+        assertNotNull(refileResponse);
     }
 
     public ItemRequestInformation getItemRequestInformation() {
@@ -137,7 +266,7 @@ public class ItemRequestServiceUT extends BaseTestCase {
         itemInformationResponse.setItemBarcode("32101077423406");
         itemInformationResponse.setRequestType("RECALL");
         itemInformationResponse.setRequestingInstitution("CUL");
-        itemInformationResponse.setRequestId(392);
+        itemInformationResponse.setRequestId(2);
         return itemInformationResponse;
     }
 
@@ -254,5 +383,6 @@ public class ItemRequestServiceUT extends BaseTestCase {
 
 
     }
+
 
 }

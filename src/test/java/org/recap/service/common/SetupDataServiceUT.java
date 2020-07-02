@@ -37,9 +37,13 @@ public class SetupDataServiceUT extends BaseTestCase {
     @Test
     public void getInstitutionEntityMap(){
         Map<Integer,String> institutionEntityMap = setupDataService.getInstitutionIdCodeMap();
+        Map<Integer,String> institutionEntityMapId = setupDataService.getInstitutionCodeIdMap();
+        Map<Integer,String> institutionEntityMapGroup = setupDataService.getCollectionGroupMap();
         assertNotNull(institutionEntityMap);
         String institutionCode = institutionEntityMap.get(1);
         assertEquals(RecapCommonConstants.PRINCETON,institutionCode);
+        assertNotNull(institutionEntityMapId);
+        assertNotNull(institutionEntityMapGroup);
 
     }
 }

@@ -89,7 +89,7 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         return (String) jsonObject.get("access_token");
     }
 
-    @Test
+   /* @Test
     public void createRecapHoldRequest() throws Exception {
         String apiUrl = nyplDataApiUrl + "/recap/hold-requests";
         String authorization = "Bearer " + generateAccessTokenForNyplApi();
@@ -117,7 +117,7 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(responseEntity.getBody());
         CreateHoldResponse createHoldResponse = responseEntity.getBody();
         assertNotNull(createHoldResponse);
-    }
+    }*/
 
     @Test
     public void cancelRecapHoldRequest() throws Exception {
@@ -152,7 +152,7 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(cancelHoldResponse);
     }
 
-    @Test
+    /*@Test
     public void nyplBibs() throws Exception {
         String apiUrl = nyplDataApiUrl + "/recap/nypl-bibs?barcode={barcode}&customercode={customercode}";
         String authorization = "Bearer " + generateAccessTokenForNyplApi();
@@ -205,9 +205,9 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertEquals(bibRecords.getBibRecords().get(0).getHoldings().get(0).getHolding().get(0).getItems().get(0).getContent().getCollection().getRecord().get(0).getDatafield().get(0).getSubfield().get(0).getCode(), "p");
         assertNotNull(bibRecords.getBibRecords().get(0).getHoldings().get(0).getHolding().get(0).getItems().get(0).getContent().getCollection().getRecord().get(0).getDatafield().get(0).getSubfield().get(0).getValue());
         assertEquals(bibRecords.getBibRecords().get(0).getHoldings().get(0).getHolding().get(0).getItems().get(0).getContent().getCollection().getRecord().get(0).getDatafield().get(0).getSubfield().get(0).getValue(), "33433001941651");
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void checkin() throws Exception {
         String apiUrl = nyplDataApiUrl + "/checkin-requests";
         String authorization = "Bearer " + generateAccessTokenForNyplApi();
@@ -227,9 +227,9 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(responseEntity.getBody());
         CheckinResponse checkinResponse = responseEntity.getBody();
         assertNotNull(checkinResponse);
-    }
+    }*/
 
-    @Test
+   /* @Test
     public void checkout() throws Exception {
         String apiUrl = nyplDataApiUrl + "/checkout-requests";
         String authorization = "Bearer " + generateAccessTokenForNyplApi();
@@ -250,9 +250,9 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(responseEntity.getBody());
         CheckoutResponse checkoutResponse = responseEntity.getBody();
         assertNotNull(checkoutResponse);
-    }
+    }*/
 
-    @Test
+   /* @Test
     public void getCheckoutRequestById() throws Exception {
         String checkoutId = "36";
         String apiUrl = nyplDataApiUrl + "/checkout-requests/" + checkoutId;
@@ -270,9 +270,9 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(responseEntity.getBody());
         CheckoutResponse checkoutResponse = responseEntity.getBody();
         assertNotNull(checkoutResponse);
-    }
+    }*/
 
-    @Test
+   /* @Test
     public void getCheckinRequestById() throws Exception {
         String checkinId = "20";
         String apiUrl = nyplDataApiUrl + "/checkin-requests/" + checkinId;
@@ -290,9 +290,9 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(responseEntity.getBody());
         CheckinResponse checkinResponse = responseEntity.getBody();
         assertNotNull(checkinResponse);
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void getJobById() throws Exception {
         String jobId = "879591d67acdf584";
         String apiUrl = nyplDataApiUrl + "/jobs/" + jobId;
@@ -313,8 +313,8 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(jobResponse.getData().getStarted());
         assertNotNull(jobResponse.getData().getFinished());
         assertNotNull(jobResponse.getData().getSuccess());
-    }
-
+    }*/
+/*
     @Test
     public void getItemByNyplSourceAndId() throws Exception {
         String nyplSource = nyplSourceNYPL;
@@ -334,9 +334,9 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         ItemResponse itemResponse = responseEntity.getBody();
         assertEquals(id, itemResponse.getItemData().getId());
         assertNotNull(itemResponse);
-    }
+    }*/
 
-    @Test
+  /*  @Test
     public void getItems() throws Exception {
         String apiUrl = nyplDataApiUrl + "/items?limit={limit}&nyplSource={nyplSource}";
         String authorization = "Bearer " + generateAccessTokenForNyplApi();
@@ -358,9 +358,9 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(responseEntity);
         ItemsResponse itemsResponse = responseEntity.getBody();
         assertNotNull(itemsResponse);
-    }
+    }*/
 
-    @Test
+   /* @Test
     public void getPatronResponseByBarcode() throws Exception {
         String patronBarcode = "23333097542730";
         String apiUrl = nyplDataApiUrl + "/patrons?barcode=" + patronBarcode;
@@ -382,9 +382,9 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(nyplPatronResponse.getData().get(0).getBarCodes());
         assertNotNull(nyplPatronResponse.getData().get(0).getBarCodes().get(0));
         assertEquals(patronBarcode, nyplPatronResponse.getData().get(0).getBarCodes().get(0));
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void recapRecallRequest() throws Exception {
         String institutionId = "PUL";
         String itemBarcode = "33433001888415";
@@ -407,9 +407,9 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(responseEntity.getBody());
         RecallResponse recallResponse = responseEntity.getBody();
         assertNotNull(recallResponse);
-    }
+    }*/
 
-    @Test
+   /* @Test
     public void recapRefileRequest() throws Exception {
         String itemBarcode = "33433001888415";
         String apiUrl = nyplDataApiUrl + "/recap/refile-requests";
@@ -430,5 +430,5 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         assertNotNull(responseEntity.getBody());
         RefileResponse refileResponse = responseEntity.getBody();
         assertNotNull(refileResponse);
-    }
+    }*/
 }

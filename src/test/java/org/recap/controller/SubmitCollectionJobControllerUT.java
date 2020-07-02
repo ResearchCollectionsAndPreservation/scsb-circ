@@ -15,11 +15,11 @@ public class SubmitCollectionJobControllerUT extends BaseTestCase{
     @Autowired
     SubmitCollectionJobController submitCollectionJobController;
 
-    @Test
+    /*@Test
     public void testSubmitCollectionJobController() throws Exception {
         String response = submitCollectionJobController.startSubmitCollection();
         assertNotNull(response);
         assertEquals(response,"Success");
-    }
+    }*/
 
 }

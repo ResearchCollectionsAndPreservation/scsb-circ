@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
  * Created by sudhishk on 12/1/17.
  */
@@ -106,7 +108,7 @@ public class TopicConsumerUT extends BaseTestCase {
         }
     }
 
-    @Ignore
+/*    @Ignore
     @Test
     public void testMQConsumption() throws JMSException, NamingException {
         subscribeWithTopicLookup();
@@ -115,7 +117,7 @@ public class TopicConsumerUT extends BaseTestCase {
     @Test
     public void testMQBroker() throws JMSException, NamingException {
 
-    }
+    }*/
 
     public static void main(String[] args) throws NamingException {
         TopicConsumerUT subscriber = new TopicConsumerUT();
@@ -135,5 +137,6 @@ public class TopicConsumerUT extends BaseTestCase {
         } catch (UnsupportedEncodingException e) {
             logger.error("",e);
         }
+        assertNotNull(name);
     }
 }

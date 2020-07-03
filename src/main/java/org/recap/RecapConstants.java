@@ -487,4 +487,7 @@ public final class RecapConstants {
     public static final List getRequestTypeList() {
         return REQUEST_TYPE_LIST;
     }
+
+    public static final String ETL_DATA_LOAD_NAMESPACE = "http://www.loc.gov/MARC21/slim";
+
 }

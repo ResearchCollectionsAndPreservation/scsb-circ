@@ -31,8 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Created by hemalathas on 2/6/17.
@@ -120,7 +119,12 @@ public class StatusReconciliationControllerUT extends BaseTestCase{
         Mockito.when(statusReconciliationController.getItemStatusDetailsRepository().findByStatusCode(RecapConstants.ITEM_STATUS_NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(statusReconciliationController.itemStatusReconciliation()).thenCallRealMethod();
         ResponseEntity responseEntity = statusReconciliationController.itemStatusReconciliation();
+        List<Integer> requestStatusIds = new ArrayList<>();
+        requestStatusIds.add(1);
+        requestStatusIds.add(2);
+        Map<String,Integer>  data= statusReconciliationController.getTotalPageCount(requestStatusIds,1);
         assertNotNull(responseEntity);
+        assertNotNull(data);
         assertEquals(responseEntity.getBody().toString(),"Success");
     }
 
@@ -205,5 +209,17 @@ public class StatusReconciliationControllerUT extends BaseTestCase{
         assertNotNull(gfaRetrieveItemResponse.getScrenMessage());
         assertNotNull(gfaRetrieveItemResponse.isSuccess());
     }
-
+    @Test
+    public void test(){
+        statusReconciliationController.getBatchSize();
+        statusReconciliationController.getFromDate(1);
+        statusReconciliationController.getGfaService();
+        statusReconciliationController.getItemDetailsRepository();
+        statusReconciliationController.getItemStatusDetailsRepository();
+        statusReconciliationController.getProducer();
+        statusReconciliationController.getRequestItemStatusDetailsRepository();
+        statusReconciliationController.getStatusReconciliationDayLimit();
+        statusReconciliationController.getStatusReconciliationLasBarcodeLimit();
+        assertTrue(true);
+    }
 }

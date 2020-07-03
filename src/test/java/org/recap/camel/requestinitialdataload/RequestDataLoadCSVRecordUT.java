@@ -1,6 +1,5 @@
 package org.recap.camel.requestinitialdataload;
 
-import org.apache.camel.dataformat.bindy.annotation.DataField;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
@@ -11,10 +10,10 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 13/7/17.
  */
-public class RequestDataLoadCSVRecordUT extends BaseTestCase{
+public class RequestDataLoadCSVRecordUT extends BaseTestCase {
 
     @Test
-    public void testRequestDataLoadCSVRecord(){
+    public void testRequestDataLoadCSVRecord() {
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = new RequestDataLoadCSVRecord();
         requestDataLoadCSVRecord.setBarcode("332456456456745");
         requestDataLoadCSVRecord.setCustomerCode("PB");
@@ -24,10 +23,8 @@ public class RequestDataLoadCSVRecordUT extends BaseTestCase{
         requestDataLoadCSVRecord.setPatronId("0000000");
         requestDataLoadCSVRecord.setStopCode("AD");
         requestDataLoadCSVRecord.setEmail("hemalatha.s@htcindia.com");
-
         RequestDataLoadErrorCSVRecord requestDataLoadErrorCSVRecord = new RequestDataLoadErrorCSVRecord();
         requestDataLoadErrorCSVRecord.setBarcodes("3324545545344575");
-
         assertNotNull(requestDataLoadCSVRecord.getBarcode());
         assertNotNull(requestDataLoadCSVRecord.getDeliveryMethod());
         assertNotNull(requestDataLoadCSVRecord.getCreatedDate());
@@ -37,7 +34,6 @@ public class RequestDataLoadCSVRecordUT extends BaseTestCase{
         assertNotNull(requestDataLoadCSVRecord.getEmail());
         assertNotNull(requestDataLoadCSVRecord.getCustomerCode());
         assertNotNull(requestDataLoadErrorCSVRecord.getBarcodes());
-
     }
 
 }

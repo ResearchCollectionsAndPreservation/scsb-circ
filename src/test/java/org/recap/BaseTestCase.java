@@ -26,7 +26,7 @@ import java.util.Arrays;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ScsbCircApplication.class)
 @Transactional
 @Rollback()
 public class BaseTestCase {

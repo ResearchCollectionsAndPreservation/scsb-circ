@@ -210,7 +210,7 @@ public final class RecapConstants {
     public static final String GFA_STATUS_VER_ON_RET_WORK_ORDER = "VER ON RET WO:";
     public static final String GFA_STATUS_VER_ON_WORK_ORDER = "VER ON WO:";
     public static final String CANNOT_REFILE_FIRST_SCAN_REQUEST ="Cannot place recall for requests placed on first scan LAS status";
-     public static final String REQUESTS_STUCK_IN__PENDING = "Requests stuck in pending";
+    public static final String REQUESTS_STUCK_IN__PENDING = "Requests stuck in pending";
     public static final String NO_PENDING_REQUESTS_FOUND = "There are no pending requests or no new pending request";
 
     protected static final List<String> GFA_STATUS_AVAILABLE_LIST = Arrays.asList(GFA_STATUS_INCOMING_ON_WORK_ORDER, GFA_STATUS_REACC_ON_WORK_ORDER, GFA_STATUS_VER_ON_REFILE_WORK_ORDER, GFA_STATUS_IN);

@@ -1,31 +1,17 @@
 package org.recap.consumer;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.broker.TransportConnector;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.Topic;
-import javax.jms.TopicConnection;
-import javax.jms.TopicConnectionFactory;
-import javax.jms.TopicSession;
+import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.HashMap;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by sudhishk on 12/1/17.
@@ -34,13 +20,16 @@ public class TopicConsumerUT extends BaseTestCase {
 
     private final static Logger logger = LoggerFactory.getLogger(TopicConsumerUT.class);
 
-    private String topicName = "PUL.RequestT";
-    private String initialContextFactory = "org.apache.activemq.jndi.ActiveMQInitialContextFactory";
-    //    private String connectionString = "tcp://localhost:61616";
-    private String connectionString = "tcp://192.168.55.210:61616";
+    private final String topicName = "PUL.RequestT";
+    private final String initialContextFactory = "org.apache.activemq.jndi.ActiveMQInitialContextFactory";
+    private final String connectionString = "tcp://192.168.55.210:61616";
 
     private boolean messageReceived = false;
 
+    public static void main(String[] args) throws NamingException {
+        TopicConsumerUT subscriber = new TopicConsumerUT();
+        subscriber.subscribeWithTopicLookup();
+    }
 
     public void subscribeWithTopicLookup() throws NamingException {
 
@@ -48,7 +37,6 @@ public class TopicConsumerUT extends BaseTestCase {
 
         TopicConnection topicConnection = null;
         properties.put("java.naming.factory.initial", initialContextFactory);
-//        properties.put("connectionfactory.QueueConnectionFactory",connectionString);
         properties.put("connectionfactory.TopicConnectionFactory", connectionString);
         properties.put("topic." + topicName, topicName);
         try {
@@ -95,6 +83,18 @@ public class TopicConsumerUT extends BaseTestCase {
         }
     }
 
+    @Test
+    public void testStringEncoding() {
+        String name = "procès Laval | gri︠a︡dushchee : poluvekovai︠a︡ paradigma poėtiki Serebri︠a︡nogo Kikhneĭ, I. Erokhinoĭ]. Mikhaĭlovskoe čeká kat. Vilém  Soi︠u︡za preobrazovanni︠k︡h";
+        String encoded = "";
+        logger.info(name);
+        encoded = new String(name.getBytes(), StandardCharsets.ISO_8859_1);
+        String resultString = name.replaceAll("[^\\x00-\\x7F]", "?");
+        logger.info(encoded);
+        logger.info(resultString);
+        assertNotNull(name);
+    }
+
     public class TestMessageListener implements MessageListener {
         public void onMessage(Message message) {
             try {
@@ -103,37 +103,6 @@ public class TopicConsumerUT extends BaseTestCase {
             } catch (JMSException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    @Ignore
-    @Test
-    public void testMQConsumption() throws JMSException, NamingException {
-        subscribeWithTopicLookup();
-    }
-
-    @Test
-    public void testMQBroker() throws JMSException, NamingException {
-
-    }
-
-    public static void main(String[] args) throws NamingException {
-        TopicConsumerUT subscriber = new TopicConsumerUT();
-        subscriber.subscribeWithTopicLookup();
-    }
-
-    @Test
-    public void testStringEncoding(){
-        String name = "procès Laval | gri︠a︡dushchee : poluvekovai︠a︡ paradigma poėtiki Serebri︠a︡nogo Kikhneĭ, I. Erokhinoĭ]. Mikhaĭlovskoe čeká kat. Vilém  Soi︠u︡za preobrazovanni︠k︡h";
-        String encoded ="";
-        try {
-            logger.info(name);
-            encoded = new String(name.getBytes(), "ISO-8859-1");
-            String resultString = name.replaceAll("[^\\x00-\\x7F]", "?");
-            logger.info(encoded);
-            logger.info(resultString);
-        } catch (UnsupportedEncodingException e) {
-            logger.error("",e);
         }
     }
 }

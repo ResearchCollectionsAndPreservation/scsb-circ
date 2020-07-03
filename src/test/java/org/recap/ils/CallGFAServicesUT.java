@@ -104,14 +104,6 @@ public class CallGFAServicesUT extends BaseTestCase {
             ResponseEntity<String> responseEntity = restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, String.class);
             logger.info(responseEntity.getStatusCode().toString());
             logger.info(parseToJason(responseEntity.getBody()));
-//            if(responseEntity.getBody() != null && responseEntity.getBody().getRetrieveItem() != null && responseEntity.getBody().getRetrieveItem().getTtitem() != null && !responseEntity.getBody().getRetrieveItem().getTtitem().isEmpty()){
-//                logger.info(parseToJason(parseToJason(responseEntity.getBody().getRetrieveItem().getTtitem())));
-//                List<Ttitem> titemList = responseEntity.getBody().getRetrieveItem().getTtitem();
-//                for(Ttitem ttitem:titemList){
-//                    logger.info(ttitem.getErrorCode());
-//                    logger.info(ttitem.getErrorNote());
-//                }
-//            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

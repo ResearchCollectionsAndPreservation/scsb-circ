@@ -162,7 +162,7 @@ public class DailyReconciliationProcessor {
         cellStyle.setAlignment(HorizontalAlignment.LEFT);
         if(StringUtils.isNotBlank(requestId)){
             Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(Integer.valueOf(requestId));
-            if(requestItemEntity != null){
+            if(requestItemEntity.isPresent()){
                 ItemEntity itemEntity = requestItemEntity.get().getItemEntity();
                 createCell(xssfWorkbook, row,cellStyle, String.valueOf(requestItemEntity.get().getId()), 0);
                 createCell(xssfWorkbook, row,cellStyle, itemEntity.getBarcode(), 1);
@@ -180,7 +180,7 @@ public class DailyReconciliationProcessor {
     }
 
     /**
-     * Build deacession rows daily reconciliation report.
+     * Build deacession rows daily reconciliation report.R
      *
      * @param xssfWorkbook  the xssf workbook
      * @param xssfSheet     the xssf sheet

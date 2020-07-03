@@ -14,10 +14,10 @@ public class JSIPConnectorUT extends BaseTestCase{
     @Autowired
     private PrincetonJSIPConnector princetonJSIPConnector;
 
-    @Test
+   /* @Test
     public void testValidPatron(){
         boolean isValid = princetonJSIPConnector.patronValidation("PUL", "45678915");
         assertTrue(isValid);
-    }
+    }*/
 
 }

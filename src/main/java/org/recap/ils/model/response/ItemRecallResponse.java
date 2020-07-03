@@ -1,5 +1,7 @@
 package org.recap.ils.model.response;
 
+import org.recap.model.AbstractResponseItem;
+
 /**
  * Created by sudhishk on 16/12/16.
  */

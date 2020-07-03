@@ -1,5 +1,7 @@
 package org.recap.ils.model.response;
 
+import org.recap.model.AbstractResponseItem;
+
 import java.util.List;
 
 /**

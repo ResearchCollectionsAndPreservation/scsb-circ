@@ -2,13 +2,7 @@ package org.recap.service;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.model.jpa.RequestTypeEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
@@ -48,15 +42,14 @@ public class EncryptEmailAddressUT extends BaseTestCase {
     SecurityUtil securityUtil;
 
     @Test
-    public void checkEmailAddressEncryption() throws Exception{
+    public void checkEmailAddressEncryption() throws Exception {
         RequestItemEntity requestItem = createRequestItem();
         String encryptedValue = securityUtil.getEncryptedValue("test@gmail.com");
         encryptEmailAddressService.encryptEmailAddress();
         System.out.println(requestItem.getId());
         RequestItemEntity requestItemEntity = requestItemDetailsRepository.findById(requestItem.getId()).orElse(null);
-//        assertEquals(requestItemEntity.getEmailId(),encryptedValue);
         String decryptedValue = securityUtil.getDecryptedValue(encryptedValue);
-        assertEquals("test@gmail.com",decryptedValue);
+        assertEquals("test@gmail.com", decryptedValue);
     }
 
     private RequestItemEntity createRequestItem() throws Exception {
@@ -130,10 +123,8 @@ public class EncryptEmailAddressUT extends BaseTestCase {
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
-
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
-
         BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
         entityManager.refresh(savedBibliographicEntity);
         return savedBibliographicEntity;

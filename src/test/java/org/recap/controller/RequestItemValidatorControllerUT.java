@@ -50,7 +50,6 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         itemRequestInformation.setItemBarcodes(Arrays.asList(bibliographicEntity.getItemEntities().get(0).getBarcode()));
         ResponseEntity responseEntity = requestItemValidatorController.validateItemRequestInformations(itemRequestInformation);
         assertNotNull(responseEntity);
-       // assertEquals(responseEntity.getBody(), RecapCommonConstants.VALID_REQUEST);
     }
 
     @Test

@@ -31,7 +31,6 @@ public class RequestInitialDataLoadProcessorUT extends BaseTestCase {
         requestDataLoadCSVRecord.setPatronId("0000000");
         requestDataLoadCSVRecord.setStopCode("AD");
         requestDataLoadCSVRecord.setEmail("hemalatha.s@htcindia.com");
-
         requestDataLoadCSVRecord1.setBarcode("332456456456745");
         requestDataLoadCSVRecord1.setCustomerCode("PB");
         requestDataLoadCSVRecord1.setDeliveryMethod("Test");

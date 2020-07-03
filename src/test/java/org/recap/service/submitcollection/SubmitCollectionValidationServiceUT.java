@@ -1,4 +1,4 @@
-package org.recap.request;
+package org.recap.service.submitcollection;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
@@ -6,65 +6,35 @@ import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.RequestTypeEntity;
+import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
-import org.recap.repository.jpa.RequestTypeDetailsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-/**
- * Created by hemalathas on 21/2/17.
- */
-public class ItemRequestDBServiceUT extends BaseTestCase{
-
+public class SubmitCollectionValidationServiceUT extends BaseTestCase {
+    private static final Logger logger = LoggerFactory.getLogger(SubmitCollectionValidationService.class);
     @Autowired
-    ItemRequestDBService itemRequestDBService;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
+    SubmitCollectionValidationService submitCollectionValidationService;
     @Autowired
     InstitutionDetailsRepository institutionDetailRepository;
 
-    @Autowired
-    RequestTypeDetailsRepository requestTypeDetailsRepository;
-
     @Test
-    public void testUpdateRecapRequestItem() throws Exception {
-
-        String requestStatusCode = "REFILED";
-        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setExpirationDate("2017-02-21");
-        itemRequestInformation.setRequestingInstitution("NYPL");
-        itemRequestInformation.setUsername("john");
-        itemRequestInformation.setDeliveryLocation("PB");
-        itemRequestInformation.setPatronBarcode("426598712");
-        itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
-        itemRequestInformation.setRequestNotes("test");
-
-        Integer response = itemRequestDBService.updateRecapRequestItem(itemRequestInformation,saveBibSingleHoldingsSingleItem().getItemEntities().get(0),requestStatusCode, null);
-        assertNotNull(response);
-
-
-    }
-
-    public RequestTypeEntity createRequestType(){
-        RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
-        requestTypeEntity.setRequestTypeCode("Recallhold");
-        requestTypeEntity.setRequestTypeDesc("Recallhold");
-        RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
-        return savedRequestTypeEntity;
-    }
-
-    public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
+    public void test() {
+        SubmitCollectionReportInfo submitCollectionReportInfo = new SubmitCollectionReportInfo();
+        submitCollectionReportInfo.setItemBarcode("33433001888415");
+        submitCollectionReportInfo.setCustomerCode("PB");
+        submitCollectionReportInfo.setOwningInstitution("CUL");
+        submitCollectionReportInfo.setMessage("Rejection record - Only use restriction and cgd not updated because the item is in use");
+        List<SubmitCollectionReportInfo> submitCollectionReportInfoList = new ArrayList<>();
+        submitCollectionReportInfoList.add(submitCollectionReportInfo);
+        Map<String, List<SubmitCollectionReportInfo>> data = new HashMap<>();
+        data.put("Test", submitCollectionReportInfoList);
 
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("UC");
@@ -107,11 +77,23 @@ public class ItemRequestDBServiceUT extends BaseTestCase{
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+        List<BibliographicEntity> bibliographicEntityList = new ArrayList<>();
+        bibliographicEntityList.add(bibliographicEntity);
+        List<String> listholdings = new ArrayList<>();
+        listholdings.add("test1");
+        listholdings.add("test2");
+        boolean datatest = false;
+        try {
+            datatest = submitCollectionValidationService.validateIncomingEntities(data, bibliographicEntity, bibliographicEntity);
+        } catch (Exception e) {
+            logger.info("Exception" + e);
+        }
+        try {
+            submitCollectionValidationService.getOwningBibIdOwnInstHoldingsIdIfAnyHoldingMismatch(bibliographicEntityList, listholdings);
+        } catch (Exception e) {
+            logger.info("Exception" + e);
+        }
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        return savedBibliographicEntity;
-
+        assertTrue(!datatest);
     }
-
 }

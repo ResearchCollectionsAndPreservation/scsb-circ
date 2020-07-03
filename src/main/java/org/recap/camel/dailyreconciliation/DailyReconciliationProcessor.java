@@ -162,7 +162,8 @@ public class DailyReconciliationProcessor {
         cellStyle.setAlignment(HorizontalAlignment.LEFT);
         if(StringUtils.isNotBlank(requestId)){
             Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(Integer.valueOf(requestId));
-                ItemEntity itemEntity = requestItemEntity.get().getItemEntity();//get().getItemEntity();
+            if(requestItemEntity.isPresent()){
+                ItemEntity itemEntity = requestItemEntity.get().getItemEntity();
                 createCell(xssfWorkbook, row,cellStyle, String.valueOf(requestItemEntity.get().getId()), 0);
                 createCell(xssfWorkbook, row,cellStyle, itemEntity.getBarcode(), 1);
                 createCell(xssfWorkbook, row,cellStyle, itemEntity.getCustomerCode(), 2);
@@ -173,6 +174,8 @@ public class DailyReconciliationProcessor {
                 createCell(xssfWorkbook, row,cellStyle, String.valueOf(itemEntity.getInstitutionEntity().getInstitutionCode()), 8);
                 createCell(xssfWorkbook, row,cellStyle, requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode(), 9);
                 createCell(xssfWorkbook, row,cellStyle, itemEntity.getItemStatusEntity().getStatusCode(), 10);
+
+            }
         }
     }
 

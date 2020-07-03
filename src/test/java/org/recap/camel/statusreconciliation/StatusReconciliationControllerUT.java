@@ -220,7 +220,6 @@ public class StatusReconciliationControllerUT extends BaseTestCase{
         statusReconciliationController.getRequestItemStatusDetailsRepository();
         statusReconciliationController.getStatusReconciliationDayLimit();
         statusReconciliationController.getStatusReconciliationLasBarcodeLimit();
-        //statusReconciliationController.getTotalPageCount();
         assertTrue(true);
     }
 }

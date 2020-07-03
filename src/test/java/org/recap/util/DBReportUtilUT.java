@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 23/3/17.
  */
-public class DBReportUtilUT extends BaseTestCase{
+public class DBReportUtilUT extends BaseTestCase {
 
     @Autowired
     DBReportUtil dbReportUtil;
@@ -27,7 +27,7 @@ public class DBReportUtilUT extends BaseTestCase{
     @Autowired
     private MarcUtil marcUtil;
 
-    private String marcXmlContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\">\n" +
+    private final String marcXmlContent = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\">\n" +
             "<record>\n" +
             "    <leader>01011cam a2200289 a 4500</leader>\n" +
             "    <controlfield tag=\"001\">115115</controlfield>\n" +
@@ -140,12 +140,12 @@ public class DBReportUtilUT extends BaseTestCase{
 
 
     @Test
-    public void testDBReportUtil(){
+    public void testDBReportUtil() {
         List<Record> recordList = marcUtil.convertMarcXmlToRecord(marcXmlContent);
         Map<String, Integer> institutionEntitiesMap = new HashMap<>();
-        institutionEntitiesMap.put("owningInstitutionId",1);
+        institutionEntitiesMap.put("owningInstitutionId", 1);
         Map<String, Integer> collectionGroupMap = new HashMap<>();
-        collectionGroupMap.put("collectionGroupId",1);
+        collectionGroupMap.put("collectionGroupId", 1);
         dbReportUtil.setCollectionGroupMap(collectionGroupMap);
         dbReportUtil.setInstitutionEntitiesMap(institutionEntitiesMap);
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -165,12 +165,9 @@ public class DBReportUtilUT extends BaseTestCase{
         holdingsEntity.setOwningInstitutionId(1);
         holdingsEntity.setOwningInstitutionHoldingsId(".b564654654564");
 
-        List<ReportDataEntity> reportDataEntityList = dbReportUtil.generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity,holdingsEntity,itemEntity,"PUL",recordList.get(0));
+        List<ReportDataEntity> reportDataEntityList = dbReportUtil.generateBibHoldingsAndItemsFailureReportEntities(bibliographicEntity, holdingsEntity, itemEntity, "PUL", recordList.get(0));
         assertNotNull(reportDataEntityList);
         assertNotNull(dbReportUtil.getCollectionGroupMap());
         assertNotNull(dbReportUtil.getInstitutionEntitiesMap());
     }
-
-
-
 }

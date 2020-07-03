@@ -17,30 +17,24 @@ public class StatusReconciliationCSVRecordUT extends BaseTestCase {
     public void testStatusReconciliationCSVRecord(){
         StatusReconciliationCSVRecord statusReconciliationCSVRecord = new StatusReconciliationCSVRecord();
         StatusReconciliationErrorCSVRecord statusReconciliationErrorCSVRecord = new StatusReconciliationErrorCSVRecord();
-
         statusReconciliationCSVRecord.setBarcode("33245645454584");
         statusReconciliationCSVRecord.setRequestAvailability("Yes");
         statusReconciliationCSVRecord.setRequestId("1235");
         statusReconciliationCSVRecord.setStatusInScsb("OUT");
         statusReconciliationCSVRecord.setStatusInLas("IN");
         statusReconciliationCSVRecord.setDateTime(new Date().toString());
-
         statusReconciliationErrorCSVRecord.setBarcode("33245645454584");
         statusReconciliationErrorCSVRecord.setReasonForFailure("Barcode not found in LAS");
         statusReconciliationErrorCSVRecord.setInstitution("PUL");
-
         assertNotNull(statusReconciliationCSVRecord.getBarcode());
         assertNotNull(statusReconciliationCSVRecord.getRequestAvailability());
         assertNotNull(statusReconciliationCSVRecord.getRequestId());
         assertNotNull(statusReconciliationCSVRecord.getStatusInLas());
         assertNotNull(statusReconciliationCSVRecord.getStatusInScsb());
         assertNotNull(statusReconciliationCSVRecord.getDateTime());
-
         assertNotNull(statusReconciliationErrorCSVRecord.getBarcode());
         assertNotNull(statusReconciliationErrorCSVRecord.getInstitution());
         assertNotNull(statusReconciliationErrorCSVRecord.getReasonForFailure());
-
     }
-
 
 }

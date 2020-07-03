@@ -27,7 +27,6 @@ import com.pkrete.jsip2.util.MessageUtil;
 import com.pkrete.jsip2.variables.HoldMode;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
-import org.recap.ils.model.response.AbstractResponseItem;
 import org.recap.ils.model.response.ItemCheckinResponse;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemCreateBibResponse;
@@ -35,6 +34,7 @@ import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.ils.model.response.ItemRecallResponse;
 import org.recap.ils.model.response.PatronInformationResponse;
+import org.recap.model.AbstractResponseItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

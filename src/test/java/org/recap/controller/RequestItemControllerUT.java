@@ -13,12 +13,17 @@ import org.recap.ils.ColumbiaJSIPConnector;
 import org.recap.ils.JSIPConnectorFactory;
 import org.recap.ils.NyplApiConnector;
 import org.recap.ils.PrincetonJSIPConnector;
-import org.recap.ils.model.response.*;
+import org.recap.ils.model.response.AbstractResponseItem;
+import org.recap.ils.model.response.ItemCheckinResponse;
+import org.recap.ils.model.response.ItemCheckoutResponse;
+import org.recap.ils.model.response.ItemHoldResponse;
+import org.recap.ils.model.response.ItemInformationResponse;
+import org.recap.ils.model.response.ItemRecallResponse;
+import org.recap.ils.model.response.PatronInformationResponse;
 import org.recap.model.ItemRefileRequest;
 import org.recap.model.jpa.ItemRefileResponse;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.ItemResponseInformation;
-import org.recap.request.ItemRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -26,7 +31,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by hemalathas on 11/11/16.
@@ -41,12 +49,12 @@ public class RequestItemControllerUT extends BaseTestCase {
 
     @Mock
     JSIPConnectorFactory jsipConectorFactory;
-    @Mock
-    ItemRequestService itemRequestService;
+
     @Mock
     private ColumbiaJSIPConnector columbiaJSIPConnector;
     @Mock
     private PrincetonJSIPConnector princetonJSIPConnector;
+
     @Mock
     private NyplApiConnector nyplAPIConnector;
 
@@ -208,10 +216,8 @@ public class RequestItemControllerUT extends BaseTestCase {
         itemRequestInformation.setBibId("12");
         itemRequestInformation.setTrackingId("235");
         itemRequestInformation.setRequestingInstitution(callInstitition);
-
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
         itemInformationResponse.setSuccess(true);
-
         Mockito.when(requestItemController.getJsipConectorFactory()).thenReturn(jsipConectorFactory);
         Mockito.when(jsipConectorFactory.getPrincetonJSIPConnector()).thenReturn(princetonJSIPConnector);
         Mockito.when(jsipConectorFactory.getColumbiaJSIPConnector()).thenReturn(columbiaJSIPConnector);
@@ -236,11 +242,9 @@ public class RequestItemControllerUT extends BaseTestCase {
         itemRequestInformation.setBibId("12");
         itemRequestInformation.setTrackingId("235");
         itemRequestInformation.setRequestingInstitution(callInstitition);
-
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
         itemInformationResponse.setScreenMessage("Item Barcode already Exist");
         itemInformationResponse.setSuccess(true);
-
         Mockito.when(requestItemController.getJsipConectorFactory()).thenReturn(jsipConectorFactory);
         Mockito.when(jsipConectorFactory.getPrincetonJSIPConnector()).thenReturn(princetonJSIPConnector);
         Mockito.when(jsipConectorFactory.getColumbiaJSIPConnector()).thenReturn(columbiaJSIPConnector);
@@ -270,7 +274,6 @@ public class RequestItemControllerUT extends BaseTestCase {
         itemRequestInformation.setBibId("12");
         itemRequestInformation.setTrackingId("235");
         itemRequestInformation.setRequestingInstitution(callInstitition);
-
         ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         itemRecallResponse.setSuccess(true);
         Mockito.when(requestItemController.getJsipConectorFactory()).thenReturn(jsipConectorFactory);
@@ -301,10 +304,8 @@ public class RequestItemControllerUT extends BaseTestCase {
         itemRequestInformation.setBibId("12");
         itemRequestInformation.setTrackingId("235");
         itemRequestInformation.setRequestingInstitution(callInstitition);
-
         PatronInformationResponse patronInformationResponse = new PatronInformationResponse();
         patronInformationResponse.setPatronIdentifier("198572368");
-
         Mockito.when(requestItemController.getJsipConectorFactory()).thenReturn(jsipConectorFactory);
         Mockito.when(jsipConectorFactory.getPrincetonJSIPConnector()).thenReturn(princetonJSIPConnector);
         Mockito.when(jsipConectorFactory.getColumbiaJSIPConnector()).thenReturn(columbiaJSIPConnector);
@@ -319,16 +320,9 @@ public class RequestItemControllerUT extends BaseTestCase {
 
     @Test
     public void testJsonResponseParse() throws Exception {
-//        MvcResult mvcResult = this.mockMvc.perform(get("/requestItem/checkoutItem")
-//                .param("", "")
-//                .param("", "")
-//        ).andReturn();
         String strJson = "{\"patronBarcode\":null,\"itemBarcode\":\"32101095533293\",\"requestType\":null,\"deliveryLocation\":null,\"requestingInstitution\":null,\"bibliographicId\":null,\"expirationDate\":null,\"screenMessage\":\"Checkout Successful.\",\"success\":true,\"emailAddress\":null,\"startPage\":null,\"endPage\":null,\"titleIdentifier\":\"Accommodating Muslims under common law : a comparative analysis / Salim Farrar and Ghena Krayem.\",\"dueDate\":\"20170301    234500\"}";
         ObjectMapper om = new ObjectMapper();
-
         ItemResponseInformation itemResponseInformation = om.readValue(strJson, ItemResponseInformation.class);
-
-//    List<SearchResultRow> searchResultRowL=new ArrayList<>(Arrays.asList(searchResultRowAr));
         logger.info(itemResponseInformation.getScreenMessage());
 
 

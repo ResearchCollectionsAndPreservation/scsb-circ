@@ -12,6 +12,9 @@ public class NyplApiConnector extends NyplApiServiceConnector {
     @Value("${ils.newyork}")
     private String newyorkILS;
 
+    @Value("${ils.newyork.port}")
+    private int newyorkILSPort;
+
     @Value("${ils.nypl.operator.user.id}")
     private String operatorUserId;
 
@@ -21,6 +24,11 @@ public class NyplApiConnector extends NyplApiServiceConnector {
     @Override
     public String getHost() {
         return newyorkILS;
+    }
+
+    @Override
+    public int getPort() {
+        return newyorkILSPort;
     }
 
     @Override

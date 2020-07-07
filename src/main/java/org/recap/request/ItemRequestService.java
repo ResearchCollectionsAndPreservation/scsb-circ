@@ -570,11 +570,11 @@ public class ItemRequestService {
         String json = "";
         try {
             json = objectMapper.writeValueAsString(itemResponseInfo);
-            System.out.println("Topic logs : " + json);
+            logger.info("Topic logs : " + json);
         } catch (JsonProcessingException e) {
             logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
         }
-        FluentProducerTemplate fluentProducerTemplate = new DefaultFluentProducerTemplate(exchange.getContext());
+        FluentProducerTemplate fluentProducerTemplate = DefaultFluentProducerTemplate.on(exchange.getContext());
         fluentProducerTemplate
                 .to(selectTopic)
                 .withBody(json);

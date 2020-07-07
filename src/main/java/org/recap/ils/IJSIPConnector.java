@@ -15,6 +15,13 @@ public interface IJSIPConnector {
     public abstract String getHost();
 
     /**
+     * Gets port.
+     *
+     * @return the port
+     */
+    public abstract int getPort();
+
+    /**
      * Gets operator user id.
      *
      * @return the operator user id

@@ -13,6 +13,9 @@ public class PrincetonJSIPConnector extends JSIPConnector {
     @Value("${ils.princeton}")
     private String princetonILS;
 
+    @Value("${ils.princeton.port}")
+    private int princetonILSPort;
+
     @Value("${ils.princeton.operator.user.id}")
     private String operatorUserId;
 
@@ -34,6 +37,11 @@ public class PrincetonJSIPConnector extends JSIPConnector {
     @Override
     public String getHost() {
         return princetonILS;
+    }
+
+    @Override
+    public int getPort() {
+        return princetonILSPort;
     }
 
     @Override

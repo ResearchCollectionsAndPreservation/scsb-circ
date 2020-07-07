@@ -13,6 +13,9 @@ public class ColumbiaJSIPConnector extends JSIPConnector {
     @Value("${ils.columbia}")
     private String columbiaILS;
 
+    @Value("${ils.columbia.port}")
+    private int columbiaILSPort;
+
     @Value("${ils.columbia.operator.user.id}")
     private String operatorUserId;
 
@@ -34,6 +37,11 @@ public class ColumbiaJSIPConnector extends JSIPConnector {
     @Override
     public String getHost() {
         return columbiaILS;
+    }
+
+    @Override
+    public int getPort() {
+        return columbiaILSPort;
     }
 
     @Override

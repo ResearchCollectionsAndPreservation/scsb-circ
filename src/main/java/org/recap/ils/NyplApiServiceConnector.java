@@ -214,6 +214,9 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
     public abstract String getHost();
 
     @Override
+    public abstract int getPort();
+
+    @Override
     public abstract String getOperatorUserId();
 
     @Override

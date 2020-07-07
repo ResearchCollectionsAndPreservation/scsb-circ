@@ -13,13 +13,8 @@ import org.recap.ils.ColumbiaJSIPConnector;
 import org.recap.ils.JSIPConnectorFactory;
 import org.recap.ils.NyplApiConnector;
 import org.recap.ils.PrincetonJSIPConnector;
-import org.recap.ils.model.response.AbstractResponseItem;
-import org.recap.ils.model.response.ItemCheckinResponse;
-import org.recap.ils.model.response.ItemCheckoutResponse;
-import org.recap.ils.model.response.ItemHoldResponse;
-import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.ils.model.response.ItemRecallResponse;
-import org.recap.ils.model.response.PatronInformationResponse;
+import org.recap.ils.model.response.*;
+import org.recap.model.AbstractResponseItem;
 import org.recap.model.ItemRefileRequest;
 import org.recap.model.jpa.ItemRefileResponse;
 import org.recap.model.jpa.ItemRequestInformation;
@@ -31,10 +26,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by hemalathas on 11/11/16.

@@ -1,7 +1,6 @@
 package com.pkrete.jsip2.variables;
 
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
-import com.pkrete.jsip2.messages.responses.SIP2CreateBibResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

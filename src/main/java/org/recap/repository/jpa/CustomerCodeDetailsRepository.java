@@ -2,7 +2,6 @@ package org.recap.repository.jpa;
 
 
 import org.recap.model.jpa.CustomerCodeEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

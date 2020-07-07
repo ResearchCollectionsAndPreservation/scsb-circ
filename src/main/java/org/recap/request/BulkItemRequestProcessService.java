@@ -2,16 +2,12 @@ package org.recap.request;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.jpa.BulkRequestItem;
-import org.recap.model.jpa.BulkRequestItemEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.CommonUtil;
@@ -21,11 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by rajeshbabuk on 10/10/17.

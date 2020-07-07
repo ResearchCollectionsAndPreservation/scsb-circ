@@ -1,9 +1,8 @@
 package org.recap.controller;
 
 import org.apache.camel.CamelContext;
+import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapCommonConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

@@ -2,8 +2,8 @@ package org.recap.camel.statusreconciliation;
 
 import com.google.common.collect.Lists;
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.model.jpa.RequestStatusEntity;
@@ -21,11 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

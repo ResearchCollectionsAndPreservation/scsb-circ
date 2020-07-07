@@ -2,8 +2,8 @@ package org.recap.routebuilder;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.route.StartRouteProcessor;
 import org.recap.mqconsumer.RequestItemQueueConsumer;
 import org.recap.request.BulkItemRequestProcessService;

@@ -1,6 +1,5 @@
 package org.recap.model.csv;
 
-import org.apache.camel.dataformat.bindy.annotation.DataField;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 

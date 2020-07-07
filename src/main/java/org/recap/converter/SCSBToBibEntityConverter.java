@@ -2,23 +2,16 @@ package org.recap.converter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.marc.Record;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jaxb.BibRecord;
 import org.recap.model.jaxb.Holding;
 import org.recap.model.jaxb.Holdings;
 import org.recap.model.jaxb.Items;
 import org.recap.model.jaxb.marc.CollectionType;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ReportEntity;
+import org.recap.model.jpa.*;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.CollectionGroupDetailsRepository;
-import org.recap.repository.jpa.InstitutionDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.recap.util.CommonUtil;
 import org.recap.util.DBReportUtil;
 import org.recap.util.MarcUtil;
@@ -26,12 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 
 /**
  * Created by premkb on 15/12/16.

@@ -2,8 +2,8 @@ package org.recap.camel.submitcollection.processor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.model.reports.ReportDataRequest;
 import org.recap.service.common.SetupDataService;
@@ -19,11 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by premkb on 19/3/17.

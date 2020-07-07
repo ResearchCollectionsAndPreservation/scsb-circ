@@ -1,12 +1,9 @@
 package org.recap.ils.model.nypl;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.deser.Deserializers;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 

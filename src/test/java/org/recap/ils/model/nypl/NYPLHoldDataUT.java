@@ -1,6 +1,5 @@
 package org.recap.ils.model.nypl;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 

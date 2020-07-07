@@ -1,7 +1,7 @@
 package org.recap.controller;
 
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.CancelRequestResponse;
@@ -9,11 +9,8 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.RequestItemEntity;
 import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.recap.request.ItemRequestDBService;
 import org.recap.request.ItemRequestService;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;

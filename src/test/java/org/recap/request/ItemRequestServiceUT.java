@@ -1,8 +1,6 @@
 package org.recap.request;
 
-import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.PollingConsumer;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.recap.BaseTestCase;

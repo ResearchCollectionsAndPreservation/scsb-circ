@@ -1,8 +1,8 @@
 package org.recap.controller;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.service.ActiveMqQueuesInfo;
 import org.slf4j.Logger;

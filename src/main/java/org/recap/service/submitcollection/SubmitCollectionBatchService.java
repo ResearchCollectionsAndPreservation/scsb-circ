@@ -3,15 +3,15 @@ package org.recap.service.submitcollection;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.collections4.ListUtils;
 import org.marc4j.marc.Record;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
+import org.recap.model.jaxb.BibRecord;
+import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jaxb.BibRecord;
-import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.model.submitcollection.BarcodeBibliographicEntityObject;
 import org.recap.model.submitcollection.BoundWithBibliographicEntityObject;
@@ -25,12 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
 import javax.xml.bind.JAXBException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

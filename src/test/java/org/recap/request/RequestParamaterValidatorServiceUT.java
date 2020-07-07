@@ -2,8 +2,8 @@ package org.recap.request;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

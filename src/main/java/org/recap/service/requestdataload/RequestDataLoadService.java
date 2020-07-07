@@ -1,8 +1,8 @@
 package org.recap.service.requestdataload;
 
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.RequestItemEntity;
@@ -18,14 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by hemalathas on 4/5/17.

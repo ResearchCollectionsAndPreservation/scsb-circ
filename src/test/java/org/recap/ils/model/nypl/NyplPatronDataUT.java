@@ -1,12 +1,10 @@
 package org.recap.ils.model.nypl;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 

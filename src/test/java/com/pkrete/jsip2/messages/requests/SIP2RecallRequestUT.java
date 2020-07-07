@@ -1,15 +1,8 @@
 package com.pkrete.jsip2.messages.requests;
 
-import com.pkrete.jsip2.variables.HoldMode;
-import org.apache.camel.spi.AsEndpointUri;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.recap.BaseTestCase;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class SIP2RecallRequestUT extends BaseTestCase {

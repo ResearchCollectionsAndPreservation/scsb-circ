@@ -1,7 +1,6 @@
 package org.recap.ils.model.nypl;
 
 import org.junit.Test;
-import org.marc4j.marc.Subfield;
 import org.recap.BaseTestCase;
 
 import java.util.Arrays;

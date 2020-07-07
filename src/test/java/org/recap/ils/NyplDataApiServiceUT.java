@@ -7,44 +7,16 @@ import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.ils.model.nypl.CancelHoldData;
 import org.recap.ils.model.nypl.DebugInfo;
-import org.recap.ils.model.nypl.Description;
 import org.recap.ils.model.nypl.request.CancelHoldRequest;
-import org.recap.ils.model.nypl.request.CheckinRequest;
-import org.recap.ils.model.nypl.request.CheckoutRequest;
-import org.recap.ils.model.nypl.request.CreateHoldRequest;
-import org.recap.ils.model.nypl.request.RecallRequest;
-import org.recap.ils.model.nypl.request.RefileRequest;
 import org.recap.ils.model.nypl.response.CancelHoldResponse;
-import org.recap.ils.model.nypl.response.CheckinResponse;
-import org.recap.ils.model.nypl.response.CheckoutResponse;
-import org.recap.ils.model.nypl.response.CreateHoldResponse;
-import org.recap.ils.model.nypl.response.ItemResponse;
-import org.recap.ils.model.nypl.response.ItemsResponse;
-import org.recap.ils.model.nypl.response.JobResponse;
-import org.recap.ils.model.nypl.response.NyplPatronResponse;
-import org.recap.ils.model.nypl.response.RecallResponse;
-import org.recap.ils.model.nypl.response.RefileResponse;
-import org.recap.ils.model.response.BibRecords;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.client.RestTemplate;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import java.io.StringReader;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by rajeshbabuk on 2/12/16.

@@ -2,8 +2,8 @@ package org.recap.request;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BulkRequestItem;
 import org.recap.model.jpa.BulkRequestItemEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -18,12 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by rajeshbabuk on 10/10/17.

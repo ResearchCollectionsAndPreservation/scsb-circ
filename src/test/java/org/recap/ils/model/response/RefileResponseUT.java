@@ -3,7 +3,6 @@ package org.recap.ils.model.response;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ils.model.nypl.DebugInfo;
-import org.recap.ils.model.nypl.response.RecallResponse;
 import org.recap.ils.model.nypl.response.RefileResponse;
 
 import java.util.ArrayList;

@@ -8,22 +8,13 @@ import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
-import org.recap.gfa.model.GFAItemStatus;
-import org.recap.gfa.model.GFAItemStatusCheckRequest;
-import org.recap.gfa.model.GFAItemStatusCheckResponse;
-import org.recap.gfa.model.GFARetrieveItemRequest;
-import org.recap.gfa.model.RetrieveItemRequest;
-import org.recap.gfa.model.TtitemRequest;
+import org.recap.gfa.model.*;
 import org.recap.request.GFAService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -31,9 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 /**
  * Created by sudhishk on 8/12/16.

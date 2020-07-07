@@ -3,7 +3,6 @@ package org.recap.model.jaxb;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.recap.BaseTestCase;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;

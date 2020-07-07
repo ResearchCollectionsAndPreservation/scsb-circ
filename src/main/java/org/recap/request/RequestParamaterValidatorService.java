@@ -1,8 +1,8 @@
 package org.recap.request;
 
 
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.controller.ItemController;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.slf4j.Logger;

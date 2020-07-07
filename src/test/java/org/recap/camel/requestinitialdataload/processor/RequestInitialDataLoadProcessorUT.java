@@ -7,9 +7,7 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.ParseException;
 import java.util.*;
 
 import static org.junit.Assert.assertTrue;

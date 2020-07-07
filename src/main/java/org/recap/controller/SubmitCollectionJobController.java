@@ -1,12 +1,8 @@
 package org.recap.controller;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.Endpoint;
-import org.apache.camel.Exchange;
-import org.apache.camel.PollingConsumer;
-import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
+import org.apache.camel.*;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

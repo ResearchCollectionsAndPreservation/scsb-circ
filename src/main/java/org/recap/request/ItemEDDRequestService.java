@@ -2,8 +2,8 @@ package org.recap.request;
 
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;

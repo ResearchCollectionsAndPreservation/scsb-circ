@@ -2,10 +2,8 @@ package com.pkrete.jsip2.messages.responses;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class SIP2CreateBibResponseUT {
     SIP2CreateBibResponse mockSIP2CreateBibResponse;

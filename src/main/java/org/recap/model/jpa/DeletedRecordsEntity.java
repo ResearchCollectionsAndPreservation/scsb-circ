@@ -2,14 +2,8 @@ package org.recap.model.jpa;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.recap.model.jpa.AbstractEntity;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 /**

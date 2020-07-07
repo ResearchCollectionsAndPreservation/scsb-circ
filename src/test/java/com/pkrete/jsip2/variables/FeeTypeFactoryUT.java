@@ -2,7 +2,6 @@ package com.pkrete.jsip2.variables;
 
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;

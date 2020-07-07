@@ -1,10 +1,10 @@
 package org.recap.routebuilder;
 
-import org.recap.RecapCommonConstants;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.SubmitCollectionJobController;
 import org.slf4j.Logger;

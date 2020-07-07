@@ -1,7 +1,6 @@
 package org.recap.repository.jpa;
 
 import org.recap.model.jpa.DeaccessionItemChangeLog;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**

@@ -2,8 +2,8 @@ package org.recap.camel.requestinitialdataload;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

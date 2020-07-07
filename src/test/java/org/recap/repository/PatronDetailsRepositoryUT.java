@@ -2,12 +2,7 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestTypeEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;

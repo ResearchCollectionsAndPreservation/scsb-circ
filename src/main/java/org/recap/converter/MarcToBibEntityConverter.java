@@ -3,14 +3,9 @@ package org.recap.converter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.marc.Record;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.CustomerCodeEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ReportEntity;
+import org.recap.RecapConstants;
+import org.recap.model.jpa.*;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.model.marc.HoldingsMarcRecord;
 import org.recap.model.marc.ItemMarcRecord;
@@ -24,12 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 
 /**
  * Created by chenchulakshmig on 17/10/16.

@@ -1,8 +1,8 @@
 package org.recap.processor;
 
 import org.apache.camel.CamelContext;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.callable.LasItemStatusCheckPollingCallable;
 import org.recap.gfa.model.GFAItemStatusCheckResponse;
 import org.recap.repository.jpa.RequestItemDetailsRepository;

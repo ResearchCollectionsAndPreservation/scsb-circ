@@ -2,7 +2,6 @@ package org.recap.ils.model.nypl.patron;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertTrue;
 

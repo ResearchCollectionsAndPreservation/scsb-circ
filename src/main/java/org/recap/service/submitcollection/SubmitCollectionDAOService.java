@@ -1,12 +1,12 @@
 package org.recap.service.submitcollection;
 
 import org.apache.commons.collections.map.HashedMap;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemChangeLogEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.model.submitcollection.BoundWithBibliographicEntityObject;
 import org.recap.model.submitcollection.NonBoundWithBibliographicEntityObject;
@@ -21,16 +21,7 @@ import org.springframework.util.StopWatch;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

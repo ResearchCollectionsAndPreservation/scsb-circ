@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.recap.ils.model.nypl.DebugInfo;
 import org.recap.ils.model.nypl.RecallData;
+
 import java.util.List;
 
 /**

@@ -2,7 +2,6 @@ package org.recap.ils.model.response;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ils.model.nypl.response.CheckinResponse;
 import org.recap.ils.model.nypl.response.CheckoutResponse;
 
 import static org.junit.Assert.assertTrue;

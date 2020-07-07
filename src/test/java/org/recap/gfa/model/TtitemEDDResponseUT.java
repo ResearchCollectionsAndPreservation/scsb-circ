@@ -3,7 +3,6 @@ package org.recap.gfa.model;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 
-import java.sql.Time;
 import java.util.Arrays;
 import java.util.Date;
 

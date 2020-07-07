@@ -9,7 +9,6 @@ import org.recap.BaseTestCase;
 import java.util.Date;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class SIP2ItemInformationResponseParserUT extends BaseTestCase {
   @Test

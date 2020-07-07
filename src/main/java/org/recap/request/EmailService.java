@@ -1,8 +1,8 @@
 package org.recap.request;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

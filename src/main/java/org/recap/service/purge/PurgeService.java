@@ -1,7 +1,7 @@
 package org.recap.service.purge;
 
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.RequestTypeEntity;
 import org.recap.repository.jpa.AccessionDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
@@ -12,11 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hemalathas on 13/4/17.

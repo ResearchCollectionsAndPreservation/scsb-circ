@@ -1,15 +1,10 @@
 package org.recap.request;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.controller.ItemController;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.CustomerCodeEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
@@ -21,11 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 /**

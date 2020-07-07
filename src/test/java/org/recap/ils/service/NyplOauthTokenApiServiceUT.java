@@ -2,7 +2,6 @@ package org.recap.ils.service;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.ils.service.NyplOauthTokenApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 

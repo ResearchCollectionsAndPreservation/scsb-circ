@@ -2,7 +2,6 @@ package org.recap;
 
 import java.util.Arrays;
 import java.util.List;
-import org.recap.RecapCommonConstants;
 
 /**
  * Created by premkb on 19/8/16.

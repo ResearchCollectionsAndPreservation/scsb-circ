@@ -2,13 +2,7 @@ package org.recap.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.BibliographicPK;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.HoldingsPK;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemPK;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;

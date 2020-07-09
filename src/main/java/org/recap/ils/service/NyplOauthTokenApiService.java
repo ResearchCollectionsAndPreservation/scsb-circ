@@ -34,8 +34,10 @@ public class NyplOauthTokenApiService {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> requestEntity = new HttpEntity("grant_type=client_credentials", headers);
+        logger.error("REQUEST"+requestEntity);
         logger.error("NyplOAuthToken"+nyplOauthTokenApiUrl);
         ResponseEntity<String> responseEntity = restTemplate.exchange(nyplOauthTokenApiUrl, HttpMethod.POST, requestEntity, String.class);
+        logger.error("RESPONSE"+responseEntity.getBody());
         JSONObject jsonObject = new JSONObject(responseEntity.getBody());
         return (String) jsonObject.get("access_token");
     }

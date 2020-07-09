@@ -53,6 +53,8 @@ public abstract class JSIPConnector implements IJSIPConnector {
     private SIP2SocketConnection getSocketConnection() {
         SIP2SocketConnection connection = new SIP2SocketConnection(getHost(), getPort());
         try {
+            logger.info("Host: {}", getHost());
+            logger.info("Port: {}", getPort());
             connection.connect();
         } catch (Exception e) {
             logger.error(RecapCommonConstants.LOG_ERROR, e);

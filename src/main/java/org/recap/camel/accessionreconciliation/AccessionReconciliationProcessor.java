@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,14 +73,14 @@ public class AccessionReconciliationProcessor {
         HttpEntity httpEntity = new HttpEntity(barcodesAndCustomerCodes);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Map> responseEntity = restTemplate.exchange(solrSolrClientUrl+ RecapConstants.ACCESSION_RECONCILATION_SOLR_CLIENT_URL, HttpMethod.POST, httpEntity,Map.class);
-        Map<String,String> body = (HashMap<String, String>) responseEntity.getBody();
+        Map<String,String> body = responseEntity.getBody();
         String barcodesAndCustomerCodesForReportFile = body.entrySet().stream().map(Object::toString).collect(Collectors.joining("\n")).replaceAll("=","\t");
-        byte[] barcodesAndCustomerCodesForReportFileBytes =barcodesAndCustomerCodesForReportFile.getBytes(Charset.forName("UTF-8"));
+        byte[] barcodesAndCustomerCodesForReportFileBytes =barcodesAndCustomerCodesForReportFile.getBytes(StandardCharsets.UTF_8);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.BARCODE_RECONCILIATION_FILE_DATE_FORMAT);
         try {
             String line= RecapConstants.NEW_LINE;
-            byte[] newLine=line.getBytes(Charset.forName("UTF-8"));
-            Path filePath = Paths.get(accessionFilePath+"/"+institutionCode+"/"+ RecapConstants.ACCESSION_RECONCILATION_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
+            byte[] newLine=line.getBytes(StandardCharsets.UTF_8);
+            Path filePath = Paths.get(accessionFilePath+RecapCommonConstants.PATH_SEPARATOR+institutionCode+RecapCommonConstants.PATH_SEPARATOR+ RecapConstants.ACCESSION_RECONCILATION_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
             if (!filePath.toFile().exists()) {
                 Files.createDirectories(filePath.getParent());
                 Files.createFile(filePath);
@@ -102,7 +102,7 @@ public class AccessionReconciliationProcessor {
             }
         }
         catch (Exception e){
-            logger.error(RecapCommonConstants.LOG_ERROR+e);
+            logger.error(RecapCommonConstants.LOG_ERROR ,e);
         }
         startFileSystemRoutesForAccessionReconciliation(exchange,index);
     }
@@ -124,7 +124,7 @@ public class AccessionReconciliationProcessor {
                     camelContext.getRouteController().startRoute(RecapConstants.ACCESSION_RECONCILATION_FS_NYPL_ROUTE);
                 }
             } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR+e);
+                logger.error(RecapCommonConstants.LOG_ERROR, e);
             }
         }
     }

@@ -24,10 +24,10 @@ public class ActiveMqQueuesInfo {
     private static final Logger logger = LoggerFactory.getLogger(ActiveMqQueuesInfo.class);
 
     @Value("${activemq.jolokia.api.url}")
-    private String ACTIVE_MQ_API_URL;
+    private String activeMqApiUrl;
 
     @Value("${activemq.jolokia.api.queue.size.attribute}")
-    private String SEARCH_ATTRIBUTE;
+    private String searchAttribute;
 
     @Value("${activemq.web.console.url}")
     private String serviceUrl;
@@ -43,7 +43,7 @@ public class ActiveMqQueuesInfo {
                 HttpHeaders headers = new HttpHeaders();
                 headers.add("Authorization", "Basic " + getEncodedActivemqCredentials());
                 HttpEntity<String> stringHttpEntity = new HttpEntity<>(headers);
-                String searchUrl = String.format(activemqUrl + ACTIVE_MQ_API_URL + "%s" + SEARCH_ATTRIBUTE, queueName);
+                String searchUrl = String.format(activemqUrl + activeMqApiUrl + "%s" + searchAttribute, queueName);
                 ResponseEntity<String> response = new RestTemplate().exchange(searchUrl, HttpMethod.GET, stringHttpEntity, String.class);
                 QueueSizeInfoJson queueInfo = new ObjectMapper().readValue(response.getBody(), QueueSizeInfoJson.class);
                 queueSizeCount = Integer.valueOf(queueInfo.getValue());

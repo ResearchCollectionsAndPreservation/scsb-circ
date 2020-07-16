@@ -113,7 +113,7 @@ public class DailyReconciliationProcessor {
             }
         }
         catch (Exception e){
-            logger.error(RecapCommonConstants.LOG_ERROR + e);
+            logger.error(RecapCommonConstants.LOG_ERROR, e);
         }
         logger.info("fileProcessed:{}",fileName);
     }

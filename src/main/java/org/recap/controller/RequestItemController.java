@@ -26,7 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.Field;
@@ -73,7 +72,7 @@ public class RequestItemController {
      * @param callInstitition        the call institition
      * @return the abstract response item
      */
-    @RequestMapping(value = "/checkoutItem", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/checkoutItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem checkoutItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         String itemBarcode;
@@ -101,7 +100,7 @@ public class RequestItemController {
      * @param callInstitition        the call institition
      * @return the abstract response item
      */
-    @RequestMapping(value = "/checkinItem", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/checkinItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem checkinItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemCheckinResponse itemCheckinResponse;
         String itemBarcode;
@@ -133,7 +132,7 @@ public class RequestItemController {
      * @param callInstitition        the call institition
      * @return the abstract response item
      */
-    @RequestMapping(value = "/holdItem", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/holdItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem holdItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         try {
@@ -165,7 +164,7 @@ public class RequestItemController {
      * @param callInstitition        the call institition
      * @return the abstract response item
      */
-    @RequestMapping(value = "/cancelHoldItem", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/cancelHoldItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem cancelHoldItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemHoldResponse itemHoldCancelResponse = null;
         String callInst = callingInsttution(callInstitition, itemRequestInformation);
@@ -187,11 +186,11 @@ public class RequestItemController {
      * @param callInstitition        the call institition
      * @return the abstract response item
      */
-    @RequestMapping(value = "/createBib", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/createBib", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem createBibliogrphicItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemCreateBibResponse itemCreateBibResponse;
         String itemBarcode;
-        logger.info("ESIP CALL FOR CREATE BIB -> " + callInstitition);
+        logger.info("ESIP CALL FOR CREATE BIB -> {}" , callInstitition);
         String callInst = callingInsttution(callInstitition, itemRequestInformation);
         if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
             itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
@@ -218,7 +217,7 @@ public class RequestItemController {
      * @param callInstitition        the call institition
      * @return the abstract response item
      */
-    @RequestMapping(value = "/itemInformation", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/itemInformation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem itemInformation(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         AbstractResponseItem itemInformationResponse;
         String callInst = callingInsttution(callInstitition, itemRequestInformation);
@@ -234,10 +233,10 @@ public class RequestItemController {
      * @param callInstitition        the call institition
      * @return the abstract response item
      */
-    @RequestMapping(value = "/recallItem", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/recallItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem recallItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemRecallResponse itemRecallResponse;
-        logger.info("ESIP CALL FOR RECALL ITEM -> " + callInstitition);
+        logger.info("ESIP CALL FOR RECALL ITEM -> {}" , callInstitition);
         String callInst = callingInsttution(callInstitition, itemRequestInformation);
         String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
         itemRecallResponse = (ItemRecallResponse) getJsipConectorFactory().getJSIPConnector(callInst).recallItem(itembarcode, itemRequestInformation.getPatronBarcode(),
@@ -255,7 +254,7 @@ public class RequestItemController {
      * @param callInstitition        the call institition
      * @return the abstract response item
      */
-    @RequestMapping(value = "/patronInformation", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/patronInformation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem patronInformation(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         PatronInformationResponse patronInformationResponse;
         String callInst = callingInsttution(callInstitition, itemRequestInformation);
@@ -269,7 +268,7 @@ public class RequestItemController {
      * @param itemRefileRequest the item refile request
      * @return the item refile response
      */
-    @RequestMapping(value = "/refile", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/refile",  consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ItemRefileResponse refileItem(@RequestBody ItemRefileRequest itemRefileRequest) {
         ItemRefileResponse itemRefileResponse = new ItemRefileResponse();
         itemRefileResponse = getItemRequestService().reFileItem(itemRefileRequest,itemRefileResponse);
@@ -298,7 +297,7 @@ public class RequestItemController {
      * @param callInstitition        the call institition
      * @return the abstract response item
      */
-    @RequestMapping(value = "/refileItemInILS", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/refileItemInILS", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem refileItemInILS(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemRefileResponse itemRefileResponse;
         String itemBarcode;
@@ -327,7 +326,7 @@ public class RequestItemController {
      * @param replaceRequest the replace request
      * @return the string response
      */
-    @RequestMapping(value = "/replaceRequest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/replaceRequest", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, String> replaceRequest(@RequestBody ReplaceRequest replaceRequest) {
         return itemRequestService.replaceRequestsToLASQueue(replaceRequest);
     }

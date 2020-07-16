@@ -8,7 +8,7 @@ import org.recap.model.AbstractResponseItem;
 public class ItemCreateBibResponse extends AbstractResponseItem {
 
     private String bibId;
-    private String ItemId;
+    private String itemId;
 
     /**
      * Gets item id.
@@ -16,7 +16,7 @@ public class ItemCreateBibResponse extends AbstractResponseItem {
      * @return the item id
      */
     public String getItemId() {
-        return ItemId;
+        return itemId;
     }
 
     /**
@@ -25,7 +25,7 @@ public class ItemCreateBibResponse extends AbstractResponseItem {
      * @param itemId the item id
      */
     public void setItemId(String itemId) {
-        ItemId = itemId;
+        this.itemId = itemId;
     }
 
     /**

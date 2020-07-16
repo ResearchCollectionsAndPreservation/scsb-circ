@@ -36,7 +36,7 @@ public class DailyReconcilationRecord implements Serializable{
     private String requestingInst;
 
     @DataField(pos = 9 , columnName = "OwningInst")
-    private String OwningInst;
+    private String owningInst;
 
     @DataField(pos = 10 , columnName = "DeliveryMethod")
     private String deliveryMethod;
@@ -118,11 +118,11 @@ public class DailyReconcilationRecord implements Serializable{
     }
 
     public String getOwningInst() {
-        return OwningInst;
+        return owningInst;
     }
 
     public void setOwningInst(String owningInst) {
-        OwningInst = owningInst;
+        this.owningInst = owningInst;
     }
 
     public String getDeliveryMethod() {

@@ -109,8 +109,8 @@ public class SubmitCollectionProcessor {
         try {
             submitCollectionBatchService.process(institutionCode,inputXml,processedBibIds,idMapToRemoveIndexList,bibIdMapToRemoveIndexList,xmlFileName,reportRecordNumList, false, isCGDProtection,updatedBoundWithDummyRecordOwnInstBibIdSet);
             logger.info("Submit Collection : Solr indexing started for {} records", processedBibIds.size());
-            logger.info("idMapToRemoveIndex--->"+idMapToRemoveIndexList.size());
-            if (processedBibIds.size()>0) {
+            logger.info("idMapToRemoveIndex---> {}", idMapToRemoveIndexList.size());
+            if (!processedBibIds.isEmpty()) {
                 submitCollectionBatchService.indexData(processedBibIds);
                 logger.info("Submit Collection : Solr indexing completed and remove the incomplete record from solr index for {} records", idMapToRemoveIndexList.size());
             }
@@ -118,7 +118,7 @@ public class SubmitCollectionProcessor {
                 logger.info("Updated boudwith dummy record own inst bib id size-->{}",updatedBoundWithDummyRecordOwnInstBibIdSet.size());
                 submitCollectionService.indexDataUsingOwningInstBibId(new ArrayList<>(updatedBoundWithDummyRecordOwnInstBibIdSet),institutionId);
             }
-            if (idMapToRemoveIndexList.size() > 0 || bibIdMapToRemoveIndexList.size() > 0) {//remove the incomplete record from solr index
+            if (!idMapToRemoveIndexList.isEmpty() || !bibIdMapToRemoveIndexList.isEmpty()) {//remove the incomplete record from solr index
                 StopWatch stopWatchRemovingDummy = new StopWatch();
                 stopWatchRemovingDummy.start();
                 logger.info("Calling indexing to remove dummy records");
@@ -151,8 +151,8 @@ public class SubmitCollectionProcessor {
         if(exception!=null){
             String fileName = (String)exchange.getIn().getHeader(Exchange.FILE_NAME);
             String filePath = (String)exchange.getIn().getHeader(Exchange.FILE_PARENT);
-            String institutionCode=(String)exchange.getIn().getHeader(RecapCommonConstants.INSTITUTION);
-            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoadForExcepion(institutionCode,fileName,filePath,exception,exception.getMessage()), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_EXCEPTION);
+            String institutionCode1=(String)exchange.getIn().getHeader(RecapCommonConstants.INSTITUTION);
+            producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoadForExcepion(institutionCode1,fileName,filePath,exception,exception.getMessage()), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_EXCEPTION);
         }
     }
 
@@ -191,7 +191,7 @@ public class SubmitCollectionProcessor {
 
     private ReportDataRequest getReportDataRequest(String xmlFileName) {
         ReportDataRequest reportRequest = new ReportDataRequest();
-        logger.info("filename--->{}-{}", RecapCommonConstants.SUBMIT_COLLECTION_REPORT,xmlFileName);
+        logger.info("filename--->{0}-{1}", RecapCommonConstants.SUBMIT_COLLECTION_REPORT,xmlFileName);
         reportRequest.setFileName(RecapCommonConstants.SUBMIT_COLLECTION_REPORT+"-"+xmlFileName);
         reportRequest.setInstitutionCode(institutionCode.toUpperCase());
         reportRequest.setReportType(RecapCommonConstants.SUBMIT_COLLECTION_SUMMARY);

@@ -3,10 +3,9 @@ package org.recap.controller;
 import org.apache.camel.CamelContext;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
-import org.recap.RecapCommonConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,7 +24,7 @@ public class DailyReconcilationJobController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/startDailyReconcilation",method = RequestMethod.POST)
+    @PostMapping(value = "/startDailyReconcilation")
     public String statCamel() throws Exception{
         camelContext.getRouteController().startRoute(RecapConstants.DAILY_RR_FTP_ROUTE_ID);
         return RecapCommonConstants.SUCCESS;

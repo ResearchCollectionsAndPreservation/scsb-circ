@@ -4,6 +4,7 @@ import org.recap.service.purge.PurgeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +30,7 @@ public class PurgeController {
      *
      * @return the response entity
      */
-    @RequestMapping(value = "/purgeEmailAddress", method = RequestMethod.GET)
+    @GetMapping(value = "/purgeEmailAddress")
     public ResponseEntity purgeEmailAddress() {
         Map<String, String> responseMap = purgeService.purgeEmailAddress();
         return new ResponseEntity(responseMap, HttpStatus.OK);
@@ -40,7 +41,7 @@ public class PurgeController {
      *
      * @return the response entity
      */
-    @RequestMapping(value = "/purgeExceptionRequests", method = RequestMethod.GET)
+    @GetMapping(value = "/purgeExceptionRequests")
     public ResponseEntity purgeExceptionRequests() {
         Map<String, String> responseMap = purgeService.purgeExceptionRequests();
         return new ResponseEntity(responseMap, HttpStatus.OK);
@@ -51,7 +52,7 @@ public class PurgeController {
      *
      * @return the response entity
      */
-    @RequestMapping(value = "/purgeAccessionRequests", method = RequestMethod.GET)
+    @GetMapping(value = "/purgeAccessionRequests")
     public ResponseEntity purgeAccessionRequests() {
         Map<String, String> responseMap = purgeService.purgeAccessionRequests();
         return new ResponseEntity(responseMap, HttpStatus.OK);

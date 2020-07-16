@@ -1,12 +1,12 @@
 package org.recap.controller;
 
 import org.recap.RecapConstants;
-import org.recap.service.DeletedRecords.DeletedRecordsService;
+import org.recap.service.deletedrecords.DeletedRecordsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -30,7 +30,7 @@ public class ReportDeletedRecordsController {
      *
      * @return
      */
-    @RequestMapping(value = "/records", method = RequestMethod.GET)
+    @GetMapping(value = "/records")
     public ResponseEntity deletedRecords() {
         String responseMsg = (getDeletedRecordsService().deletedRecords())? RecapConstants.DELETED_RECORDS_SUCCESS_MSG : RecapConstants.DELETED_RECORDS_FAILURE_MSG;
         return new ResponseEntity(responseMsg, HttpStatus.OK);

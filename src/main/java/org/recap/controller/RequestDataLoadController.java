@@ -6,6 +6,7 @@ import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,7 @@ public class RequestDataLoadController {
     @Autowired
     CamelContext camelContext;
 
-    @RequestMapping(value = "/startRequestInitialLoad",method = RequestMethod.POST)
+    @PostMapping(value = "/startRequestInitialLoad")
     public String startAccessionReconcilation() throws Exception{
         logger.info("Request Initial DataLoad Starting.....");
         camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_PUL_FTP_ROUTE);

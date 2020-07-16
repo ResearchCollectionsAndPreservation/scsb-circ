@@ -13,7 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -48,14 +48,14 @@ public class RequestItemValidatorController {
      * @param itemRequestInformation the item request information
      * @return the response entity
      */
-    @RequestMapping(value = "/validateItemRequestInformations", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/validateItemRequestInformations", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity validateItemRequestInformations(@RequestBody ItemRequestInformation itemRequestInformation) {
-        ResponseEntity responseEntity;
+        ResponseEntity<?> responseEntity;
         responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         if (responseEntity == null) {
             responseEntity = itemValidatorService.itemValidation(itemRequestInformation);
             if (responseEntity.getStatusCode() == HttpStatus.OK && !jsipConnectorFactory.getJSIPConnector(itemRequestInformation.getRequestingInstitution()).patronValidation(itemRequestInformation.getRequestingInstitution(), itemRequestInformation.getPatronBarcode())) {
-                    responseEntity = new ResponseEntity(RecapConstants.INVALID_PATRON, requestParamaterValidatorService.getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                    responseEntity = new ResponseEntity<>(RecapConstants.INVALID_PATRON, requestParamaterValidatorService.getHttpHeaders(), HttpStatus.BAD_REQUEST);
                 }
         }
         logger.info(String.format("Request Validation: %s - %s",responseEntity.getStatusCode(), responseEntity.getBody()));
@@ -68,9 +68,9 @@ public class RequestItemValidatorController {
      * @param itemRequestInformation the item request information
      * @return the response entity
      */
-    @RequestMapping(value = "/validateItemRequest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/validateItemRequest", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity validateItemRequest(@RequestBody ItemRequestInformation itemRequestInformation) {
-        ResponseEntity responseEntity;
+        ResponseEntity<?> responseEntity;
         logger.info("Request Validation: Start");
         responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         if (responseEntity == null) {

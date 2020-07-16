@@ -9,11 +9,8 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.RequestItemEntity;
 import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.recap.request.ItemRequestDBService;
 import org.recap.request.ItemRequestService;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
@@ -21,14 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
@@ -67,17 +64,16 @@ public class CancelItemController {
      * @Exception
      *
      */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/cancel", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CancelRequestResponse cancelRequest(@RequestParam Integer requestId) {
         CancelRequestResponse cancelRequestResponse = new CancelRequestResponse();
         ItemHoldResponse itemCanceHoldResponse = null;
         try {
             Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(requestId);
-            if (requestItemEntity != null) {
+            if (requestItemEntity.isPresent()) {
                 ItemEntity itemEntity = requestItemEntity.get().getItemEntity();
-
                 ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-                itemRequestInformation.setItemBarcodes(Arrays.asList(itemEntity.getBarcode()));
+                itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
                 itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
                 itemRequestInformation.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 itemRequestInformation.setRequestingInstitution(requestItemEntity.get().getInstitutionEntity().getInstitutionCode());

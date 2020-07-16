@@ -42,7 +42,7 @@ public class StatusReconciliationEmailService {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setCc(statusReconciliationEmailCC);
         emailPayLoad.setTo(statusReconciliationEmailTo);
-        logger.info("Status Reconciliation : email sent to : {} and cc : {} ",emailPayLoad.getTo(),emailPayLoad.getCc());
+        logger.info("Status Reconciliation : email sent to : {0} and cc : {1} ",emailPayLoad.getTo(),emailPayLoad.getCc());
         emailPayLoad.setMessageDisplay("The \"Out\" Status Reconciliation report is available at the FTP location "+FileLocation);
         return emailPayLoad;
     }

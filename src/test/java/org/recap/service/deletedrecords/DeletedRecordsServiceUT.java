@@ -1,4 +1,4 @@
-package org.recap.service.DeletedRecords;
+package org.recap.service.deletedrecords;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;

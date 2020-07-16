@@ -44,7 +44,7 @@ public class LasItemStatusCheckPollingCallable implements Callable {
         gfaItemStatusCheckRequest.setItemStatus(gfaItemStatuses);
         try {
             gfaItemStatusCheckResponse = gfaService.itemStatusCheck(gfaItemStatusCheckRequest);
-            logger.info("Item Status Check Polling -> "+gfaItemStatusCheckResponse);
+            logger.info("Item Status Check Polling -> {}", gfaItemStatusCheckResponse);
             if (gfaItemStatusCheckResponse == null) {
                 Thread.sleep(pollingTimeInterval);
                 logger.info("LAS Item Status Check Polling");

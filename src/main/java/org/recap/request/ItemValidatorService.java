@@ -75,8 +75,7 @@ public class ItemValidatorService {
      */
     public ResponseEntity itemValidation(ItemRequestInformation itemRequestInformation) {
         List<ItemEntity> itemEntityList = getItemEntities(itemRequestInformation.getItemBarcodes());
-        RequestItemEntity requestItemList;
-
+        
         if (itemRequestInformation.getItemBarcodes().size() == 1) {
             if (itemEntityList != null && !itemEntityList.isEmpty()) {
                 if (!itemEntityList.isEmpty()) {
@@ -167,7 +166,7 @@ public class ItemValidatorService {
     public String getItemStatus(Integer itemAvailabilityStatusId) {
         String status = "";
         Optional<ItemStatusEntity> itemStatusEntity = itemStatusDetailsRepository.findById(itemAvailabilityStatusId);
-        if (itemStatusEntity != null) {
+        if (itemStatusEntity.isPresent()) {
             status = itemStatusEntity.get().getStatusCode();
         }
         return status;
@@ -251,10 +250,6 @@ public class ItemValidatorService {
 
     private boolean checkRequestItemStatus(String barcode, String requestItemStatus) {
         RequestItemEntity requestItemList = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(barcode, requestItemStatus);
-        if (requestItemList != null && requestItemList.getId() > 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return (requestItemList != null && requestItemList.getId() > 0);
     }
 }

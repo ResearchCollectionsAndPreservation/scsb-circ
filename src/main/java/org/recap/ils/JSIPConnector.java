@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -78,8 +79,8 @@ public abstract class JSIPConnector implements IJSIPConnector {
             }
             if (connection.connect()) {
                 login = new SIP2LoginRequest(getOperatorUserId(), getOperatorPassword(), getOperatorLocation());
-                logger.error("username ="+getOperatorUserId());
-                logger.error("password = "+getOperatorPassword());
+                logger.error("username = {}", getOperatorUserId());
+                logger.error("password = {}", getOperatorPassword());
                 SIP2LoginResponse loginResponse = (SIP2LoginResponse) connection.send(login);
                 SIP2PatronInformationRequest request = new SIP2PatronInformationRequest(patronIdentifier);
                 SIP2PatronInformationResponse response = (SIP2PatronInformationResponse) connection.send(request);
@@ -318,7 +319,7 @@ public abstract class JSIPConnector implements IJSIPConnector {
                             itemCheckinResponse.setHoldPatronName(checkinResponse.getHoldPatronName());
                         } else {
                             logger.info(RecapConstants.CHECK_IN_REQUEST_FAILED);
-                            logger.info("Response -> " + checkinResponse.getData());
+                            logger.info("Response -> {}" , checkinResponse.getData());
                         }
                         itemCheckinResponse.setScreenMessage((!checkinResponse.getScreenMessage().isEmpty()) ? checkinResponse.getScreenMessage().get(0) : "");
                         itemCheckinResponse.setSuccess(checkinResponse.isOk());
@@ -371,7 +372,7 @@ public abstract class JSIPConnector implements IJSIPConnector {
                         holdRequest.setBibId(bibId);
                         holdRequest.setPickupLocation(pickupLocation);
 
-                        logger.info("Request Hold -> " + holdRequest.getData());
+                        logger.info("Request Hold -> {}" , holdRequest.getData());
                         itemHoldResponse.setEsipDataIn(holdRequest.getData());
                         holdResponse = (SIP2HoldResponse) connection.send(holdRequest);
                         itemHoldResponse.setEsipDataOut(holdResponse.getData());
@@ -386,8 +387,8 @@ public abstract class JSIPConnector implements IJSIPConnector {
                         itemHoldResponse.setPatronIdentifier(holdResponse.getPatronIdentifier());
                         itemHoldResponse.setBibId(holdResponse.getBibId());
                         itemHoldResponse.setQueuePosition(holdResponse.getQueuePosition());
-                        itemHoldResponse.setLCCN(holdResponse.getLccn());
-                        itemHoldResponse.setISBN(holdResponse.getIsbn());
+                        itemHoldResponse.setLccn(holdResponse.getLccn());
+                        itemHoldResponse.setIsbn(holdResponse.getIsbn());
                         itemHoldResponse.setAvailable(holdResponse.isAvailable());
                     } else {
                         itemHoldResponse.setSuccess(false);
@@ -402,11 +403,11 @@ public abstract class JSIPConnector implements IJSIPConnector {
         } catch (InvalidSIP2ResponseException e) {
             logger.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
             holdResponse = new SIP2HoldResponse("");
-            holdResponse.setScreenMessage(java.util.Arrays.asList(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE));
+            holdResponse.setScreenMessage(Collections.singletonList(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE));
         } catch (InvalidSIP2ResponseValueException e) {
             logger.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
             holdResponse = new SIP2HoldResponse("");
-            holdResponse.setScreenMessage(java.util.Arrays.asList(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE));
+            holdResponse.setScreenMessage(Collections.singletonList(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE));
         } finally {
             connection.close();
         }
@@ -429,7 +430,7 @@ public abstract class JSIPConnector implements IJSIPConnector {
                     SIP2PatronInformationResponse response = (SIP2PatronInformationResponse) connection.send(request);
                     if (response.isValidPatron() && response.isValidPatronPassword()) {
                         SIP2CreateBibRequest createBibRequest = new SIP2CreateBibRequest(patronIdentifier, titleIdentifier, itemIdentifier);
-                        logger.info("Request Create -> " + createBibRequest.getData());
+                        logger.info("Request Create -> {} " , createBibRequest.getData());
                         itemCreateBibResponse.setEsipDataIn(createBibRequest.getData());
                         createBibResponse = (SIP2CreateBibResponse) connection.send(createBibRequest);
                         itemCreateBibResponse.setEsipDataOut(createBibResponse.getData());
@@ -568,7 +569,7 @@ public abstract class JSIPConnector implements IJSIPConnector {
                         recallRequest.setBibId(bibId);
                         recallRequest.setPickupLocation(pickupLocation);
 
-                        logger.info("Request Recall -> " + recallRequest.getData());
+                        logger.info("Request Recall -> {} " , recallRequest.getData());
                         itemRecallResponse.setEsipDataIn(recallRequest.getData());
                         sip2RecallResponse = (SIP2RecallResponse) connection.send(recallRequest);
                         itemRecallResponse.setEsipDataOut(sip2RecallResponse.getData());

@@ -5,7 +5,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
-import org.recap.service.DeletedRecords.DeletedRecordsService;
+import org.recap.service.deletedrecords.DeletedRecordsService;
 import org.springframework.http.ResponseEntity;
 
 import static org.junit.Assert.assertEquals;

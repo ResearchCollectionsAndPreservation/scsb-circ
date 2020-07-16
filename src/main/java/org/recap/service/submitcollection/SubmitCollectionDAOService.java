@@ -21,16 +21,7 @@ import org.springframework.util.StopWatch;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -77,12 +68,10 @@ public class SubmitCollectionDAOService {
             , Set<Integer> processedBibIds, List<Map<String, String>> idMapToRemoveIndexList, Set<String> processedBarcodeSetForDummyRecords) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        List<String> incomingItemBarcodeList = new ArrayList<>();
-        incomingItemBarcodeList.addAll(getBarcodeSetFromNonBoundWithBibliographicEntity(nonBoundWithBibliographicEntityObjectList));
+        List<String> incomingItemBarcodeList = new ArrayList<>(getBarcodeSetFromNonBoundWithBibliographicEntity(nonBoundWithBibliographicEntityObjectList));
         Map<String,ItemEntity> incomingBarcodeItemEntityMapFromBibliographicEntityList = getBarcodeItemEntityMapFromNonBoundWithBibliographicEntityList(nonBoundWithBibliographicEntityObjectList);
         List<ItemEntity> fetchedItemEntityList = getItemEntityListUsingBarcodeList(incomingItemBarcodeList, owningInstitutionId);
-        List<String> fetchedItemBarcodeList = new ArrayList<>();
-        fetchedItemBarcodeList.addAll(getBarcodeSetFromItemEntityList(fetchedItemEntityList));
+        List<String> fetchedItemBarcodeList = new ArrayList<>(getBarcodeSetFromItemEntityList(fetchedItemEntityList));
         Map<String, ItemEntity> fetchedBarcodeItemEntityMap = getBarcodeItemEntityMap(fetchedItemEntityList);
         Map<String,Map<String,BibliographicEntity>> fetchedBarcodeBibliographicEntityMap = getBarcodeBibliographicEntityMap(fetchedItemEntityList);
         List<BibliographicEntity> updatedBibliographicEntityList = new ArrayList<>();
@@ -96,7 +85,8 @@ public class SubmitCollectionDAOService {
                         List<BibliographicEntity> fetchedBibliographicEntityList = fetchedItemEntity.getBibliographicEntities();
                         for (BibliographicEntity fetchedBibliographicEntity : fetchedBibliographicEntityList) {
                             Map<String,BibliographicEntity> fetchedOwnInstBibIdBibliographicEntityMap = fetchedBarcodeBibliographicEntityMap.get(incomingItemEntity.getBarcode());
-                            if (fetchedOwnInstBibIdBibliographicEntityMap != null && fetchedOwnInstBibIdBibliographicEntityMap.containsKey(incomingBibliographicEntity.getOwningInstitutionBibId())) {//TODO need to check the if condition, remove the condition if not required
+                            if (fetchedOwnInstBibIdBibliographicEntityMap != null && fetchedOwnInstBibIdBibliographicEntityMap.containsKey(incomingBibliographicEntity.getOwningInstitutionBibId())) {
+                                //TODO need to check the if condition, remove the condition if not required
                                 if (fetchedBibliographicEntity.getOwningInstitutionBibId().equals(incomingBibliographicEntity.getOwningInstitutionBibId())) {//update existing record
                                     BibliographicEntity updatedBibliographicEntity = updateExistingRecordToEntityObject(fetchedBibliographicEntity, incomingBibliographicEntity, submitCollectionReportInfoMap, processedBibIds,itemChangeLogEntityList);
                                     if (updatedBibliographicEntity != null) {
@@ -115,23 +105,23 @@ public class SubmitCollectionDAOService {
                                 submitCollectionReportHelperService.setSubmitCollectionReportInfoForOwningInstitutionBibIdMismatch(fetchedBibliographicEntity, incomingBibliographicEntity, submitCollectionReportInfoMap);
                             }
                         }
-                    } else if(isExistingItemABoundWith){//Error message when existing is a bound-with item and incoming is a single volume
-                        String barcode = fetchedItemEntity.getBarcode();
-                        String customerCode = fetchedItemEntity.getCustomerCode();
-                        String owningInstitution = fetchedItemEntity.getInstitutionEntity().getInstitutionCode();
-                        String existingBoundWithOwnInstBibIds = submitCollectionHelperService.getBibliographicIdsInString(fetchedItemEntity.getBibliographicEntities());
-                        StringBuilder message = new StringBuilder();
-                        message.append(RecapConstants.SUBMIT_COLLECTION_FAILED_RECORD).append(RecapCommonConstants.HYPHEN).append("Existing record is a bound-with, incoming record is a Single volume, ").append("incoming owning institution item id ")
-                        .append(incomingItemEntity.getOwningInstitutionItemId()).append(", incoming owning institution holdings id ").append(incomingBibliographicEntity.getHoldingsEntities().get(0).getOwningInstitutionHoldingsId())
-                        .append(", owning institution bib id ").append(incomingBibliographicEntity.getOwningInstitutionBibId()).append(", existing owning institution item id ")
-                        .append(fetchedItemEntity.getOwningInstitutionItemId()).append(", existing owning institution holdings id ").append(fetchedItemEntity.getHoldingsEntities().get(0).getOwningInstitutionHoldingsId())
-                        .append("' existing owning institution bib ids ").append(existingBoundWithOwnInstBibIds);
-                        submitCollectionReportHelperService.setSubmitCollectionReportInfo(submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),
-                                barcode,customerCode,owningInstitution,message.toString());
+                    } else if(isExistingItemABoundWith && fetchedItemEntity != null){//Error message when existing is a bound-with item and incoming is a single volume
+                            String barcode = fetchedItemEntity.getBarcode();
+                            String customerCode = fetchedItemEntity.getCustomerCode();
+                            String owningInstitution = fetchedItemEntity.getInstitutionEntity().getInstitutionCode();
+                            String existingBoundWithOwnInstBibIds = submitCollectionHelperService.getBibliographicIdsInString(fetchedItemEntity.getBibliographicEntities());
+                            StringBuilder message = new StringBuilder();
+                            message.append(RecapConstants.SUBMIT_COLLECTION_FAILED_RECORD).append(RecapCommonConstants.HYPHEN).append("Existing record is a bound-with, incoming record is a Single volume, ").append("incoming owning institution item id ")
+                                    .append(incomingItemEntity.getOwningInstitutionItemId()).append(", incoming owning institution holdings id ").append(incomingBibliographicEntity.getHoldingsEntities().get(0).getOwningInstitutionHoldingsId())
+                                    .append(", owning institution bib id ").append(incomingBibliographicEntity.getOwningInstitutionBibId()).append(", existing owning institution item id ")
+                                    .append(fetchedItemEntity.getOwningInstitutionItemId()).append(", existing owning institution holdings id ").append(fetchedItemEntity.getHoldingsEntities().get(0).getOwningInstitutionHoldingsId())
+                                    .append("' existing owning institution bib ids ").append(existingBoundWithOwnInstBibIds);
+                            submitCollectionReportHelperService.setSubmitCollectionReportInfo(submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),
+                                    barcode, customerCode, owningInstitution, message.toString());
+                        }
                     }
                 }
             }
-        }
         prepareExceptionReport(incomingItemBarcodeList,fetchedItemBarcodeList,incomingBarcodeItemEntityMapFromBibliographicEntityList,submitCollectionReportInfoMap);
         stopWatch.stop();
         saveUpdatedBibliographicEntityListAndItemChangeLogList(updatedBibliographicEntityList,itemChangeLogEntityList);
@@ -156,12 +146,10 @@ public class SubmitCollectionDAOService {
             , Set<Integer> processedBibIds, List<Map<String, String>> idMapToRemoveIndexList, List<Map<String, String>> bibIdMapToRemoveIndexList, Set<String> processedBarcodeSetForDummyRecords) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        List<String> incomingItemBarcodeList = new ArrayList<>();
-        incomingItemBarcodeList.addAll(getBarcodeSetFromBoundWithBibliographicEntity(boundWithBibliographicEntityObjectList));
+        List<String> incomingItemBarcodeList = new ArrayList<>(getBarcodeSetFromBoundWithBibliographicEntity(boundWithBibliographicEntityObjectList));
         Map<String,ItemEntity> incomingBarcodeItemEntityMapFromBibliographicEntityList = getBarcodeItemEntityMapFromBoundWithBibliographicEntityList(boundWithBibliographicEntityObjectList);
         List<ItemEntity> fetchedItemEntityList = getItemEntityListUsingBarcodeList(incomingItemBarcodeList, owningInstitutionId);
-        List<String> fetchedItemBarcodeList = new ArrayList<>();
-        fetchedItemBarcodeList.addAll(getBarcodeSetFromItemEntityList(fetchedItemEntityList));
+        List<String> fetchedItemBarcodeList = new ArrayList<>(getBarcodeSetFromItemEntityList(fetchedItemEntityList));
         Map<String, ItemEntity> fetchedBarcodeItemEntityMap = getBarcodeItemEntityMap(fetchedItemEntityList);
         List<BibliographicEntity> updatedBibliographicEntityList = new ArrayList<>();
         List<ItemChangeLogEntity> itemChangeLogEntityList = new ArrayList<>();
@@ -194,17 +182,11 @@ public class SubmitCollectionDAOService {
     }
 
     private boolean isSingleVolumeToBoundWith(Integer existingBibCount,Integer incomingBibCountForBoundWithItem){
-        if(existingBibCount == 1 && (incomingBibCountForBoundWithItem > existingBibCount)){
-            return true;
-        }
-        return false;
+        return (existingBibCount == 1 && (incomingBibCountForBoundWithItem > existingBibCount));
     }
 
     private boolean isBoundWithBibIncreased(Integer existingBibCount,Integer incomingBibCountForBoundWithItem){
-        if(existingBibCount > 1 && (incomingBibCountForBoundWithItem > existingBibCount)){
-            return true;
-        }
-        return false;
+        return (existingBibCount > 1 && (incomingBibCountForBoundWithItem > existingBibCount));
     }
 
     private void iterateAndUpdateBoundWithItems(Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap, Set<Integer> processedBibIds,
@@ -352,7 +334,7 @@ public class SubmitCollectionDAOService {
                 } else {
                     if(fetchedItemEntity.getBarcode().equals(barcode)){
                         fetchedBibliographicEntity.getItemEntities().remove(fetchedItemEntity);
-                        if(fetchedBibliographicEntity.getItemEntities().size()==0){//when there is no item linked to the bib then bib is made as deleted
+                        if(fetchedBibliographicEntity.getItemEntities().isEmpty()) {//when there is no item linked to the bib then bib is made as deleted
                             fetchedBibliographicEntity.setDeleted(true);
                         }
                         Set<String> owningInstHoldingIdSet = fetchedItemEntity.getHoldingsEntities().stream().map(HoldingsEntity::getOwningInstitutionHoldingsId).collect(Collectors.toSet());
@@ -376,7 +358,7 @@ public class SubmitCollectionDAOService {
                 Map<String, String> idMapToRemoveIndex = new HashMap<>();
                 idMapToRemoveIndex.put(RecapCommonConstants.HOLDING_ID, String.valueOf(holdingsEntity.getHoldingsId()));
                 idMapToRemoveIndex.put(RecapCommonConstants.ITEM_ID, String.valueOf(itemId));
-                idMapToRemoveIndex.put(RecapCommonConstants.ROOT, String.valueOf(fetchedBibliographicEntity.getOwningInstitutionId() + fetchedBibliographicEntity.getOwningInstitutionBibId()));
+                idMapToRemoveIndex.put(RecapCommonConstants.ROOT, fetchedBibliographicEntity.getOwningInstitutionId() + fetchedBibliographicEntity.getOwningInstitutionBibId());
                 idMapToRemoveIndexList.add(idMapToRemoveIndex);
                 logger.info("Added id to remove from solr - holding id - {}, item id - {}, root - {}", holdingsEntity.getHoldingsId(), itemId, fetchedBibliographicEntity.getOwningInstitutionId() + fetchedBibliographicEntity.getOwningInstitutionBibId());
                 holdingsEntityIterator.remove();
@@ -393,8 +375,7 @@ public class SubmitCollectionDAOService {
                 }
             } catch (Exception e) {
                 logger.error("Exception while saving non bound with batch ");
-                logger.info(RecapCommonConstants.LOG_ERROR,e);
-                e.printStackTrace();
+                logger.error(RecapCommonConstants.LOG_ERROR,e);
             }
         }
     }
@@ -434,7 +415,7 @@ public class SubmitCollectionDAOService {
                 boolean isBarcodeAlreadyAdded = submitCollectionReportHelperService.isBarcodeAlreadyAdded(incomingBarcode,submitCollectionReportInfoMap);
                 if(!isBarcodeAlreadyAdded){
                     ItemEntity unavailableItemEntity = incomingBarcodeItemEntityMapFromBibliographicEntityList.get(incomingBarcode);
-                    addExceptionReport(Arrays.asList(unavailableItemEntity), submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_EXCEPTION_RECORD);
+                    addExceptionReport(Collections.singletonList(unavailableItemEntity), submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_EXCEPTION_RECORD);
                 }
             }
         }
@@ -446,9 +427,8 @@ public class SubmitCollectionDAOService {
      * @param itemEntityList the item entity list
      * @return the barcode set from item entity list
      */
-    public Collection<? extends String> getBarcodeSetFromItemEntityList(List<ItemEntity> itemEntityList) {
-        Set<String> barcodeList = itemEntityList.stream().map(ItemEntity::getBarcode).collect(Collectors.toSet());
-        return barcodeList;
+    public Collection<String> getBarcodeSetFromItemEntityList(List<ItemEntity> itemEntityList) {
+        return itemEntityList.stream().map(ItemEntity::getBarcode).collect(Collectors.toSet());
     }
 
     /**
@@ -759,18 +739,17 @@ public class SubmitCollectionDAOService {
             ItemEntity fetchedItemEntity = fetchedBarcodeItemEntityMap.get(incomingBarcodeItemEntityMapEntry.getKey());
             logger.info("Processing barcode--->{}",incomingItemEntity.getBarcode());
             if(fetchedItemEntity != null){
-                if (fetchedItemEntity.getOwningInstitutionItemId().equalsIgnoreCase(incomingItemEntity.getOwningInstitutionItemId())) {
-                    if (fetchedItemEntity.getBarcode().equals(incomingItemEntity.getBarcode())) {
-                        if(!isDeAccessionedItem(fetchedItemEntity)) {
-                            copyItemEntity(fetchedItemEntity, incomingItemEntity, updatedItemEntityList);
-                            isAnyValidItemToUpdate = true;
-                        } else {//add exception report for deaccession record
-                            addExceptionReport(Arrays.asList(incomingItemEntity),submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_DEACCESSION_EXCEPTION_RECORD);
-                        }
+                if (fetchedItemEntity.getOwningInstitutionItemId().equalsIgnoreCase(incomingItemEntity.getOwningInstitutionItemId())
+                      && fetchedItemEntity.getBarcode().equals(incomingItemEntity.getBarcode())) {
+                    if(!isDeAccessionedItem(fetchedItemEntity)) {
+                        copyItemEntity(fetchedItemEntity, incomingItemEntity, updatedItemEntityList);
+                        isAnyValidItemToUpdate = true;
+                    } else {//add exception report for deaccession record
+                        addExceptionReport(Collections.singletonList(incomingItemEntity),submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_DEACCESSION_EXCEPTION_RECORD);
                     }
                 }
             } else {//Add to exception report when barcode is unavailable
-                addExceptionReport(Arrays.asList(incomingItemEntity),submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_EXCEPTION_RECORD);
+                addExceptionReport(Collections.singletonList(incomingItemEntity),submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_EXCEPTION_RECORD);
             }
         }
 
@@ -852,18 +831,17 @@ public class SubmitCollectionDAOService {
             ItemEntity fetchedItemEntity = fetchedBarcodeItemEntityMap.get(incomingBarcodeItemEntityMapEntry.getKey());
             logger.info("Processing barcode--->{}",incomingItemEntity.getBarcode());
             if(fetchedItemEntity != null){
-                if (fetchedItemEntity.getOwningInstitutionItemId().equalsIgnoreCase(incomingItemEntity.getOwningInstitutionItemId())) {
-                    if (fetchedItemEntity.getBarcode().equals(incomingItemEntity.getBarcode()) && !barcodeHavingMismatchHoldingsId.contains(incomingItemEntity.getBarcode())) {
-                        if(!isDeAccessionedItem(fetchedItemEntity)) {
-                                copyItemEntity(fetchedItemEntity, incomingItemEntity, updatedItemEntityList);
-                                isAnyValidItemToUpdate = true;
-                        } else {//add exception report for deaccession record
-                            addExceptionReport(Arrays.asList(incomingItemEntity),submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_DEACCESSION_EXCEPTION_RECORD);
-                        }
+                if (fetchedItemEntity.getOwningInstitutionItemId().equalsIgnoreCase(incomingItemEntity.getOwningInstitutionItemId()) &&
+                     (fetchedItemEntity.getBarcode().equals(incomingItemEntity.getBarcode()) && !barcodeHavingMismatchHoldingsId.contains(incomingItemEntity.getBarcode()))) {
+                    if(!isDeAccessionedItem(fetchedItemEntity)) {
+                            copyItemEntity(fetchedItemEntity, incomingItemEntity, updatedItemEntityList);
+                            isAnyValidItemToUpdate = true;
+                    } else {//add exception report for deaccession record
+                        addExceptionReport(Collections.singletonList(incomingItemEntity),submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_DEACCESSION_EXCEPTION_RECORD);
                     }
                 }
             } else {//Add to exception report when barcode is unavailable
-                addExceptionReport(Arrays.asList(incomingItemEntity),submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_EXCEPTION_RECORD);
+                addExceptionReport(Collections.singletonList(incomingItemEntity),submitCollectionReportInfoMap, RecapConstants.SUBMIT_COLLECTION_EXCEPTION_RECORD);
             }
         }
         fetchBibliographicEntity.setHoldingsEntities(fetchedHoldingsEntityList);
@@ -1043,8 +1021,7 @@ public class SubmitCollectionDAOService {
     }
 
     private List<ItemChangeLogEntity> prepareItemChangeLogEntity(String operationType, String message, List<ItemEntity> itemEntityList) {
-        List<ItemChangeLogEntity> itemChangeLogEntityList = getItemChangeLogEntities(operationType, message, itemEntityList);
-        return itemChangeLogEntityList;
+        return getItemChangeLogEntities(operationType, message, itemEntityList);
     }
 
     private ItemChangeLogEntity prepareItemChangeLogEntity(String operationType, String message, Integer itemId) {
@@ -1099,7 +1076,7 @@ public class SubmitCollectionDAOService {
         fetchBibliographicEntity.setContent(bibliographicEntity.getContent());
         fetchBibliographicEntity.setLastUpdatedBy(bibliographicEntity.getLastUpdatedBy());
         fetchBibliographicEntity.setLastUpdatedDate(bibliographicEntity.getLastUpdatedDate());
-        logger.info("updating existing bib - owning inst bibid - "+fetchBibliographicEntity.getOwningInstitutionBibId());
+        logger.info("updating existing bib - owning inst bibid - {} ", fetchBibliographicEntity.getOwningInstitutionBibId());
         return fetchBibliographicEntity;
     }
 
@@ -1130,7 +1107,7 @@ public class SubmitCollectionDAOService {
         fetchItemEntity.setVolumePartYear(itemEntity.getVolumePartYear());
 
         fetchItemEntity.setCgdProtection(itemEntity.isCgdProtection());
-        logger.info("updating existing barcode - "+fetchItemEntity.getBarcode());
+        logger.info("updating existing barcode - {}", fetchItemEntity.getBarcode());
         itemEntityList.add(fetchItemEntity);
         return fetchItemEntity;
     }

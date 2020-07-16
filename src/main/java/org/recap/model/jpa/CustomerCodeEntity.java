@@ -12,6 +12,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by rajeshbabuk on 18/10/16.
@@ -57,7 +58,7 @@ public class CustomerCodeEntity extends CustomerCodeAbstractEntity  implements C
 
         CustomerCodeEntity customerCodeEntity = (CustomerCodeEntity) object;
 
-        if (id != null ? !id.equals(customerCodeEntity.id) : customerCodeEntity.id != null)
+        if (!Objects.equals(id, customerCodeEntity.id))
             return false;
         if (getCustomerCode() != null ? !getCustomerCode().equals(customerCodeEntity.getCustomerCode()) : customerCodeEntity.getCustomerCode() != null)
             return false;

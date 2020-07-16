@@ -6,8 +6,8 @@ import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,10 +25,10 @@ public class AccessionReconcilationJobController {
     /**
      * This method is used for generating report by, comparing LAS(ReCAP) barcodes and SCSB barcodes. The LAS barcodes are send to SCSB as CVS files, in specific FTP folder.
      * The barcodes are physically seprated by institution. This method will initiate the comparison of all the three institution at the same time.
-     * @return
+     * @return String
      * @throws Exception
      */
-    @RequestMapping(value = "/startAccessionReconcilation",method = RequestMethod.POST)
+    @PostMapping(value = "/startAccessionReconcilation")
     public String startAccessionReconcilation() throws Exception{
         logger.info("Starting Accession Reconcilation Routes");
         camelContext.getRouteController().startRoute(RecapConstants.ACCESSION_RECONCILATION_FTP_PUL_ROUTE);

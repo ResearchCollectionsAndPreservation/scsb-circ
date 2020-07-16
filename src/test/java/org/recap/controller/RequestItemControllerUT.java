@@ -13,7 +13,7 @@ import org.recap.ils.ColumbiaJSIPConnector;
 import org.recap.ils.JSIPConnectorFactory;
 import org.recap.ils.NyplApiConnector;
 import org.recap.ils.PrincetonJSIPConnector;
-import org.recap.ils.model.response.AbstractResponseItem;
+import org.recap.model.AbstractResponseItem;
 import org.recap.ils.model.response.ItemCheckinResponse;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemHoldResponse;

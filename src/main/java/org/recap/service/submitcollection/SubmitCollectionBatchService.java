@@ -26,7 +26,7 @@ import org.springframework.util.StopWatch;
 
 import javax.xml.bind.JAXBException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -123,9 +123,9 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
                         splitedHoldingsEntity.setCreatedDate(holdingsEntity.getCreatedDate());
                         splitedHoldingsEntity.setLastUpdatedBy(holdingsEntity.getLastUpdatedBy());
                         splitedHoldingsEntity.setLastUpdatedDate(holdingsEntity.getLastUpdatedDate());
-                        splitedHoldingsEntity.setItemEntities(Arrays.asList(itemEntity));
-                        splitedBibliographicEntity.setHoldingsEntities(Arrays.asList(splitedHoldingsEntity));
-                        splitedBibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+                        splitedHoldingsEntity.setItemEntities(Collections.singletonList(itemEntity));
+                        splitedBibliographicEntity.setHoldingsEntities(Collections.singletonList(splitedHoldingsEntity));
+                        splitedBibliographicEntity.setItemEntities(Collections.singletonList(itemEntity));
                         splitedBibliographicEntityList.add(splitedBibliographicEntity);
                     }
                 }
@@ -307,15 +307,13 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
     }
 
     private Map<String,List<BarcodeBibliographicEntityObject>> groupByBarcodeAndGetBarcodeBibliographicEntityObjectMap(List<BarcodeBibliographicEntityObject> barcodeOwningInstitutionBibIdObjectList){
-        Map<String,List<BarcodeBibliographicEntityObject>> groupByBarcodeOwningInstitutionBibIdObjectMap = barcodeOwningInstitutionBibIdObjectList.stream()
+        return barcodeOwningInstitutionBibIdObjectList.stream()
                 .collect(Collectors.groupingBy(BarcodeBibliographicEntityObject::getBarcode));
-        return groupByBarcodeOwningInstitutionBibIdObjectMap;
     }
 
     private Map<String,List<BibliographicEntity>> groupByOwnInstBibIdBibliographicEntityListMap(List<BibliographicEntity> bibliographicEntityList){
-        Map<String,List<BibliographicEntity>> groupByOwnInstBibIdBibliographicEntityListMap = bibliographicEntityList.stream()
+        return bibliographicEntityList.stream()
                 .collect(Collectors.groupingBy(BibliographicEntity::getOwningInstitutionBibId));
-        return  groupByOwnInstBibIdBibliographicEntityListMap;
     }
     private Map<String,List<BibliographicEntity>> groupByBarcodeBibliographicEntityListMap(List<BibliographicEntity> bibliographicEntityList){
         Map<String,List<BibliographicEntity>> groupByBarcodeBibliographicEntityListMap = new HashedMap();
@@ -326,7 +324,7 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
                 updatedBibliographicEntityList.add(bibliographicEntity);
                 groupByBarcodeBibliographicEntityListMap.put(bibliographicEntity.getItemEntities().get(0).getBarcode(),updatedBibliographicEntityList);
             } else {
-                groupByBarcodeBibliographicEntityListMap.put(bibliographicEntity.getItemEntities().get(0).getBarcode(),Arrays.asList(bibliographicEntity));
+                groupByBarcodeBibliographicEntityListMap.put(bibliographicEntity.getItemEntities().get(0).getBarcode(), Collections.singletonList(bibliographicEntity));
             }
         }
         return groupByBarcodeBibliographicEntityListMap;

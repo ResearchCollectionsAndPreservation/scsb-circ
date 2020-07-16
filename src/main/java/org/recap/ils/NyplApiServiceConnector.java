@@ -54,7 +54,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -210,7 +210,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         return new CancelHoldRequest();
     }
 
-    @Override
+    /*@Override
     public abstract String getHost();
 
     @Override
@@ -224,7 +224,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
 
     @Override
     public abstract String getOperatorLocation();
-
+*/
     /**
      * Look up item in NYPL for the given item identifier.
      *
@@ -244,7 +244,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
 
             HttpHeaders headers = getHttpHeader();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
             headers.set("Authorization", authorization);
 
             HttpEntity requestEntity = getHttpEntity(headers);
@@ -276,18 +276,18 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         try {
             String apiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_CHECKOUT_REQUEST_URL;
-            logger.error("API URL ="+apiUrl);
+            logger.error("API URL = {}" , apiUrl);
             CheckoutRequest checkoutRequest = getCheckOutRequest();
             checkoutRequest.setPatronBarcode(patronIdentifier);
             checkoutRequest.setItemBarcode(itemIdentifier);
             checkoutRequest.setDesiredDateDue(getNyplApiResponseUtil().getExpirationDateForNypl());
 
-            logger.error("CHECKOUT REQUEST"+checkoutRequest);
+            logger.error("CHECKOUT REQUEST {}", checkoutRequest);
             HttpEntity<CheckoutRequest> requestEntity = new HttpEntity(checkoutRequest, getHttpHeaders());
-            logger.error("CHECKOUT REQUEST ENTITY = " +requestEntity);
+            logger.error("CHECKOUT REQUEST ENTITY = {}" , requestEntity);
             ResponseEntity<CheckoutResponse> responseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, CheckoutResponse.class);
             CheckoutResponse checkoutResponse = responseEntity.getBody();
-            logger.error("CHECKOUT RESPONSE"+checkoutResponse);
+            logger.error("CHECKOUT RESPONSE {}" , checkoutResponse);
             itemCheckoutResponse = getNyplApiResponseUtil().buildItemCheckoutResponse(checkoutResponse);
             CheckoutData checkoutData = checkoutResponse.getData();
             if (null != checkoutData) {
@@ -340,7 +340,6 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
             CheckinRequest checkinRequest = getCheckInRequest();
             checkinRequest.setItemBarcode(itemIdentifier);
 
-            RestTemplate restTemplate = new RestTemplate();
             HttpEntity<CheckinRequest> requestEntity = new HttpEntity(checkinRequest, getHttpHeaders());
             ResponseEntity<CheckinResponse> responseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, CheckinResponse.class);
             CheckinResponse checkinResponse = responseEntity.getBody();
@@ -411,7 +410,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
             createHoldRequest.setPatronBarcode(patronIdentifier);
             Description description = new Description();
             String titleIdentifier = title.replace("[" + RecapConstants.REQUEST_USE_RESTRICTIONS + "]", "[" + RecapConstants.NYPL_NO_RESTRICTIONS + "]");
-            logger.info("Nypl title identifier : " + titleIdentifier);
+            logger.info("Nypl title identifier : {} " , titleIdentifier);
             description.setTitle(titleIdentifier);
             description.setAuthor(author);
             description.setCallNumber(callNumber);
@@ -437,8 +436,8 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                     JobData jobData = jobResponse.getData();
                     if (null != jobData) {
                         itemHoldResponse.setSuccess(jobData.getSuccess());
-                        getLogger().info("Hold Finished -> " + jobData.getFinished());
-                        getLogger().info("Hold Success -> " + jobData.getSuccess());
+                        getLogger().info("Hold Finished -> {}" , jobData.getFinished());
+                        getLogger().info("Hold Success -> {}" , jobData.getSuccess());
                         getLogger().info(statusMessage);
                     } else {
                         itemHoldResponse.setSuccess(false);
@@ -501,8 +500,8 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                 JobData jobData = jobResponse.getData();
                 if (null != jobData) {
                     itemHoldResponse.setSuccess(jobData.getSuccess());
-                    getLogger().info("Cancel hold Finished -> " + jobData.getFinished());
-                    getLogger().info("Cancel hold Success -> " + jobData.getSuccess());
+                    getLogger().info("Cancel hold Finished -> {}" , jobData.getFinished());
+                    getLogger().info("Cancel hold Success -> {}" , jobData.getSuccess());
                     getLogger().info(statusMessage);
                 } else {
                     itemHoldResponse.setSuccess(false);
@@ -532,7 +531,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
      */
     public JobResponse queryForJob(String jobId) throws Exception {
         String apiUrl = nyplDataApiUrl + "/jobs/" + jobId;
-        getLogger().info("NYPL job url :" + apiUrl );
+        getLogger().info("NYPL job url : {}" , apiUrl );
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = new HttpEntity(getHttpHeaders());
         ResponseEntity<JobResponse> jobResponseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, JobResponse.class);
@@ -564,7 +563,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         String authorization = "Bearer " + getNyplOauthTokenApiService().generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.set("Authorization", authorization);
         return headers;
     }
@@ -631,7 +630,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
      */
     private NyplPatronResponse queryForPatronResponse(String patronIdentifier) throws Exception {
         String apiUrl = nyplDataApiUrl + RecapConstants.NYPL_PATRON_BY_BARCODE_URL + patronIdentifier;
-        getLogger().info("NYPL patron response url :" + apiUrl );
+        getLogger().info("NYPL patron response url : {}" , apiUrl );
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = new HttpEntity(getHttpHeaders());
         ResponseEntity<NyplPatronResponse> jobResponseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, NyplPatronResponse.class);
@@ -691,8 +690,8 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                 JobData jobData = jobResponse.getData();
                 if (null != jobData) {
                     itemRecallResponse.setSuccess(jobData.getSuccess());
-                    getLogger().info("Recall request Finished -> " + jobData.getFinished());
-                    getLogger().info("Recall request Success -> " + jobData.getSuccess());
+                    getLogger().info("Recall request Finished -> {} " , jobData.getFinished());
+                    getLogger().info("Recall request Success -> {} " , jobData.getSuccess());
                     getLogger().info(statusMessage);
                 } else {
                     itemRecallResponse.setSuccess(false);
@@ -745,8 +744,8 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
                 JobData jobData = jobResponse.getData();
                 if (null != jobData) {
                     itemRefileResponse.setSuccess(jobData.getSuccess());
-                    getLogger().info("Refile request Finished -> " + jobData.getFinished());
-                    getLogger().info("Refile request Success -> " + jobData.getSuccess());
+                    getLogger().info("Refile request Finished -> {}" , jobData.getFinished());
+                    getLogger().info("Refile request Success -> {}" , jobData.getSuccess());
                     getLogger().info(statusMessage);
                 } else {
                     itemRefileResponse.setSuccess(false);

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.activation.DataHandler;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by chenchulakshmig on 13/9/16.
@@ -34,6 +35,14 @@ public class EmailRouteBuilder {
     private String emailBodyForSubmitCollectionEmptyDirectory;
     private String emailBodyForExceptionInSubmitColletion;
     private String emailBodyForBulkRequestProcess;
+    private  String subjectHeader = "subject";
+    private  String smtps = "smtps://";
+    private  String emailPayLoadSubject = "${header.emailPayLoad.subject}";
+    private  String emailPayLoadTo = "${header.emailPayLoad.to}";
+    private String password = "&password=";
+    private String userName = "?username=";
+    private String emailPayLoadcc = "${header.emailPayLoad.cc}";
+    private String emailPayLoadMessage = "${header.emailPayLoad.messageDisplay}";
 
     /**
      * Instantiates a new Email route builder.
@@ -71,115 +80,114 @@ public class EmailRouteBuilder {
                             .end()
                             .choice()
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.REQUEST_RECALL_MAIL_QUEUE))
-                                    .setHeader("subject", simple("${header.emailPayLoad.subject}"))
+                                    .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyRecall))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
+                                    .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email for Recall")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.REQUEST_LAS_STATUS_MAIL_QUEUE))
-                                    .setHeader("subject", simple("${header.emailPayLoad.subject}"))
+                                    .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyLasStatus))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
+                                    .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email for LAS Status")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.SUBMIT_COLLECTION))
-                                    .setHeader("subject", simple("${header.emailPayLoad.subject}"))
+                                    .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyForSubmitCollection))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
-                                    .setHeader("cc", simple("${header.emailPayLoad.cc}"))
+                                    .setHeader("to", simple(emailPayLoadTo))
+                                    .setHeader("cc", simple(emailPayLoadcc))
                                     .log("email body for submit collection")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.SUBMIT_COLLECTION_FOR_NO_FILES))
-                                    .setHeader("subject", simple("${header.emailPayLoad.subject}"))
+                                    .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyForSubmitCollectionEmptyDirectory))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
+                                    .setHeader("to", simple(emailPayLoadTo))
                                     .log("email body for submit collection")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.REQUEST_ACCESSION_RECONCILATION_MAIL_QUEUE))
                                     .log("email for accession Reconciliation")
-                                    .setHeader("subject", simple("Barcode Reconciliation Report"))
-                                    .setBody(simple("${header.emailPayLoad.messageDisplay}"))
+                                    .setHeader(subjectHeader, simple("Barcode Reconciliation Report"))
+                                    .setBody(simple(emailPayLoadMessage))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
-                                    .setHeader("cc", simple("${header.emailPayLoad.cc}"))
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .setHeader("to", simple(emailPayLoadTo))
+                                    .setHeader("cc", simple(emailPayLoadcc))
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.DELETED_MAIL_QUEUE))
-                                    .setHeader("subject", simple("${header.emailPayLoad.subject}"))
+                                    .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyDeletedRecords))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
+                                    .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email Send for Deleted Records")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo("StatusReconcilation"))
                                     .log("email for status Reconciliation")
-                                    .setHeader("subject", simple("\"Out\" Status Reconciliation Report"))
-                                    .setBody(simple("${header.emailPayLoad.messageDisplay}"))
+                                    .setHeader(subjectHeader, simple("\"Out\" Status Reconciliation Report"))
+                                    .setBody(simple(emailPayLoadMessage))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
-                                    .setHeader("cc", simple("${header.emailPayLoad.cc}"))
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .setHeader("to", simple(emailPayLoadTo))
+                                    .setHeader("cc", simple(emailPayLoadcc))
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.DAILY_RECONCILIATION))
                                     .log("email for Daily Reconciliation")
-                                    .setHeader("subject", simple("Daily Reconciliation Report"))
-                                    .setBody(simple("${header.emailPayLoad.messageDisplay}"))
+                                    .setHeader(subjectHeader, simple("Daily Reconciliation Report"))
+                                    .setBody(simple(emailPayLoadMessage))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .setHeader("to", simple(emailPayLoadTo))
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.REQUEST_INITIAL_DATA_LOAD))
-                                    .setHeader("subject", simple("${header.emailPayLoad.subject}"))
-                                    .setBody(simple("${header.emailPayLoad.messageDisplay}"))
+                                    .setHeader(subjectHeader, simple(emailPayLoadSubject))
+                                    .setBody(simple(emailPayLoadMessage))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
+                                    .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email for request initial data load")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.SUBMIT_COLLECTION_EXCEPTION))
-                                    .setHeader("subject", simple("${header.emailPayLoad.subject}"))
+                                    .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyForExceptionInSubmitColletion))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
-                                    .setHeader("cc", simple("${header.emailPayLoad.cc}"))
+                                    .setHeader("to", simple(emailPayLoadTo))
+                                    .setHeader("cc", simple(emailPayLoadcc))
                                     .log("Email sent for exception in submit collection")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.EMAIL_HEADER_REQUEST_PENDING))
-                                    .setHeader("subject", simple("LAS Pending Request Queue"))
+                                    .setHeader(subjectHeader, simple("LAS Pending Request Queue"))
                                     .setBody(simple(emailBodyForRequestPending))
                                     .setHeader("from", simple(from))
                                     .setHeader("to", simple(requestPendingTo))
                                     .log("Email for request pending")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.EMAIL_HEADER_REQUEST_STATUS_PENDING))
-                                    .setHeader("subject",simple("${header.emailPayLoad.subject}"))
-                                    .setBody(simple("${header.emailPayLoad.messageDisplay}"))
+                                    .setHeader(subjectHeader,simple(emailPayLoadSubject))
+                                    .setBody(simple(emailPayLoadMessage))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
-                                    .setHeader("cc", simple("${header.emailPayLoad.cc}"))
+                                    .setHeader("to", simple(emailPayLoadTo))
+                                    .setHeader("cc", simple(emailPayLoadcc))
                                     .log("Email for pending Request status")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                                  .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.BULK_REQUEST_EMAIL_QUEUE))
-                                    .setHeader("subject", simple("${header.emailPayLoad.subject}"))
+                                    .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyForBulkRequestProcess))
                                     .process(new Processor() {
                                         @Override
                                         public void process(Exchange exchange) throws Exception {
-                                            try {
-                                              //  Message in = exchange.getIn();
-                                                AttachmentMessage in = exchange.getMessage(AttachmentMessage.class);
+                                        try {
+                                            AttachmentMessage in = exchange.getMessage(AttachmentMessage.class);
 
-                                                EmailPayLoad emailPayLoad = (EmailPayLoad) in.getHeader("emailPayLoad");
-                                                in.addAttachment("Results_" + emailPayLoad.getBulkRequestFileName(), new DataHandler(emailPayLoad.getBulkRequestCsvFileData(), "text/csv"));
-                                            } catch (Exception ex) {
-                                                logger.info(RecapCommonConstants.LOG_ERROR, ex);
-                                            }
+                                            EmailPayLoad emailPayLoad = (EmailPayLoad) in.getHeader("emailPayLoad");
+                                            in.addAttachment("Results_" + emailPayLoad.getBulkRequestFileName(), new DataHandler(emailPayLoad.getBulkRequestCsvFileData(), "text/csv"));
+                                        } catch (Exception ex) {
+                                            logger.info(RecapCommonConstants.LOG_ERROR , ex);
+                                        }
                                         }
                                     })
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple("${header.emailPayLoad.to}"))
+                                    .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email sent for bulk request process")
-                                    .to("smtps://" + smtpServer + "?username=" + username + "&password=" + emailPassword)
+                                    .to(smtps + smtpServer + userName + username + password + emailPassword)
                     ;
                 }
 
@@ -203,7 +211,7 @@ public class EmailRouteBuilder {
                     File file = new File(passwordDirectory);
                     if (file.exists()) {
                         try {
-                            emailPassword = FileUtils.readFileToString(file, "UTF-8").trim();
+                            emailPassword = FileUtils.readFileToString(file, StandardCharsets.UTF_8).trim();
                         } catch (IOException e) {
                             logger.error(RecapCommonConstants.LOG_ERROR,e);
                         }
@@ -225,12 +233,10 @@ public class EmailRouteBuilder {
                     String line;
                     try {
                         while ((line = reader.readLine()) != null) {
-                            if (line.isEmpty()) {
-                                out.append("\n");
-                            } else {
+                            if (!line.isEmpty()) {
                                 out.append(line);
-                                out.append("\n");
                             }
+                            out.append("\n");
                         }
                     } catch (IOException e) {
                         logger.error(RecapCommonConstants.LOG_ERROR, e);

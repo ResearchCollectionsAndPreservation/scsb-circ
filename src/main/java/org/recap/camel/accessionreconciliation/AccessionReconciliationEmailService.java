@@ -49,7 +49,7 @@ public class AccessionReconciliationEmailService {
      *
      * @param institutionCode the institution code
      */
-    public AccessionReconciliationEmailService(String institutionCode) {
+    public AccessionReconciliationEmailService(String institutionCode, ProducerTemplate producerTemplate) {
         this.institutionCode = institutionCode;
     }
 
@@ -59,7 +59,7 @@ public class AccessionReconciliationEmailService {
      * @param exchange the exchange
      */
     public void processInput(Exchange exchange) {
-        logger.info("accession email started for"+institutionCode);
+        logger.info("accession email started for {}", institutionCode);
         producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(exchange), RecapConstants.EMAIL_BODY_FOR,"AccessionReconcilation");
     }
 
@@ -72,7 +72,7 @@ public class AccessionReconciliationEmailService {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         String fileNameWithPath = (String)exchange.getIn().getHeader("CamelFileNameProduced");
         emailIdTo(institutionCode,emailPayLoad);
-        logger.info("Accession Reconciliation email sent to : {} and cc : {} ",emailPayLoad.getTo(),emailPayLoad.getCc());
+        logger.info("Accession Reconciliation email sent to : {0} and cc : {1} ",emailPayLoad.getTo(),emailPayLoad.getCc());
         emailPayLoad.setMessageDisplay("Barcode Reconciliation has been completed for "+institutionCode.toUpperCase()+". The report is at the FTP location "+fileNameWithPath);
         return emailPayLoad;
     }

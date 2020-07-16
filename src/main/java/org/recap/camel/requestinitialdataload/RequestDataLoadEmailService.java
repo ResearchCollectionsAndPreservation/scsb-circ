@@ -38,7 +38,7 @@ public class RequestDataLoadEmailService {
     public RequestDataLoadEmailService(String institutionCode){this.institutionCode=institutionCode;}
 
     public void processInput(Exchange exchange) {
-        logger.info("ReqeustDataLoad EMailservice started for"+institutionCode);
+        logger.info("ReqeustDataLoad EMailservice started for {}", institutionCode);
         String fileNameWithPath = (String)exchange.getIn().getHeader("CamelFileNameProduced");
         producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(fileNameWithPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.REQUEST_INITIAL_DATA_LOAD);
     }
@@ -47,7 +47,7 @@ public class RequestDataLoadEmailService {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setTo(emailIdTo(institutionCode));
         emailPayLoad.setSubject(subjectForRequestInitialDataLoad);
-        logger.info("RequestDataLoad email sent to "+emailPayLoad.getTo());
+        logger.info("RequestDataLoad email sent to {}", emailPayLoad.getTo());
         emailPayLoad.setMessageDisplay(messageDisplayForInstitution(fileNameWithPath));
         return emailPayLoad;
     }

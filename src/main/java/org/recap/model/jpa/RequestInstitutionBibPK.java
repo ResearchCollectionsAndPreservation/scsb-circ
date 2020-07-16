@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Created by angelind on 29/7/16.
@@ -25,7 +26,7 @@ public class RequestInstitutionBibPK implements Serializable {
 
         RequestInstitutionBibPK requestInstitutionBibPK = (RequestInstitutionBibPK) o;
 
-        if (itemId != null ? !itemId.equals(requestInstitutionBibPK.itemId) : requestInstitutionBibPK.itemId != null)
+        if (!Objects.equals(itemId, requestInstitutionBibPK.itemId))
             return false;
         return owningInstitutionId != null ? owningInstitutionId.equals(requestInstitutionBibPK.owningInstitutionId) : requestInstitutionBibPK.owningInstitutionId == null;
 

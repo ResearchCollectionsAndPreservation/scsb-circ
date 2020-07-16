@@ -23,14 +23,13 @@ import java.util.List;
 @Entity
 @Table(name = "holdings_t", schema = "recap", catalog = "")
 @IdClass(HoldingsPK.class)
-@NamedNativeQueries({
         @NamedNativeQuery(
                 name = "HoldingsEntity.getNonDeletedItemEntities",
                 query = "SELECT ITEM_T.* FROM ITEM_T, ITEM_HOLDINGS_T WHERE ITEM_HOLDINGS_T.ITEM_INST_ID = ITEM_T.OWNING_INST_ID AND " +
                         "ITEM_HOLDINGS_T.OWNING_INST_ITEM_ID = ITEM_T.OWNING_INST_ITEM_ID AND ITEM_T.IS_DELETED = 0 AND " +
                         " ITEM_HOLDINGS_T.OWNING_INST_HOLDINGS_ID = :owningInstitutionHoldingsId AND ITEM_HOLDINGS_T.HOLDINGS_INST_ID = :owningInstitutionId",
                 resultClass = ItemEntity.class)
-})
+
 public class HoldingsEntity extends HoldingsAbstractEntity {
 
 

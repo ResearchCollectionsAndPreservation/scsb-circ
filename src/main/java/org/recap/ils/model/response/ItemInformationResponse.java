@@ -20,13 +20,13 @@ public class ItemInformationResponse extends AbstractResponseItem {
     private String holdQueueLength = "0";
     private String holdPickupDate;
     private String recallDate;
-    private String Owner;
+    private String owner;
     private String mediaType;
     private String permanentLocation;
     private String currentLocation;
     private String bibID;
-    private String ISBN;
-    private String LCCN;
+    private String isbn;
+    private String lccn;
     private String currencyType;
     private String callNumber;
     private String itemType;
@@ -235,7 +235,7 @@ public class ItemInformationResponse extends AbstractResponseItem {
      * @return the owner
      */
     public String getOwner() {
-        return Owner;
+        return owner;
     }
 
     /**
@@ -244,7 +244,7 @@ public class ItemInformationResponse extends AbstractResponseItem {
      * @param owner the owner
      */
     public void setOwner(String owner) {
-        Owner = owner;
+        this.owner = owner;
     }
 
     /**
@@ -324,17 +324,17 @@ public class ItemInformationResponse extends AbstractResponseItem {
      *
      * @return the isbn
      */
-    public String getISBN() {
-        return ISBN;
+    public String getIsbn() {
+        return isbn;
     }
 
     /**
      * Sets isbn.
      *
-     * @param ISBN the isbn
+     * @param isbn the isbn
      */
-    public void setISBN(String ISBN) {
-        this.ISBN = ISBN;
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     /**
@@ -342,17 +342,17 @@ public class ItemInformationResponse extends AbstractResponseItem {
      *
      * @return the lccn
      */
-    public String getLCCN() {
-        return LCCN;
+    public String getLccn() {
+        return lccn;
     }
 
     /**
      * Sets lccn.
      *
-     * @param LCCN the lccn
+     * @param lccn the lccn
      */
-    public void setLCCN(String LCCN) {
-        this.LCCN = LCCN;
+    public void setLccn(String lccn) {
+        this.lccn = lccn;
     }
 
     /**

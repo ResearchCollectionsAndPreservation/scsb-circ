@@ -21,8 +21,8 @@ public class ItemCheckoutResponse extends AbstractResponseItem {
     private String feeAmount;
     private String mediaType;
     private String bibId;
-    private String ISBN;
-    private String LCCN;
+    private String isbn;
+    private String lccn;
     private String jobId;
     private boolean processed;
     private String updatedDate;
@@ -285,17 +285,17 @@ public class ItemCheckoutResponse extends AbstractResponseItem {
      *
      * @return the isbn
      */
-    public String getISBN() {
-        return ISBN;
+    public String getIsbn() {
+        return isbn;
     }
 
     /**
      * Sets isbn.
      *
-     * @param ISBN the isbn
+     * @param isbn the isbn
      */
-    public void setISBN(String ISBN) {
-        this.ISBN = ISBN;
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     /**
@@ -303,17 +303,17 @@ public class ItemCheckoutResponse extends AbstractResponseItem {
      *
      * @return the lccn
      */
-    public String getLCCN() {
-        return LCCN;
+    public String getLccn() {
+        return lccn;
     }
 
     /**
      * Sets lccn.
      *
-     * @param LCCN the lccn
+     * @param lccn the lccn
      */
-    public void setLCCN(String LCCN) {
-        this.LCCN = LCCN;
+    public void setLccn(String lccn) {
+        this.lccn = lccn;
     }
 
     /**

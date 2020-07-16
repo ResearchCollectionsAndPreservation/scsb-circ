@@ -2,7 +2,6 @@ package org.recap;
 
 import java.util.Arrays;
 import java.util.List;
-import org.recap.RecapCommonConstants;
 
 /**
  * Created by premkb on 19/8/16.
@@ -442,7 +441,6 @@ public final class RecapConstants {
     public static final String CUSTOMER_CODE_HEADER = "Customer Code mentioned in LAS";
     public static final String TAB = "\t";
     public static final String NEW_LINE = "\n";
-    public static String LAS_ITEM_STATUS_REST_SERVICE = "http://recapgfa-dev.princeton.edu:9092/lasapi/rest/lasapiSvc/itemStatus";
 
     public static final String DEFAULT_DATE_FORMAT = "dd-MM-yyyy hh:mm";
     public static final String REQUEST_IDS_RANGE = "RangeOfRequestIds";
@@ -476,15 +474,15 @@ public final class RecapConstants {
     private RecapConstants() {
     }
 
-    public static final List getGFAStatusAvailableList() {
+    public static List getGFAStatusAvailableList() {
         return GFA_STATUS_AVAILABLE_LIST;
     }
 
-    public static final List getGFAStatusNotAvailableList() {
+    public static List getGFAStatusNotAvailableList() {
         return GFA_STATUS_NOT_AVAILABLE_LIST;
     }
 
-    public static final List getRequestTypeList() {
+    public static List getRequestTypeList() {
         return REQUEST_TYPE_LIST;
     }
 

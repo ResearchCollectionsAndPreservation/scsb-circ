@@ -46,7 +46,7 @@ public class LasItemStatusCheckPollingProcessor {
         try {
             Future<GFAItemStatusCheckResponse> future = executor.submit(new LasItemStatusCheckPollingCallable(pollingTimeInterval, gfaService, barcode));
             gfaItemStatusCheckResponse = future.get();
-            logger.info("Process -1 -> " + gfaItemStatusCheckResponse);
+            logger.info("Process -1 -> {}" , gfaItemStatusCheckResponse);
             if (gfaItemStatusCheckResponse != null
                     && gfaItemStatusCheckResponse.getDsitem() != null
                     && gfaItemStatusCheckResponse.getDsitem().getTtitem() != null && !gfaItemStatusCheckResponse.getDsitem().getTtitem().isEmpty()) {
@@ -56,7 +56,9 @@ public class LasItemStatusCheckPollingProcessor {
             executor.shutdown();
         } catch (InterruptedException e) {
             logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
-        } catch (ExecutionException e) {
+            Thread.currentThread().interrupt();
+            executor.shutdown();
+        }  catch(ExecutionException e) {
             logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         } catch (Exception e) {
             logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);

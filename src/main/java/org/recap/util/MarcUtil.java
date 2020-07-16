@@ -28,8 +28,8 @@ import org.springframework.util.CollectionUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class MarcUtil {
      */
     public List<Record> convertMarcXmlToRecord(String marcXml) {
         List<Record> records = new ArrayList<>();
-        MarcReader reader = new MarcXmlReader(IOUtils.toInputStream(marcXml));
+        MarcReader reader = new MarcXmlReader(IOUtils.toInputStream(marcXml, StandardCharsets.UTF_8));
         while (reader.hasNext()) {
             Record record = reader.next();
             records.add(record);
@@ -188,20 +188,19 @@ public class MarcUtil {
         String indicator2 = StringUtils.isNotBlank(ind2) ? String.valueOf(ind2.charAt(0)) : " ";
         List<VariableField> dataFields = marcRecord.getVariableFields(field);
 
-        for (Iterator<VariableField> variableFieldIterator = dataFields.iterator(); variableFieldIterator.hasNext(); ) {
-            DataField dataField = (DataField) variableFieldIterator.next();
-            if(dataField!=null && doIndicatorsMatch(indicator1, indicator2, dataField)){
+        for (VariableField variableField : dataFields) {
+            DataField dataField = (DataField) variableField;
+            if (dataField != null && doIndicatorsMatch(indicator1, indicator2, dataField)) {
                 List<Subfield> subFields = dataField.getSubfields(subField);
-                    for (Iterator<Subfield> subfieldIterator = subFields.iterator(); subfieldIterator.hasNext(); ) {
-                        Subfield subfield = subfieldIterator.next();
-                        if (subField!=null){
-                            String data = subfield.getData();
-                            if (StringUtils.isNotBlank(data)) {
-                                values.add(data);
-                            }
+                for (Subfield subfield : subFields) {
+                    if (subField != null) {
+                        String data = subfield.getData();
+                        if (StringUtils.isNotBlank(data)) {
+                            values.add(data);
                         }
                     }
                 }
+            }
         }
         return values;
     }
@@ -226,9 +225,9 @@ public class MarcUtil {
      */
     public String getControlFieldValue(Record marcRecord, String field) {
         List<VariableField> variableFields = marcRecord.getVariableFields(field);
-        for (Iterator<VariableField> variableFieldIterator = variableFields.iterator(); variableFieldIterator.hasNext(); ) {
-            ControlFieldImpl controlField = (ControlFieldImpl) variableFieldIterator.next();
-            if (controlField!=null) {
+        for (VariableField variableField : variableFields) {
+            ControlFieldImpl controlField = (ControlFieldImpl) variableField;
+            if (controlField != null) {
                 return controlField.getData();
             }
         }
@@ -332,9 +331,7 @@ public class MarcUtil {
         VariableField variableField = record.getVariableField(field);
         if (variableField != null) {
             DataField dataField = (DataField) variableField;
-            if (dataField != null) {
                 return dataField;
-            }
         }
         return null;
     }
@@ -366,15 +363,12 @@ public class MarcUtil {
      */
     public BibMarcRecord buildBibMarcRecord(Record record) {
         Record bibRecord = record;
-        List<VariableField> holdingsVariableFields = new ArrayList<>();
-        List<VariableField> holdings866VariableFields = new ArrayList<>();
-        List<VariableField> itemVariableFields = new ArrayList<>();
         String[] holdingsTags = {"852"};
         String[] holdings866Tags = {"866"};
         String[] itemTags = {"876"};
-        holdingsVariableFields.addAll(bibRecord.getVariableFields(holdingsTags));
-        holdings866VariableFields.addAll(bibRecord.getVariableFields(holdings866Tags));
-        itemVariableFields.addAll(bibRecord.getVariableFields(itemTags));
+        List<VariableField> holdingsVariableFields = new ArrayList<>(bibRecord.getVariableFields(holdingsTags));
+        List<VariableField> holdings866VariableFields = new ArrayList<>(bibRecord.getVariableFields(holdings866Tags));
+        List<VariableField> itemVariableFields = new ArrayList<>(bibRecord.getVariableFields(itemTags));
 
         if (org.apache.commons.collections.CollectionUtils.isNotEmpty(holdingsVariableFields)) {
             for (VariableField holdingsVariableField : holdingsVariableFields) {

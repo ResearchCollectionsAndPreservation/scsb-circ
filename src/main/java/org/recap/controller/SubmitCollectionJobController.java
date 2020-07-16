@@ -10,8 +10,8 @@ import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -36,17 +36,24 @@ public class SubmitCollectionJobController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/startSubmitCollection",method = RequestMethod.POST)
+    @PostMapping(value = "/startSubmitCollection")
     public String startSubmitCollection() throws Exception{
-
-
         camelContext.getRouteController().startRoute(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE);
-
         Endpoint endpoint = camelContext.getEndpoint(RecapConstants.SUBMIT_COLLECTION_COMPLETION_QUEUE_TO);
-        PollingConsumer consumer = endpoint.createPollingConsumer();
-        Exchange exchange = consumer.receive();
-
-        logger.info("Message Received : {}", exchange.getIn().getBody());
+        PollingConsumer consumer = null;
+        try {
+            consumer = endpoint.createPollingConsumer();
+            Exchange exchange = consumer.receive();
+            logger.info("Message Received : {}", exchange.getIn().getBody());
+        }
+        catch (Exception e){
+            logger.error(RecapCommonConstants.LOG_ERROR, e);
+        }
+        finally {
+            if(consumer != null) {
+                consumer.close();
+            }
+        }
 
         logger.info("Submit Collection Job ends");
         return RecapCommonConstants.SUCCESS;

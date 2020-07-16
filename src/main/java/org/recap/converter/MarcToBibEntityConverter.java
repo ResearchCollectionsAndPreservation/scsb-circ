@@ -2,6 +2,7 @@ package org.recap.converter;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
@@ -164,11 +165,9 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         String holdingsContent = new MarcUtil().writeMarcXml(holdingsRecord);
         HoldingsEntity holdingsEntity = commonUtil.buildHoldingsEntity(bibliographicEntity, currentDate, errorMessage, holdingsContent);
         String owningInstitutionHoldingsId = marcUtil.getDataFieldValue(holdingsRecord, "852", '0');
-        if (StringUtils.isBlank(owningInstitutionHoldingsId)) {
+        if (StringUtils.isBlank(owningInstitutionHoldingsId) || owningInstitutionHoldingsId.length() > 100) {
             owningInstitutionHoldingsId = UUID.randomUUID().toString();
-        } else if (owningInstitutionHoldingsId.length() > 100) {
-            owningInstitutionHoldingsId = UUID.randomUUID().toString();
-        }
+        } 
         holdingsEntity.setOwningInstitutionHoldingsId(owningInstitutionHoldingsId);
         map.put("holdingsEntity", holdingsEntity);
         return map;
@@ -192,7 +191,7 @@ public class MarcToBibEntityConverter implements XmlToBibEntityConverterInterfac
         itemEntity.setCallNumber(holdingsCallNumber);
         itemEntity.setCallNumberType(holdingsCallNumberType != null ? String.valueOf(holdingsCallNumberType) : "");
         String copyNumber = marcUtil.getDataFieldValue(itemRecord, "876", 't');
-        if (StringUtils.isNotBlank(copyNumber) && org.apache.commons.lang3.math.NumberUtils.isNumber(copyNumber)) {
+        if (StringUtils.isNotBlank(copyNumber) && NumberUtils.isCreatable(copyNumber)) {
             itemEntity.setCopyNumber(Integer.valueOf(copyNumber));
         }
         if (institutionEntity != null) {

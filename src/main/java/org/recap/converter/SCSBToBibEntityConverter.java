@@ -1,6 +1,7 @@
 package org.recap.converter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.marc4j.marc.Record;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
@@ -16,9 +17,6 @@ import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ReportEntity;
 import org.recap.model.marc.BibMarcRecord;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.CollectionGroupDetailsRepository;
-import org.recap.repository.jpa.InstitutionDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.recap.util.CommonUtil;
 import org.recap.util.DBReportUtil;
 import org.recap.util.MarcUtil;
@@ -222,7 +220,7 @@ public class SCSBToBibEntityConverter implements XmlToBibEntityConverterInterfac
         itemEntity.setCallNumber(holdingsCallNumber);
         itemEntity.setCallNumberType(holdingsCallNumberType != null ? String.valueOf(holdingsCallNumberType) : "");
         String copyNumber = marcUtil.getDataFieldValue(itemRecord, "876", 't');
-        if (StringUtils.isNotBlank(copyNumber) && org.apache.commons.lang3.math.NumberUtils.isNumber(copyNumber)) {
+        if (StringUtils.isNotBlank(copyNumber) && NumberUtils.isCreatable(copyNumber)) {
             itemEntity.setCopyNumber(Integer.valueOf(copyNumber));
         }
         if (owningInstitutionId != null) {

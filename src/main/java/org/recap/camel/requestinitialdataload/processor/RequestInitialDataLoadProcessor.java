@@ -65,11 +65,11 @@ public class RequestInitialDataLoadProcessor {
     public void processInput(Exchange exchange) throws ParseException {
         List<RequestDataLoadCSVRecord> requestDataLoadCSVRecordList = (List<RequestDataLoadCSVRecord>)exchange.getIn().getBody();
         Integer index = (Integer) exchange.getProperty(RecapConstants.CAMEL_SPLIT_INDEX);
-        logger.info("count from ftp" + requestDataLoadCSVRecordList.size());
+        logger.info("count from ftp {}", requestDataLoadCSVRecordList.size());
         try {
             Set<String> barcodesNotInScsb = requestDataLoadService.process(requestDataLoadCSVRecordList,barcodeSet);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMMyyyy");
-            Path filePath = Paths.get(requestInitialLoadFilePath+"/"+institutionCode+"/"+ RecapConstants.REQUEST_INITIAL_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
+            Path filePath = Paths.get(requestInitialLoadFilePath+RecapCommonConstants.PATH_SEPARATOR+institutionCode+RecapCommonConstants.PATH_SEPARATOR+ RecapConstants.REQUEST_INITIAL_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
             if (!filePath.toFile().exists()) {
                 Files.createDirectories(filePath.getParent());
                 Files.createFile(filePath);
@@ -101,19 +101,19 @@ public class RequestInitialDataLoadProcessor {
             logger.info("split last index-->{}",index);
             try {
                 if(RecapConstants.REQUEST_INITIAL_LOAD_PUL.equalsIgnoreCase(institutionCode)){
-                    logger.info(RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
+                    logger.info("{}", RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
                     camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
                 }
                 if(RecapConstants.REQUEST_INITIAL_LOAD_CUL.equalsIgnoreCase(institutionCode)){
-                    logger.info(RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
+                    logger.info("{}", RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
                     camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
                 }
                 if(RecapConstants.REQUEST_INITIAL_LOAD_NYPL.equalsIgnoreCase(institutionCode)){
-                    logger.info(RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
+                    logger.info("{}",RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
                     camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
                 }
             } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR+e);
+                logger.error(RecapCommonConstants.LOG_ERROR, e);
             }
         }
     }

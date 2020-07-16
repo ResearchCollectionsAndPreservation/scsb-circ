@@ -41,10 +41,10 @@ public class StopRouteProcessor implements Processor {
                     } else {
                         exchange.getContext().getRouteController().stopRoute(routeId);
                     }
-                    logger.info("Stop Route " + routeId);
+                    logger.info("Stop Route {}" , routeId);
                 } catch (Exception e) {
-                    logger.error("Exception while stop route : " + routeId);
-                    logger.error(RecapCommonConstants.LOG_ERROR + e);
+                    logger.error("Exception while stop route : {}" , routeId);
+                    logger.error(RecapCommonConstants.LOG_ERROR , e);
 
                 }
             }

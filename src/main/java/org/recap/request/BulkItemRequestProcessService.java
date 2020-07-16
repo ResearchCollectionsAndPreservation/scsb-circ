@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -67,37 +67,39 @@ public class BulkItemRequestProcessService {
         if (RecapConstants.COMPLETE.equals(itemBarcode)) {
             try {
                 Thread.sleep(5000);
-            }
-            catch (InterruptedException e){
-                logger.info("Interrupted Exception");
+            } catch (InterruptedException e) {
+                logger.error("Interrupted Exception {0}", e);
+                Thread.currentThread().interrupt();
             }
             bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
-            bulkRequestItemEntity.get().setBulkRequestStatus(RecapConstants.PROCESSED);
-            bulkRequestItemEntity.get().setLastUpdatedDate(new Date());
-            BulkRequestItemEntity savedBulkRequestItemEntity = bulkRequestItemDetailsRepository.save(bulkRequestItemEntity.get());
-            List<RequestItemEntity> requestItemEntities = savedBulkRequestItemEntity.getRequestItemEntities();
-            if (CollectionUtils.isNotEmpty(requestItemEntities)) {
-                List<BulkRequestItem> bulkRequestItems = new ArrayList<>();
-                for (RequestItemEntity requestItemEntity : requestItemEntities) {
-                    BulkRequestItem bulkRequestItem = new BulkRequestItem();
-                    bulkRequestItem.setItemBarcode(requestItemEntity.getItemEntity().getBarcode());
-                    bulkRequestItem.setCustomerCode(requestItemEntity.getItemEntity().getCustomerCode());
-                    bulkRequestItem.setRequestId(String.valueOf(requestItemEntity.getId()));
-                    bulkRequestItem.setRequestStatus(requestItemEntity.getRequestStatusEntity().getRequestStatusDescription());
-                    if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)
-                            || requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(RecapConstants.REQUEST_STATUS_PENDING)) {
-                        bulkRequestItem.setStatus(RecapCommonConstants.SUCCESS);
-                    } else {
-                        bulkRequestItem.setStatus(StringUtils.substringAfter(requestItemEntity.getNotes(), "Exception : "));
+            if (bulkRequestItemEntity.isPresent()) {
+                bulkRequestItemEntity.get().setBulkRequestStatus(RecapConstants.PROCESSED);
+                bulkRequestItemEntity.get().setLastUpdatedDate(new Date());
+                BulkRequestItemEntity savedBulkRequestItemEntity = bulkRequestItemDetailsRepository.save(bulkRequestItemEntity.get());
+                List<RequestItemEntity> requestItemEntities = savedBulkRequestItemEntity.getRequestItemEntities();
+                if (CollectionUtils.isNotEmpty(requestItemEntities)) {
+                    List<BulkRequestItem> bulkRequestItems = new ArrayList<>();
+                    for (RequestItemEntity requestItemEntity : requestItemEntities) {
+                        BulkRequestItem bulkRequestItem = new BulkRequestItem();
+                        bulkRequestItem.setItemBarcode(requestItemEntity.getItemEntity().getBarcode());
+                        bulkRequestItem.setCustomerCode(requestItemEntity.getItemEntity().getCustomerCode());
+                        bulkRequestItem.setRequestId(String.valueOf(requestItemEntity.getId()));
+                        bulkRequestItem.setRequestStatus(requestItemEntity.getRequestStatusEntity().getRequestStatusDescription());
+                        if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)
+                                || requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(RecapConstants.REQUEST_STATUS_PENDING)) {
+                            bulkRequestItem.setStatus(RecapCommonConstants.SUCCESS);
+                        } else {
+                            bulkRequestItem.setStatus(StringUtils.substringAfter(requestItemEntity.getNotes(), "Exception : "));
+                        }
+                        bulkRequestItems.add(bulkRequestItem);
                     }
-                    bulkRequestItems.add(bulkRequestItem);
+                    itemRequestServiceUtil.updateStatusToBarcodes(bulkRequestItems, savedBulkRequestItemEntity);
                 }
-                itemRequestServiceUtil.updateStatusToBarcodes(bulkRequestItems, savedBulkRequestItemEntity);
+                itemRequestServiceUtil.generateReportAndSendEmail(bulkRequestId);
+                logger.info("Bulk request processing completed for bulk request id : {}", bulkRequestId);
+            } else {
+                processBulkRequestForBarcode(itemBarcode, bulkRequestItemEntity.get());
             }
-            itemRequestServiceUtil.generateReportAndSendEmail(bulkRequestId);
-            logger.info("Bulk request processing completed for bulk request id : {}", bulkRequestId);
-        } else {
-            processBulkRequestForBarcode(itemBarcode, bulkRequestItemEntity.get());
         }
     }
 
@@ -114,7 +116,7 @@ public class BulkItemRequestProcessService {
             itemRequestDBService.updateItemAvailabilutyStatus(itemEntities, bulkRequestItemEntity.getCreatedBy());
             Integer requestId = itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, bulkRequestItemEntity);
             itemRequestInformation.setRequestId(requestId);
-            itemRequestInformation.setItemBarcodes(Arrays.asList(itemEntity.getBarcode()));
+            itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
             itemRequestInformation.setCustomerCode(itemEntity.getCustomerCode());
             ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
             itemCheckoutResponse.setSuccess(true);
@@ -124,7 +126,7 @@ public class BulkItemRequestProcessService {
                 }
                 ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                 itemInformationResponse.setRequestId(requestId);
-                itemInformationResponse = gfaService.executeRetriveOrder(itemRequestInformation, itemInformationResponse);
+                itemInformationResponse = gfaService.executeRetrieveOrder(itemRequestInformation, itemInformationResponse);
                 if(itemInformationResponse.isRequestTypeForScheduledOnWO()){
                     logger.info("Bulk Request : Request received on first scan");
                     itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.LAS_REFILE_REQUEST_PLACED,bulkRequestItemEntity);
@@ -149,7 +151,7 @@ public class BulkItemRequestProcessService {
             itemRequestServiceUtil.updateSolrIndex(itemEntity);
             logger.info("Request processing completed for barcode : {}", itemBarcode);
         } catch (Exception ex) {
-            logger.error(RecapCommonConstants.LOG_ERROR, itemBarcode);
+            logger.error(RecapCommonConstants.LOG_ERROR , itemBarcode);
         }
     }
 

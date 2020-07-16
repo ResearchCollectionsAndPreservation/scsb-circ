@@ -65,8 +65,8 @@ public class AccessionReconciliationRouteBuilder {
         Predicate gzipFile = new Predicate() {
             @Override
             public boolean matches(Exchange exchange) {
-                String fileName = (String) exchange.getIn().getHeader(Exchange.FILE_NAME);
-                return StringUtils.equalsIgnoreCase("gz", FilenameUtils.getExtension(fileName));
+            String fileName = (String) exchange.getIn().getHeader(Exchange.FILE_NAME);
+            return StringUtils.equalsIgnoreCase("gz", FilenameUtils.getExtension(fileName));
             }
         };
 
@@ -219,8 +219,7 @@ public class AccessionReconciliationRouteBuilder {
             });
 
         } catch (Exception e) {
-            logger.info(RecapCommonConstants.LOG_ERROR+e);
+            logger.info(RecapCommonConstants.LOG_ERROR, e);
         }
-
     }
 }

@@ -107,29 +107,13 @@ public class NyplApiResponseUtil {
     private String formatFromSipDate(String sipDate) {
         SimpleDateFormat sipFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         SimpleDateFormat requiredFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
-        String reformattedStr = "";
-        try {
-            if (sipDate != null && sipDate.trim().length() > 0) {
-                reformattedStr = requiredFormat.format(sipFormat.parse(sipDate));
-            }
-        } catch (ParseException e) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
-        }
-        return reformattedStr;
+        return requiredFormattedDate(sipDate, sipFormat, requiredFormat);
     }
 
     private String formatDueDate(String sipDate) {
         SimpleDateFormat sipFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat requiredFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
-        String reformattedStr = "";
-        try {
-            if (sipDate != null && sipDate.trim().length() > 0) {
-                reformattedStr = requiredFormat.format(sipFormat.parse(sipDate));
-            }
-        } catch (ParseException e) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
-        }
-        return reformattedStr;
+        return requiredFormattedDate(sipDate, sipFormat, requiredFormat);
     }
 
     /**
@@ -336,5 +320,17 @@ public class NyplApiResponseUtil {
         }
         return institutionCode;
     }
-
+    
+    private String requiredFormattedDate(String sipDate, SimpleDateFormat sipFormat, SimpleDateFormat requiredFormat)
+    {
+        String reformattedStr = "";
+        try {
+            if (sipDate != null && sipDate.trim().length() > 0) {
+                reformattedStr = requiredFormat.format(sipFormat.parse(sipDate));
+            }
+        } catch (ParseException e) {
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+        }
+        return reformattedStr;
+    }
 }

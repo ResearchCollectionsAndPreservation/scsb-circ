@@ -2,7 +2,6 @@ package org.recap.repository.jpa;
 
 
 import org.recap.model.jpa.RequestStatusEntity;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 

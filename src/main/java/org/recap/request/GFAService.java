@@ -274,7 +274,7 @@ public class GFAService {
         } catch (JsonProcessingException e) {
             logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION + " " + e.getMessage());
+            logger.error(RecapCommonConstants.REQUEST_EXCEPTION + " " , e.getMessage());
         }
 
         return gfaItemStatusCheckResponse;
@@ -313,9 +313,7 @@ public class GFAService {
                                 processMismatchStatus(statusReconciliationCSVRecordList, itemChangeLogEntityList, lasStatus, itemEntity);
                             }
                             break;
-                        } else {
-                            continue;
-                        }
+                        } 
 
                     }
                     if (!isBarcodeAvailableForErrorReport) {
@@ -342,14 +340,14 @@ public class GFAService {
         List<String> barcodeList = new ArrayList<>();
         List<Integer> requestIdList = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
-        Optional<ItemStatusEntity> itemStatusEntity = getItemStatusDetailsRepository().findById(itemEntity.getItemAvailabilityStatusId());
+        ItemStatusEntity itemStatusEntity = getItemStatusDetailsRepository().findById(itemEntity.getItemAvailabilityStatusId()).orElse(new ItemStatusEntity());
         if (!requestItemEntityList.isEmpty()) {
             for (RequestItemEntity requestItemEntity : requestItemEntityList) {
                 if (!requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_STATUS_CANCELED)){
-                    statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity.get(), requestItemEntity);
+                    statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity, requestItemEntity);
                 }else {
                     if (StringUtils.containsIgnoreCase(requestItemEntity.getNotes(),"Cancel requested")){
-                        statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity.get(), requestItemEntity);
+                        statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(lasStatus, itemEntity, barcodeList, requestIdList, simpleDateFormat, itemStatusEntity, requestItemEntity);
                     }else{
                         RequestStatusEntity byRequestStatusCode = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED);
                         requestItemEntity.setRequestStatusId(byRequestStatusCode.getId());
@@ -360,7 +358,7 @@ public class GFAService {
                 }
             }
         } else {
-            statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(itemEntity.getBarcode(), "No", null, lasStatus, simpleDateFormat.format(new Date()), itemStatusEntity.get());
+            statusReconciliationCSVRecord = getStatusReconciliationCSVRecord(itemEntity.getBarcode(), "No", null, lasStatus, simpleDateFormat.format(new Date()), itemStatusEntity);
             getItemDetailsRepository().updateAvailabilityStatus(1, RecapConstants.GUEST_USER, itemEntity.getBarcode());
             ItemChangeLogEntity itemChangeLogEntity = saveItemChangeLogEntity(itemEntity.getItemId(), RecapConstants.GUEST_USER, RecapConstants.STATUS_RECONCILIATION_CHANGE_LOG_OPERATION_TYPE, itemEntity.getBarcode());
             itemChangeLogEntityList.add(itemChangeLogEntity);
@@ -524,9 +522,9 @@ public class GFAService {
 
                 RestTemplate restTemplate = new RestTemplate();
                 HttpEntity requestEntity = new HttpEntity(gfaRetrieveEDDItemRequest, getHttpHeaders());
-                logger.info("" + convertJsontoString(requestEntity.getBody()));
+                logger.info("{}" , convertJsontoString(requestEntity.getBody()));
                 ResponseEntity<GFARetrieveItemResponse> responseEntity = restTemplate.exchange(getGfaItemEDDRetrival(), HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class);
-                logger.info(responseEntity.getStatusCode() + " - " + convertJsontoString(responseEntity.getBody()));
+                logger.info("{}", responseEntity.getStatusCode() + " - " + convertJsontoString(responseEntity.getBody()));
                 if (responseEntity.getStatusCode() == HttpStatus.OK) {
                     gfaRetrieveItemResponse = responseEntity.getBody();
                     gfaRetrieveItemResponse = getLASRetrieveResponse(gfaRetrieveItemResponse);
@@ -566,7 +564,7 @@ public class GFAService {
      * @param itemResponseInformation the item response information
      * @return the item information response
      */
-    public ItemInformationResponse executeRetriveOrder(ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation) {
+    public ItemInformationResponse executeRetrieveOrder(ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation) {
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
 
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse;
@@ -741,7 +739,7 @@ public class GFAService {
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(getGfaServerResponseTimeOutMilliseconds());
             ResponseEntity<GFAPwdResponse> responseEntity = restTemplate.exchange(getGfaItemPermanentWithdrawlDirect(), HttpMethod.POST, requestEntity, GFAPwdResponse.class);
             gfaPwdResponse = responseEntity.getBody();
-            logger.info("GFA PWD Response Status Code : {}", responseEntity.getStatusCode().toString());
+            logger.info("GFA PWD Response Status Code : {}", responseEntity.getStatusCode());
             logger.info("GFA PWD Response : {}", convertJsontoString(responseEntity.getBody()));
             logger.info("GFA PWD item status processed");
         } catch (Exception e) {
@@ -766,7 +764,7 @@ public class GFAService {
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(getGfaServerResponseTimeOutMilliseconds());
             ResponseEntity<GFAPwiResponse> responseEntity = restTemplate.exchange(getGfaItemPermanentWithdrawlInDirect(), HttpMethod.POST, requestEntity, GFAPwiResponse.class);
             gfaPwiResponse = responseEntity.getBody();
-            logger.info("GFA PWI Response Status Code : {}", responseEntity.getStatusCode().toString());
+            logger.info("GFA PWI Response Status Code : {}", responseEntity.getStatusCode());
             logger.info("GFA PWI Response : {}", convertJsontoString(responseEntity.getBody()));
             logger.info("GFA PWI item status processed");
         } catch (Exception e) {
@@ -874,7 +872,7 @@ public class GFAService {
             requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
             requestItemEntity.setLastUpdatedDate(new Date());
             requestItemDetailsRepository.save(requestItemEntity);
-            logger.info("lasPolling Saved " + requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
+            logger.info("lasPolling Saved {}" , requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
             ObjectMapper objectMapper = getObjectMapper();
             String json = null;
             RequestInformation requestInformation = new RequestInformation();
@@ -882,7 +880,7 @@ public class GFAService {
             requestInformation.setItemResponseInformation(itemResponseInformation);
             json = objectMapper.writeValueAsString(requestInformation);
             logger.info(json);
-            logger.info("Rest Service Status -> " + RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS);
+            logger.info("Rest Service Status -> {}" , RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS);
             if (RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
                 getProducer().getCamelContext().getRouteController().stopRoute(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
             }
@@ -957,7 +955,7 @@ public class GFAService {
         ttitem001.setRequestId(String.valueOf(requestItemEntity.getId()));
         ttitem001.setRequestor(requestItemEntity.getPatronId());
         RetrieveItemRequest retrieveItem = new RetrieveItemRequest();
-        retrieveItem.setTtitem(Arrays.asList(ttitem001));
+        retrieveItem.setTtitem(Collections.singletonList(ttitem001));
         gfaRetrieveItemRequest.setRetrieveItem(retrieveItem);
         return gfaRetrieveItemRequest;
     }
@@ -989,7 +987,7 @@ public class GFAService {
         ttitem001.setBiblioLocation(itemEntity.getCallNumber());
 
         RetrieveItemEDDRequest retrieveItemEDDRequest = new RetrieveItemEDDRequest();
-        retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitem001));
+        retrieveItemEDDRequest.setTtitem(Collections.singletonList(ttitem001));
         gfaRetrieveEDDItemRequest.setRetrieveEDD(retrieveItemEDDRequest);
         return gfaRetrieveEDDItemRequest;
     }
@@ -999,7 +997,7 @@ public class GFAService {
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
         GFAItemStatus gfaItemStatus = new GFAItemStatus();
         gfaItemStatus.setItemBarCode(itemBarcode);
-        gfaItemStatusCheckRequest.setItemStatus(Arrays.asList(gfaItemStatus));
+        gfaItemStatusCheckRequest.setItemStatus(Collections.singletonList(gfaItemStatus));
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = itemStatusCheck(gfaItemStatusCheckRequest);
         if (null != gfaItemStatusCheckResponse) {
             Dsitem dsitem = gfaItemStatusCheckResponse.getDsitem();

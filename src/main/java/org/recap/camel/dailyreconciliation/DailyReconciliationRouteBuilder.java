@@ -46,8 +46,8 @@ public class DailyReconciliationRouteBuilder {
         @Override
         public boolean matches(Exchange exchange) {
 
-            String fileName = (String) exchange.getIn().getHeader(Exchange.FILE_NAME);
-            return StringUtils.equalsIgnoreCase("gz", FilenameUtils.getExtension(fileName));
+        String fileName = (String) exchange.getIn().getHeader(Exchange.FILE_NAME);
+        return StringUtils.equalsIgnoreCase("gz", FilenameUtils.getExtension(fileName));
 
         }
     };
@@ -74,8 +74,8 @@ public class DailyReconciliationRouteBuilder {
                             .process(new Processor() {
                                 @Override
                                 public void process(Exchange exchange) throws Exception {
-                                    String fileName = (String)exchange.getIn().getHeader(Exchange.FILE_NAME);
-                                    exchange.getIn().setHeader(Exchange.FILE_NAME, fileName.replaceFirst(".gz", ".csv"));
+                                String fileName = (String)exchange.getIn().getHeader(Exchange.FILE_NAME);
+                                exchange.getIn().setHeader(Exchange.FILE_NAME, fileName.replaceFirst(".gz", ".csv"));
                                 }
                             })
                             .to(RecapConstants.DIRECT+ RecapConstants.PROCESS_DAILY_RECONCILIATION)

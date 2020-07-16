@@ -1,4 +1,4 @@
-package org.recap.service.DeletedRecords;
+package org.recap.service.deletedrecords;
 
 import org.recap.RecapConstants;
 import org.recap.repository.jpa.DeletedRecordsRepository;
@@ -30,18 +30,17 @@ public class DeletedRecordsService {
 
         try {
             long lCountDeleted = deletedRecordsRepository.countByDeletedReportedStatus(RecapConstants.DELETED_STATUS_NOT_REPORTED);
-            logger.info("Count : " + lCountDeleted);
+            logger.info("Count : {}", lCountDeleted);
             if (lCountDeleted > 0) {
                 // Change Status
                 int statusChange = deletedRecordsRepository.updateDeletedReportedStatus(RecapConstants.DELETED_STATUS_REPORTED, RecapConstants.DELETED_STATUS_NOT_REPORTED);
-                logger.info("Delete Count : " + statusChange);
+                logger.info("Delete Count : {}" , statusChange);
                 // Send Email
                 emailService.sendEmail(RecapConstants.EMAIL_DELETED_RECORDS_DISPLAY_MESSAGE + lCountDeleted, "", RecapConstants.DELETED_MAIl_TO, RecapConstants.EMAIL_SUBJECT_DELETED_RECORDS);
-                bReturnMsg = true;
             } else {
                 logger.info("No records to delete" );
-                bReturnMsg = true;
             }
+            bReturnMsg = true;
         } catch (Exception ex) {
             logger.error("", ex);
         }

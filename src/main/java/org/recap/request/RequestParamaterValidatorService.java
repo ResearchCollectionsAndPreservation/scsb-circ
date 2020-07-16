@@ -133,7 +133,7 @@ public class RequestParamaterValidatorService {
 
     private String buildErrorMessage(Map<Integer, String> erroMessageMap) {
         StringBuilder errorMessageBuilder = new StringBuilder();
-        erroMessageMap.entrySet().forEach(entry -> errorMessageBuilder.append(entry.getValue()).append("\n"));
+        erroMessageMap.forEach((key, value) -> errorMessageBuilder.append(value).append("\n"));
         return errorMessageBuilder.toString();
     }
 }

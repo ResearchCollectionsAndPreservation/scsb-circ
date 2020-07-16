@@ -268,7 +268,7 @@ public class GFAServiceUT extends BaseTestCase {
         gfaPwdDsItemRequest.setTtitem(Arrays.asList(gfaPwdTtItemRequest));
         gfaPwdRequest.setDsitem(gfaPwdDsItemRequest);
         GFAPwdResponse gfaPwdResponse = getGfaService.gfaPermanentWithdrawlDirect(gfaPwdRequest);
-        ItemInformationResponse responseitemInformationResponse = getGfaService.executeRetriveOrder(getItemRequestInformation(), getItemInformationResponse());
+        ItemInformationResponse responseitemInformationResponse = getGfaService.executeRetrieveOrder(getItemRequestInformation(), getItemInformationResponse());
         TtitemEDDResponse ttitemEDDResponse = new TtitemEDDResponse();
         ttitemEDDResponse.setItemBarcode("332445645758458");
         ttitemEDDResponse.setCustomerCode("AD");

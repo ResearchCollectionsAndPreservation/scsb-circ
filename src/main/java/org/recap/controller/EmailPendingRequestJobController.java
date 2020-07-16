@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmailPendingRequestJobController {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailPendingRequestJobController.class);
-
-    private static String queueName = "lasOutgoingQ";
 
     /**
      * The Producer template.
@@ -45,9 +43,9 @@ public class EmailPendingRequestJobController {
      * @return the string
      * @throws Exception the exception
      */
-    @RequestMapping(value = "/sendEmailForPendingRequest",method = RequestMethod.POST)
+    @PostMapping(value = "/sendEmailForPendingRequest")
     public String sendEmailForPendingRequest() throws Exception{
-        Integer pendingRequests = activemqQueuesInfo.getActivemqQueuesInfo(queueName);
+        Integer pendingRequests = activemqQueuesInfo.getActivemqQueuesInfo("lasOutgoingQ");
         if(pendingRequests >= pendingRequestLimit) {
             logger.info("Pending Request : {}", pendingRequests);
             EmailPayLoad emailPayLoad = new EmailPayLoad();

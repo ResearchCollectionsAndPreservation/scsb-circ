@@ -104,54 +104,55 @@ public class SIP2ResponseFactory {
         // Get the command identifier
         String code = data.substring(0, 2);
         logger.info(data);
-        if ("94".equals(code)) {
-            parser = new SIP2LoginResponseParser();
-            return parser.parse(data);
-        } else if ("98".equals(code)) {
-            parser = new SIP2ACSStatusResponseParser();
-            return parser.parse(data);
-        } else if ("24".equals(code)) {
-            parser = new SIP2PatronStatusResponseParser();
-            return parser.parse(data);
-        } else if ("64".equals(code)) {
-            parser = new SIP2PatronInformationResponseParser();
-            return parser.parse(data);
-        } else if ("10".equals(code)) {
-            parser = new SIP2CheckinResponseParser();
-            return parser.parse(data);
-        } else if ("12".equals(code)) {
-            parser = new SIP2CheckoutResponseParser();
-            return parser.parse(data);
-        } else if ("36".equals(code)) {
-            parser = new SIP2EndSessionResponseParser();
-            return parser.parse(data);
-        } else if ("38".equals(code)) {
-            parser = new SIP2FeePaidResponseParser();
-            return parser.parse(data);
-        } else if ("18".equals(code)) {
-            parser = new SIP2ItemInformationResponseParser();
-            return parser.parse(data);
-        } else if ("20".equals(code)) {
-            parser = new SIP2ItemStatusUpdateResponseParser();
-            return parser.parse(data);
-        } else if ("26".equals(code)) {
-            parser = new SIP2PatronEnableResponseParser();
-            return parser.parse(data);
-        } else if ("16".equals(code)) {
-            parser = new SIP2HoldResponseParser();
-            return parser.parse(data);
-        } else if ("30".equals(code)) {
-            parser = new SIP2RenewResponseParser();
-            return parser.parse(data);
-        } else if ("66".equals(code)) {
-            parser = new SIP2RenewAllResponseParser();
-            return parser.parse(data);
-        } else if ("82".equals(code)) {
-            parser = new SIP2CreateBibResponseParser();
-            return parser.parse(data);
-        } else if ("88".equals(code)) {
-            parser = new SIP2RecallResponseParser();
-            return parser.parse(data);
+        switch (code) {
+            case "94":
+                parser = new SIP2LoginResponseParser();
+                return parser.parse(data);
+            case "98":
+                parser = new SIP2ACSStatusResponseParser();
+                return parser.parse(data);
+            case "24":
+                parser = new SIP2PatronStatusResponseParser();
+                return parser.parse(data);
+            case "64":
+                parser = new SIP2PatronInformationResponseParser();
+                return parser.parse(data);
+            case "10":
+                parser = new SIP2CheckinResponseParser();
+                return parser.parse(data);
+            case "12":
+                parser = new SIP2CheckoutResponseParser();
+                return parser.parse(data);
+            case "36":
+                parser = new SIP2EndSessionResponseParser();
+                return parser.parse(data);
+            case "38":
+                parser = new SIP2FeePaidResponseParser();
+                return parser.parse(data);
+            case "18":
+                parser = new SIP2ItemInformationResponseParser();
+                return parser.parse(data);
+            case "20":
+                parser = new SIP2ItemStatusUpdateResponseParser();
+                return parser.parse(data);
+            case "26":
+                parser = new SIP2PatronEnableResponseParser();
+                return parser.parse(data);
+            case "16":
+                parser = new SIP2HoldResponseParser();
+                return parser.parse(data);
+            case "30":
+                parser = new SIP2RenewResponseParser();
+                return parser.parse(data);
+            case "66":
+                parser = new SIP2RenewAllResponseParser();
+                return parser.parse(data);
+            case "82":
+                parser = new SIP2CreateBibResponseParser();
+                return parser.parse(data);
+            case "88":
+                parser = new SIP2RecallResponseParser();
+                return parser.parse(data);
         }
         throw new InvalidSIP2ResponseException("Unsupported responses type! Command identifier: " + code);
     }

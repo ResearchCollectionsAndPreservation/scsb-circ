@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -60,7 +60,7 @@ public class SharedCollectionRestController {
      * @param requestParameters holds map of input xml string, institution, cdg protetion flag
      * @return the response entity
      */
-    @RequestMapping(value = "/submitCollection", method = RequestMethod.POST)
+    @PostMapping(value = "/submitCollection")
     @ResponseBody
     public ResponseEntity submitCollection(@RequestParam Map<String,Object> requestParameters){
         StopWatch stopWatch = new StopWatch();
@@ -112,7 +112,7 @@ public class SharedCollectionRestController {
      * @param deAccessionRequest the de accession request
      * @return the response entity
      */
-    @RequestMapping(value = "/deAccession", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/deAccession", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity deAccession(@RequestBody DeAccessionRequest deAccessionRequest) {
         Map<String, String> resultMap = deAccessionService.deAccession(deAccessionRequest);

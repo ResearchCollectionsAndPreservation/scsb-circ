@@ -108,7 +108,7 @@ public class ItemEDDRequestService {
         List<ItemEntity> itemEntities;
         ItemEntity itemEntity=null;
         ItemInformationResponse itemResponseInformation = getItemInformationResponse();
-        Integer requestId = 0;
+        Integer requestId;
         try {
             itemEntities = getItemDetailsRepository().findByBarcodeIn(itemRequestInfo.getItemBarcodes());
             if (itemEntities != null && !itemEntities.isEmpty()) {
@@ -129,7 +129,7 @@ public class ItemEDDRequestService {
                 itemRequestInfo.setRequestNotes(getNotes(itemRequestInfo));
                 boolean isItemStatusAvailable;
                 synchronized (this) {
-                    // Change Item Availablity
+                    // Change Item Availability
                     isItemStatusAvailable = getItemRequestService().updateItemAvailabilutyStatus(itemEntities, itemRequestInfo.getUsername());
                 }
                 requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING);

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +74,8 @@ public class ItemRequestDBService {
 
     @Autowired
     private CommonUtil commonUtil;
+    
+    private String errorNote = " with error note - ";
 
     /**
      * Update recap request item integer.
@@ -97,15 +99,14 @@ public class ItemRequestDBService {
             //Request Item
             if (itemRequestInformation.getRequestId() != null && itemRequestInformation.getRequestId() > 0) {
                 requestItemEntity = requestItemDetailsRepository.findById(itemRequestInformation.getRequestId()).orElse(requestItemEntity);
-                requestItemEntity.setRequestExpirationDate(getExpirationDate(itemRequestInformation.getExpirationDate(), itemRequestInformation.getRequestingInstitution()));
+                requestItemEntity.setRequestExpirationDate(getExpirationDate(itemRequestInformation.getExpirationDate()));
                 requestItemEntity.setLastUpdatedDate(new Date());
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
-                requestItemEntity.setNotes(itemRequestInformation.getRequestNotes());
             } else {
                 requestItemEntity.setItemId(itemEntity.getItemId());
                 requestItemEntity.setRequestingInstitutionId(institutionEntity.getId());
                 requestItemEntity.setRequestTypeId(requestTypeEntity.getId());
-                requestItemEntity.setRequestExpirationDate(getExpirationDate(itemRequestInformation.getExpirationDate(), itemRequestInformation.getRequestingInstitution()));
+                requestItemEntity.setRequestExpirationDate(getExpirationDate(itemRequestInformation.getExpirationDate()));
                 requestItemEntity.setCreatedBy(commonUtil.getUser(itemRequestInformation.getUsername()));
                 requestItemEntity.setCreatedDate(new Date());
                 requestItemEntity.setLastUpdatedDate(new Date());
@@ -117,14 +118,12 @@ public class ItemRequestDBService {
                 }else {
                     requestItemEntity.setEmailId(itemRequestInformation.getEmailAddress());
                 }
-                requestItemEntity.setNotes(itemRequestInformation.getRequestNotes());
             }
+            requestItemEntity.setNotes(itemRequestInformation.getRequestNotes());
             savedItemRequest = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
-            if (savedItemRequest != null) {
-                requestId = savedItemRequest.getId();
-                commonUtil.saveItemChangeLogEntity(savedItemRequest.getId(), commonUtil.getUser(itemRequestInformation.getUsername()), RecapConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
-            }
-            logger.info("SCSB DB Update Successful");
+            requestId = savedItemRequest.getId();
+            commonUtil.saveItemChangeLogEntity(savedItemRequest.getId(), commonUtil.getUser(itemRequestInformation.getUsername()), RecapConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
+        logger.info("SCSB DB Update Successful");
         } catch (ParseException e) {
             logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
@@ -160,10 +159,14 @@ public class ItemRequestDBService {
 
             if (itemInformationResponse.getRequestId() != null && itemInformationResponse.getRequestId() > 0) {
                 requestItemEntity = requestItemDetailsRepository.findById(itemInformationResponse.getRequestId()).orElse(null);
-                requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
-                requestItemEntity.setRequestExpirationDate(getExpirationDate(itemInformationResponse.getExpirationDate(), itemInformationResponse.getRequestingInstitution()));
-                requestItemEntity.setNotes(itemInformationResponse.getRequestNotes());
-                requestItemEntity.setLastUpdatedDate(new Date());
+                if(requestItemEntity != null) {
+                    if (requestStatusEntity != null) {
+                        requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
+                    }
+                    requestItemEntity.setRequestExpirationDate(getExpirationDate(itemInformationResponse.getExpirationDate()));
+                    requestItemEntity.setNotes(itemInformationResponse.getRequestNotes());
+                    requestItemEntity.setLastUpdatedDate(new Date());
+                }
             } else {
                 requestItemEntity = new RequestItemEntity();
                 RequestTypeEntity requestTypeEntity = requestTypeDetailsRepository.findByrequestTypeCode(itemInformationResponse.getRequestType());
@@ -173,13 +176,15 @@ public class ItemRequestDBService {
                 requestItemEntity.setItemId(itemInformationResponse.getItemId());
                 requestItemEntity.setRequestingInstitutionId(institutionEntity.getId());
                 requestItemEntity.setRequestTypeId(requestTypeEntity.getId());
-                requestItemEntity.setRequestExpirationDate(getExpirationDate(itemInformationResponse.getExpirationDate(), itemInformationResponse.getRequestingInstitution()));
+                requestItemEntity.setRequestExpirationDate(getExpirationDate(itemInformationResponse.getExpirationDate()));
                 requestItemEntity.setCreatedBy(commonUtil.getUser(itemInformationResponse.getUsername()));
                 requestItemEntity.setCreatedDate(new Date());
                 requestItemEntity.setLastUpdatedDate(new Date());
                 requestItemEntity.setPatronId(itemInformationResponse.getPatronBarcode());
                 requestItemEntity.setStopCode(itemInformationResponse.getDeliveryLocation());
-                requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
+                if(requestStatusEntity != null) {
+                    requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
+                }
                 if (StringUtils.isNotBlank(itemInformationResponse.getEmailAddress())){
                     requestItemEntity.setEmailId(securityUtil.getEncryptedValue(itemInformationResponse.getEmailAddress()));
                 }else {
@@ -211,7 +216,7 @@ public class ItemRequestDBService {
     public ItemInformationResponse updateRecapRequestStatus(ItemInformationResponse itemInformationResponse) {
         RequestStatusEntity requestStatusEntity=null;
         Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemInformationResponse.getRequestId());
-        if(requestItemEntity != null) {
+        if(requestItemEntity.isPresent()) {
             BulkRequestItemEntity bulkRequestItemEntity = requestItemEntity.get().getBulkRequestItemEntity();
             String notes = RecapConstants.USER + " : " + requestItemEntity.get().getNotes();
             if (null != bulkRequestItemEntity) {
@@ -231,11 +236,18 @@ public class ItemRequestDBService {
             } else {
                 requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_EXCEPTION);
                 if (itemInformationResponse.isBulk()) {
-                    requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + " with error note - " + itemInformationResponse.getScreenMessage() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
+                    if (null != bulkRequestItemEntity) {
+                        requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + errorNote + itemInformationResponse.getScreenMessage() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
+                    }
+                    else {
+                        requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + errorNote + itemInformationResponse.getScreenMessage() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT);
+                    }
                 }
-                requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + " with error note - " + itemInformationResponse.getScreenMessage());
+                requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + errorNote + itemInformationResponse.getScreenMessage());
             }
-            requestItemEntity.get().setRequestStatusId(requestStatusEntity.getId());
+            if(requestStatusEntity != null) {
+                requestItemEntity.get().setRequestStatusId(requestStatusEntity.getId());
+            }
             requestItemDetailsRepository.save(requestItemEntity.get());
         }
         return itemInformationResponse;
@@ -260,7 +272,7 @@ public class ItemRequestDBService {
         itemDetailsRepository.flush();
     }
 
-    private Date getExpirationDate(String expirationDate, String requestingInstitutionId) throws ParseException {
+    private Date getExpirationDate(String expirationDate) throws ParseException {
         if (StringUtils.isNotBlank(expirationDate)) {
             logger.info("Expiration date from response : {}", expirationDate);
             try {
@@ -281,13 +293,13 @@ public class ItemRequestDBService {
     public ItemRequestInformation rollbackAfterGFA(ItemInformationResponse itemInformationResponse) {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemInformationResponse.getRequestId());
-        if(requestItemEntity != null) {
+        if(requestItemEntity.isPresent()) {
             CustomerCodeEntity customerCodeEntity= customerCodeDetailsRepository.findByCustomerCode(requestItemEntity.get().getItemEntity().getCustomerCode());
             commonUtil.rollbackUpdateItemAvailabilutyStatus(requestItemEntity.get().getItemEntity(), RecapConstants.GUEST_USER);
             commonUtil.saveItemChangeLogEntity(itemInformationResponse.getRequestId(), requestItemEntity.get().getCreatedBy(), RecapConstants.REQUEST_ITEM_GFA_FAILURE, RecapConstants.REQUEST_ITEM_GFA_FAILURE + itemInformationResponse.getScreenMessage());
             itemRequestInformation.setBibId(requestItemEntity.get().getItemEntity().getBibliographicEntities().get(0).getOwningInstitutionBibId());
             itemRequestInformation.setPatronBarcode(requestItemEntity.get().getPatronId());
-            itemRequestInformation.setItemBarcodes(Arrays.asList(requestItemEntity.get().getItemEntity().getBarcode()));
+            itemRequestInformation.setItemBarcodes(Collections.singletonList(requestItemEntity.get().getItemEntity().getBarcode()));
             itemRequestInformation.setPickupLocation(customerCodeEntity.getPickupLocation());
             itemRequestInformation.setItemOwningInstitution(requestItemEntity.get().getItemEntity().getInstitutionEntity().getInstitutionCode());
             itemRequestInformation.setRequestingInstitution(requestItemEntity.get().getInstitutionEntity().getInstitutionCode());

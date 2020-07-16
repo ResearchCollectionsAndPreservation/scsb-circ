@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.recap.model.jpa.BibliographicEntity;
 
+import java.util.Objects;
+
 /**
  * Created by premkb on 14/10/17.
  */
@@ -27,9 +29,9 @@ public class BarcodeBibliographicEntityObject {
         BarcodeBibliographicEntityObject that = (BarcodeBibliographicEntityObject) o;
 
         if (barcode != null ? !barcode.equals(that.barcode) : that.barcode != null) return false;
-        if (owningInstitutionBibId != null ? !owningInstitutionBibId.equals(that.owningInstitutionBibId) : that.owningInstitutionBibId != null)
+        if (!Objects.equals(owningInstitutionBibId, that.owningInstitutionBibId))
             return false;
-        return bibliographicEntity != null ? bibliographicEntity.equals(that.bibliographicEntity) : that.bibliographicEntity == null;
+        return Objects.equals(bibliographicEntity, that.bibliographicEntity);
     }
 
     @Override

@@ -44,8 +44,7 @@ public class SetupDataService {
             itemStatusIdCodeMap = new HashMap();
             try {
                 Iterable<ItemStatusEntity> itemStatusEntities = repositoryService.getItemStatusDetailsRepository().findAll();
-                for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
-                    ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
+                for (ItemStatusEntity itemStatusEntity : itemStatusEntities) {
                     itemStatusIdCodeMap.put(itemStatusEntity.getId(), itemStatusEntity.getStatusCode());
                 }
             } catch (Exception e) {
@@ -65,8 +64,7 @@ public class SetupDataService {
             itemStatusCodeIdMap = new HashMap();
             try {
                 Iterable<ItemStatusEntity> itemStatusEntities = repositoryService.getItemStatusDetailsRepository().findAll();
-                for (Iterator iterator = itemStatusEntities.iterator(); iterator.hasNext(); ) {
-                    ItemStatusEntity itemStatusEntity = (ItemStatusEntity) iterator.next();
+                for (ItemStatusEntity itemStatusEntity : itemStatusEntities) {
                     itemStatusCodeIdMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getId());
                 }
             } catch (Exception e) {
@@ -86,8 +84,7 @@ public class SetupDataService {
             institutionEntityMap = new HashMap();
             try {
                 Iterable<InstitutionEntity> institutionEntities = repositoryService.getInstitutionDetailsRepository().findAll();
-                for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
-                    InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
+                for (InstitutionEntity institutionEntity : institutionEntities) {
                     institutionEntityMap.put(institutionEntity.getId(), institutionEntity.getInstitutionCode());
                 }
             } catch (Exception e) {
@@ -102,9 +99,8 @@ public class SetupDataService {
             institutionCodeIdMap = new HashMap();
             try {
                 Iterable<InstitutionEntity> institutionEntities = repositoryService.getInstitutionDetailsRepository().findAll();
-                for (Iterator iterator = institutionEntities.iterator(); iterator.hasNext(); ) {
-                    InstitutionEntity institutionEntity = (InstitutionEntity) iterator.next();
-                    institutionCodeIdMap.put(institutionEntity.getInstitutionCode(),institutionEntity.getId());
+                for (InstitutionEntity institutionEntity : institutionEntities) {
+                    institutionCodeIdMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getId());
                 }
             } catch (Exception e) {
                 logger.error(RecapCommonConstants.LOG_ERROR,e);
@@ -118,8 +114,7 @@ public class SetupDataService {
             collectionGroupMap = new HashMap();
             try {
                 Iterable<CollectionGroupEntity> collectionGroupEntities = repositoryService.getCollectionGroupDetailsRepository().findAll();
-                for (Iterator iterator = collectionGroupEntities.iterator(); iterator.hasNext(); ) {
-                    CollectionGroupEntity collectionGroupEntity = (CollectionGroupEntity) iterator.next();
+                for (CollectionGroupEntity collectionGroupEntity : collectionGroupEntities) {
                     collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getId());
                 }
             } catch (Exception e) {

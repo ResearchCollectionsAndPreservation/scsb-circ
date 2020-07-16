@@ -56,9 +56,11 @@ public class BulkItemRequestService {
     public void bulkRequestItems(Integer bulkRequestId) {
         LinkedList<String> bulkRequestItemBarcodeList = new LinkedList<>();
         Optional<BulkRequestItemEntity> bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
-        String requestData = new String(bulkRequestItemEntity.get().getBulkRequestFileData());
-        new BufferedReader(new StringReader(requestData)).lines().forEach(barcodeRow -> bulkRequestItemBarcodeList.add(barcodeRow.split(",")[0]));
-        bulkRequestItemBarcodeList.remove(0);
+        if(bulkRequestItemEntity.isPresent()) {
+            String requestData = new String(bulkRequestItemEntity.get().getBulkRequestFileData());
+            new BufferedReader(new StringReader(requestData)).lines().forEach(barcodeRow -> bulkRequestItemBarcodeList.add(barcodeRow.split(",")[0]));
+            bulkRequestItemBarcodeList.remove(0);
+        }
         Integer bulkRequestItemBarcodeCount = bulkRequestItemBarcodeList.size();
         logger.info("Total number of barcodes received for bulk request with id {} is - {}", bulkRequestId, bulkRequestItemBarcodeCount);
         Set<String> nonDuplicateBarcodeList = removeDuplicates(bulkRequestItemBarcodeList);
@@ -81,7 +83,7 @@ public class BulkItemRequestService {
                 ItemEntity itemEntity = itemEntities.get(0);
                 if (itemEntity.getItemStatusEntity().getStatusCode().equalsIgnoreCase(RecapCommonConstants.NOT_AVAILABLE)) {
                     exceptionBulkRequestItems.add(buildBulkRequestItem(itemBarcode, itemEntity.getCustomerCode(), RecapConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM));
-                } else if (itemEntity.getOwningInstitutionId() != bulkRequestItemEntity.get().getRequestingInstitutionId()) {
+                } else if (!itemEntity.getOwningInstitutionId().equals(bulkRequestItemEntity.get().getRequestingInstitutionId())) {
                     exceptionBulkRequestItems.add(buildBulkRequestItem(itemBarcode, itemEntity.getCustomerCode(), "Item doesn't belong to the requesting institution."));
                 } else {
                     producerTemplate.sendBodyAndHeader(RecapConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE, itemBarcode, RecapCommonConstants.BULK_REQUEST_ID, bulkRequestId);
@@ -107,15 +109,17 @@ public class BulkItemRequestService {
      */
     private void updateStatusToBarcodes(List<BulkRequestItem> exceptionBulkRequestItems, Integer bulkRequestId) {
        Optional<BulkRequestItemEntity> bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
-        if (!RecapConstants.PROCESSED.equals(bulkRequestItemEntity.get().getBulkRequestStatus())) {
-            StringBuilder csvFormatDataBuilder = new StringBuilder();
-            csvFormatDataBuilder.append("BARCODE,CUSTOMER CODE,REQUEST ID,REQUEST STATUS,STATUS");
-            itemRequestServiceUtil.buildCsvFormatData(exceptionBulkRequestItems, csvFormatDataBuilder);
-            bulkRequestItemEntity.get().setBulkRequestFileData(csvFormatDataBuilder.toString().getBytes());
-            bulkRequestItemDetailsRepository.save(bulkRequestItemEntity.get());
-        } else {
-            itemRequestServiceUtil.updateStatusToBarcodes(exceptionBulkRequestItems, bulkRequestItemEntity.get());
-        }
+       if(bulkRequestItemEntity.isPresent()) {
+           if (!RecapConstants.PROCESSED.equals(bulkRequestItemEntity.get().getBulkRequestStatus())) {
+               StringBuilder csvFormatDataBuilder = new StringBuilder();
+               csvFormatDataBuilder.append("BARCODE,CUSTOMER CODE,REQUEST ID,REQUEST STATUS,STATUS");
+               itemRequestServiceUtil.buildCsvFormatData(exceptionBulkRequestItems, csvFormatDataBuilder);
+               bulkRequestItemEntity.get().setBulkRequestFileData(csvFormatDataBuilder.toString().getBytes());
+               bulkRequestItemDetailsRepository.save(bulkRequestItemEntity.get());
+           } else {
+               itemRequestServiceUtil.updateStatusToBarcodes(exceptionBulkRequestItems, bulkRequestItemEntity.get());
+           }
+       }
     }
 
     /**

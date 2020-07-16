@@ -8,7 +8,7 @@ import org.recap.RecapCommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by sudhishk on 9/11/16.
@@ -32,14 +32,14 @@ public class SIP2CreateBibResponseParser extends  SIP2ResponseParser{
             response.setOk(this.intToBool(data.charAt(2)));
             response.setItemIdentifier("");
             response.setBibId(strmsg[1].substring(2));
-            response.setScreenMessage(Arrays.asList(strmsg[2].substring(2)));
+            response.setScreenMessage(Collections.singletonList(strmsg[2].substring(2)));
 
             if (!parseSequence(data).isEmpty()) {
                 response.setSequence(Integer.parseInt(parseSequence(data)));
             }
             response.setCheckSum(parseChecksum(data));
         } catch (InvalidSIP2ResponseValueException e) {
-            logger.error(RecapCommonConstants.LOG_ERROR,e);
+            logger.error(RecapCommonConstants.LOG_ERROR ,e);
             throw new InvalidSIP2ResponseValueException(e.getMessage() + " Response message string: \"" + data + "\"");
         }
         return response;

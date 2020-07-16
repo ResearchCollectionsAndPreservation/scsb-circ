@@ -6,10 +6,6 @@ import org.codehaus.jettison.json.JSONException;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.controller.RequestItemController;
-import org.recap.gfa.model.Dsitem;
-import org.recap.gfa.model.GFAItemStatus;
-import org.recap.gfa.model.GFAItemStatusCheckRequest;
-import org.recap.gfa.model.GFAItemStatusCheckResponse;
 import org.recap.gfa.model.GFAPwdDsItemRequest;
 import org.recap.gfa.model.GFAPwdDsItemResponse;
 import org.recap.gfa.model.GFAPwdRequest;
@@ -22,7 +18,6 @@ import org.recap.gfa.model.GFAPwiRequest;
 import org.recap.gfa.model.GFAPwiResponse;
 import org.recap.gfa.model.GFAPwiTtItemRequest;
 import org.recap.gfa.model.GFAPwiTtItemResponse;
-import org.recap.gfa.model.Ttitem;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
@@ -65,7 +60,7 @@ import org.springframework.web.client.RestTemplate;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -283,7 +278,7 @@ public class DeAccessionService {
                     gfaPwdTtItemRequest.setItemBarcode(deAccessionDBResponseEntity.getBarcode());
                     gfaPwdTtItemRequest.setDestination(deAccessionDBResponseEntity.getDeliveryLocation());
                     gfaPwdTtItemRequest.setRequestor(username);
-                    gfaPwdDsItemRequest.setTtitem(Arrays.asList(gfaPwdTtItemRequest));
+                    gfaPwdDsItemRequest.setTtitem(Collections.singletonList(gfaPwdTtItemRequest));
                     gfaPwdRequest.setDsitem(gfaPwdDsItemRequest);
                     GFAPwdResponse gfaPwdResponse = gfaService.gfaPermanentWithdrawlDirect(gfaPwdRequest);
                     if (null != gfaPwdResponse) {
@@ -310,7 +305,7 @@ public class DeAccessionService {
                     GFAPwiTtItemRequest gfaPwiTtItemRequest = new GFAPwiTtItemRequest();
                     gfaPwiTtItemRequest.setCustomerCode(deAccessionDBResponseEntity.getCustomerCode());
                     gfaPwiTtItemRequest.setItemBarcode(deAccessionDBResponseEntity.getBarcode());
-                    gfaPwiDsItemRequest.setTtitem(Arrays.asList(gfaPwiTtItemRequest));
+                    gfaPwiDsItemRequest.setTtitem(Collections.singletonList(gfaPwiTtItemRequest));
                     gfaPwiRequest.setDsitem(gfaPwiDsItemRequest);
                     GFAPwiResponse gfaPwiResponse = gfaService.gfaPermanentWithdrawlInDirect(gfaPwiRequest);
                     if (null != gfaPwiResponse) {
@@ -436,7 +431,7 @@ public class DeAccessionService {
     private ItemRequestInformation getItemRequestInformation(RequestItemEntity activeRetrievalRequest) {
         ItemEntity itemEntity = activeRetrievalRequest.getItemEntity();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setItemBarcodes(Arrays.asList(itemEntity.getBarcode()));
+        itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
         itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
         itemRequestInformation.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
         itemRequestInformation.setRequestingInstitution(activeRetrievalRequest.getInstitutionEntity().getInstitutionCode());
@@ -758,7 +753,7 @@ public class DeAccessionService {
                     RestTemplate restTemplate = new RestTemplate();
                     HttpEntity<DeAccessionSolrRequest> requestEntity = new HttpEntity(deAccessionSolrRequest, getRestHeaderService().getHttpHeaders());
                     ResponseEntity<String> responseEntity = restTemplate.exchange(deAccessionSolrClientUrl, HttpMethod.POST, requestEntity, String.class);
-                    logger.info("Deaccession Item Solr update status : " + responseEntity.getBody());
+                    logger.info("Deaccession Item Solr update status : {}" , responseEntity.getBody());
                 }
             }
         } catch (Exception e) {

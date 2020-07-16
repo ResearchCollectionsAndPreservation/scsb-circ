@@ -26,7 +26,7 @@ public class DailyReconciliationEmailService{
     @Value("${daily.reconciliation.email.to}")
     private String emailTo;
 
-    private String fileLocation = new String();
+    private String fileLocation;
 
 
     public void process(Exchange exchange) throws Exception {
@@ -38,7 +38,7 @@ public class DailyReconciliationEmailService{
     private EmailPayLoad getEmailPayLoad(){
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         emailPayLoad.setTo(emailTo);
-        logger.info("Daily Reconciliation email sent to "+emailPayLoad.getTo());
+        logger.info("Daily Reconciliation email sent to {}", emailPayLoad.getTo());
         emailPayLoad.setMessageDisplay("Daily reconciliation report is available at the FTP location "+fileLocation);
         return emailPayLoad;
     }

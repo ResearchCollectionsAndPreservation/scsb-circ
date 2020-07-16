@@ -2,7 +2,6 @@ package org.recap.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.marc4j.marc.Record;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -73,7 +72,7 @@ public class DBReportUtil {
 
         if (bibliographicEntity.getOwningInstitutionId() != null) {
             for (Map.Entry<String, Integer> entry : institutionEntitiesMap.entrySet()) {
-                if (entry.getValue() == bibliographicEntity.getOwningInstitutionId()) {
+                if (entry.getValue().equals(bibliographicEntity.getOwningInstitutionId())) {
                     owningInstitutionReportDataEntity.setHeaderName(RecapCommonConstants.OWNING_INSTITUTION);
                     owningInstitutionReportDataEntity.setHeaderValue(entry.getKey());
                     reportDataEntities.add(owningInstitutionReportDataEntity);
@@ -109,8 +108,7 @@ public class DBReportUtil {
      * @return the list
      */
     public List<ReportDataEntity> generateBibHoldingsFailureReportEntity(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, String institutionName, Record bibRecord) {
-        List<ReportDataEntity> reportDataEntities = new ArrayList<>();
-        reportDataEntities.addAll(generateBibFailureReportEntity(bibliographicEntity, bibRecord));
+        List<ReportDataEntity> reportDataEntities = new ArrayList<>(generateBibFailureReportEntity(bibliographicEntity, bibRecord));
         if (holdingsEntity != null) {
                 ReportDataEntity owningInstitutionHoldingsIdReportDataEntity = new ReportDataEntity();
                 owningInstitutionHoldingsIdReportDataEntity.setHeaderName(RecapCommonConstants.OWNING_INSTITUTION_HOLDINGS_ID);
@@ -131,8 +129,7 @@ public class DBReportUtil {
      * @return the list
      */
     public List<ReportDataEntity> generateBibHoldingsAndItemsFailureReportEntities(BibliographicEntity bibliographicEntity, HoldingsEntity holdingsEntity, ItemEntity itemEntity, String institutionName, Record bibRecord) {
-        List<ReportDataEntity> reportEntities = new ArrayList<>();
-        reportEntities.addAll(generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity, institutionName, bibRecord));
+        List<ReportDataEntity> reportEntities = new ArrayList<>(generateBibHoldingsFailureReportEntity(bibliographicEntity, holdingsEntity, institutionName, bibRecord));
 
         if (itemEntity != null) {
             if (StringUtils.isNotBlank(itemEntity.getOwningInstitutionItemId())) {
@@ -158,7 +155,7 @@ public class DBReportUtil {
 
             if (itemEntity.getCollectionGroupId() != null) {
                 for (Map.Entry<String, Integer> entry : collectionGroupMap.entrySet()) {
-                    if (entry.getValue() == itemEntity.getCollectionGroupId()) {
+                    if (entry.getValue().equals(itemEntity.getCollectionGroupId())) {
                         ReportDataEntity collectionGroupDesignationEntity = new ReportDataEntity();
                         collectionGroupDesignationEntity.setHeaderName(RecapCommonConstants.COLLECTION_GROUP_DESIGNATION);
                         collectionGroupDesignationEntity.setHeaderValue(entry.getKey());

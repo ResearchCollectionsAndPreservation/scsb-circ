@@ -24,8 +24,8 @@ public class ItemRecallResponseUT extends BaseTestCase{
         itemRecallResponse.setPickupLocation("PB");
         itemRecallResponse.setQueuePosition("1");
         itemRecallResponse.setBibId("4564645");
-        itemRecallResponse.setISBN("4545");
-        itemRecallResponse.setLCCN("7854");
+        itemRecallResponse.setIsbn("4545");
+        itemRecallResponse.setLccn("7854");
 
         assertNotNull(itemRecallResponse.getAvailable());
         assertNotNull(itemRecallResponse.getTransactionDate());
@@ -36,8 +36,8 @@ public class ItemRecallResponseUT extends BaseTestCase{
         assertNotNull(itemRecallResponse.getPickupLocation());
         assertNotNull(itemRecallResponse.getQueuePosition());
         assertNotNull(itemRecallResponse.getBibId());
-        assertNotNull(itemRecallResponse.getISBN());
-        assertNotNull(itemRecallResponse.getLCCN());
+        assertNotNull(itemRecallResponse.getIsbn());
+        assertNotNull(itemRecallResponse.getLccn());
     }
 
 }

@@ -25,8 +25,8 @@ public class ItemHoldResponseUT extends BaseTestCase{
         itemHoldResponse.setPickupLocation("PB");
         itemHoldResponse.setQueuePosition("1");
         itemHoldResponse.setBibId("1");
-        itemHoldResponse.setISBN("1");
-        itemHoldResponse.setLCCN("1");
+        itemHoldResponse.setIsbn("1");
+        itemHoldResponse.setLccn("1");
         itemHoldResponse.setTrackingId("1");
         itemHoldResponse.setJobId("1");
         itemHoldResponse.setUpdatedDate(new Date().toString());
@@ -41,8 +41,8 @@ public class ItemHoldResponseUT extends BaseTestCase{
         assertNotNull(itemHoldResponse.getPickupLocation());
         assertNotNull(itemHoldResponse.getQueuePosition());
         assertNotNull(itemHoldResponse.getBibId());
-        assertNotNull(itemHoldResponse.getISBN());
-        assertNotNull(itemHoldResponse.getLCCN());
+        assertNotNull(itemHoldResponse.getIsbn());
+        assertNotNull(itemHoldResponse.getLccn());
         assertNotNull(itemHoldResponse.getTrackingId());
         assertNotNull(itemHoldResponse.getJobId());
         assertNotNull(itemHoldResponse.getUpdatedDate());

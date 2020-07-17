@@ -31,8 +31,8 @@ public class ItemInformationResponseUT extends BaseTestCase{
         itemInformationResponse.setPermanentLocation("test");
         itemInformationResponse.setCurrentLocation("test");
         itemInformationResponse.setBibID("1");
-        itemInformationResponse.setISBN("254564");
-        itemInformationResponse.setLCCN("524545578");
+        itemInformationResponse.setIsbn("254564");
+        itemInformationResponse.setLccn("524545578");
         itemInformationResponse.setCurrencyType("test");
         itemInformationResponse.setCallNumber("56465");
         itemInformationResponse.setItemType("test");
@@ -67,8 +67,8 @@ public class ItemInformationResponseUT extends BaseTestCase{
         assertNotNull(itemInformationResponse.getPermanentLocation());
         assertNotNull(itemInformationResponse.getCurrentLocation());
         assertNotNull(itemInformationResponse.getBibID());
-        assertNotNull(itemInformationResponse.getISBN());
-        assertNotNull(itemInformationResponse.getLCCN());
+        assertNotNull(itemInformationResponse.getIsbn());
+        assertNotNull(itemInformationResponse.getLccn());
         assertNotNull(itemInformationResponse.getHoldPickupDate());
         assertNotNull(itemInformationResponse.getCurrencyType());
         assertNotNull(itemInformationResponse.getCallNumber());

@@ -91,6 +91,8 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.12'
 
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
+	testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.7'
 
 	runtime('mysql:mysql-connector-java')
 	runtime("org.springframework.boot:spring-boot-starter-actuator")

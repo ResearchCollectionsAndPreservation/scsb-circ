@@ -250,6 +250,6 @@ public class ItemValidatorService {
 
     private boolean checkRequestItemStatus(String barcode, String requestItemStatus) {
         RequestItemEntity requestItemList = requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(barcode, requestItemStatus);
-        return (requestItemList != null && requestItemList.getId() > 0);
+        return !(requestItemList != null && requestItemList.getId() > 0);
     }
 }

@@ -97,10 +97,12 @@ public class BulkItemRequestProcessService {
                 }
                 itemRequestServiceUtil.generateReportAndSendEmail(bulkRequestId);
                 logger.info("Bulk request processing completed for bulk request id : {}", bulkRequestId);
-            } else {
-                processBulkRequestForBarcode(itemBarcode, bulkRequestItemEntity.get());
             }
-        }
+            } else {
+                    if(bulkRequestItemEntity.isPresent()) {
+                        processBulkRequestForBarcode(itemBarcode, bulkRequestItemEntity.get());
+                    }
+            }
     }
 
     /**

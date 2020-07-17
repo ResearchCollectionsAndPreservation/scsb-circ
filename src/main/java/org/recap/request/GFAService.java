@@ -484,9 +484,6 @@ public class GFAService {
                     gfaRetrieveItemResponse.setSuccess(false);
                     gfaRetrieveItemResponse.setScrenMessage(ttitem.getErrorNote());
                 } else {
-                    if (gfaRetrieveItemResponse == null) {
-                        gfaRetrieveItemResponse = new GFARetrieveItemResponse();
-                    }
                     gfaRetrieveItemResponse.setSuccess(true);
                 }
             }
@@ -534,6 +531,9 @@ public class GFAService {
                     gfaRetrieveItemResponse.setScrenMessage(RecapConstants.REQUEST_LAS_EXCEPTION + "HTTP Error response from LAS");
                 }
             } else {
+                if(gfaRetrieveItemResponse == null) {
+                    gfaRetrieveItemResponse = new GFARetrieveItemResponse();
+                }
                 gfaRetrieveItemResponse.setSuccess(false);
                 gfaRetrieveItemResponse.setScrenMessage(RecapConstants.GFA_ITEM_STATUS_CHECK_FAILED);
             }

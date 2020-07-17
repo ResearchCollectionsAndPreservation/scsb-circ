@@ -233,9 +233,17 @@ public class SubmitCollectionService {
                     savedBibliographicEntity = getSubmitCollectionDAOService().updateBibliographicEntity(bibliographicEntity, submitCollectionReportInfoMap,idMapToRemoveIndexList,processedBarcodeSetForDummyRecords);
                 }
             } else {
+                if (errorMessage != null && errorMessage.length()>0) {
                 logger.error("Error while parsing xml for a barcode in submit collection");
                 getSubmitCollectionReportHelperService().setSubmitCollectionFailureReportForUnexpectedException(bibliographicEntity,
                         submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),"Failed record - Item not updated - "+errorMessage.toString(),institutionEntity);
+                }
+                else {
+                    logger.error("Error while parsing xml for a barcode in submit collection");
+                    getSubmitCollectionReportHelperService().setSubmitCollectionFailureReportForUnexpectedException(bibliographicEntity,
+                            submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),"Failed record - Item not updated - ",institutionEntity);
+                }
+
             }
         } catch (Exception e) {
             getSubmitCollectionReportHelperService().setSubmitCollectionFailureReportForUnexpectedException(bibliographicEntity,

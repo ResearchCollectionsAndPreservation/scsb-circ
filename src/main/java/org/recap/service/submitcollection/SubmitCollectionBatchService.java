@@ -223,9 +223,16 @@ public class SubmitCollectionBatchService extends SubmitCollectionService {
                     return incomingBibliographicEntity;
                 }
             } else {//Invalid bibliographic entity is added to the failure report
-                logger.error("Error while parsing xml for a barcode in submit collection");
-                submitCollectionReportHelperService.setSubmitCollectionFailureReportForUnexpectedException(incomingBibliographicEntity,
-                        submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST),"Failed record - Item not updated - "+errorMessage.toString(),institutionEntity);
+                if (errorMessage != null && errorMessage.length() > 0) {
+                    logger.error("Error while parsing xml for a barcode in submit collection");
+                    submitCollectionReportHelperService.setSubmitCollectionFailureReportForUnexpectedException(incomingBibliographicEntity,
+                            submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST), "Failed record - Item not updated - " + errorMessage.toString(), institutionEntity);
+                } else {
+                    logger.error("Error while parsing xml for a barcode in submit collection");
+                    submitCollectionReportHelperService.setSubmitCollectionFailureReportForUnexpectedException(incomingBibliographicEntity,
+                            submitCollectionReportInfoMap.get(RecapConstants.SUBMIT_COLLECTION_FAILURE_LIST), "Failed record - Item not updated - ", institutionEntity);
+
+                }
             }
         } catch (Exception e) {
             logger.error("Exception while preparing bibliographic entity");

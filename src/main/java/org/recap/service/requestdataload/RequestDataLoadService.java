@@ -136,7 +136,7 @@ public class RequestDataLoadService {
         if(org.apache.commons.collections.CollectionUtils.isNotEmpty(itemEntityList)){
             Integer itemInstitutionId = itemEntityList.get(0).getOwningInstitutionId();
             for(ItemEntity itemEntity : itemEntityList){
-                if(itemEntity.getOwningInstitutionId() == itemInstitutionId){
+                if(itemEntity.getOwningInstitutionId().equals(itemInstitutionId)){
                     itemId = itemEntityList.get(0).getItemId();
                     owningInstitutionId = itemEntityList.get(0).getOwningInstitutionId();
                 }else{

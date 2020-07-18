@@ -9,19 +9,17 @@ import org.mockito.Spy;
 import org.recap.BaseTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class SIP2RecallRequestUT extends BaseTestCase {
 
-    SIP2RecallRequest mockSIP2RecallRequest;
+
 
     @Test
     public void testSIP2RecallRequest() {
-        mockSIP2RecallRequest = new SIP2RecallRequest("test", "test");
         SIP2RecallRequest SIP2RecallRequestnew = new SIP2RecallRequest("test", "test", "Test", "1234");
-        mockSIP2RecallRequest.getData();
-        assertTrue(true);
+        String result = SIP2RecallRequestnew.getData();
+        assertNotNull(result);
     }
 }
 

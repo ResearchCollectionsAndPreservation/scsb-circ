@@ -26,8 +26,8 @@ public class ItemCheckinResponseUT extends BaseTestCase {
         itemCheckinResponse.setFeeAmount("156");
         itemCheckinResponse.setMediaType("test");
         itemCheckinResponse.setBibId("1");
-        itemCheckinResponse.setISBN("145345");
-        itemCheckinResponse.setLCCN("454558");
+        itemCheckinResponse.setIsbn("145345");
+        itemCheckinResponse.setLccn("454558");
         itemCheckinResponse.setPermanentLocation("test");
         itemCheckinResponse.setSortBin("test");
         itemCheckinResponse.setCollectionCode("test");
@@ -66,8 +66,8 @@ public class ItemCheckinResponseUT extends BaseTestCase {
         assertNotNull(itemCheckinResponse.getFeeAmount());
         assertNotNull(itemCheckinResponse.getMediaType());
         assertNotNull(itemCheckinResponse.getBibId());
-        assertNotNull(itemCheckinResponse.getISBN());
-        assertNotNull(itemCheckinResponse.getLCCN());
+        assertNotNull(itemCheckinResponse.getIsbn());
+        assertNotNull(itemCheckinResponse.getLccn());
         assertNotNull(itemCheckinResponse.getJobId());
         assertNotNull(itemCheckinResponse.isProcessed());
         assertNotNull(itemCheckinResponse.getUpdatedDate());

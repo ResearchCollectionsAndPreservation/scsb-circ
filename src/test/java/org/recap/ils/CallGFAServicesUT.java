@@ -84,7 +84,7 @@ public class CallGFAServicesUT extends BaseTestCase {
     }
 
     @Test
-    public void testretrieveItem() {
+    public void wtestretrieveItem() {
         GFARetrieveItemRequest gfaRetrieveItemRequest = new GFARetrieveItemRequest();
         try {
             TtitemRequest ttitem001 = new TtitemRequest();

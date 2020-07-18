@@ -26,8 +26,8 @@ public class ItemCheckoutResponseUT extends BaseTestCase{
         itemCheckoutResponse.setFeeType("test");
         itemCheckoutResponse.setMediaType("test");
         itemCheckoutResponse.setBibId("1");
-        itemCheckoutResponse.setISBN("5664471");
-        itemCheckoutResponse.setLCCN("56646547");
+        itemCheckoutResponse.setIsbn("5664471");
+        itemCheckoutResponse.setLccn("56646547");
         itemCheckoutResponse.setJobId("4");
         itemCheckoutResponse.setProcessed(true);
         itemCheckoutResponse.setUpdatedDate(new Date().toString());
@@ -51,8 +51,8 @@ public class ItemCheckoutResponseUT extends BaseTestCase{
         assertNotNull(itemCheckoutResponse.getFeeAmount());
         assertNotNull(itemCheckoutResponse.getMediaType());
         assertNotNull(itemCheckoutResponse.getBibId());
-        assertNotNull(itemCheckoutResponse.getISBN());
-        assertNotNull(itemCheckoutResponse.getLCCN());
+        assertNotNull(itemCheckoutResponse.getIsbn());
+        assertNotNull(itemCheckoutResponse.getLccn());
         assertNotNull(itemCheckoutResponse.getJobId());
         assertNotNull(itemCheckoutResponse.isProcessed());
         assertNotNull(itemCheckoutResponse.getUpdatedDate());

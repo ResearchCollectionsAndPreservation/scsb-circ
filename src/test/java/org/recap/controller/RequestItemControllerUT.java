@@ -20,16 +20,22 @@ import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.ils.model.response.ItemRecallResponse;
 import org.recap.ils.model.response.PatronInformationResponse;
+import org.recap.model.BulkRequestInformation;
 import org.recap.model.ItemRefileRequest;
 import org.recap.model.jpa.ItemRefileResponse;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.ItemResponseInformation;
+import org.recap.model.jpa.ReplaceRequest;
+import org.recap.request.ItemRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -46,10 +52,13 @@ public class RequestItemControllerUT extends BaseTestCase {
 
     @Mock
     RequestItemController requestItemController;
-
+    @Autowired
+    RequestItemController requestItemControllerAutowired;
     @Mock
     JSIPConnectorFactory jsipConectorFactory;
 
+    @Mock
+    ItemRequestService itemRequestService;
     @Mock
     private ColumbiaJSIPConnector columbiaJSIPConnector;
     @Mock
@@ -324,7 +333,80 @@ public class RequestItemControllerUT extends BaseTestCase {
         ObjectMapper om = new ObjectMapper();
         ItemResponseInformation itemResponseInformation = om.readValue(strJson, ItemResponseInformation.class);
         logger.info(itemResponseInformation.getScreenMessage());
-
-
+    }
+    @Test
+    public void refileItem(){
+        ItemRefileRequest itemRefileRequest = new ItemRefileRequest();
+        itemRefileRequest.setItemBarcodes(Arrays.asList("123456"));
+        itemRefileRequest.setRequestIds(Arrays.asList(1));
+        ItemRefileResponse itemRefileResponse = requestItemControllerAutowired.refileItem(itemRefileRequest);
+        assertNotNull(itemRefileResponse);
+    }
+    @Test
+    public void patronValidationBulkRequest(){
+        BulkRequestInformation bulkRequestInformation = new BulkRequestInformation();
+        bulkRequestInformation.setPatronBarcode("123456");
+        bulkRequestInformation.setRequestingInstitution("PUL");
+        boolean result = requestItemControllerAutowired.patronValidationBulkRequest(bulkRequestInformation);
+        assertNotNull(result);
+    }
+    @Test
+    public void refileItemInILSWithItemBarcode(){
+        String callInstitition = "PUL";
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Arrays.asList("32101074849843"));
+        Mockito.doCallRealMethod().when(requestItemController).refileItemInILS(itemRequestInformation,callInstitition);
+        AbstractResponseItem abstractResponseItem = requestItemController.refileItemInILS(itemRequestInformation,callInstitition);
+        assertNotNull(abstractResponseItem);
+    }
+    @Test
+    public void refileItemInILS(){
+        String callInstitition = "PUL";
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Collections.EMPTY_LIST);
+        Mockito.doCallRealMethod().when(requestItemController).refileItemInILS(itemRequestInformation,callInstitition);
+        AbstractResponseItem abstractResponseItem = requestItemController.refileItemInILS(itemRequestInformation,callInstitition);
+        assertNotNull(abstractResponseItem);
+    }
+    @Test
+    public void replaceRequest(){
+        ReplaceRequest replaceRequest = new ReplaceRequest();
+        Map<String, String> result = requestItemControllerAutowired.replaceRequest(replaceRequest);
+        assertNotNull(result);
+    }
+    /*@Test
+    public void replaceRequestException(){
+        ReplaceRequest replaceRequest = new ReplaceRequest();
+        Mockito.when(itemRequestService.replaceRequestsToLASQueue(replaceRequest)).thenThrow(new Exception());
+        Mockito.doCallRealMethod().when(requestItemController).replaceRequest(replaceRequest);
+        Map<String, String> result = requestItemController.replaceRequest(replaceRequest);
+        assertNotNull(result);
+    }*/
+    @Test
+    public void replaceRequestEDD(){
+        ReplaceRequest replaceRequest = new ReplaceRequest();
+        replaceRequest.setReplaceRequestByType("EDD");
+        Map<String, String> result = requestItemControllerAutowired.replaceRequest(replaceRequest);
+        assertNotNull(result);
+    }
+    @Test
+    public void getPickupLocationCUL() {
+        String institution = "CUL";
+        String pickUpLocation = requestItemControllerAutowired.getPickupLocation(institution);
+        assertNotNull(pickUpLocation);
+        assertEquals("CIRCrecap",pickUpLocation);
+    }
+    @Test
+    public void getPickupLocationNYPL() {
+        String institution = "NYPL";
+        String pickUpLocation = requestItemControllerAutowired.getPickupLocation(institution);
+        assertNotNull(pickUpLocation);
+        assertEquals("lb",pickUpLocation);
+    }
+    @Test
+    public void logMessages(){
+        Object test ="test";
+        Logger logger = LoggerFactory.getLogger(RequestItemController.class);
+        requestItemControllerAutowired.logMessages(logger,test);
     }
 }

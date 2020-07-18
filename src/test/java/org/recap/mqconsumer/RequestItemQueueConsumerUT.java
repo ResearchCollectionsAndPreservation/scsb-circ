@@ -2,11 +2,22 @@ package org.recap.mqconsumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
+import org.recap.RecapCommonConstants;
+import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.model.jpa.RequestInformation;
+import org.recap.request.BulkItemRequestProcessService;
+import org.recap.request.BulkItemRequestService;
 import org.recap.request.ItemEDDRequestService;
 import org.recap.request.ItemRequestService;
 import org.slf4j.Logger;
@@ -18,7 +29,8 @@ import java.util.Arrays;
 /**
  * Created by hemalathas on 14/3/17.
  */
-public class RequestItemQueueConsumerUT extends BaseTestCase{
+@RunWith(MockitoJUnitRunner.class)
+public class RequestItemQueueConsumerUT{
 
     private static final Logger logger = LoggerFactory.getLogger(RequestItemQueueConsumer.class);
 
@@ -26,7 +38,19 @@ public class RequestItemQueueConsumerUT extends BaseTestCase{
     RequestItemQueueConsumer requestItemQueueConsumer;
 
     @Mock
+    RequestItemQueueConsumer injectMockedRequestItemQueueConsumer;
+
+    @Mock
+    BulkItemRequestProcessService bulkItemRequestProcessService;
+
+    @Mock
     Exchange exchange;
+
+    @Mock
+    Message message;
+
+    @Mock
+    BulkItemRequestService bulkItemRequestService;
 
     @Mock
     ItemRequestService itemRequestService;
@@ -36,6 +60,11 @@ public class RequestItemQueueConsumerUT extends BaseTestCase{
 
     @Mock
     ObjectMapper om;
+
+    @Before
+    public  void setup(){
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void testRequestItemOnMessage() throws IOException {
@@ -227,7 +256,7 @@ public class RequestItemQueueConsumerUT extends BaseTestCase{
         itemRequestInformation.setItemBarcodes(Arrays.asList("123"));
         String body = itemRequestInformation.toString();
         Mockito.when(requestItemQueueConsumer.getLogger()).thenReturn(logger);
-        Mockito.when(requestItemQueueConsumer.getItemRequestService()).thenReturn(itemRequestService);
+//        Mockito.when(requestItemQueueConsumer.getItemRequestService()).thenReturn(itemRequestService);
         Mockito.doCallRealMethod().when(requestItemQueueConsumer).lasOutgoingQOnCompletion(body);
         requestItemQueueConsumer.lasOutgoingQOnCompletion(body);
     }
@@ -283,29 +312,39 @@ public class RequestItemQueueConsumerUT extends BaseTestCase{
         Mockito.doCallRealMethod().when(requestItemQueueConsumer).lasResponsePWDOnMessage(body);
         requestItemQueueConsumer.lasResponsePWDOnMessage(body);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @Test
+    public void bulkRequestItemOnMessage() throws Exception{
+        String body = "12345";
+//        Mockito.doNothing().when(bulkItemRequestService).bulkRequestItems(1);
+        requestItemQueueConsumer.bulkRequestItemOnMessage(body,exchange);
+    }
+    @Test
+    public void bulkRequestProcessItemOnMessage() throws Exception{
+        message.setHeader(RecapCommonConstants.BULK_REQUEST_ID,1);
+        message.setBody("BULK REQUEST");
+        exchange.setIn(message);
+        String body = "12345";
+//        Mockito.when(exchange.getIn()).thenReturn(message);
+//        Mockito.doNothing().when(bulkItemRequestProcessService).processBulkRequestItem(body,1);
+        requestItemQueueConsumer.bulkRequestProcessItemOnMessage(body,exchange);
+    }
+    /*@Test
+    public  void requestItemLasStatusCheckOnMessage() throws Exception{
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Arrays.asList("123"));
+        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+        itemInformationResponse.setRequestId(1);
+        itemInformationResponse.setBibID("1");
+        String body = "12345";
+        RequestInformation requestInformation = new RequestInformation();
+        requestInformation.setItemRequestInfo(itemRequestInformation);
+        requestInformation.setItemResponseInformation(itemInformationResponse);
+        Mockito.when(om.readValue(body, RequestInformation.class)).thenReturn(requestInformation);
+        requestItemQueueConsumer.requestItemLasStatusCheckOnMessage(body,exchange);
+    }*/
+    @Test
+    public  void requestItemLasStatusCheckOnMessageException() throws Exception{
+        String body = "12345";
+        requestItemQueueConsumer.requestItemLasStatusCheckOnMessage(body,exchange);
+    }
 }

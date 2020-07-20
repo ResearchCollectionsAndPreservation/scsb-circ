@@ -10,7 +10,8 @@ import javax.management.MBeanServerConnection;
 
 import static org.junit.Assert.assertNull;
 
-public class JmxHelperUT extends BaseTestCase {
+
+public class JmxHelperUT{
     private static final Logger logger = LoggerFactory.getLogger(JmxHelper.class);
 
     @Test

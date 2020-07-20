@@ -42,6 +42,7 @@ public class BulkItemRequestServiceUT {
 
     @Before
     public void setUp() throws Exception {
+        ReflectionTestUtils.setField(bulkItemRequestService, "bulkRequestItemCountLimit", 5000);
     }
 
     @Test
@@ -66,9 +67,11 @@ public class BulkItemRequestServiceUT {
     @Test
     public void bulkRequestItems(){
         int bulkRequestId = 1;
+        ItemEntity itemEntity = getItemEntity();
         BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
-        //Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
-        //bulkItemRequestService.bulkRequestItems(bulkRequestId);
+//        Mockito.when(itemDetailsRepository.findByBarcode("123456")).thenReturn(Arrays.asList(itemEntity));
+        Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
     }
     private BulkRequestItemEntity getBulkRequestItemEntity(){
         InstitutionEntity institutionEntity = new InstitutionEntity();

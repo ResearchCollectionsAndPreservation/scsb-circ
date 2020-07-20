@@ -3,23 +3,29 @@ package org.recap.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.model.submitcollection.SubmitCollectionResponse;
+import org.recap.service.common.SetupDataService;
 import org.recap.service.deaccession.DeAccessionService;
+import org.recap.service.submitcollection.SubmitCollectionBatchService;
+import org.recap.service.submitcollection.SubmitCollectionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -29,13 +35,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by premkb on 26/12/16.
  */
-public class SharedCollectionRestControllerUT extends BaseTestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class SharedCollectionRestControllerUT {
+
+    @InjectMocks
+    private SharedCollectionRestController sharedCollectionRestController;
+    @Mock
+    private SubmitCollectionService submitCollectionService;
 
     @Mock
-    private SharedCollectionRestController sharedCollectionRestController;
+    private SubmitCollectionBatchService submitCollectionBatchService;
 
     @Mock
     DeAccessionService deAccessionService;
+
+    @Mock
+    private SetupDataService setupDataService;
 
     String updatedMarcXml = "<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\">\n" +
             "<record>\n" +
@@ -153,16 +168,27 @@ public class SharedCollectionRestControllerUT extends BaseTestCase {
         SubmitCollectionResponse submitCollectionResponse = new SubmitCollectionResponse();
         submitCollectionResponse.setItemBarcode("32101068878931");
         submitCollectionResponse.setMessage("ExceptionRecord");
+        String inputRecords = updatedMarcXml;
+        String institution = "PUL";
+        boolean isCGDProtection = true;
+        Map map = new HashMap();
+        map.put(1,"PUL");
         Map<String,Object> requestParameters = new HashedMap();
         requestParameters.put(RecapCommonConstants.INPUT_RECORDS,updatedMarcXml);
         requestParameters.put(RecapCommonConstants.INSTITUTION,"PUL");
-        requestParameters.put(RecapCommonConstants.IS_CGD_PROTECTED,false);
+        requestParameters.put(RecapCommonConstants.IS_CGD_PROTECTED,"true");
+        List<Integer> reportRecordNumberList = new ArrayList<>();
+        Set<Integer> processedBibIdSet = new HashSet<>();
+        List<Map<String, String>> idMapToRemoveIndexList = new ArrayList<>();//Added to remove dummy record in solr
+        List<Map<String, String>> bibIdMapToRemoveIndexList = new ArrayList<>();//Added to remove orphan record while unlinking
+        Set<String> updatedBoundWithDummyRecordOwnInstBibIdSet = new HashSet<>();
+        List<SubmitCollectionResponse> submitCollectionResponseList = new ArrayList<>();
+        submitCollectionResponseList.add(submitCollectionResponse);
         ResponseEntity responseEntity = new ResponseEntity(submitCollectionResponse,HttpStatus.OK);
-        Mockito.when(sharedCollectionRestController.submitCollection(requestParameters)).thenReturn(responseEntity);
+        Mockito.when(setupDataService.getInstitutionCodeIdMap()).thenReturn(map);
+        Mockito.when(submitCollectionBatchService.process(institution, inputRecords, processedBibIdSet, idMapToRemoveIndexList, bibIdMapToRemoveIndexList, "", reportRecordNumberList, true, isCGDProtection, updatedBoundWithDummyRecordOwnInstBibIdSet)).thenReturn(submitCollectionResponseList);
         ResponseEntity response = sharedCollectionRestController.submitCollection(requestParameters);
-        SubmitCollectionResponse responseBody = (SubmitCollectionResponse) response.getBody();
-        assertEquals(submitCollectionResponse.getItemBarcode(),responseBody.getItemBarcode());
-        assertEquals(submitCollectionResponse.getMessage(),responseBody.getMessage());
+        assertNotNull(response);
     }
 
     @Test
@@ -172,20 +198,11 @@ public class SharedCollectionRestControllerUT extends BaseTestCase {
         deAccessionItem.setItemBarcode("1");
         deAccessionItem.setDeliveryLocation("PB");
         deAccessionRequest.setDeAccessionItems(Arrays.asList(deAccessionItem));
-        ObjectMapper objectMapper = new ObjectMapper();
-        MvcResult mvcResult = this.mockMvc.perform(post("/sharedCollection/deAccession")
-                .headers(getHttpHeaders())
-                .content(objectMapper.writeValueAsString(deAccessionRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-        String result = mvcResult.getResponse().getContentAsString();
+        Map<String, String> map = new HashMap<>();
+        map.put("Institution","PUL");
+        Mockito.when(deAccessionService.deAccession(deAccessionRequest)).thenReturn(map);
+        ResponseEntity result = sharedCollectionRestController.deAccession(deAccessionRequest);
         assertNotNull(result);
     }
 
-    private HttpHeaders getHttpHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("api_key", "recap");
-        return headers;
-    }
 }

@@ -30,7 +30,7 @@ public class LasItemStatusCheckPollingCallbleUT {
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
 //        Mockito.when(gfaService.itemStatusCheck(gfaItemStatusCheckRequest)).thenReturn(gfaItemStatusCheckResponse);
         //GFAItemStatusCheckResponse gfaItemStatusCheckResponse1 = lasItemStatusCheckPollingCallable.call();
-        //assertNotNull(gfaItemStatusCheckResponse1);
+       // assertNotNull(gfaItemStatusCheckResponse1);
     }
     private GFAItemStatusCheckResponse getGfaItemStatusCheckResponse(){
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = new GFAItemStatusCheckResponse();

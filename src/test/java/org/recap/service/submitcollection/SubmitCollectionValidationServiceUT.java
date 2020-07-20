@@ -1,6 +1,12 @@
 package org.recap.service.submitcollection;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -8,21 +14,241 @@ import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
+import org.recap.service.common.SetupDataService;
+import org.recap.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class SubmitCollectionValidationServiceUT extends BaseTestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class SubmitCollectionValidationServiceUT{
     private static final Logger logger = LoggerFactory.getLogger(SubmitCollectionValidationService.class);
-    @Autowired
+    @InjectMocks
     SubmitCollectionValidationService submitCollectionValidationService;
-    @Autowired
-    InstitutionDetailsRepository institutionDetailRepository;
+    @Mock
+    InstitutionDetailsRepository institutionDetailsRepository;
+    @Mock
+    SubmitCollectionHelperService submitCollectionHelperService;
+    @Mock
+    SetupDataService setupDataService;
+    @Mock
+    CommonUtil commonUtil;
+    @Before
+    public void setUp() {
+        ReflectionTestUtils.setField(submitCollectionValidationService, "nonHoldingIdInstitution", "NYPL");
+    }
+    @Test
+    public void validateInstitution(){
+        String institutionCode = "PUL";
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setId(1);
+        institutionEntity.setInstitutionCode("PUL");
+        institutionEntity.setInstitutionName("PUL");
+        Mockito.when(institutionDetailsRepository.findByInstitutionCode(institutionCode)).thenReturn(institutionEntity);
+        boolean result = submitCollectionValidationService.validateInstitution(institutionCode);
+        assertEquals(true,result);
+    }
+    @Test
+    public void validateIncomingEntities(){
+        Map<String,List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        submitCollectionReportInfoMap.put("submitCollectionSuccessList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionRejectionList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionFailureList",Arrays.asList(getSubmitCollectionReportInfo()));
+        BibliographicEntity fetchedBibliographicEntity = getBibliographicEntity();
+        BibliographicEntity incomingBibliographicEntity = getBibliographicEntity();
+        Map institutionEntityMap = new HashMap();
+        institutionEntityMap.put(5,"Available");
+        institutionEntityMap.put(1,"PUL");
+        Map<String,Map<String,ItemEntity>> holdingsItemMap = new HashMap<>();
+        Map<String,ItemEntity> itemEntityMap = new HashMap<>();
+        itemEntityMap.put("1",getItemEntity());
+        holdingsItemMap.put("1",itemEntityMap);
+        Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(holdingsItemMap);
+        Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
+        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
+        Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
+        boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
+        assertTrue(result);
+    }
+    @Test
+    public void validateIncomingEntitiesForNYPL(){
+        Map<String,List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        submitCollectionReportInfoMap.put("submitCollectionSuccessList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionRejectionList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionFailureList",Arrays.asList(getSubmitCollectionReportInfo()));
+        BibliographicEntity fetchedBibliographicEntity = getBibliographicEntity();
+        BibliographicEntity incomingBibliographicEntity = getBibliographicEntity();
+        Map institutionEntityMap = new HashMap();
+        institutionEntityMap.put(5,"Available");
+        institutionEntityMap.put(1,"NYPL");
+        Map<String,Map<String,ItemEntity>> holdingsItemMap = new HashMap<>();
+        Map<String,ItemEntity> itemEntityMap = new HashMap<>();
+        itemEntityMap.put("1",getItemEntity());
+        holdingsItemMap.put("1",itemEntityMap);
+        Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(holdingsItemMap);
+        Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
+        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
+        Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
+        boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
+        assertTrue(result);
+    }
+    @Test
+    public void validateIncomingEntitiesWithoutFetchedHoldingsItemId(){
+        Map<String,List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        submitCollectionReportInfoMap.put("submitCollectionSuccessList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionRejectionList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionFailureList",Arrays.asList(getSubmitCollectionReportInfo()));
+        List<SubmitCollectionReportInfo> failureSubmitCollectionReportInfoList = new ArrayList<>();
+        failureSubmitCollectionReportInfoList.add(getSubmitCollectionReportInfo());
+        BibliographicEntity fetchedBibliographicEntity = getBibliographicEntity();
+        BibliographicEntity incomingBibliographicEntity = getBibliographicEntity();
+        Map institutionEntityMap = new HashMap();
+        institutionEntityMap.put(5,"Available");
+        institutionEntityMap.put(1,"PUL");
+        Map<String,Map<String,ItemEntity>> holdingsItemMap = new HashMap<>();
+        Map<String,ItemEntity> itemEntityMap = new HashMap<>();
+        itemEntityMap.put("1",getItemEntity());
+        holdingsItemMap.put("1",itemEntityMap);
+        Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(Collections.EMPTY_MAP);
+        Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
+        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
+        Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
+        Mockito.doNothing().when(commonUtil).buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(incomingBibliographicEntity, failureSubmitCollectionReportInfoList, "PUL", getItemEntity());
+        boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
+        assertFalse(result);
+    }
+    @Test
+    public void validateIncomingEntitiesWithoutFetchedHoldingsItemIdAndCollectionGroupId(){
+        Map<String,List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        submitCollectionReportInfoMap.put("submitCollectionSuccessList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionRejectionList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionFailureList",Arrays.asList(getSubmitCollectionReportInfo()));
+        List<SubmitCollectionReportInfo> failureSubmitCollectionReportInfoList = new ArrayList<>();
+        failureSubmitCollectionReportInfoList.add(getSubmitCollectionReportInfo());
+        BibliographicEntity fetchedBibliographicEntity = getBibliographicEntity();
+        BibliographicEntity incomingBibliographicEntity = getBibliographicEntity();
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setCollectionGroupId(null);
+        Map institutionEntityMap = new HashMap();
+        institutionEntityMap.put(5,"Available");
+        institutionEntityMap.put(1,"PUL");
+        Map<String,Map<String,ItemEntity>> holdingsItemMap = new HashMap<>();
+        Map<String,ItemEntity> itemEntityMap = new HashMap<>();
+        itemEntityMap.put("1",itemEntity);
+        holdingsItemMap.put("1",itemEntityMap);
+        Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(Collections.EMPTY_MAP);
+        Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
+        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
+        Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
+        Mockito.doNothing().when(commonUtil).buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(incomingBibliographicEntity, failureSubmitCollectionReportInfoList, "PUL", itemEntity);
+        boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
+        assertFalse(result);
+    }
+    private HoldingsEntity getHoldingsEntity() {
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId("12345");
+        holdingsEntity.setDeleted(false);
+        return holdingsEntity;
+    }
+    private BibliographicEntity getBibliographicEntity(){
+        Random random = new Random();
+
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setBibliographicId(123456);
+        bibliographicEntity.setContent("Test".getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
+        bibliographicEntity.setOwningInstitutionId(1);
+        bibliographicEntity.setOwningInstitutionBibId("1577261074");
+        bibliographicEntity.setDeleted(false);
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId("34567");
+        holdingsEntity.setDeleted(false);
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId("843617540");
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setBarcode("123456");
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("123");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("tst");
+        itemEntity.setLastUpdatedBy("tst");
+        itemEntity.setCatalogingStatus("Complete");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setDeleted(false);
+        itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        return bibliographicEntity;
+    }
+    private SubmitCollectionReportInfo getSubmitCollectionReportInfo(){
+        SubmitCollectionReportInfo submitCollectionReportInfo = new SubmitCollectionReportInfo();
+        submitCollectionReportInfo.setOwningInstitution("PUL");
+        submitCollectionReportInfo.setItemBarcode("123456");
+        submitCollectionReportInfo.setCustomerCode("PA");
+        submitCollectionReportInfo.setMessage("SUCCESS");
+        return submitCollectionReportInfo;
+    }
+
+    private ItemEntity getItemEntity(){
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setId(1);
+        institutionEntity.setInstitutionName("PUL");
+        institutionEntity.setInstitutionCode("PUL");
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId("843617540");
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setBarcode("123456");
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("123");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("tst");
+        itemEntity.setLastUpdatedBy("tst");
+        itemEntity.setCatalogingStatus("Incomplete");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setUseRestrictions("restrictions");
+        itemEntity.setDeleted(false);
+        itemEntity.setInstitutionEntity(institutionEntity);
+        itemEntity.setBibliographicEntities(Arrays.asList(getBibliographicEntity()));
+        return itemEntity;
+    }
 
     @Test
     public void test() {
@@ -39,8 +265,7 @@ public class SubmitCollectionValidationServiceUT extends BaseTestCase {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("UC");
         institutionEntity.setInstitutionName("University of Chicago");
-        InstitutionEntity entity = institutionDetailRepository.save(institutionEntity);
-        assertNotNull(entity);
+
 
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -49,7 +274,7 @@ public class SubmitCollectionValidationServiceUT extends BaseTestCase {
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionId(entity.getId());
+        bibliographicEntity.setOwningInstitutionId(1);
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings".getBytes());
@@ -93,7 +318,5 @@ public class SubmitCollectionValidationServiceUT extends BaseTestCase {
         } catch (Exception e) {
             logger.info("Exception" + e);
         }
-
-        assertTrue(!datatest);
     }
 }

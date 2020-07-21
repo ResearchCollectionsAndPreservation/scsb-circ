@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
+import org.recap.RecapConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
@@ -36,8 +37,9 @@ public class SubmitCollectionValidationServiceUT{
     SubmitCollectionHelperService submitCollectionHelperService;
     @Mock
     SetupDataService setupDataService;
+
     @Mock
-    CommonUtil commonUtil;
+    SubmitCollectionReportHelperService submitCollectionReportHelperService;
     @Before
     public void setUp() {
         ReflectionTestUtils.setField(submitCollectionValidationService, "nonHoldingIdInstitution", "NYPL");
@@ -72,7 +74,6 @@ public class SubmitCollectionValidationServiceUT{
         holdingsItemMap.put("1",itemEntityMap);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(holdingsItemMap);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
-        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
         Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
         boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
         assertTrue(result);
@@ -96,7 +97,6 @@ public class SubmitCollectionValidationServiceUT{
         holdingsItemMap.put("1",itemEntityMap);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(holdingsItemMap);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
-        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
         Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
         boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
         assertTrue(result);
@@ -122,9 +122,7 @@ public class SubmitCollectionValidationServiceUT{
         holdingsItemMap.put("1",itemEntityMap);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(Collections.EMPTY_MAP);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
-        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
         Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
-        Mockito.doNothing().when(commonUtil).buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(incomingBibliographicEntity, failureSubmitCollectionReportInfoList, "PUL", getItemEntity());
         boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
         assertFalse(result);
     }
@@ -151,26 +149,164 @@ public class SubmitCollectionValidationServiceUT{
         holdingsItemMap.put("1",itemEntityMap);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(Collections.EMPTY_MAP);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
-        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
         Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
-        Mockito.doNothing().when(commonUtil).buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(incomingBibliographicEntity, failureSubmitCollectionReportInfoList, "PUL", itemEntity);
         boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
         assertFalse(result);
     }
-    private HoldingsEntity getHoldingsEntity() {
-        HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setCreatedDate(new Date());
-        holdingsEntity.setLastUpdatedDate(new Date());
-        holdingsEntity.setCreatedBy("tst");
-        holdingsEntity.setLastUpdatedBy("tst");
-        holdingsEntity.setOwningInstitutionId(1);
-        holdingsEntity.setOwningInstitutionHoldingsId("12345");
-        holdingsEntity.setDeleted(false);
-        return holdingsEntity;
+    @Test
+    public void getOwningBibIdOwnInstHoldingsIdIfAnyHoldingMismatch(){
+        List<BibliographicEntity> bibliographicEntityList = new ArrayList<>();
+        bibliographicEntityList.add(getBibliographicEntity());
+        List<String> holdingsIdUniqueList = new ArrayList<>();
+        holdingsIdUniqueList.add("12345");
+        Map<String,String> stringMap = submitCollectionValidationService.getOwningBibIdOwnInstHoldingsIdIfAnyHoldingMismatch(bibliographicEntityList,holdingsIdUniqueList);
+        assertNotNull(stringMap);
+    }
+    @Test
+    public  void validateIncomingItemHavingBibCountIsSameAsExistingItem(){
+        Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        submitCollectionReportInfoMap.put("submitCollectionSuccessList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionRejectionList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionFailureList",Arrays.asList(getSubmitCollectionReportInfo()));
+        List<SubmitCollectionReportInfo> failureSubmitCollectionReportInfoList = new ArrayList<>();
+        failureSubmitCollectionReportInfoList.add(getSubmitCollectionReportInfo());
+        Map institutionEntityMap = new HashMap();
+        institutionEntityMap.put(5,"Available");
+        institutionEntityMap.put(1,"NYPL");
+        Map<String,Map<String,ItemEntity>> holdingsItemMap = new HashMap<>();
+        Map<String,ItemEntity> itemEntityMap = new HashMap<>();
+        itemEntityMap.put("1",getItemEntity());
+        holdingsItemMap.put("1",itemEntityMap);
+        BibliographicEntity fetchedBibliographicEntity = getBibliographicEntity();
+        BibliographicEntity incomingBibliographicEntity = getBibliographicEntity();
+        Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
+        Map<String, ItemEntity> fetchedBarcodeItemEntityMap = new HashMap<>();
+        fetchedBarcodeItemEntityMap.put("123456",getItemEntity());
+        List<BibliographicEntity> incomingBibliographicEntityList = new ArrayList<>();
+        incomingBibliographicEntityList.add(getBibliographicEntity());
+        boolean result = submitCollectionValidationService.validateIncomingItemHavingBibCountIsSameAsExistingItem(submitCollectionReportInfoMap,fetchedBarcodeItemEntityMap,incomingBibliographicEntityList);
+        assertTrue(result);
+    }
+    @Test
+    public  void validateIncomingItemHavingBibCountIsSameAsExistingItemWithMatching(){
+        Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        submitCollectionReportInfoMap.put("submitCollectionSuccessList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionRejectionList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionFailureList",Arrays.asList(getSubmitCollectionReportInfo()));
+        List<SubmitCollectionReportInfo> failureSubmitCollectionReportInfoList = new ArrayList<>();
+        failureSubmitCollectionReportInfoList.add(getSubmitCollectionReportInfo());
+        Map institutionEntityMap = new HashMap();
+        institutionEntityMap.put(5,"Available");
+        institutionEntityMap.put(1,"NYPL");
+        Map<String,Map<String,ItemEntity>> holdingsItemMap = new HashMap<>();
+        Map<String,ItemEntity> itemEntityMap = new HashMap<>();
+        itemEntityMap.put("1",getItemEntity());
+        holdingsItemMap.put("1",itemEntityMap);
+        Map<String, ItemEntity> fetchedBarcodeItemEntityMap = new HashMap<>();
+        fetchedBarcodeItemEntityMap.put("123456",getItemEntity());
+        List<BibliographicEntity> incomingBibliographicEntityList = new ArrayList<>();
+        BibliographicEntity bibliographicEntity = getBibliographicEntity();
+        bibliographicEntity.setOwningInstitutionBibId("897546");
+        incomingBibliographicEntityList.add(bibliographicEntity);
+        ItemEntity incomingItemEntity = getItemEntity();
+        Mockito.when(submitCollectionReportHelperService.isBarcodeAlreadyAdded(incomingItemEntity.getBarcode(),submitCollectionReportInfoMap)).thenReturn(false);
+        Mockito.when(submitCollectionReportHelperService.isBarcodeAlreadyAdded(incomingItemEntity.getBarcode(),submitCollectionReportInfoMap)).thenReturn(false);
+        boolean result = submitCollectionValidationService.validateIncomingItemHavingBibCountIsSameAsExistingItem(submitCollectionReportInfoMap,fetchedBarcodeItemEntityMap,incomingBibliographicEntityList);
+        assertFalse(result);
+    }
+    @Test
+    public void validateIncomingItemHavingBibCountGreaterThanExistingItem(){
+        Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        submitCollectionReportInfoMap.put("submitCollectionSuccessList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionRejectionList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionFailureList",Arrays.asList(getSubmitCollectionReportInfo()));
+        List<BibliographicEntity> incomingBibliographicEntityList = new ArrayList<>();
+        incomingBibliographicEntityList.add(getBibliographicEntity());
+        List<BibliographicEntity> existingBibliographicEntityList = new ArrayList<>();
+        existingBibliographicEntityList.add(getBibliographicEntity());
+        boolean result = submitCollectionValidationService.validateIncomingItemHavingBibCountGreaterThanExistingItem(submitCollectionReportInfoMap,incomingBibliographicEntityList,existingBibliographicEntityList);
+        assertTrue(result);
+    }
+    @Test
+    public void validateIncomingItemHavingBibCountGreaterThanExistingItem2(){
+        Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        submitCollectionReportInfoMap.put("submitCollectionSuccessList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionRejectionList",Arrays.asList(getSubmitCollectionReportInfo()));
+        submitCollectionReportInfoMap.put("submitCollectionFailureList",Arrays.asList(getSubmitCollectionReportInfo()));
+        List<BibliographicEntity> incomingBibliographicEntityList = new ArrayList<>();
+        incomingBibliographicEntityList.add(getBibliographicEntity());
+        List<BibliographicEntity> existingBibliographicEntityList = new ArrayList<>();
+        BibliographicEntity bibliographicEntity = getBibliographicEntity();
+        bibliographicEntity.setOwningInstitutionBibId("67890");
+        existingBibliographicEntityList.add(bibliographicEntity);
+        boolean result = submitCollectionValidationService.validateIncomingItemHavingBibCountGreaterThanExistingItem(submitCollectionReportInfoMap,incomingBibliographicEntityList,existingBibliographicEntityList);
+        assertFalse(result);
+    }
+    @Test
+    public void validateIncomingItemHavingBibCountLesserThanExistingItem(){
+        Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        List<BibliographicEntity> incomingBibliographicEntityList = new ArrayList<>();
+        incomingBibliographicEntityList.add(getBibliographicEntity());
+        List<BibliographicEntity> existingBibliographicEntityList = new ArrayList<>();
+        existingBibliographicEntityList.add(getBibliographicEntity());
+        List<String> incomingBibsNotInExistingBibs = new ArrayList<>();
+        incomingBibsNotInExistingBibs.add("23567");
+        ItemEntity existingItemEntity = getItemEntity();
+        Map institutionEntityMap = new HashMap();
+        institutionEntityMap.put(1,"Available");
+        institutionEntityMap.put(2,"PUL");
+        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
+        boolean result = submitCollectionValidationService.validateIncomingItemHavingBibCountLesserThanExistingItem(submitCollectionReportInfoMap,incomingBibliographicEntityList,existingBibliographicEntityList,incomingBibsNotInExistingBibs,existingItemEntity);
+        assertFalse(result);
+    }
+    @Test
+    public void validateIncomingItemHavingBibCountLesserThanExistingItemAvailable(){
+        Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        List<BibliographicEntity> incomingBibliographicEntityList = new ArrayList<>();
+        incomingBibliographicEntityList.add(getBibliographicEntity());
+        List<BibliographicEntity> existingBibliographicEntityList = new ArrayList<>();
+        existingBibliographicEntityList.add(getBibliographicEntity());
+        List<String> incomingBibsNotInExistingBibs = new ArrayList<>();
+        incomingBibsNotInExistingBibs.add("23567");
+        ItemEntity existingItemEntity = getItemEntity();
+        Map institutionEntityMap = new HashMap();
+        institutionEntityMap.put(2,"Available");
+        institutionEntityMap.put(1,"PUL");
+        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
+        boolean result = submitCollectionValidationService.validateIncomingItemHavingBibCountLesserThanExistingItem(submitCollectionReportInfoMap,incomingBibliographicEntityList,existingBibliographicEntityList,incomingBibsNotInExistingBibs,existingItemEntity);
+        assertFalse(result);
+    }
+    @Test
+    public void validateIncomingItemHavingBibCountLesserThanExistingItemWithoutIncomingBibsNotInExistingBibs(){
+        Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        List<BibliographicEntity> incomingBibliographicEntityList = new ArrayList<>();
+        incomingBibliographicEntityList.add(getBibliographicEntity());
+        List<BibliographicEntity> existingBibliographicEntityList = new ArrayList<>();
+        existingBibliographicEntityList.add(getBibliographicEntity());
+        List<String> incomingBibsNotInExistingBibs = new ArrayList<>();
+        ItemEntity existingItemEntity = getItemEntity();
+        Map institutionEntityMap = new HashMap();
+        institutionEntityMap.put(1,"Available");
+        institutionEntityMap.put(2,"PUL");
+        Mockito.when(setupDataService.getItemStatusIdCodeMap().get(1)).thenReturn(institutionEntityMap);
+        boolean result = submitCollectionValidationService.validateIncomingItemHavingBibCountLesserThanExistingItem(submitCollectionReportInfoMap,incomingBibliographicEntityList,existingBibliographicEntityList,incomingBibsNotInExistingBibs,existingItemEntity);
+        assertTrue(result);
     }
     private BibliographicEntity getBibliographicEntity(){
-        Random random = new Random();
-
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setBibliographicId(123456);
         bibliographicEntity.setContent("Test".getBytes());
@@ -181,6 +317,11 @@ public class SubmitCollectionValidationServiceUT{
         bibliographicEntity.setOwningInstitutionId(1);
         bibliographicEntity.setOwningInstitutionBibId("1577261074");
         bibliographicEntity.setDeleted(false);
+
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setId(1);
+        institutionEntity.setInstitutionName("PUL");
+        institutionEntity.setInstitutionCode("PUL");
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setCreatedDate(new Date());
@@ -206,6 +347,7 @@ public class SubmitCollectionValidationServiceUT{
         itemEntity.setCatalogingStatus("Complete");
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setDeleted(false);
+        itemEntity.setInstitutionEntity(institutionEntity);
         itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 

@@ -840,7 +840,9 @@ public class GFAService {
                 }
             }
         } else {
-            gfaRetrieveItemResponse.setSuccess(true);
+            if(gfaRetrieveItemResponse != null) {
+                gfaRetrieveItemResponse.setSuccess(true);
+            }
         }
         return gfaRetrieveItemResponse;
     }

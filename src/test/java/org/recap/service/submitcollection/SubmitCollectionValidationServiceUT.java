@@ -37,6 +37,8 @@ public class SubmitCollectionValidationServiceUT{
     SubmitCollectionHelperService submitCollectionHelperService;
     @Mock
     SetupDataService setupDataService;
+    @Mock
+    CommonUtil commonUtil;
 
     @Mock
     SubmitCollectionReportHelperService submitCollectionReportHelperService;
@@ -123,6 +125,10 @@ public class SubmitCollectionValidationServiceUT{
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(Collections.EMPTY_MAP);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
         Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
+        String owningInstitution = "NYPL";
+        Map<String,ItemEntity> entityMap = new HashMap<>();
+        //Map.Entry<String,Map<String,ItemEntity>> incomingHoldingItemMapEntry = new E<String,Map<String,ItemEntity>>();
+//        Mockito.doNothing().when(commonUtil).buildSubmitCollectionReportInfoAndAddFailures(fetchedBibliographicEntity, failureSubmitCollectionReportInfoList, owningInstitution,null, getItemEntity());
         boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
         assertFalse(result);
     }
@@ -150,6 +156,9 @@ public class SubmitCollectionValidationServiceUT{
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(fetchedBibliographicEntity)).thenReturn(Collections.EMPTY_MAP);
         Mockito.when(submitCollectionHelperService.getHoldingItemIdMap(incomingBibliographicEntity)).thenReturn(holdingsItemMap);
         Mockito.when(setupDataService.getInstitutionIdCodeMap().get(incomingBibliographicEntity.getOwningInstitutionId())).thenReturn(institutionEntityMap);
+        String owningInstitution = "NYPL";
+        ItemEntity incomingItemEntity = getItemEntity();
+//        Mockito.doNothing().when(commonUtil).buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(incomingBibliographicEntity, failureSubmitCollectionReportInfoList, owningInstitution, incomingItemEntity);
         boolean result = submitCollectionValidationService.validateIncomingEntities(submitCollectionReportInfoMap,fetchedBibliographicEntity,incomingBibliographicEntity);
         assertFalse(result);
     }

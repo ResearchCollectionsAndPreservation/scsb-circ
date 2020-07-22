@@ -11,33 +11,31 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
-import org.recap.converter.MarcToBibEntityConverter;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
-import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.service.common.RepositoryService;
 import org.recap.service.common.SetupDataService;
 import org.recap.util.CommonUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Collections;
+import static org.junit.Assert.assertNotNull;
 
-import static org.junit.Assert.*;
 
 /**
  * Created by premkb on 18/6/17.
@@ -377,7 +375,6 @@ public class SubmitCollectionReportHelperServiceUT{
         return holdingsEntity;
     }
     private BibliographicEntity getBibliographicEntity(){
-        Random random = new Random();
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setBibliographicId(123456);

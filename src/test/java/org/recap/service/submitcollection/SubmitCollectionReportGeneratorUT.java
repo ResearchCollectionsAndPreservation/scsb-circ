@@ -1,8 +1,11 @@
 package org.recap.service.submitcollection;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
 import org.recap.model.reports.ReportDataRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +16,8 @@ import static junit.framework.TestCase.assertNotNull;
 /**
  * Created by premkb on 23/3/17.
  */
-public class SubmitCollectionReportGeneratorUT extends BaseTestCase{
+@RunWith(MockitoJUnitRunner.class)
+public class SubmitCollectionReportGeneratorUT{
 
     @Mock
     private SubmitCollectionReportGenerator submitCollectionReportGenerator;
@@ -27,7 +31,11 @@ public class SubmitCollectionReportGeneratorUT extends BaseTestCase{
     public String getSolrClientUrl() {
         return solrClientUrl;
     }
-
+@Before
+public void setup(){
+    Mockito.when(submitCollectionReportGenerator.getSolrClientUrl()).thenReturn(solrClientUrl);
+    Mockito.when(submitCollectionReportGenerator.getRestTemplate()).thenReturn(restTemplate);
+}
     @Test
     public void generateReport(){
         ReportDataRequest reportDataRequest = new ReportDataRequest();

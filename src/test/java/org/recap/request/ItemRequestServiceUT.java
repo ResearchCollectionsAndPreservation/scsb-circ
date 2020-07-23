@@ -29,6 +29,8 @@ import org.recap.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.powermock.api.mockito.PowerMockito;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.Normalizer;
@@ -132,6 +134,7 @@ public class ItemRequestServiceUT {
         Mockito.when(mockedCustomerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(customerCodeEntity);
        // PowerMockito.mockStatic(UriComponentsBuilder.class);
        // PowerMockito.when(UriComponentsBuilder.fromHttpUrl("http://localhost:9090/")).thenReturn(builder);
+        //restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>()
         Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(mockedItemDetailsRepository.findByItemId(itemEntity.getItemId())).thenReturn(itemEntity);
         Mockito.doNothing().when(mockedItemRequestDBService).updateItemAvailabilutyStatus(Arrays.asList(itemEntity), itemRequestInfo.getUsername());

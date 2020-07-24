@@ -4,12 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.controller.ItemController;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.CustomerCodeEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
@@ -242,7 +237,26 @@ public class ItemValidatorService {
                     bSuccess = -1;
                 }
             } else {
-                bSuccess = 1;
+                customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(customerCode);
+                List<DeliveryRestrictionEntity> deliveryRestrictionEntityList = customerCodeEntity.getDeliveryRestrictionEntityList();
+                if(CollectionUtils.isNotEmpty(deliveryRestrictionEntityList)){
+                      for (DeliveryRestrictionEntity deliveryRestrictionEntity : deliveryRestrictionEntityList) {
+                          if(itemRequestInformation.getRequestingInstitution().equals(deliveryRestrictionEntity.getInstitutionEntity().getInstitutionCode()))
+                          {
+                              if ((deliveryRestrictionEntity.getDeliveryRestriction()).contains(itemRequestInformation.getDeliveryLocation())) {
+                                      bSuccess = 1;
+                                      break;
+                                  }
+                                  else {
+                                      bSuccess = -1;
+                                  }
+                          }
+                    }
+                }
+                else{
+                    bSuccess = -1;
+                }
+
             }
         }
         return bSuccess;

@@ -6,6 +6,7 @@ import org.recap.RecapCommonConstants;
 import org.recap.controller.ItemController;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.CustomerCodeEntity;
+import org.recap.model.jpa.DeliveryRestrictionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.ItemStatusEntity;
@@ -242,7 +243,26 @@ public class ItemValidatorService {
                     bSuccess = -1;
                 }
             } else {
-                bSuccess = 1;
+                customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(customerCode);
+                List<DeliveryRestrictionEntity> deliveryRestrictionEntityList = customerCodeEntity.getDeliveryRestrictionEntityList();
+                if(CollectionUtils.isNotEmpty(deliveryRestrictionEntityList)){
+                      for (DeliveryRestrictionEntity deliveryRestrictionEntity : deliveryRestrictionEntityList) {
+                          if(itemRequestInformation.getRequestingInstitution().equals(deliveryRestrictionEntity.getInstitutionEntity().getInstitutionCode()))
+                          {
+                              if ((deliveryRestrictionEntity.getDeliveryRestriction()).contains(itemRequestInformation.getDeliveryLocation())) {
+                                      bSuccess = 1;
+                                      break;
+                                  }
+                                  else {
+                                      bSuccess = -1;
+                                  }
+                          }
+                    }
+                }
+                else{
+                    bSuccess = -1;
+                }
+
             }
         }
         return bSuccess;

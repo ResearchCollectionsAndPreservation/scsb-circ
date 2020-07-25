@@ -2,22 +2,22 @@ package org.recap.camel.submitcollection.processor;
 
 import org.apache.camel.ProducerTemplate;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.recap.BaseTestCase;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import org.mockito.junit.MockitoJUnitRunner;
 import static org.junit.Assert.assertTrue;
 
-public class SubmitCollectionNotificationProcessorUT extends BaseTestCase {
-    @Mock
+@RunWith(MockitoJUnitRunner.class)
+public class SubmitCollectionNotificationProcessorUT {
+    @InjectMocks
     SubmitCollectionNotificationProcessor submitCollectionNotificationProcessor;
-    @Autowired
+    @Mock
     private ProducerTemplate producer;
 
     @Test
     public void testSubmitCollectionNotificationProcessor(){
-        submitCollectionNotificationProcessor = Mockito.mock(SubmitCollectionNotificationProcessor.class);
         submitCollectionNotificationProcessor.sendSubmitCollectionNotification();
         assertTrue(true);
     }

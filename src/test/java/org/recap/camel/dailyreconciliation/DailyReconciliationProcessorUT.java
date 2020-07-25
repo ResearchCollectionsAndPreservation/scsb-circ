@@ -1,4 +1,4 @@
-package org.recap.camel;
+package org.recap.camel.dailyreconciliation;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;

@@ -2,11 +2,20 @@ package org.recap.camel.requestinitialdataload.processor;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.Message;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
+import org.recap.service.requestdataload.RequestDataLoadService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
@@ -14,13 +23,33 @@ import java.util.*;
 
 import static org.junit.Assert.assertTrue;
 
-public class RequestInitialDataLoadProcessorUT extends BaseTestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class RequestInitialDataLoadProcessorUT {
 
+    @InjectMocks
     RequestInitialDataLoadProcessor requestInitialDataLoadProcessor;
+    @Mock
+    RequestInitialDataLoadProcessor requestInitialDataLoadProcessor1;
+    @Mock
+    RequestInitialDataLoadProcessor requestInitialDataLoadProcessor2;
+    @Mock
+    Exchange exchange;
+    @Mock
+    Message message;
+    @Mock
+    RequestDataLoadService requestDataLoadService;
+
+    private Set<String> barcodeSet = new HashSet<>();
+    @Before
+    public  void setup(){
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void testBefore() {
         requestInitialDataLoadProcessor = new RequestInitialDataLoadProcessor("CUL");
+        requestInitialDataLoadProcessor1 = new RequestInitialDataLoadProcessor("PUL");
+        requestInitialDataLoadProcessor2 = new RequestInitialDataLoadProcessor("NYPL");
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = new RequestDataLoadCSVRecord();
         RequestDataLoadCSVRecord requestDataLoadCSVRecord1 = new RequestDataLoadCSVRecord();
         requestDataLoadCSVRecord.setBarcode("332456456456745");
@@ -55,12 +84,46 @@ public class RequestInitialDataLoadProcessorUT extends BaseTestCase {
             requestInitialDataLoadProcessor.getBarcodeSet();
             requestInitialDataLoadProcessor.processInput(ex);
             ex.getIn().setHeader("directoryName", "PUL");
-            requestInitialDataLoadProcessor.processInput(ex);
-            ex.getIn().setHeader("directoryName", "NYPLL");
-            requestInitialDataLoadProcessor.processInput(ex);
+            requestInitialDataLoadProcessor1.processInput(ex);
+            ex.getIn().setHeader("directoryName", "NYPL");
+            requestInitialDataLoadProcessor2.processInput(ex);
         } catch (Exception e) {
             e.printStackTrace();
         }
         assertTrue(true);
+    }
+
+    @Test
+    public void processInput() throws ParseException {
+        barcodeSet.add("123456");
+        RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord();
+        RequestDataLoadCSVRecord requestDataLoadCSVRecord1 = getRequestDataLoadCSVRecord();
+        requestDataLoadCSVRecord.setBarcode("123456");
+        List<RequestDataLoadCSVRecord> requestDataLoadCSVRecordList = new ArrayList<>();
+        requestDataLoadCSVRecordList.add(requestDataLoadCSVRecord);
+        requestDataLoadCSVRecordList.add(requestDataLoadCSVRecord1);
+        CamelContext ctx = new DefaultCamelContext();
+        Exchange exchange = new DefaultExchange(ctx);
+        exchange.getIn().setBody(requestDataLoadCSVRecordList);
+        exchange.getIn().setHeader("John", "CUL");
+        exchange.setProperty("CamelSplitIndex",0);
+        exchange.setProperty("CamelSplitComplete",true);
+        Set<String> stringSet = new HashSet<>();
+        stringSet.add("test");
+        requestInitialDataLoadProcessor.processInput(exchange);
+
+    }
+    private RequestDataLoadCSVRecord getRequestDataLoadCSVRecord(){
+        RequestDataLoadCSVRecord requestDataLoadCSVRecord = new RequestDataLoadCSVRecord();
+        requestDataLoadCSVRecord.setBarcode("332456456456745");
+        requestDataLoadCSVRecord.setCustomerCode("PB");
+        requestDataLoadCSVRecord.setDeliveryMethod("Test");
+        requestDataLoadCSVRecord.setCreatedDate(new Date().toString());
+        requestDataLoadCSVRecord.setLastUpdatedDate(new Date().toString());
+        requestDataLoadCSVRecord.setPatronId("0000000");
+        requestDataLoadCSVRecord.setStopCode("AD");
+        requestDataLoadCSVRecord.setEmail("hemalatha.s@htcindia.com");
+        return requestDataLoadCSVRecord;
+
     }
 }

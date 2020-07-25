@@ -10,12 +10,22 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.model.jaxb.JAXBHandler;
 import org.recap.model.jaxb.marc.BibRecords;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.util.MarcUtil;
 
 import javax.xml.bind.JAXBException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Set;
+import java.util.HashSet;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -150,12 +160,20 @@ public class SubmitCollectionBatchServiceUT {
         processedBibIds.add(1);
         processedBibIds.add(2);
         Map<String, List< SubmitCollectionReportInfo >> submitCollectionReportInfoMap = new HashMap<>();
+        List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();
+        submitCollectionReportInfos.add(getSubmitCollectionReportInfo());
+        submitCollectionReportInfoMap.put("1",submitCollectionReportInfos);
         List<Map<String, String>> idMapToRemoveIndexList = new ArrayList<>();
+        Map<String, String> stringMap = new HashMap<>();
+        stringMap.put("1","1");
+        idMapToRemoveIndexList.add(stringMap);
         List<Map<String, String>> bibIdMapToRemoveIndexList = new ArrayList<>();
+        bibIdMapToRemoveIndexList.add(stringMap);
         boolean checkLimit = true;
         boolean isCGDProtection = true;
         Set<String> updatedDummyRecordOwnInstBibIdSet = new HashSet<>();
-        InstitutionEntity institutionEntity = new InstitutionEntity();
+        updatedDummyRecordOwnInstBibIdSet.add("123456");
+        InstitutionEntity institutionEntity = getInstitutionEntity();
         record.setId(1l);
         leader.setId(1l);
         leader.setBaseAddressOfData(1);
@@ -163,9 +181,11 @@ public class SubmitCollectionBatchServiceUT {
         record.setType("Submit");
         List<Record> recordList = new ArrayList<>();
         recordList.add(record);
+//        Mockito.when(submitCollectionBatchService.getMarcUtil()).thenReturn(marcUtil);
+//        Mockito.when(marcUtil.convertMarcXmlToRecord(inputRecords)).thenReturn(recordList);
+ ///       Mockito.when(marcUtil.convertAndValidateXml(inputRecords, checkLimit, recordList)).thenCallRealMethod();
         String result = submitCollectionBatchService.processMarc(inputRecords, processedBibIds,submitCollectionReportInfoMap,idMapToRemoveIndexList,bibIdMapToRemoveIndexList,checkLimit
             ,isCGDProtection,institutionEntity,updatedDummyRecordOwnInstBibIdSet);
-        //assertNotNull(result);
     }
 
     @Test
@@ -187,7 +207,23 @@ public class SubmitCollectionBatchServiceUT {
         assertNotNull(result);
     }
     @Test
+    public void processSCSB() throws JAXBException {
+        //String inputRecords = "test";
+        Set<Integer> processedBibIds = new HashSet<>();
+        Map<String, List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
+        List<Map<String, String>> idMapToRemoveIndexList = new ArrayList<>();
+        List<Map<String, String>> bibIdMapToRemoveIndexList = new ArrayList<>();
+        boolean checkLimit = true;
+        boolean isCGDProtected = true;
+        InstitutionEntity institutionEntity = getInstitutionEntity();
+        Set<String> updatedDummyRecordOwnInstBibIdSet = new HashSet<>();
+        BibRecords bibRecords = new BibRecords();
+//        Mockito.when((BibRecords)jaxbHandler.getInstance().unmarshal(inputRecords, BibRecords.class)).thenReturn(bibRecords);
+   //     submitCollectionBatchService.processSCSB(inputRecords,processedBibIds,submitCollectionReportInfoMap,idMapToRemoveIndexList,bibIdMapToRemoveIndexList,checkLimit,isCGDProtected,institutionEntity,updatedDummyRecordOwnInstBibIdSet);
+    }
+    @Test
     public  void processSCSBException() throws JAXBException {
+        //String inputRecords = "/home/jancy.roach/Workspace/Recap-4jdk11/Phase4-SCSB-Circ/src/test/resources";
         Set<Integer> processedBibIds = new HashSet<>();
         processedBibIds.add(1);
         processedBibIds.add(2);
@@ -197,11 +233,105 @@ public class SubmitCollectionBatchServiceUT {
         boolean checkLimit = true;
         boolean isCGDProtection = true;
         Set<String> updatedDummyRecordOwnInstBibIdSet = new HashSet<>();
-        InstitutionEntity institutionEntity = new InstitutionEntity();
+        InstitutionEntity institutionEntity = getInstitutionEntity();
         BibRecords bibRecords = new BibRecords();
         //Mockito.when((BibRecords) jaxbHandler.getInstance().unmarshal(inputRecords, BibRecords.class)).thenReturn(bibRecords);
         String result = submitCollectionBatchService.processSCSB(inputRecords, processedBibIds,submitCollectionReportInfoMap,idMapToRemoveIndexList,bibIdMapToRemoveIndexList,checkLimit
                 ,isCGDProtection,institutionEntity,updatedDummyRecordOwnInstBibIdSet);
         assertNotNull(result);
     }
+
+    private InstitutionEntity getInstitutionEntity(){
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setId(1);
+        institutionEntity.setInstitutionName("PUL");
+        institutionEntity.setInstitutionCode("PUL");
+        return institutionEntity;
+    }
+    private BibliographicEntity getBibliographicEntity(){
+        BibliographicEntity bibliographicEntity = new BibliographicEntity();
+        bibliographicEntity.setBibliographicId(123456);
+        bibliographicEntity.setContent("Test".getBytes());
+        bibliographicEntity.setCreatedDate(new Date());
+        bibliographicEntity.setLastUpdatedDate(new Date());
+        bibliographicEntity.setCreatedBy("tst");
+        bibliographicEntity.setLastUpdatedBy("tst");
+        bibliographicEntity.setOwningInstitutionId(1);
+        bibliographicEntity.setOwningInstitutionBibId("1577261074");
+        bibliographicEntity.setDeleted(false);
+
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setId(1);
+        institutionEntity.setInstitutionName("PUL");
+        institutionEntity.setInstitutionCode("PUL");
+
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setCreatedDate(new Date());
+        holdingsEntity.setLastUpdatedDate(new Date());
+        holdingsEntity.setCreatedBy("tst");
+        holdingsEntity.setLastUpdatedBy("tst");
+        holdingsEntity.setOwningInstitutionId(1);
+        holdingsEntity.setOwningInstitutionHoldingsId("34567");
+        holdingsEntity.setDeleted(false);
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId("843617540");
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setBarcode("123456");
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("123");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("tst");
+        itemEntity.setLastUpdatedBy("tst");
+        itemEntity.setCatalogingStatus("Complete");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setDeleted(false);
+        itemEntity.setInstitutionEntity(institutionEntity);
+        itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+
+        holdingsEntity.setItemEntities(Arrays.asList(itemEntity));
+        bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
+
+        return bibliographicEntity;
+    }
+    private SubmitCollectionReportInfo getSubmitCollectionReportInfo(){
+        SubmitCollectionReportInfo submitCollectionReportInfo = new SubmitCollectionReportInfo();
+        submitCollectionReportInfo.setOwningInstitution("PUL");
+        submitCollectionReportInfo.setItemBarcode("123456");
+        submitCollectionReportInfo.setCustomerCode("PA");
+        submitCollectionReportInfo.setMessage("SUCCESS");
+        return submitCollectionReportInfo;
+    }
+
+    private ItemEntity getItemEntity(){
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setId(1);
+        institutionEntity.setInstitutionName("PUL");
+        institutionEntity.setInstitutionCode("PUL");
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setLastUpdatedDate(new Date());
+        itemEntity.setOwningInstitutionItemId("843617540");
+        itemEntity.setOwningInstitutionId(1);
+        itemEntity.setBarcode("123456");
+        itemEntity.setCallNumber("x.12321");
+        itemEntity.setCollectionGroupId(1);
+        itemEntity.setCallNumberType("1");
+        itemEntity.setCustomerCode("123");
+        itemEntity.setCreatedDate(new Date());
+        itemEntity.setCreatedBy("tst");
+        itemEntity.setLastUpdatedBy("tst");
+        itemEntity.setCatalogingStatus("Incomplete");
+        itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setUseRestrictions("restrictions");
+        itemEntity.setDeleted(false);
+        itemEntity.setInstitutionEntity(institutionEntity);
+        itemEntity.setBibliographicEntities(Arrays.asList(getBibliographicEntity()));
+        return itemEntity;
+    }
+
 }

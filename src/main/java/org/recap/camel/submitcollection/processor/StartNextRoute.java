@@ -4,7 +4,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.support.EndpointHelper;
+import org.apache.camel.component.file.remote.SftpEndpoint;
 import org.slf4j.Logger;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
@@ -84,9 +84,9 @@ public class StartNextRoute implements Processor{
     
      */
     public void sendEmailForEmptyDirectory(Exchange exchange) throws Exception {
-
-     //   String ftpLocationPath = (String) exchange.getFromEndpoint().getEndpointConfiguration().getParameter("path");
-        String ftpLocationPath = EndpointHelper.resolveParameter(camelContext, "path", exchange.getFromEndpoint().getClass()).getEndpointUri();
+        //String ftpLocationPath = (String) exchange.getFromEndpoint().getEndpointConfiguration().getParameter("path");
+        //String ftpLocationPath = EndpointHelper.resolveParameter(camelContext, "path", exchange.getFromEndpoint().getClass()).getEndpointUri();
+        String ftpLocationPath = ((SftpEndpoint) exchange.getFromEndpoint()).getConfiguration().getDirectoryName();
         if(routeId.equalsIgnoreCase(RecapConstants.SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE )){
             producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(RecapCommonConstants.PRINCETON,ftpLocationPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.SUBMIT_COLLECTION_FOR_NO_FILES);
             logger.info("Email Sent");

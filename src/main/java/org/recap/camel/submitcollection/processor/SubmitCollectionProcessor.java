@@ -191,7 +191,7 @@ public class SubmitCollectionProcessor {
 
     private ReportDataRequest getReportDataRequest(String xmlFileName) {
         ReportDataRequest reportRequest = new ReportDataRequest();
-        logger.info("filename--->{0}-{1}", RecapCommonConstants.SUBMIT_COLLECTION_REPORT,xmlFileName);
+        logger.info("filename--->{}-{}", RecapCommonConstants.SUBMIT_COLLECTION_REPORT,xmlFileName);
         reportRequest.setFileName(RecapCommonConstants.SUBMIT_COLLECTION_REPORT+"-"+xmlFileName);
         reportRequest.setInstitutionCode(institutionCode.toUpperCase());
         reportRequest.setReportType(RecapCommonConstants.SUBMIT_COLLECTION_SUMMARY);

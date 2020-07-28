@@ -385,7 +385,7 @@ public class SubmitCollectionDAOService {
                 }
             } catch (Exception e) {
                 logger.error("Exception while saving non bound with batch ");
-                logger.error(RecapCommonConstants.LOG_ERROR,e.getStackTrace());
+                logger.error(RecapCommonConstants.LOG_ERROR,e);
             }
         }
     }

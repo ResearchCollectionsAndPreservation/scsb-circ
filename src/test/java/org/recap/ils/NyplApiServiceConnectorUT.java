@@ -3,23 +3,44 @@ package org.recap.ils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
-import org.recap.ils.model.nypl.*;
-import org.recap.ils.model.nypl.request.*;
-import org.recap.ils.model.nypl.response.*;
+import org.recap.ils.model.nypl.request.RecallRequest;
+import org.recap.ils.model.nypl.request.CheckinRequest;
+import org.recap.ils.model.nypl.request.CheckoutRequest;
+import org.recap.ils.model.nypl.request.CancelHoldRequest;
+import org.recap.ils.model.nypl.request.CreateHoldRequest;
+import org.recap.ils.model.nypl.response.CancelHoldResponse;
+import org.recap.ils.model.nypl.response.CheckinResponse;
+import org.recap.ils.model.nypl.response.CheckoutResponse;
+import org.recap.ils.model.nypl.response.CreateHoldResponse;
+import org.recap.ils.model.nypl.response.RecallResponse;
+import org.recap.ils.model.nypl.response.RefileResponse;
+import org.recap.ils.model.nypl.response.ItemResponse;
+import org.recap.ils.model.nypl.response.NYPLHoldResponse;
+import org.recap.ils.model.nypl.response.NyplPatronResponse;
+import org.recap.ils.model.nypl.NyplPatronData;
+import org.recap.ils.model.nypl.RefileData;
+import org.recap.ils.model.nypl.CheckoutData;
+import org.recap.ils.model.nypl.CancelHoldData;
+import org.recap.ils.model.nypl.CheckinData;
+import org.recap.ils.model.nypl.CreateHoldData;
+import org.recap.ils.model.nypl.NYPLHoldData;
+import org.recap.ils.model.nypl.RecallData;
+import org.recap.ils.model.nypl.ItemData;
+import org.recap.ils.model.nypl.VarField;
+import org.recap.ils.model.nypl.SubField;
+import org.recap.ils.model.nypl.Description;
+import org.recap.ils.model.nypl.DebugInfo;
 import org.recap.ils.model.response.ItemCheckinResponse;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.ils.service.NyplApiResponseUtil;
 import org.recap.ils.service.NyplOauthTokenApiService;
-import org.recap.model.ItemRefileRequest;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -31,7 +52,6 @@ import org.recap.repository.jpa.ItemDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,17 +60,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
-
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
 
 /**
  * Created by rajeshbabuk on 19/12/16.

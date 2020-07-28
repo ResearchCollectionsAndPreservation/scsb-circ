@@ -1,8 +1,6 @@
 package org.recap.request;
 
-import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.PollingConsumer;
 import org.apache.camel.ProducerTemplate;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -29,8 +26,6 @@ import org.recap.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.powermock.api.mockito.PowerMockito;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.Normalizer;
@@ -141,7 +136,7 @@ public class ItemRequestServiceUT {
         Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
         Mockito.doNothing().when(mockedCommonUtil).rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
         Mockito.doNothing().when(mockedCommonUtil).saveItemChangeLogEntity(itemRequestInfo.getRequestId(), itemRequestInfo.getUsername(), RecapConstants.REQUEST_RETRIEVAL, itemRequestInfo.getRequestNotes());
-//        mockedItemRequestService.requestItem(itemRequestInfo,exchange);
+       // mockedItemRequestService.requestItem(itemRequestInfo,exchange);
     }
 
     private ItemEntity getItemEntity() {

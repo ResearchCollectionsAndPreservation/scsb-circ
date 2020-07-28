@@ -1,19 +1,24 @@
 package org.recap.service;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
+import org.recap.controller.EncryptEmailAddress;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
 import org.recap.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -21,10 +26,22 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by akulak on 20/9/17.
  */
-public class EncryptEmailAddressUT extends BaseTestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class EncryptEmailAddressUT {
 
-    @PersistenceContext
-    EntityManager entityManager;
+   @InjectMocks
+    EncryptEmailAddressService mockedEncryptEmailAddressService;
+
+    @Mock
+    RequestItemDetailsRepository mockedRequestItemDetailsRepository;
+
+    @Mock
+    Pageable pageable;
+
+    @Mock
+    SecurityUtil mockedSecurityUtil;
+
+    public static final String REQUEST_ID = "requestId";
 
     @Autowired
     RequestTypeDetailsRepository requestTypeDetailsRepository;
@@ -41,18 +58,38 @@ public class EncryptEmailAddressUT extends BaseTestCase {
     @Autowired
     SecurityUtil securityUtil;
 
+
     @Test
-    public void checkEmailAddressEncryption() throws Exception {
-        RequestItemEntity requestItem = createRequestItem();
-        String encryptedValue = securityUtil.getEncryptedValue("test@gmail.com");
-        encryptEmailAddressService.encryptEmailAddress();
-        System.out.println(requestItem.getId());
-        RequestItemEntity requestItemEntity = requestItemDetailsRepository.findById(requestItem.getId()).orElse(null);
-        String decryptedValue = securityUtil.getDecryptedValue(encryptedValue);
-//        assertEquals("test@gmail.com", decryptedValue);
+    public void checkEmailAddressEncryption() {
+         try {
+             RequestItemEntity requestItem = createRequestItem();
+             String encryptedValue = securityUtil.getEncryptedValue("test@gmail.com");
+             encryptEmailAddressService.encryptEmailAddress();
+             System.out.println(requestItem.getId());
+             RequestItemEntity requestItemEntity = requestItemDetailsRepository.findById(requestItem.getId()).orElse(null);
+             String decryptedValue = securityUtil.getDecryptedValue(encryptedValue);
+         }
+         catch (Exception e){
+             e.printStackTrace();
+         }
+    }
+    @Test
+    public void encryptEmailAddress(){
+        Mockito.when(mockedRequestItemDetailsRepository.count()).thenReturn(10L);
+        List<RequestItemEntity> requestItemEntityListToSave = new ArrayList<>();
+        RequestItemEntity requestItemEntity = createRequestItem();
+        requestItemEntityListToSave.add(requestItemEntity);
+        Pageable pageable = PageRequest.of(0,1000, Sort.Direction.ASC,REQUEST_ID);
+        Page<RequestItemEntity> page = new PageImpl<>(requestItemEntityListToSave);
+        Mockito.when(mockedRequestItemDetailsRepository.findAll(pageable)).thenReturn(page);
+        Mockito.when(mockedSecurityUtil.getEncryptedValue(requestItemEntity.getEmailId())).thenReturn("test@gmail.com");
+        Mockito.when(mockedRequestItemDetailsRepository.saveAll(requestItemEntityListToSave)).thenReturn(requestItemEntityListToSave);
+        String encryptEmailAddress = mockedEncryptEmailAddressService.encryptEmailAddress();
+        assertNotNull(encryptEmailAddress);
+
     }
 
-    private RequestItemEntity createRequestItem() throws Exception {
+    private RequestItemEntity createRequestItem(){
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("PUL");
         institutionEntity.setInstitutionName("PUL");
@@ -62,15 +99,15 @@ public class EncryptEmailAddressUT extends BaseTestCase {
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
         requestTypeEntity.setRequestTypeCode("Recall");
         requestTypeEntity.setRequestTypeDesc("Recall");
-        RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
-        assertNotNull(savedRequestTypeEntity);
+        //RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
+        //assertNotNull(savedRequestTypeEntity);
 
-        RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findById(3).orElse(null);
+        //RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findById(3).orElse(null);
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getId());
-        requestItemEntity.setRequestStatusEntity(requestStatusEntity);
+        requestItemEntity.setRequestTypeId(requestTypeEntity.getId());
+       // requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         requestItemEntity.setRequestingInstitutionId(2);
         requestItemEntity.setStopCode("test");
         requestItemEntity.setNotes("test");
@@ -84,12 +121,12 @@ public class EncryptEmailAddressUT extends BaseTestCase {
         requestItemEntity.setCreatedBy("test");
         requestItemEntity.setEmailId("test@gmail.com");
         requestItemEntity.setLastUpdatedDate(new Date());
-        RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
-        entityManager.refresh(savedRequestItemEntity);
-        return savedRequestItemEntity;
+        //RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
+       // entityManager.refresh(savedRequestItemEntity);
+        return requestItemEntity;
     }
 
-    private BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
+    private BibliographicEntity saveBibSingleHoldingsSingleItem(){
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("mock Content".getBytes());
@@ -125,9 +162,9 @@ public class EncryptEmailAddressUT extends BaseTestCase {
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        return savedBibliographicEntity;
+        //BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
+       // entityManager.refresh(savedBibliographicEntity);
+        return bibliographicEntity;
 
     }
 }

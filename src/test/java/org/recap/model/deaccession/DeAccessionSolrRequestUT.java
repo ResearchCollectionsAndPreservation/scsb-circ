@@ -19,9 +19,11 @@ public class DeAccessionSolrRequestUT extends BaseTestCase{
         deAccessionSolrRequest.setBibIds(Arrays.asList(123));
         deAccessionSolrRequest.setHoldingsIds(Arrays.asList(369));
         deAccessionSolrRequest.setItemIds(Arrays.asList(14752));
+        deAccessionSolrRequest.setStatus("SUCCESS");
         assertNotNull(deAccessionSolrRequest.getBibIds());
         assertNotNull(deAccessionSolrRequest.getHoldingsIds());
         assertNotNull(deAccessionSolrRequest.getItemIds());
+        assertNotNull(deAccessionSolrRequest.getStatus());
     }
 
 }

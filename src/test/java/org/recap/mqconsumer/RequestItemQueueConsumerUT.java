@@ -1,8 +1,12 @@
 package org.recap.mqconsumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.support.DefaultExchange;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +41,7 @@ public class RequestItemQueueConsumerUT{
     @Mock
     RequestItemQueueConsumer requestItemQueueConsumer;
 
-    @Mock
+    @InjectMocks
     RequestItemQueueConsumer injectMockedRequestItemQueueConsumer;
 
     @Mock
@@ -122,7 +126,8 @@ public class RequestItemQueueConsumerUT{
     public void testPulRequestTopicOnMessage() throws Exception{
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Arrays.asList("123"));
-        String body = itemRequestInformation.toString();
+        JSONObject jsonObject = new JSONObject();
+        String body = jsonObject.toString();
         Mockito.when(requestItemQueueConsumer.getLogger()).thenReturn(logger);
         Mockito.when(requestItemQueueConsumer.getItemRequestService()).thenReturn(itemRequestService);
         Mockito.doCallRealMethod().when(requestItemQueueConsumer).pulRequestTopicOnMessage(body);
@@ -315,7 +320,10 @@ public class RequestItemQueueConsumerUT{
     @Test
     public void bulkRequestItemOnMessage() throws Exception{
         String body = "12345";
+        Mockito.when(requestItemQueueConsumer.getBulkItemRequestService()).thenReturn(bulkItemRequestService);
 //        Mockito.doNothing().when(bulkItemRequestService).bulkRequestItems(1);
+        Mockito.when(requestItemQueueConsumer.getLogger()).thenReturn(logger);
+        Mockito.doCallRealMethod().when(requestItemQueueConsumer).bulkRequestItemOnMessage(body,exchange);
         requestItemQueueConsumer.bulkRequestItemOnMessage(body,exchange);
     }
     @Test
@@ -324,27 +332,37 @@ public class RequestItemQueueConsumerUT{
         message.setBody("BULK REQUEST");
         exchange.setIn(message);
         String body = "12345";
-//        Mockito.when(exchange.getIn()).thenReturn(message);
+        Mockito.when(requestItemQueueConsumer.getLogger()).thenReturn(logger);
+        Mockito.when(exchange.getIn()).thenReturn(message);
+        Mockito.when(requestItemQueueConsumer.getBulkItemRequestProcessService()).thenReturn(bulkItemRequestProcessService);
 //        Mockito.doNothing().when(bulkItemRequestProcessService).processBulkRequestItem(body,1);
+        Mockito.doCallRealMethod().when(requestItemQueueConsumer).bulkRequestProcessItemOnMessage(body,exchange);
         requestItemQueueConsumer.bulkRequestProcessItemOnMessage(body,exchange);
     }
-    /*@Test
+    @Test
     public  void requestItemLasStatusCheckOnMessage() throws Exception{
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Arrays.asList("123"));
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
         itemInformationResponse.setRequestId(1);
         itemInformationResponse.setBibID("1");
-        String body = "12345";
         RequestInformation requestInformation = new RequestInformation();
         requestInformation.setItemRequestInfo(itemRequestInformation);
         requestInformation.setItemResponseInformation(itemInformationResponse);
-        Mockito.when(om.readValue(body, RequestInformation.class)).thenReturn(requestInformation);
+        JSONObject jsonObject = new JSONObject();
+        String body = jsonObject.toString();
+//        Mockito.when(om.readValue(body, RequestInformation.class)).thenReturn(requestInformation);
+        Mockito.when(requestItemQueueConsumer.getItemRequestService()).thenReturn(itemRequestService);
+//        Mockito.when(requestItemQueueConsumer.getItemRequestService().executeLasitemCheck(requestInformation.getItemRequestInfo(), requestInformation.getItemResponseInformation())).thenReturn(true);
+        Mockito.when(requestItemQueueConsumer.getLogger()).thenReturn(logger);
+        Mockito.doCallRealMethod().when(requestItemQueueConsumer).requestItemLasStatusCheckOnMessage(body,exchange);
         requestItemQueueConsumer.requestItemLasStatusCheckOnMessage(body,exchange);
-    }*/
+    }
     @Test
     public  void requestItemLasStatusCheckOnMessageException() throws Exception{
         String body = "12345";
+        Mockito.when(requestItemQueueConsumer.getLogger()).thenReturn(logger);
+        Mockito.doCallRealMethod().when(requestItemQueueConsumer).requestItemLasStatusCheckOnMessage(body,exchange);
         requestItemQueueConsumer.requestItemLasStatusCheckOnMessage(body,exchange);
     }
 }

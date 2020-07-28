@@ -7,12 +7,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemHoldResponse;
+import org.recap.ils.model.response.ItemInformationResponse;
+import org.recap.model.AbstractResponseItem;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
@@ -41,6 +44,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DeAccessionServiceUT{
 
+    @InjectMocks
+    DeAccessionService deAccessionService;
+
     @Mock
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
@@ -66,6 +72,9 @@ public class DeAccessionServiceUT{
     RequestItemController requestItemController;
 
     @Mock
+    ItemHoldResponse itemHoldResponse;
+
+    @Mock
     GFAService gfaService;
 
     @Mock
@@ -74,8 +83,16 @@ public class DeAccessionServiceUT{
     @Mock
     RestHeaderService restHeaderService;
 
-    @InjectMocks
-    DeAccessionService deAccessionService;
+    @Mock
+    DeaccesionItemChangeLogDetailsRepository deaccesionItemChangeLogDetailsRepository;
+
+   // AbstractResponseItem mockedAbstractResponseItem;
+
+    @Before
+    public  void setup(){
+        MockitoAnnotations.initMocks(this);
+       // mockedAbstractResponseItem = Mockito.mock(AbstractResponseItem.class, Mockito.CALLS_REAL_METHODS);
+    }
 
     @Test
     public void deaccession(){
@@ -85,12 +102,166 @@ public class DeAccessionServiceUT{
         deAccessionRequest.setUsername("Test");
         deAccessionRequest.setNotes("test");
         ItemEntity itemEntity = getItemEntity();
+        itemEntity.setCatalogingStatus("Complete");
         RequestItemEntity requestItemEntity = getRequestItem();
         String itemBarcode ="123456";
-        Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
-//        Mockito.when(requestItemDetailsRepository.findByItemBarcode(itemBarcode)).thenReturn(Arrays.asList(requestItemEntity));
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        barcodeAndStopCodeMap.put("123456","PA");
+        Set<String> itemBarcodeList = barcodeAndStopCodeMap.keySet();
+        Map<Integer, String> itemIdAndMessageMap = new HashMap<>();
+        itemIdAndMessageMap.put(1,"LAS server is not reachable. Please contact ReCAP staff (<a href=\"mailto:null\">null</a>) for further assistance.");
+        List<DeaccessionItemChangeLog> itemChangeLogEntities = new ArrayList<>();
+        DeaccessionItemChangeLog deaccessionItemChangeLog = new DeaccessionItemChangeLog();
+        deaccessionItemChangeLog.setUpdatedBy("Test");
+        deaccessionItemChangeLog.setCreatedDate(new Date());
+        deaccessionItemChangeLog.setOperationType("Deaccession Rollback");
+        deaccessionItemChangeLog.setRecordId(1);
+        deaccessionItemChangeLog.setNotes(itemIdAndMessageMap.get(1) + " Hence, the transaction of deaccessioning item is rolled back.");
+        itemChangeLogEntities.add(deaccessionItemChangeLog);
+        when(gfaService.callGfaItemStatus(itemBarcode)).thenReturn("INC ON WO:");
+        when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
+        when(itemDetailsRepository.findByBarcodeIn(new ArrayList<>(itemBarcodeList))).thenReturn(Arrays.asList(itemEntity));
+        when(requestItemDetailsRepository.findByItemBarcode(itemBarcode)).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(deaccesionItemChangeLogDetailsRepository.saveAll(itemChangeLogEntities)).thenReturn(Arrays.asList(deaccessionItemChangeLog));
         Map<String, String> result = deAccessionService.deAccession(deAccessionRequest);
         assertNotNull(result);
+    }
+    @Test
+    public void checkAndCancelHolds() throws Exception {
+        Map<String, String> resultMap = new HashMap<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
+        DeAccessionItem deAccessionItem = new DeAccessionItem();
+        deAccessionItem.setItemBarcode("123456");
+        deAccessionItem.setDeliveryLocation("PB");
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        barcodeAndStopCodeMap.put("123456", "PB");
+        barcodeAndStopCodeMap.put("123", "AB");
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        deAccessionDBResponseEntity.setBarcode("12345");
+        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
+        deAccessionDBResponseEntity.setReasonForFailure(RecapCommonConstants.ITEM_BARCDE_DOESNOT_EXIST);
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation();
+        Mockito.when(requestItemDetailsRepository.findByItemBarcode("123")).thenReturn(Arrays.asList(getRequestItem()));
+//        Mockito.when((ItemInformationResponse) requestItemController.itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn(getItemInformationResponse());
+        deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
+        assertNotNull(barcodeAndStopCodeMap);
+        assertEquals(deAccessionItem.getItemBarcode(), barcodeAndStopCodeMap.keySet().toArray()[1]);
+    }
+    @Test
+    public void cancelRequest(){
+        RequestItemEntity requestItemEntity = getMockRequestItemEntities().get(0);
+        String username = "username";
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation2();
+        itemHoldResponse = new ItemHoldResponse();
+        itemHoldResponse.setScreenMessage("Canceled Successfully");
+        itemHoldResponse.setItemBarcode(itemRequestInformation.getItemBarcodes().get(0));
+        itemHoldResponse.setBibId(itemRequestInformation.getBibId());
+        itemHoldResponse.setCreatedDate(new Date().toString());
+        itemHoldResponse.setExpirationDate(new Date().toString());
+        itemHoldResponse.setInstitutionID("1");
+        itemHoldResponse.setIsbn("34567");
+        itemHoldResponse.setAvailable(true);
+       // Mockito.when((ItemHoldResponse) requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn(itemHoldResponse);
+       // deAccessionService.cancelRequest(requestItemEntity,username);
+    }
+    @Test
+    public void deAccessionItemsInDB(){
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        barcodeAndStopCodeMap.put("1","345890");
+        Set<String> itemBarcodeList = barcodeAndStopCodeMap.keySet();
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        String username = "username";
+        Mockito.when(itemDetailsRepository.findByBarcodeIn(new ArrayList<>(itemBarcodeList))).thenReturn(Arrays.asList(getItemEntity()));
+        Mockito.when(holdingsDetailsRepository.getNonDeletedItemsCount(1, "1")).thenReturn(1l);
+        Mockito.when(bibliographicDetailsRepository.getNonDeletedItemsCount(1, "1234")).thenReturn(1l);
+        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap,deAccessionDBResponseEntities,username);
+
+    }
+    @Test
+    public void deAccessionItemsInDBException(){
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        Set<String> itemBarcodeList = barcodeAndStopCodeMap.keySet();
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        String username = "username";
+        Mockito.when(itemDetailsRepository.findByBarcodeIn(new ArrayList<>(itemBarcodeList))).thenReturn(null);
+        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap,deAccessionDBResponseEntities,username);
+    }
+    @Test
+    public  void deAcessionItemsInSolrSuccess(){
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
+        deAccessionDBResponseEntity.setBarcode("123456");
+        deAccessionDBResponseEntity.setStatus("Success");
+        deAccessionDBResponseEntity.setBibliographicIds(Arrays.asList(1));
+        deAccessionDBResponseEntity.setHoldingIds(Arrays.asList(1));
+        deAccessionDBResponseEntity.setItemId(1);
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> resultMap = new HashMap<>();
+        deAccessionService.deAccessionItemsInSolr(deAccessionDBResponseEntities,resultMap);
+    }
+    @Test
+    public  void deAcessionItemsInSolrFailure(){
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
+        deAccessionDBResponseEntity.setBarcode("123456");
+        deAccessionDBResponseEntity.setStatus("Failure");
+        deAccessionDBResponseEntity.setReasonForFailure("Barcode UnAvailable");
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> resultMap = new HashMap<>();
+        deAccessionService.deAccessionItemsInSolr(deAccessionDBResponseEntities,resultMap);
+    }
+    public ItemInformationResponse getItemInformationResponse() {
+        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+        itemInformationResponse.setCirculationStatus("test");
+        itemInformationResponse.setSecurityMarker("test");
+        itemInformationResponse.setFeeType("test");
+        itemInformationResponse.setTransactionDate(new Date().toString());
+        itemInformationResponse.setHoldQueueLength("10");
+        itemInformationResponse.setTitleIdentifier("test");
+        itemInformationResponse.setBibID("1223");
+        itemInformationResponse.setDueDate(new Date().toString());
+        itemInformationResponse.setExpirationDate("30-03-2017 00:00:00");
+        itemInformationResponse.setRecallDate(new Date().toString());
+        itemInformationResponse.setCurrentLocation("test");
+        itemInformationResponse.setHoldPickupDate(new Date().toString());
+        itemInformationResponse.setItemBarcode("32101077423406");
+        itemInformationResponse.setRequestType("RECALL");
+        itemInformationResponse.setRequestingInstitution("CUL");
+        itemInformationResponse.setRequestId(2);
+        return itemInformationResponse;
+    }
+
+    private ItemRequestInformation getItemRequestInformation2(){
+        ItemEntity itemEntity = getMockRequestItemEntities().get(0).getItemEntity();
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
+        itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
+        itemRequestInformation.setRequestingInstitution(getMockRequestItemEntities().get(0).getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setPatronBarcode(getMockRequestItemEntities().get(0).getPatronId());
+        itemRequestInformation.setDeliveryLocation(getMockRequestItemEntities().get(0).getStopCode());
+        return itemRequestInformation;
+    }
+
+    private ItemRequestInformation getItemRequestInformation() {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Arrays.asList("123"));
+        itemRequestInformation.setPatronBarcode("45678915");
+        itemRequestInformation.setUsername("Discovery");
+        itemRequestInformation.setBibId("12");
+        itemRequestInformation.setItemOwningInstitution("PUL");
+        itemRequestInformation.setCallNumber("X");
+        itemRequestInformation.setAuthor("John");
+        itemRequestInformation.setTitleIdentifier("test");
+        itemRequestInformation.setTrackingId("235");
+        itemRequestInformation.setRequestingInstitution("PUL");
+        itemRequestInformation.setDeliveryLocation("PB");
+        itemRequestInformation.setExpirationDate("30-03-2017 00:00:00");
+        itemRequestInformation.setCustomerCode("PB");
+        itemRequestInformation.setRequestNotes("test");
+        itemRequestInformation.setRequestType("RETRIEVAL");
+        return itemRequestInformation;
     }
     public RequestItemEntity getRequestItem() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
@@ -100,7 +271,16 @@ public class DeAccessionServiceUT{
         requestItemEntity.setId(16);
         requestItemEntity.setItemId(1);
         requestItemEntity.setRequestTypeId(3);
-
+        RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
+        requestTypeEntity.setRequestTypeCode("RETRIEVAL");
+        requestTypeEntity.setRequestTypeDesc("RETRIEVAL");
+        ItemEntity itemEntity = getItemEntity();
+        RequestStatusEntity requestStatusEntity =  new RequestStatusEntity();
+        requestStatusEntity.setRequestStatusCode("LAS_REFILE_REQUEST_PLACED");
+        requestStatusEntity.setRequestStatusDescription("RETRIEVAL ORDER PLACED");
+        requestItemEntity.setId(1);
+        requestItemEntity.setRequestTypeEntity(requestTypeEntity);
+        requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         requestItemEntity.setRequestingInstitutionId(2);
         requestItemEntity.setStopCode("test");
         requestItemEntity.setNotes("test");
@@ -122,7 +302,7 @@ public class DeAccessionServiceUT{
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setId(1);
         itemStatusEntity.setStatusDescription("COMPLETE");
-        itemStatusEntity.setStatusCode("AVAILABLE");
+        itemStatusEntity.setStatusCode("Available");
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);
         CollectionGroupEntity collectionGroupEntity = new CollectionGroupEntity();
@@ -135,6 +315,10 @@ public class DeAccessionServiceUT{
         BibliographicEntity bibliographicEntity = getBibliographicEntity();
         institutionEntity.setInstitutionCode("PUL");
         institutionEntity.setInstitutionName("PUL");
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setHoldingsId(123456);
+        holdingsEntity.setOwningInstitutionHoldingsId("1");
+        holdingsEntity.setOwningInstitutionId(1);
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setItemId(1);
         itemEntity.setBarcode("123456");
@@ -143,6 +327,7 @@ public class DeAccessionServiceUT{
         itemEntity.setInstitutionEntity(institutionEntity);
         itemEntity.setCollectionGroupEntity(collectionGroupEntity);
         itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
+        itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         return itemEntity;
     }
 
@@ -167,7 +352,7 @@ public class DeAccessionServiceUT{
     }
 
     @Test
-    public void deAccessionItemsInDB() throws Exception {
+    public void deAccessionItemsInDB1() throws Exception {
         Random random = new Random();
         String itemBarcode = String.valueOf(random.nextInt());
         Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
@@ -281,26 +466,7 @@ public class DeAccessionServiceUT{
         return new File(resource.toURI());
     }
 
-    @Test
-    public void checkAndCancelHolds() throws Exception {
-        Map<String, String> resultMap = new HashMap<>();
-        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
-        DeAccessionItem deAccessionItem = new DeAccessionItem();
-        deAccessionItem.setItemBarcode("123456");
-        deAccessionItem.setDeliveryLocation("PB");
-        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
-        barcodeAndStopCodeMap.put("123456", "PB");
-        barcodeAndStopCodeMap.put("123", "AB");
-        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
-        deAccessionDBResponseEntity.setBarcode("12345");
-        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
-        deAccessionDBResponseEntity.setReasonForFailure(RecapCommonConstants.ITEM_BARCDE_DOESNOT_EXIST);
-        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
-        deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
-        assertNotNull(barcodeAndStopCodeMap);
-        // assertTrue(barcodeAndStopCodeMap.size() == 1);
-        assertEquals(deAccessionItem.getItemBarcode(), barcodeAndStopCodeMap.keySet().toArray()[1]);
-    }
+
 
    /* @Test
     public void deaccessionFlowTest() throws Exception {

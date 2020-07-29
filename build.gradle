@@ -46,6 +46,7 @@ dependencies {
 		}
 	}*/
 	compile fileTree(dir: '/data/commonjar', include: '*1.1.jar')
+	compile fileTree(dir: '/data/commonjar', include: 'jsip2-1.1.0.jar')
 	implementation 'org.projectlombok:lombok:1.18.12'
 	annotationProcessor 'org.projectlombok:lombok:1.18.12'
 	testImplementation 'org.projectlombok:lombok:1.18.12'

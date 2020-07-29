@@ -45,7 +45,7 @@ dependencies {
 			branch = 'development'
 		}
 	}*/
-	implementation fileTree(dir: 'lib', include: '*.jar')
+	compile fileTree(dir: '/data/commonjar', include: '*1.1.jar')
 	implementation 'org.projectlombok:lombok:1.18.12'
 	annotationProcessor 'org.projectlombok:lombok:1.18.12'
 	testImplementation 'org.projectlombok:lombok:1.18.12'

@@ -1,10 +1,16 @@
 package org.recap.camel.statusreconciliation;
 
 import org.apache.camel.ProducerTemplate;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
+import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.gfa.model.Dsitem;
 import org.recap.gfa.model.GFAItemStatusCheckResponse;
@@ -13,6 +19,7 @@ import org.recap.gfa.model.RetrieveItem;
 import org.recap.gfa.model.Ttitem;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.RequestStatusEntity;
 import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
@@ -23,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,9 +44,10 @@ import static org.junit.Assert.*;
 /**
  * Created by hemalathas on 2/6/17.
  */
-public class StatusReconciliationControllerUT extends BaseTestCase{
+@RunWith(MockitoJUnitRunner.class)
+public class StatusReconciliationControllerUT{
 
-    @Mock
+    @InjectMocks
     private StatusReconciliationController statusReconciliationController;
 
     private static final Logger logger = LoggerFactory.getLogger(StatusReconciliationController.class);
@@ -49,17 +58,11 @@ public class StatusReconciliationControllerUT extends BaseTestCase{
 
     private Integer batchSize = 100;
 
-    @Value("${status.reconciliation.day.limit}")
-    private Integer statusReconciliationDayLimit;
-
     @Mock
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
 
     @Mock
     private ItemDetailsRepository itemDetailsRepository;
-
-
-    private Integer statusReconciliationLasBarcodeLimit = 100;
 
     @Mock
     private ProducerTemplate producer;
@@ -72,6 +75,14 @@ public class StatusReconciliationControllerUT extends BaseTestCase{
 
     @Mock
     private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+
+    @Before
+    public  void setup(){
+        MockitoAnnotations.initMocks(this);
+        ReflectionTestUtils.setField(statusReconciliationController,"batchSize",10);
+        ReflectionTestUtils.setField(statusReconciliationController,"statusReconciliationDayLimit",2);
+        ReflectionTestUtils.setField(statusReconciliationController,"statusReconciliationLasBarcodeLimit",1);
+    }
 
     @Test
     public void testStatusReconciliation(){
@@ -94,30 +105,19 @@ public class StatusReconciliationControllerUT extends BaseTestCase{
         itemEntity.setItemAvailabilityStatusId(2);
         List<ItemEntity> itemEntityList = Arrays.asList(itemEntity);
         itemEntityChunkList = Arrays.asList(itemEntityList);
-        long from = 10 * Long.valueOf(batchSize);
-        Date date = new Date();
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setId(2);
-        Mockito.when(gfaService.getGFAItemStatusCheckResponse(Mockito.any())).thenReturn(gfaItemStatusCheckResponse);
-        Mockito.when(gfaService.getRequestItemDetailsRepository()).thenReturn(mockedRequestItemDetailsRepository);
-        Mockito.when(gfaService.getItemDetailsRepository()).thenReturn(itemDetailsRepository);
-        Mockito.when(gfaService.getItemStatusDetailsRepository()).thenReturn(itemStatusDetailsRepository);
-        Mockito.when(gfaService.getItemChangeLogDetailsRepository()).thenReturn(itemChangeLogDetailsRepository);
-        Mockito.when(statusReconciliationController.getGfaService()).thenReturn(gfaService);
-        Mockito.when(statusReconciliationController.getFromDate(0)).thenReturn(from);
-        Mockito.when(statusReconciliationController.getTotalPageCount(Arrays.asList(1,9), itemStatusEntity.getId())).thenReturn(itemCountAndStatusIdMap);
-        Mockito.when(statusReconciliationController.getItemDetailsRepository()).thenReturn(itemDetailsRepository);
-        Mockito.when(statusReconciliationController.getBatchSize()).thenReturn(batchSize);
-        Mockito.when(statusReconciliationController.getItemStatusDetailsRepository()).thenReturn(itemStatusDetailsRepository);
-        Mockito.when(statusReconciliationController.getRequestItemStatusDetailsRepository()).thenReturn(requestItemStatusDetailsRepository);
-        Mockito.when(statusReconciliationController.getStatusReconciliationDayLimit()).thenReturn(statusReconciliationDayLimit);
-        Mockito.when(statusReconciliationController.getStatusReconciliationLasBarcodeLimit()).thenReturn(statusReconciliationLasBarcodeLimit);
-        Mockito.when(statusReconciliationController.getProducer()).thenReturn(producer);
+        List<RequestStatusEntity> requestStatusEntityList = new ArrayList<>();
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
+        requestStatusEntity.setId(3);
+        requestStatusEntity.setRequestStatusCode("EDD");
+        requestStatusEntity.setRequestStatusDescription("EDD");
+        requestStatusEntityList.add(requestStatusEntity);
+        List<String> requestStatusCodes = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
+        Mockito.when(statusReconciliationController.getRequestItemStatusDetailsRepository().findByRequestStatusCodeIn(requestStatusCodes)).thenReturn(Arrays.asList(requestStatusEntity));
         Mockito.when(statusReconciliationController.getGfaService().itemStatusComparison(Mockito.any(),Mockito.any())).thenCallRealMethod();
-        Mockito.when(statusReconciliationController.getItemDetailsRepository().getNotAvailableItems(statusReconciliationDayLimit,Arrays.asList(1,9),from,batchSize,itemStatusEntity.getId())).thenReturn(itemEntityList);
-        Mockito.when(statusReconciliationController.getTotalPageCount(Arrays.asList(1,9), itemStatusEntity.getId())).thenCallRealMethod();
+        Mockito.when(itemDetailsRepository.getNotAvailableItemsCount(2,Arrays.asList(3),itemStatusEntity.getId())).thenReturn((long) 1);
         Mockito.when(statusReconciliationController.getItemStatusDetailsRepository().findByStatusCode(RecapConstants.ITEM_STATUS_NOT_AVAILABLE)).thenReturn(itemStatusEntity);
-        Mockito.when(statusReconciliationController.itemStatusReconciliation()).thenCallRealMethod();
         ResponseEntity responseEntity = statusReconciliationController.itemStatusReconciliation();
         List<Integer> requestStatusIds = new ArrayList<>();
         requestStatusIds.add(1);

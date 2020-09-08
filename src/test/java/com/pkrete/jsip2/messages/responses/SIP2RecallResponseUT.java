@@ -9,22 +9,26 @@ import org.mockito.Spy;
 import org.recap.BaseTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+import java.util.Date;
+
 import static org.junit.Assert.*;
 
-public class SIP2RecallResponseUT extends BaseTestCase {
+public class SIP2RecallResponseUT  {
 
-    SIP2RecallResponse mockSIP2RecallResponse;
 
-    @Before
-    public void Setup() {
-    }
     @Test
     public void testSIP2CreateBibResponse() {
-        try {
-            mockSIP2RecallResponse = new SIP2RecallResponse("82Test");
-            String res = mockSIP2RecallResponse.countChecksum();
-        } catch (Exception e) {
-        }
-        assertTrue(true);
+           SIP2RecallResponse sip2RecallResponse = new SIP2RecallResponse("82Test");
+           sip2RecallResponse.setExpirationDate(new Date().toString());
+           sip2RecallResponse.setPickupLocation("PA");
+           sip2RecallResponse.setItemIdentifier("12345");
+           sip2RecallResponse.setTitleIdentifier("234");
+           sip2RecallResponse.setBibId("123456");
+           sip2RecallResponse.setScreenMessage(Arrays.asList("Success","Failure"));
+           sip2RecallResponse.setPrintLine(Arrays.asList("P","A"));
+           sip2RecallResponse.setSequence(1);
+           String res = sip2RecallResponse.countChecksum();
+           assertTrue(true);
     }
 }

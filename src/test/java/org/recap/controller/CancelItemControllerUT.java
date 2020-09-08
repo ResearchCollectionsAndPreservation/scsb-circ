@@ -1,10 +1,19 @@
 package org.recap.controller;
 
+import org.apache.commons.math3.analysis.function.Power;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
+import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.CancelRequestResponse;
 import org.recap.model.jpa.*;
@@ -18,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Random;
 
 import static org.junit.Assert.assertNotNull;
@@ -26,10 +36,10 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by hemalathas on 17/2/17.
  */
+@RunWith(MockitoJUnitRunner.class)
+public class CancelItemControllerUT{
 
-public class CancelItemControllerUT extends BaseTestCase{
-
-    @Autowired
+    @InjectMocks
     CancelItemController cancelItemController;
 
     @Mock
@@ -56,7 +66,12 @@ public class CancelItemControllerUT extends BaseTestCase{
     @Mock
     AbstractResponseItem abstractResponseItem;
 
-    /*@Test
+    @Before
+    public  void setup(){
+        MockitoAnnotations.initMocks(this);
+    }
+
+   /* @Test
     public void testCancelRequest() throws Exception {
         RequestItemEntity requestItemEntity = createRequestItem();
         String patronBarcode = "45678912";
@@ -66,15 +81,18 @@ public class CancelItemControllerUT extends BaseTestCase{
         itemRequestInformation.setItemBarcodes(Arrays.asList("32101074849843"));
         itemRequestInformation.setItemOwningInstitution("PUL");
         itemRequestInformation.setRequestingInstitution("PUL");
+        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+        itemInformationResponse.setBibID("134556");
         abstractResponseItem.setItemOwningInstitution("PUL");
         abstractResponseItem.setItemBarcode("32101074849843");
         abstractResponseItem.setSuccess(true);
         abstractResponseItem.setScreenMessage("SUCCESS");
         CancelRequestResponse cancelRequestResponse = null;
-        Mockito.when(requestItemDetailsRepository.findById(15)).thenReturn(Optional.of(requestItemEntity));
+        RequestItemController requestItemController = PowerMockito.mock(RequestItemController.class);
+        Mockito.when(requestItemDetailsRepository.findById(16)).thenReturn(Optional.of(requestItemEntity));
         Mockito.doNothing().when(itemRequestService).saveItemChangeLogEntity(requestItemEntity.getId(), RecapConstants.GUEST_USER, RecapConstants.REQUEST_ITEM_CANCEL_ITEM_AVAILABILITY_STATUS, RecapCommonConstants.REQUEST_STATUS_CANCELED + requestItemEntity.getItemId());
         Mockito.when(itemRequestService.getEmailService()).thenReturn(emailService);
-        Mockito.when(requestItemController.itemInformation(itemRequestInformation, "PUL")).thenReturn(abstractResponseItem);
+        Mockito.when((ItemInformationResponse)requestItemController.itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn((new ItemInformationResponse()));
         Mockito.doNothing().when(emailService).sendEmail(customerCode, itemBarcode, RecapConstants.REQUEST_CANCELLED_NO_REFILED, patronBarcode, RecapConstants.GFA, RecapConstants.REQUEST_CANCELLED_SUBJECT);
         Mockito.doNothing().when(commonUtil).rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
         Mockito.doNothing().when(itemRequestServiceUtil).updateSolrIndex(requestItemEntity.getItemEntity());
@@ -132,13 +150,12 @@ public class CancelItemControllerUT extends BaseTestCase{
         institutionEntity.setInstitutionName("PUL");
 
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
-
-
-        //RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
-        //assertNotNull(savedRequestTypeEntity);
-
-        //RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findById(3).orElse(null);
-
+        RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
+        requestTypeEntity.setRequestTypeDesc("EDD");
+        requestTypeEntity.setRequestTypeCode("EDD");
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
+        requestStatusEntity.setRequestStatusDescription("LAS_REFILE_REQUEST_PLACED");
+        requestStatusEntity.setRequestStatusCode("LAS_REFILE_REQUEST_PLACED");
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setId(16);
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
@@ -156,7 +173,8 @@ public class CancelItemControllerUT extends BaseTestCase{
         requestItemEntity.setRequestStatusId(3);
         requestItemEntity.setCreatedBy("test");
         requestItemEntity.setEmailId("test@gmail.com");
-
+        requestItemEntity.setRequestTypeEntity(requestTypeEntity);
+        requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         requestItemEntity.setLastUpdatedDate(new Date());
         //RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
         return requestItemEntity;

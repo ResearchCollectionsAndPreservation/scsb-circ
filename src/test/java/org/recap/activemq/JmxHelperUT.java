@@ -33,7 +33,7 @@ public class JmxHelperUT{
 
     @Before
     public void setUp() throws IOException {
-        ReflectionTestUtils.setField(jmxHelper, "serviceUrl", "service:jmx:rmi:///jndi/rmi://127.0.0.1:1099/jmxrmi");
+        ReflectionTestUtils.setField(jmxHelper, "serviceUrl", "service:jmx:rmi:///jndi/rmi://172.31.27.8:1099/jmxrmi");
     }
     @Test
     public void testGetBeanForQueueName() {

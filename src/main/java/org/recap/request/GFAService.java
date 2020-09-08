@@ -7,11 +7,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
-import org.recap.camel.statusreconciliation.StatusReconciliationCSVRecord;
-import org.recap.camel.statusreconciliation.StatusReconciliationErrorCSVRecord;
+import org.recap.model.csv.StatusReconciliationCSVRecord;
+import org.recap.model.csv.StatusReconciliationErrorCSVRecord;
 import org.recap.gfa.model.*;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.ItemRefileRequest;
+import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.jpa.*;
 import org.recap.processor.LasItemStatusCheckPollingProcessor;
 import org.recap.repository.jpa.*;
@@ -30,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,6 +73,9 @@ public class GFAService {
 
     @Value("${gfa.server.response.timeout.milliseconds}")
     private Integer gfaServerResponseTimeOutMilliseconds;
+
+    @Value("${recap.assist.email.to}")
+    private String recapAssistanceEmailTo;
 
     @Autowired
     private ProducerTemplate producer;
@@ -1012,4 +1017,69 @@ public class GFAService {
         }
         return gfaItemStatusValue;
     }
+
+    public void callGfaDeaccessionService(List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities, String username) {
+        if (CollectionUtils.isNotEmpty(deAccessionDBResponseEntities)) {
+            for (DeAccessionDBResponseEntity deAccessionDBResponseEntity : deAccessionDBResponseEntities) {
+                if (RecapCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && RecapCommonConstants.AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
+                    GFAPwdRequest gfaPwdRequest = new GFAPwdRequest();
+                    GFAPwdDsItemRequest gfaPwdDsItemRequest = new GFAPwdDsItemRequest();
+                    GFAPwdTtItemRequest gfaPwdTtItemRequest = new GFAPwdTtItemRequest();
+                    gfaPwdTtItemRequest.setCustomerCode(deAccessionDBResponseEntity.getCustomerCode());
+                    gfaPwdTtItemRequest.setItemBarcode(deAccessionDBResponseEntity.getBarcode());
+                    gfaPwdTtItemRequest.setDestination(deAccessionDBResponseEntity.getDeliveryLocation());
+                    gfaPwdTtItemRequest.setRequestor(username);
+                    gfaPwdDsItemRequest.setTtitem(Collections.singletonList(gfaPwdTtItemRequest));
+                    gfaPwdRequest.setDsitem(gfaPwdDsItemRequest);
+                    GFAPwdResponse gfaPwdResponse = gfaPermanentWithdrawlDirect(gfaPwdRequest);
+                    if (null != gfaPwdResponse) {
+                        GFAPwdDsItemResponse gfaPwdDsItemResponse = gfaPwdResponse.getDsitem();
+                        if (null != gfaPwdDsItemResponse) {
+                            List<GFAPwdTtItemResponse> gfaPwdTtItemResponses = gfaPwdDsItemResponse.getTtitem();
+                            if (CollectionUtils.isNotEmpty(gfaPwdTtItemResponses)) {
+                                GFAPwdTtItemResponse gfaPwdTtItemResponse = gfaPwdTtItemResponses.get(0);
+                                String errorCode = (String) gfaPwdTtItemResponse.getErrorCode();
+                                String errorNote = (String) gfaPwdTtItemResponse.getErrorNote();
+                                if (StringUtils.isNotBlank(errorCode) || StringUtils.isNotBlank(errorNote)) {
+                                    deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
+                                    deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(RecapConstants.LAS_DEACCESSION_REJECT_ERROR, RecapConstants.REQUEST_TYPE_PW_DIRECT, errorCode, errorNote));
+                                }
+                            }
+                        }
+                    } else {
+                        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
+                        deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(RecapConstants.LAS_SERVER_NOT_REACHABLE_ERROR, recapAssistanceEmailTo, recapAssistanceEmailTo));
+                    }
+                } else if (RecapCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && RecapCommonConstants.NOT_AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
+                    GFAPwiRequest gfaPwiRequest = new GFAPwiRequest();
+                    GFAPwiDsItemRequest gfaPwiDsItemRequest = new GFAPwiDsItemRequest();
+                    GFAPwiTtItemRequest gfaPwiTtItemRequest = new GFAPwiTtItemRequest();
+                    gfaPwiTtItemRequest.setCustomerCode(deAccessionDBResponseEntity.getCustomerCode());
+                    gfaPwiTtItemRequest.setItemBarcode(deAccessionDBResponseEntity.getBarcode());
+                    gfaPwiDsItemRequest.setTtitem(Collections.singletonList(gfaPwiTtItemRequest));
+                    gfaPwiRequest.setDsitem(gfaPwiDsItemRequest);
+                    GFAPwiResponse gfaPwiResponse = gfaPermanentWithdrawlInDirect(gfaPwiRequest);
+                    if (null != gfaPwiResponse) {
+                        GFAPwiDsItemResponse gfaPwiDsItemResponse = gfaPwiResponse.getDsitem();
+                        if (null != gfaPwiDsItemResponse) {
+                            List<GFAPwiTtItemResponse> gfaPwiTtItemResponses = gfaPwiDsItemResponse.getTtitem();
+                            if (CollectionUtils.isNotEmpty(gfaPwiTtItemResponses)) {
+                                GFAPwiTtItemResponse gfaPwiTtItemResponse = gfaPwiTtItemResponses.get(0);
+                                String errorCode = gfaPwiTtItemResponse.getErrorCode();
+                                String errorNote = gfaPwiTtItemResponse.getErrorNote();
+                                if (StringUtils.isNotBlank(errorCode) || StringUtils.isNotBlank(errorNote)) {
+                                    deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
+                                    deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(RecapConstants.LAS_DEACCESSION_REJECT_ERROR, RecapConstants.REQUEST_TYPE_PW_INDIRECT, errorCode, errorNote));
+                                }
+                            }
+                        }
+                    } else {
+                        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
+                        deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(RecapConstants.LAS_SERVER_NOT_REACHABLE_ERROR, recapAssistanceEmailTo, recapAssistanceEmailTo));
+                    }
+                }
+            }
+        }
+    }
+
 }

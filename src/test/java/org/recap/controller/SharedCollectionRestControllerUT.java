@@ -13,11 +13,8 @@ import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
-import org.recap.model.submitcollection.SubmitCollectionResponse;
 import org.recap.service.common.SetupDataService;
 import org.recap.service.deaccession.DeAccessionService;
-import org.recap.service.submitcollection.SubmitCollectionBatchService;
-import org.recap.service.submitcollection.SubmitCollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,11 +37,6 @@ public class SharedCollectionRestControllerUT {
 
     @InjectMocks
     private SharedCollectionRestController sharedCollectionRestController;
-    @Mock
-    private SubmitCollectionService submitCollectionService;
-
-    @Mock
-    private SubmitCollectionBatchService submitCollectionBatchService;
 
     @Mock
     DeAccessionService deAccessionService;
@@ -162,34 +154,6 @@ public class SharedCollectionRestControllerUT {
             "</datafield>\n" +
             "</record>\n" +
             "</collection>";
-
-    @Test
-    public void submitCollectiontest() throws Exception{
-        SubmitCollectionResponse submitCollectionResponse = new SubmitCollectionResponse();
-        submitCollectionResponse.setItemBarcode("32101068878931");
-        submitCollectionResponse.setMessage("ExceptionRecord");
-        String inputRecords = updatedMarcXml;
-        String institution = "PUL";
-        boolean isCGDProtection = true;
-        Map map = new HashMap();
-        map.put(1,"PUL");
-        Map<String,Object> requestParameters = new HashedMap();
-        requestParameters.put(RecapCommonConstants.INPUT_RECORDS,updatedMarcXml);
-        requestParameters.put(RecapCommonConstants.INSTITUTION,"PUL");
-        requestParameters.put(RecapCommonConstants.IS_CGD_PROTECTED,"true");
-        List<Integer> reportRecordNumberList = new ArrayList<>();
-        Set<Integer> processedBibIdSet = new HashSet<>();
-        List<Map<String, String>> idMapToRemoveIndexList = new ArrayList<>();//Added to remove dummy record in solr
-        List<Map<String, String>> bibIdMapToRemoveIndexList = new ArrayList<>();//Added to remove orphan record while unlinking
-        Set<String> updatedBoundWithDummyRecordOwnInstBibIdSet = new HashSet<>();
-        List<SubmitCollectionResponse> submitCollectionResponseList = new ArrayList<>();
-        submitCollectionResponseList.add(submitCollectionResponse);
-        ResponseEntity responseEntity = new ResponseEntity(submitCollectionResponse,HttpStatus.OK);
-        Mockito.when(setupDataService.getInstitutionCodeIdMap()).thenReturn(map);
-        Mockito.when(submitCollectionBatchService.process(institution, inputRecords, processedBibIdSet, idMapToRemoveIndexList, bibIdMapToRemoveIndexList, "", reportRecordNumberList, true, isCGDProtection, updatedBoundWithDummyRecordOwnInstBibIdSet)).thenReturn(submitCollectionResponseList);
-        ResponseEntity response = sharedCollectionRestController.submitCollection(requestParameters);
-        assertNotNull(response);
-    }
 
     @Test
     public void deAccession() throws Exception {

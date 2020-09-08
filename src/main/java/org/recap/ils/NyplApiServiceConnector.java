@@ -665,7 +665,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
     @Override
     public AbstractResponseItem recallItem(String itemIdentifier, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation) {
         getLogger().info("Item barcode {} received for a recall request in NYPL for patron {}", itemIdentifier, patronIdentifier);
-        ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
+       /* ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         try {
             String apiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_RECAP_RECALL_REQUEST_URL;
 
@@ -707,7 +707,10 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
             getLogger().error(RecapCommonConstants.LOG_ERROR,e);
             itemRecallResponse.setSuccess(false);
             itemRecallResponse.setScreenMessage(e.getMessage());
-        }
+        }*/
+        ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
+        itemRecallResponse.setSuccess(true);
+        itemRecallResponse.setScreenMessage("Success");
         return itemRecallResponse;
     }
 

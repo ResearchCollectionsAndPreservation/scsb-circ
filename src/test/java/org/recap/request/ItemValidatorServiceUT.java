@@ -2,6 +2,7 @@ package org.recap.request;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
@@ -68,6 +69,20 @@ public class ItemValidatorServiceUT extends BaseTestCase{
         assertNotNull(responseEntity);
         assertEquals("Item Validation ", RecapCommonConstants.VALID_REQUEST,responseEntity.getBody());
     }
+    /*@Test
+    public void testValidItemWithoutItemStatus() throws Exception{
+        saveBibSingleHoldingsMultipleItem();
+        List<String> itemBarcodes = new ArrayList<>();
+        itemBarcodes.add("10123");
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(itemBarcodes);
+        itemRequestInformation.setDeliveryLocation("PB");
+        itemRequestInformation.setRequestType(RecapCommonConstants.RETRIEVAL);
+        Mockito.when(checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD))
+        ResponseEntity responseEntity = itemValidatorService.itemValidation(itemRequestInformation);
+        assertNotNull(responseEntity);
+        assertEquals("Item Validation ", RecapCommonConstants.VALID_REQUEST,responseEntity.getBody());
+    }*/
 
     @Test
     public void testInValidItem() throws Exception{

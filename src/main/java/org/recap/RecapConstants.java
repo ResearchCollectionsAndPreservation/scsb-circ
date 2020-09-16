@@ -488,4 +488,10 @@ public final class RecapConstants {
 
     public static final String ETL_DATA_LOAD_NAMESPACE = "http://www.loc.gov/MARC21/slim";
 
+    /* Institution and Protocol Specific Properties */
+    public static final String SIP2_PROTOCOL = "SIP2";
+    public static final String NCIP_PROTOCOL = "NCIP";
+    public static final String REST_PROTOCOL = "REST";
+
+    public static final String PROTOCOL = "protocol";
 }

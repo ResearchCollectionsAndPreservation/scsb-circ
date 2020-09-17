@@ -9,14 +9,17 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 23/3/17.
  */
-public class RequestInstitutionBibPKUT extends BaseTestCase{
+public class RequestInstitutionBibPKUT{
 
     @Test
     public void testRequestInstitutionBibPK(){
         RequestInstitutionBibPK requestInstitutionBibPK = new RequestInstitutionBibPK();
         requestInstitutionBibPK.setItemId(1);
+        requestInstitutionBibPK.equals(requestInstitutionBibPK);
+        requestInstitutionBibPK.hashCode();
         requestInstitutionBibPK.setOwningInstitutionId(1);
         RequestInstitutionBibPK requestInstitutionBibPK1 = new RequestInstitutionBibPK(1,1);
+        requestInstitutionBibPK1.equals(requestInstitutionBibPK);
         assertNotNull(requestInstitutionBibPK.getOwningInstitutionId());
         assertNotNull(requestInstitutionBibPK.getItemId());
     }

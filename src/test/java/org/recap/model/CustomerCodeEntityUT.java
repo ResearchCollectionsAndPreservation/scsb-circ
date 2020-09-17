@@ -17,21 +17,15 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 14/3/17.
  */
-public class CustomerCodeEntityUT extends BaseTestCase{
-
-    @Autowired
-    CustomerCodeDetailsRepository customerCodeDetailsRepository;
-
-    @Autowired
-    InstitutionDetailsRepository institutionDetailRepository;
+public class CustomerCodeEntityUT{
 
     @Test
     public void testCustomerCode(){
         InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setId(1);
         institutionEntity.setInstitutionCode("UC");
         institutionEntity.setInstitutionName("University of Chicago");
-        InstitutionEntity entity = institutionDetailRepository.save(institutionEntity);
-        assertNotNull(entity);
+        assertNotNull(institutionEntity);
 
         CustomerCodeEntity customerCodeEntity = new CustomerCodeEntity();
         customerCodeEntity.setId(1);
@@ -40,10 +34,11 @@ public class CustomerCodeEntityUT extends BaseTestCase{
         customerCodeEntity.setRecapDeliveryRestrictions("No Restriction");
         customerCodeEntity.setPwdDeliveryRestrictions("Others");
         customerCodeEntity.setDescription("test");
-        customerCodeEntity.setOwningInstitutionId(entity.getId());
-        customerCodeEntity.setInstitutionEntity(entity);
+        customerCodeEntity.setOwningInstitutionId(institutionEntity.getId());
+        customerCodeEntity.setInstitutionEntity(institutionEntity);
         customerCodeEntity.setPickupLocation("Discovery");
         customerCodeEntity.setDeliveryRestrictionEntityList(Arrays.asList(new DeliveryRestrictionEntity()));
+        customerCodeEntity.equals(customerCodeEntity);
 
         assertNotNull(customerCodeEntity.getId());
         assertEquals(customerCodeEntity.getCustomerCode(),"AB");
@@ -55,6 +50,12 @@ public class CustomerCodeEntityUT extends BaseTestCase{
         assertNotNull(customerCodeEntity.getRecapDeliveryRestrictions());
         assertNotNull(customerCodeEntity.getPwdDeliveryRestrictions());
         assertNotNull(customerCodeEntity.getDeliveryRestrictionEntityList());
+
+        CustomerCodeEntity customerCodeEntity1 = new CustomerCodeEntity();
+        customerCodeEntity.setDescription("PA");
+        customerCodeEntity1.compareTo(customerCodeEntity);
+        customerCodeEntity1.equals(customerCodeEntity);
+        customerCodeEntity.hashCode();
     }
 
 }

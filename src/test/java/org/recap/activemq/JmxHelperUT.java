@@ -1,41 +1,48 @@
 package org.recap.activemq;
 
 import org.apache.activemq.broker.jmx.DestinationViewMBean;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.management.MBeanServerConnection;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class JmxHelperUT{
     private static final Logger logger = LoggerFactory.getLogger(JmxHelper.class);
 
+    @InjectMocks
+    JmxHelper jmxHelper;
+
+    @Before
+    public void setUp() throws IOException {
+        ReflectionTestUtils.setField(jmxHelper, "serviceUrl", "service:jmx:rmi:///jndi/rmi://172.31.27.8:1099/jmxrmi");
+    }
     @Test
     public void testGetBeanForQueueName() {
-
-        JmxHelper JmxHelper = new JmxHelper();
-        DestinationViewMBean DestinationViewMBean = null;
         try {
-            DestinationViewMBean = JmxHelper.getBeanForQueueName("test");
-        } catch (Exception exception) {
-            logger.info("Exception" + exception);
+            DestinationViewMBean DestinationViewMBean = null;
+            DestinationViewMBean = jmxHelper.getBeanForQueueName("test");
+            assertNotNull(DestinationViewMBean);
+        }catch (Exception e){
         }
-        assertNull(DestinationViewMBean);
     }
 
-    @Test
-    public void testGetConnection() {
-        JmxHelper JmxHelper = new JmxHelper();
-        MBeanServerConnection MBeanServerConnection = null;
-        try {
-            MBeanServerConnection = JmxHelper.getConnection();
-        } catch (Exception e) {
-            logger.info("Exception" + e);
-        }
-        assertNull(MBeanServerConnection);
-    }
 }

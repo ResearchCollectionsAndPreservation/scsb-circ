@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
+import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
@@ -93,21 +94,40 @@ public class BulkItemRequestProcessServiceUT {
         int bulkRequestId = 1;
         BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
         ItemEntity itemEntity = getItemEntity();
-        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setItemBarcodes(Arrays.asList("32101074849843"));
-        itemRequestInformation.setItemOwningInstitution("PUL");
-        itemRequestInformation.setRequestingInstitution("PUL");
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation();
+
         AbstractResponseItem abstractResponseItem = Mockito.mock(AbstractResponseItem.class,Mockito.CALLS_REAL_METHODS);
         /*abstractResponseItem.setItemOwningInstitution("PUL");
-        abstractResponseItem.setItemBarcode("32101074849843");
+        abstractResponseItem.setItemBarcode("123456");
         abstractResponseItem.setSuccess(true);
         abstractResponseItem.setScreenMessage("SUCCESS");*/
+//        Mockito.when((ItemCheckoutResponse)requestItemController.checkoutItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn(new ItemCheckoutResponse());
         Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
-//        Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
-   //     Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilutyStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
-       // Mockito.when(itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, bulkRequestItemEntity)).thenReturn(1);
+        Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
+        Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilutyStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
+//        Mockito.when(itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, bulkRequestItemEntity)).thenReturn(1);
         //Mockito.when(requestItemController.checkoutItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn(abstractResponseItem);
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode,bulkRequestId);
+    }
+
+    private ItemRequestInformation getItemRequestInformation() {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Arrays.asList("123456"));
+        itemRequestInformation.setTitleIdentifier(null);
+        itemRequestInformation.setPatronBarcode("123456");
+        itemRequestInformation.setItemOwningInstitution("");
+        itemRequestInformation.setRequestingInstitution("PUL");
+        itemRequestInformation.setEmailAddress("test@gmail.com");
+        itemRequestInformation.setRequestType("RETRIEVAL");
+        itemRequestInformation.setDeliveryLocation("PA");
+        itemRequestInformation.setCustomerCode("PA");
+        itemRequestInformation.setRequestNotes("test");
+        itemRequestInformation.setTrackingId(null);
+        itemRequestInformation.setChapterTitle("");
+        itemRequestInformation.setBibId("");
+        itemRequestInformation.setUsername("test(Bulk)");
+        itemRequestInformation.setRequestId(0);
+        return itemRequestInformation;
     }
 
     private ItemEntity getItemEntity(){

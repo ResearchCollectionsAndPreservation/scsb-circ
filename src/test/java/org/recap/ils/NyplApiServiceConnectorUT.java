@@ -322,14 +322,14 @@ public class NyplApiServiceConnectorUT{
         recallRequest.setItemBarcode(itemIdentifier);
         String apiUrl = nyplDataApiUrl +"/recap/recall-requests";
         HttpEntity<RecallRequest> requestEntity = new HttpEntity(recallRequest, getHttpHeaders());
-        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil()).thenReturn(nyplApiResponseUtil);
-        Mockito.when(nyplApiServiceConnector.getNyplDataApiUrl()).thenReturn(nyplDataApiUrl);
-        Mockito.when(nyplApiServiceConnector.getNyplOauthTokenApiService()).thenReturn(nyplOauthTokenApiService);
+  //      Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil()).thenReturn(nyplApiResponseUtil);
+//        Mockito.when(nyplApiServiceConnector.getNyplDataApiUrl()).thenReturn(nyplDataApiUrl);
+//        Mockito.when(nyplApiServiceConnector.getNyplOauthTokenApiService()).thenReturn(nyplOauthTokenApiService);
         Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
-        Mockito.when(nyplApiServiceConnector.getRestTemplate()).thenReturn(restTemplate);
+//        Mockito.when(nyplApiServiceConnector.getRestTemplate()).thenReturn(restTemplate);
         ResponseEntity<RecallResponse>responseEntity = new ResponseEntity<RecallResponse>(getRecallResponse(),HttpStatus.OK);
         RecallResponse recallResponse = responseEntity.getBody();
-        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenReturn("PUL");
+//        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenReturn("PUL");
         Mockito.when(nyplApiServiceConnector.recallItem(itemIdentifier,patronIdentifier,institutionId,expirationDate,bibId,pickupLocation)).thenCallRealMethod();
         nyplApiServiceConnector.recallItem(itemIdentifier,patronIdentifier,institutionId,expirationDate,bibId,pickupLocation);
     }

@@ -7,15 +7,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.PendingRequestDetailsRespository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Random;
 
 import static org.junit.Assert.assertTrue;
 
@@ -39,10 +41,21 @@ public class IdentifyPendingRequestServiceUT{
     @Test
     public void testidentifyNonPendingRequest() {
         RequestItemEntity requestItemEntity = getRequestItem();
-        PendingRequestEntity pendingRequestEntity = new PendingRequestEntity();
-        List<PendingRequestEntity> pendingRequestEntityList = new ArrayList<>();
         Mockito.when(requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(RecapConstants.REQUEST_STATUS_PENDING, RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
-//        Mockito.when(pendingRequestDetailsRespository.saveAll(pendingRequestEntityList)).thenReturn(Arrays.asList(pendingRequestEntity));
+        boolean status = identifyPendingRequestService.identifyPendingRequest();
+        assertTrue(status);
+    } @Test
+    public void testidentifyPendingRequest() {
+        RequestItemEntity requestItemEntity = getRequestItem();
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
+        requestStatusEntity.setRequestStatusDescription("PENDING");
+        requestStatusEntity.setRequestStatusCode("PENDING");
+        requestItemEntity.setRequestStatusEntity(requestStatusEntity);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime then = now.minusDays(7);
+        Date date = Date.from(then.atZone(ZoneId.systemDefault()).toInstant());
+        requestItemEntity.setCreatedDate(date);
+        Mockito.when(requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(RecapConstants.REQUEST_STATUS_PENDING, RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
         boolean status = identifyPendingRequestService.identifyPendingRequest();
         assertTrue(status);
     }

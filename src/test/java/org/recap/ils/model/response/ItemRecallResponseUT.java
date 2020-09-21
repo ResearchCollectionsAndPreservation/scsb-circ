@@ -26,6 +26,7 @@ public class ItemRecallResponseUT extends BaseTestCase{
         itemRecallResponse.setBibId("4564645");
         itemRecallResponse.setIsbn("4545");
         itemRecallResponse.setLccn("7854");
+        itemRecallResponse.setJobId("2");
 
         assertNotNull(itemRecallResponse.getAvailable());
         assertNotNull(itemRecallResponse.getTransactionDate());
@@ -38,6 +39,7 @@ public class ItemRecallResponseUT extends BaseTestCase{
         assertNotNull(itemRecallResponse.getBibId());
         assertNotNull(itemRecallResponse.getIsbn());
         assertNotNull(itemRecallResponse.getLccn());
+        assertNotNull(itemRecallResponse.getJobId());
     }
 
 }

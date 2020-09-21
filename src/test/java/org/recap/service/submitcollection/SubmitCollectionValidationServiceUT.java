@@ -55,6 +55,12 @@ public class SubmitCollectionValidationServiceUT{
         assertEquals(true,result);
     }
     @Test
+    public void isExistingBoundWithItem(){
+        ItemEntity itemEntity = getItemEntity();
+        boolean result = submitCollectionValidationService.isExistingBoundWithItem(itemEntity);
+        assertFalse(result);
+    }
+    @Test
     public void validateIncomingEntities(){
         Map<String,List<SubmitCollectionReportInfo>> submitCollectionReportInfoMap = new HashMap<>();
         List<SubmitCollectionReportInfo> submitCollectionReportInfos = new ArrayList<>();

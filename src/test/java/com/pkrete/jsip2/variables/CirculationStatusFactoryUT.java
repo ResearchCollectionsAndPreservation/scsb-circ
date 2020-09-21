@@ -20,6 +20,7 @@ public class CirculationStatusFactoryUT {
     public void testgetCirculationStatusForITEM_BARCODE_NOT_FOUND() throws InvalidSIP2ResponseValueException {
         CirculationStatus returnValue = CirculationStatus.ITEM_BARCODE_NOT_FOUND;
         CirculationStatus result = circulationStatusFactory.getCirculationStatus("00");
+        circulationStatusFactory.toString();
         assertEquals(returnValue, result);
     }
     @Test

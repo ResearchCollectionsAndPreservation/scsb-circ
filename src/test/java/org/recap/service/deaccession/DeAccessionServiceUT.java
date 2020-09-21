@@ -7,15 +7,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.BaseTestCase;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
+import org.recap.gfa.model.GFAPwdDsItemResponse;
+import org.recap.gfa.model.GFAPwdResponse;
+import org.recap.gfa.model.GFAPwdTtItemResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.AbstractResponseItem;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
@@ -24,18 +24,14 @@ import org.recap.repository.jpa.*;
 import org.recap.request.GFAService;
 import org.recap.service.RestHeaderService;
 import org.recap.util.ItemRequestServiceUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -86,12 +82,9 @@ public class DeAccessionServiceUT{
     @Mock
     DeaccesionItemChangeLogDetailsRepository deaccesionItemChangeLogDetailsRepository;
 
-   // AbstractResponseItem mockedAbstractResponseItem;
 
     @Before
     public  void setup(){
-        MockitoAnnotations.initMocks(this);
-       // mockedAbstractResponseItem = Mockito.mock(AbstractResponseItem.class, Mockito.CALLS_REAL_METHODS);
     }
 
     @Test
@@ -111,23 +104,40 @@ public class DeAccessionServiceUT{
         Map<Integer, String> itemIdAndMessageMap = new HashMap<>();
         itemIdAndMessageMap.put(1,"LAS server is not reachable. Please contact ReCAP staff (<a href=\"mailto:null\">null</a>) for further assistance.");
         List<DeaccessionItemChangeLog> itemChangeLogEntities = new ArrayList<>();
+        DeaccessionItemChangeLog deaccessionItemChangeLog = getDeaccessionItemChangeLog(itemIdAndMessageMap);
+        itemChangeLogEntities.add(deaccessionItemChangeLog);
+        GFAPwdResponse gfaPwdResponse = getGFAPwdResponse();
+        when(gfaService.callGfaItemStatus(itemBarcode)).thenReturn("INC ON WO:");
+        when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
+        when(itemDetailsRepository.findByBarcodeIn(new ArrayList<>(itemBarcodeList))).thenReturn(Arrays.asList(itemEntity));
+        when(requestItemDetailsRepository.findByItemBarcode(itemBarcode)).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(gfaService.gfaPermanentWithdrawlDirect(any())).thenReturn(gfaPwdResponse);
+        Mockito.when(deaccesionItemChangeLogDetailsRepository.saveAll(itemChangeLogEntities)).thenReturn(Arrays.asList(deaccessionItemChangeLog));
+        Map<String, String> result = deAccessionService.deAccession(deAccessionRequest);
+        assertNotNull(result);
+        GFAPwdTtItemResponse gfaPwdTtItemResponse = new GFAPwdTtItemResponse();
+        gfaPwdTtItemResponse.setErrorCode("error");
+        gfaPwdTtItemResponse.setErrorNote("Error");
+        gfaPwdTtItemResponse.setCustomerCode("PA");
+        gfaPwdTtItemResponse.setDestination("GA");
+        gfaPwdResponse.getDsitem().setTtitem(Arrays.asList(gfaPwdTtItemResponse));
+        Map<String, String> result2 = deAccessionService.deAccession(deAccessionRequest);
+        assertNotNull(result2);
+    }
+
+    private DeaccessionItemChangeLog getDeaccessionItemChangeLog(Map<Integer, String> itemIdAndMessageMap) {
         DeaccessionItemChangeLog deaccessionItemChangeLog = new DeaccessionItemChangeLog();
         deaccessionItemChangeLog.setUpdatedBy("Test");
         deaccessionItemChangeLog.setCreatedDate(new Date());
         deaccessionItemChangeLog.setOperationType("Deaccession Rollback");
         deaccessionItemChangeLog.setRecordId(1);
         deaccessionItemChangeLog.setNotes(itemIdAndMessageMap.get(1) + " Hence, the transaction of deaccessioning item is rolled back.");
-        itemChangeLogEntities.add(deaccessionItemChangeLog);
-        when(gfaService.callGfaItemStatus(itemBarcode)).thenReturn("INC ON WO:");
-        when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
-        when(itemDetailsRepository.findByBarcodeIn(new ArrayList<>(itemBarcodeList))).thenReturn(Arrays.asList(itemEntity));
-        when(requestItemDetailsRepository.findByItemBarcode(itemBarcode)).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(deaccesionItemChangeLogDetailsRepository.saveAll(itemChangeLogEntities)).thenReturn(Arrays.asList(deaccessionItemChangeLog));
-        Map<String, String> result = deAccessionService.deAccession(deAccessionRequest);
-        assertNotNull(result);
+        return deaccessionItemChangeLog;
     }
+
     @Test
     public void checkAndCancelHolds() throws Exception {
+        RequestItemEntity requestItemEntity = getMockRequestItemEntities().get(0);
         Map<String, String> resultMap = new HashMap<>();
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
         DeAccessionItem deAccessionItem = new DeAccessionItem();
@@ -143,7 +153,6 @@ public class DeAccessionServiceUT{
         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         Mockito.when(requestItemDetailsRepository.findByItemBarcode("123")).thenReturn(Arrays.asList(getRequestItem()));
-//        Mockito.when((ItemInformationResponse) requestItemController.itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn(getItemInformationResponse());
         deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
         assertNotNull(barcodeAndStopCodeMap);
         assertEquals(deAccessionItem.getItemBarcode(), barcodeAndStopCodeMap.keySet().toArray()[1]);
@@ -162,8 +171,13 @@ public class DeAccessionServiceUT{
         itemHoldResponse.setInstitutionID("1");
         itemHoldResponse.setIsbn("34567");
         itemHoldResponse.setAvailable(true);
-       // Mockito.when((ItemHoldResponse) requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn(itemHoldResponse);
-       // deAccessionService.cancelRequest(requestItemEntity,username);
+        itemHoldResponse.setSuccess(true);
+        Mockito.when(requestItemController.cancelHoldItem(any(), any())).thenReturn(itemHoldResponse);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.doNothing().when(itemRequestServiceUtil).updateSolrIndex(requestItemEntity.getItemEntity());
+        Mockito.when(requestItemDetailsRepository.save(requestItemEntity)).thenReturn(requestItemEntity);
+        ItemHoldResponse itemHoldResponse = deAccessionService.cancelRequest(requestItemEntity,username);
+        assertNotNull(itemHoldResponse);
     }
     @Test
     public void deAccessionItemsInDB(){
@@ -575,6 +589,16 @@ public class DeAccessionServiceUT{
         requestItemEntities.add(requestItemEntity2);
 
         return requestItemEntities;
+    }
+    private GFAPwdResponse getGFAPwdResponse(){
+        GFAPwdResponse gfaPwdResponse = new GFAPwdResponse();
+        GFAPwdDsItemResponse gfaPwdDsItemResponse = new GFAPwdDsItemResponse();
+        GFAPwdTtItemResponse gfaPwdTtItemResponse = new GFAPwdTtItemResponse();
+        gfaPwdTtItemResponse.setCustomerCode("PA");
+        gfaPwdTtItemResponse.setDestination("GA");
+        gfaPwdDsItemResponse.setTtitem(Arrays.asList(gfaPwdTtItemResponse));
+        gfaPwdResponse.setDsitem(gfaPwdDsItemResponse);
+        return gfaPwdResponse;
     }
 
    /* @Test

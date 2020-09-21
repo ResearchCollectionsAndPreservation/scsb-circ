@@ -88,6 +88,13 @@ public class EncryptEmailAddressUT {
         assertNotNull(encryptEmailAddress);
 
     }
+    @Test
+    public void encryptEmailAddressException(){
+        Mockito.when(mockedRequestItemDetailsRepository.count()).thenReturn(10L);
+        RequestItemEntity requestItemEntity = createRequestItem();
+        String encryptEmailAddress = mockedEncryptEmailAddressService.encryptEmailAddress();
+        assertNotNull(encryptEmailAddress);
+    }
 
     private RequestItemEntity createRequestItem(){
         InstitutionEntity institutionEntity = new InstitutionEntity();

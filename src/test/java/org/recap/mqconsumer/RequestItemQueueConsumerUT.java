@@ -68,6 +68,12 @@ public class RequestItemQueueConsumerUT{
     @Before
     public  void setup(){
         MockitoAnnotations.initMocks(this);
+        Mockito.when(requestItemQueueConsumer.getBulkItemRequestProcessService()).thenReturn(bulkItemRequestProcessService);
+        Mockito.when(requestItemQueueConsumer.getBulkItemRequestService()).thenReturn(bulkItemRequestService);
+        Mockito.when(requestItemQueueConsumer.getItemEDDRequestService()).thenReturn(itemEDDRequestService);
+        Mockito.when(requestItemQueueConsumer.getItemRequestService()).thenReturn(itemRequestService);
+        Mockito.when(requestItemQueueConsumer.getLogger()).thenReturn(logger);
+        Mockito.when(requestItemQueueConsumer.getObjectMapper()).thenReturn(om);
     }
 
     @Test

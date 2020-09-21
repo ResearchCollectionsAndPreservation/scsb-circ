@@ -52,10 +52,18 @@ public class CustomerCodeEntityUT{
         assertNotNull(customerCodeEntity.getDeliveryRestrictionEntityList());
 
         CustomerCodeEntity customerCodeEntity1 = new CustomerCodeEntity();
-        customerCodeEntity.setDescription("PA");
+        customerCodeEntity1.setId(2);
+        customerCodeEntity1.setDescription("PA");
+        customerCodeEntity1.setCustomerCode("OP");
+        CustomerCodeEntity customerCodeEntity2 = new CustomerCodeEntity();
+        customerCodeEntity1.setId(2);
+        customerCodeEntity1.setDescription("PA");
+        customerCodeEntity1.setCustomerCode("OP");
         customerCodeEntity1.compareTo(customerCodeEntity);
         customerCodeEntity1.equals(customerCodeEntity);
         customerCodeEntity.hashCode();
+        customerCodeEntity1.compareTo(customerCodeEntity2);
+        customerCodeEntity1.equals(customerCodeEntity2);
     }
 
 }

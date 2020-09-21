@@ -43,8 +43,6 @@ public void setup(){
         reportDataRequest.setInstitutionCode("PUL");
         reportDataRequest.setReportType("Submit_Collection_Exception_Report");
         reportDataRequest.setTransmissionType("FTP");
-        Mockito.when(submitCollectionReportGenerator.getSolrClientUrl()).thenReturn(solrClientUrl);
-        Mockito.when(submitCollectionReportGenerator.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(submitCollectionReportGenerator.getRestTemplate().postForObject(getSolrClientUrl() + "/reportsService/generateCsvReport", reportDataRequest, String.class)).thenReturn("Submit_Collection_Report");
         Mockito.when(submitCollectionReportGenerator.generateReport(reportDataRequest)).thenCallRealMethod();
         String response = submitCollectionReportGenerator.generateReport(reportDataRequest);

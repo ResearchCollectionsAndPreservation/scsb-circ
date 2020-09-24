@@ -20,6 +20,7 @@ public class RequestInstitutionBibPKUT{
         requestInstitutionBibPK.setOwningInstitutionId(1);
         RequestInstitutionBibPK requestInstitutionBibPK1 = new RequestInstitutionBibPK(1,1);
         requestInstitutionBibPK1.equals(requestInstitutionBibPK);
+        requestInstitutionBibPK1.hashCode();
         assertNotNull(requestInstitutionBibPK.getOwningInstitutionId());
         assertNotNull(requestInstitutionBibPK.getItemId());
     }

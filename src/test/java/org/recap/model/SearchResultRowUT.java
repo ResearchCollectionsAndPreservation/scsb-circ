@@ -24,6 +24,8 @@ public class SearchResultRowUT extends BaseTestCase{
         searchResultRow.setItemId(658);
         searchResultRow.setTitle("test");
         searchResultRow.setAuthor("john");
+        searchResultRow.setSummaryHoldings("test");
+        searchResultRow.setShowItems(true);
         searchResultRow.setAvailability("Available");
         searchResultRow.setBibId(36598);
         searchResultRow.setCollectionGroupDesignation("Shared");
@@ -41,6 +43,8 @@ public class SearchResultRowUT extends BaseTestCase{
         searchResultRow.setSelected(true);
         searchResultRow.setSelectAllItems(true);
         assertNotNull(searchResultRow);
+        assertNotNull(searchResultRow.getSummaryHoldings());
+        assertNotNull(searchResultRow.isShowItems());
         assertNotNull(searchResultRow.getBarcode());
         assertNotNull(searchResultRow.getSearchItemResultRows());
         assertNotNull(searchResultRow.getItemId());

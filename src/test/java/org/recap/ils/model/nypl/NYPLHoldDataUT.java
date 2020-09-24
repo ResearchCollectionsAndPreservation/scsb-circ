@@ -16,6 +16,7 @@ public class NYPLHoldDataUT extends BaseTestCase{
     @Test
     public void testNYPLHoldData(){
         NYPLHoldData nyplHoldData = new NYPLHoldData();
+        nyplHoldData.setId(1);
         nyplHoldData.setPatron("test");
         nyplHoldData.setRecordType("test");
         nyplHoldData.setRecord("test");
@@ -29,6 +30,7 @@ public class NYPLHoldDataUT extends BaseTestCase{
         nyplHoldData.setProcessed(true);
         nyplHoldData.setSuccess(true);
 
+        assertNotNull(nyplHoldData.getId());
         assertNotNull(nyplHoldData.getPatron());
         assertNotNull(nyplHoldData.getRecordType());
         assertNotNull(nyplHoldData.getRecord());

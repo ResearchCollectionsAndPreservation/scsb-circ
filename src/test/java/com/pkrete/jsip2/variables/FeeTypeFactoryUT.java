@@ -21,6 +21,7 @@ public class FeeTypeFactoryUT {
         FeeType returnValue = FeeType.EMPTY;
         FeeType result =  feeTypeFactory.getFeeType("00");
         assertEquals(returnValue,result);
+        returnValue.toString();
     }
     @Test
     public void testGetFeeTypeForOTHER_UNKNONW() throws InvalidSIP2ResponseValueException {

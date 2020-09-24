@@ -26,6 +26,8 @@ public class ItemInformationResponseUT extends BaseTestCase{
         itemInformationResponse.setHoldQueueLength("1");
         itemInformationResponse.setHoldPickupDate(new Date().toString());
         itemInformationResponse.setRecallDate(new Date().toString());
+        itemInformationResponse.setEddFailureResponseScreenMsg("FAILURE");
+        itemInformationResponse.setEddSuccessResponseScreenMsg("SUCCESS");
         itemInformationResponse.setOwner("PUL");
         itemInformationResponse.setMediaType("test");
         itemInformationResponse.setPermanentLocation("test");
@@ -88,6 +90,9 @@ public class ItemInformationResponseUT extends BaseTestCase{
         assertNotNull(itemInformationResponse.getRequestNotes());
         assertNotNull(itemInformationResponse.getItemId());
         assertNotNull(itemInformationResponse.getUsername());
+        assertNotNull(itemInformationResponse.getEddFailureResponseScreenMsg());
+        assertNotNull(itemInformationResponse.getEddSuccessResponseScreenMsg());
+
     }
 
 }

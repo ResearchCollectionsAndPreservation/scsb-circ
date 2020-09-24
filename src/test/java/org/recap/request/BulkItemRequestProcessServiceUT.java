@@ -6,25 +6,23 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
-import org.recap.model.AbstractResponseItem;
+import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BulkItemRequestProcessServiceUT {
@@ -52,12 +50,8 @@ public class BulkItemRequestProcessServiceUT {
     @Mock
     private CommonUtil commonUtil;
 
-    /*@Mock
-    AbstractResponseItem abstractResponseItem;*/
-
     @Before
     public  void setup(){
-        MockitoAnnotations.initMocks(this);
     }
 
     @Test
@@ -89,24 +83,38 @@ public class BulkItemRequestProcessServiceUT {
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode,bulkRequestId);
     }
     @Test
+    public void processBulkRequestItemForException(){
+        String itemBarcode ="Complete";
+        int bulkRequestId = 1;
+        BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
+        bulkItemRequestProcessService.processBulkRequestItem(itemBarcode,bulkRequestId);
+    }
+    @Test
     public void processBulkRequestItemForBarcode(){
         String itemBarcode ="123456";
         int bulkRequestId = 1;
         BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
         ItemEntity itemEntity = getItemEntity();
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
-
-        AbstractResponseItem abstractResponseItem = Mockito.mock(AbstractResponseItem.class,Mockito.CALLS_REAL_METHODS);
-        /*abstractResponseItem.setItemOwningInstitution("PUL");
-        abstractResponseItem.setItemBarcode("123456");
-        abstractResponseItem.setSuccess(true);
-        abstractResponseItem.setScreenMessage("SUCCESS");*/
-//        Mockito.when((ItemCheckoutResponse)requestItemController.checkoutItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn(new ItemCheckoutResponse());
+        ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
+        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+        itemInformationResponse.setRequestTypeForScheduledOnWO(true);
+        itemInformationResponse.setSuccess(true);
+        Mockito.when(requestItemController.checkoutItem(any(), any())).thenReturn(itemCheckoutResponse);
         Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
         Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
+        Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
         Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilutyStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
-//        Mockito.when(itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, bulkRequestItemEntity)).thenReturn(1);
-        //Mockito.when(requestItemController.checkoutItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn(abstractResponseItem);
+        Mockito.when(gfaService.executeRetrieveOrder(any(), any())).thenReturn(itemInformationResponse);
+        bulkItemRequestProcessService.processBulkRequestItem(itemBarcode,bulkRequestId);
+        itemInformationResponse.setRequestTypeForScheduledOnWO(false);
+        Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
+        Mockito.when(gfaService.executeRetrieveOrder(any(), any())).thenReturn(itemInformationResponse);
+        bulkItemRequestProcessService.processBulkRequestItem(itemBarcode,bulkRequestId);
+        itemInformationResponse.setSuccess(false);
+        bulkItemRequestProcessService.processBulkRequestItem(itemBarcode,bulkRequestId);
+        itemCheckoutResponse.setSuccess(false);
+        Mockito.when(requestItemController.checkoutItem(any(), any())).thenReturn(itemCheckoutResponse);
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode,bulkRequestId);
     }
 

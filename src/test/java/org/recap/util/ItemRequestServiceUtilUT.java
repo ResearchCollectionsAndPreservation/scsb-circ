@@ -12,7 +12,7 @@ import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.recap.request.EmailService;
 import org.recap.service.RestHeaderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,10 +35,10 @@ public class ItemRequestServiceUtilUT {
     @Mock
     private BulkRequestItemDetailsRepository bulkRequestItemDetailsRepository;
 
-   /* @Before
-    public void before(){
-        itemRequestServiceUtil= Mockito.mock(ItemRequestServiceUtil.class);
-    }*/
+    @Before
+    public void setUp() throws Exception {
+        ReflectionTestUtils.setField(itemRequestServiceUtil, "scsbSolrClientUrl", "http://localhost:9090/");
+    }
     @Test
     public void testupdateSolrIndex(){
         ItemEntity itemEntity=new ItemEntity();
@@ -73,29 +73,63 @@ public class ItemRequestServiceUtilUT {
                 bulkRequestItemEntity.get().getBulkRequestStatus(), new String(bulkRequestItemEntity.get().getBulkRequestFileData()),
                 "Bulk Request Process Report"));*/
         itemRequestServiceUtil.generateReportAndSendEmail(bulkRequestId);
-        assertTrue(true);
+
     }
     @Test
     public void testsetEddInfoToGfaRequest() {
         TtitemEDDResponse TtitemEDDResponse = new TtitemEDDResponse();
-        String line = "testdata:testdat:testdata:testdata:testdata:testdata";
+        String line = "Start Page:testdat:testdata:testdata:testdata:testdata";
+        String line1 = "End Page:testdat:testdata:testdata:testdata:testdata";
+        String line2 = "Volume Number:testdat:testdata:testdata:testdata:testdata";
+        String line3 = "Issue:testdat:testdata:testdata:testdata:testdata";
+        String line4 = "Article Author:testdat:testdata:testdata:testdata:testdata";
+        String line5 = "Article/Chapter Title:testdat:testdata:testdata:testdata:testdata";
         itemRequestServiceUtil.setEddInfoToGfaRequest(line, TtitemEDDResponse);
-        assertTrue(true);
+        itemRequestServiceUtil.setEddInfoToGfaRequest(line1, TtitemEDDResponse);
+        itemRequestServiceUtil.setEddInfoToGfaRequest(line2, TtitemEDDResponse);
+        itemRequestServiceUtil.setEddInfoToGfaRequest(line3, TtitemEDDResponse);
+        itemRequestServiceUtil.setEddInfoToGfaRequest(line4, TtitemEDDResponse);
+        itemRequestServiceUtil.setEddInfoToGfaRequest(line5, TtitemEDDResponse);
+
+    } @Test
+    public void testSetEddInfoToScsbRequest() {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        String line = "Start Page:testdat:testdata:testdata:testdata:testdata";
+        String line1 = "End Page:testdat:testdata:testdata:testdata:testdata";
+        String line2 = "Volume Number:testdat:testdata:testdata:testdata:testdata";
+        String line3 = "Issue:testdat:testdata:testdata:testdata:testdata";
+        String line4 = "Article Author:testdat:testdata:testdata:testdata:testdata";
+        String line5 = "Article/Chapter Title:testdat:testdata:testdata:testdata:testdata";
+        String line6 = "User:testdat:testdata:testdata:testdata:testdata";
+        itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation);
+        itemRequestServiceUtil.setEddInfoToScsbRequest(line1, itemRequestInformation);
+        itemRequestServiceUtil.setEddInfoToScsbRequest(line2, itemRequestInformation);
+        itemRequestServiceUtil.setEddInfoToScsbRequest(line3, itemRequestInformation);
+        itemRequestServiceUtil.setEddInfoToScsbRequest(line4, itemRequestInformation);
+        itemRequestServiceUtil.setEddInfoToScsbRequest(line5, itemRequestInformation);
+        itemRequestServiceUtil.setEddInfoToScsbRequest(line6, itemRequestInformation);
+
     }
     @Test
-    public void testsetEddInfoToScsbRequest() {
-        ItemRequestInformation ItemRequestInformation =  new ItemRequestInformation();
-        String line = "testdata:testdat:testdata";
-        itemRequestServiceUtil.setEddInfoToScsbRequest(line, ItemRequestInformation);
-        assertTrue(true);
+    public void getPatronIdBorrowingInstitutionPUL(){
+        String requestingInstitution ="CUL";
+        String owningInstitution = "PUL";
+        String requestType = "EDD";
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution(requestingInstitution,owningInstitution,requestType);
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution("NYPL",owningInstitution,requestType);
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution(requestingInstitution,owningInstitution,"RECALL");
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution("NYPL",owningInstitution,"RECALL");
     }
 
     @Test
-    public void getPatronIdBorrowingInstitutionPUL(){
+    public void getPatronIdBorrowingInstitutionCUL(){
         String requestingInstitution ="PUL";
         String owningInstitution = "CUL";
         String requestType = "EDD";
         itemRequestServiceUtil.getPatronIdBorrowingInstitution(requestingInstitution,owningInstitution,requestType);
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution("NYPL",owningInstitution,requestType);
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution(requestingInstitution,owningInstitution,"RECALL");
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution("NYPL",owningInstitution,"RECALL");
     }
     @Test
     public void getPatronIdBorrowingInstitutionNYPL(){
@@ -103,6 +137,9 @@ public class ItemRequestServiceUtilUT {
         String owningInstitution = "NYPL";
         String requestType = "EDD";
         itemRequestServiceUtil.getPatronIdBorrowingInstitution(requestingInstitution,owningInstitution,requestType);
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution("CUL",owningInstitution,requestType);
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution(requestingInstitution,owningInstitution,"RECALL");
+        itemRequestServiceUtil.getPatronIdBorrowingInstitution("CUL",owningInstitution,"RECALL");
     }
     private BulkRequestItemEntity getBulkRequestItemEntity(){
         InstitutionEntity institutionEntity = new InstitutionEntity();

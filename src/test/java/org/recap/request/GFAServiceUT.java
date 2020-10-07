@@ -4,15 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.util.json.JsonObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.BaseTestCase;
+import org.mockito.MockitoAnnotations;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
+import org.recap.ScsbCircApplication;
 import org.recap.camel.statusreconciliation.StatusReconciliationCSVRecord;
 import org.recap.camel.statusreconciliation.StatusReconciliationErrorCSVRecord;
 import org.recap.gfa.model.*;
@@ -25,15 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.*;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -47,7 +43,10 @@ import static org.junit.Assert.*;
 /**
  * Created by hemalathas on 21/2/17.
  */
-public class GFAServiceUT extends BaseTestCase{
+@TestPropertySource("classpath:application.properties")
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ScsbCircApplication.class)
+public class GFAServiceUT{
 
     private static final Logger logger = LoggerFactory.getLogger(GFAServiceUT.class);
 
@@ -129,6 +128,10 @@ public class GFAServiceUT extends BaseTestCase{
     @Autowired
     InstitutionDetailsRepository institutionDetailsRepository;
 
+    @Before
+    public void setUp(){
+        MockitoAnnotations.initMocks(this);
+    }
     @Test
     public void testGFAService() {
         GFARetrieveItemRequest gfaRetrieveItemRequest = new GFARetrieveItemRequest();
@@ -636,6 +639,7 @@ public class GFAServiceUT extends BaseTestCase{
         assertNotNull(gfaPwiDsItemResponse.getProdsHasChanges());
         assertNotNull(gfaPwiDsItemResponse.getTtitem());
         gfaPwiResponse.setDsitem(gfaPwiDsItemResponse);
+        assertNotNull(gfaPwiResponse.getDsitem());
 
         ResponseEntity<GFAPwiResponse> responseEntity = new ResponseEntity(gfaPwiResponse, HttpStatus.OK);
         HttpEntity requestEntity = new HttpEntity(gfaPwiRequest, getHttpHeaders());

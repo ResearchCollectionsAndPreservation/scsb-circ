@@ -1,11 +1,14 @@
 package org.recap.request;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
-import org.recap.RecapConstants;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
+import org.recap.controller.ItemController;
 import org.recap.model.jpa.ItemRequestInformation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -18,25 +21,40 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 3/11/16.
  */
-public class RequestParamaterValidatorServiceUT extends BaseTestCase{
+@RunWith(MockitoJUnitRunner.class)
+public class RequestParamaterValidatorServiceUT{
 
-    @Autowired
+    @InjectMocks
     RequestParamaterValidatorService requestParamaterValidatorService;
+
+    @Mock
+    ItemController itemController;
 
     @Test
     public void testForValidatingInvalidRequestingInstitution(){
-        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        List<String> itemBarcodeList = new ArrayList<>();
-        itemBarcodeList.add("33433014514719");
-        itemBarcodeList.add("33433012968222");
-        itemRequestInformation.setItemBarcodes(itemBarcodeList);
-        itemRequestInformation.setPatronBarcode("45678915");
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT);
-        itemRequestInformation.setRequestingInstitution("PULd");
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), RecapConstants.INVALID_REQUEST_INSTITUTION+"\n");
+    }
+    @Test
+    public void testForValidatingInvalidRequestingInstitutionWithBarcode(){
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation();
+        itemRequestInformation.setRequestType(RecapConstants.EDD_REQUEST);
+        ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
+        assertNotNull(responseEntity);
+        itemRequestInformation.setEmailAddress("");
+        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RECALL);
+        ResponseEntity responseEntity1 = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
+        assertNotNull(responseEntity1);
+    }
+    private ItemRequestInformation getItemRequestInformation() {
+
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setPatronBarcode("45678915");
+        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT);
+        itemRequestInformation.setRequestingInstitution("PUL");
+        return itemRequestInformation;
     }
 
     @Test

@@ -49,6 +49,8 @@ public class AccessionReconciliationProcessor {
 
     int noOfLinesInFile=0;
 
+    @Autowired
+    RestTemplate restTemplate;
     /**
      * Instantiates a new Accession reconcilation processor.
      *
@@ -71,7 +73,6 @@ public class AccessionReconciliationProcessor {
         }
         Integer index = (Integer) exchange.getProperty(RecapConstants.CAMEL_SPLIT_INDEX);
         HttpEntity httpEntity = new HttpEntity(barcodesAndCustomerCodes);
-        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Map> responseEntity = restTemplate.exchange(solrSolrClientUrl+ RecapConstants.ACCESSION_RECONCILATION_SOLR_CLIENT_URL, HttpMethod.POST, httpEntity,Map.class);
         Map<String,String> body = responseEntity.getBody();
         String barcodesAndCustomerCodesForReportFile = body.entrySet().stream().map(Object::toString).collect(Collectors.joining("\n")).replaceAll("=","\t");

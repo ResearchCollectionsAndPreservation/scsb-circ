@@ -13,7 +13,7 @@ public class BibRecordsUT {
     public  void getBibRecords(){
         BibRecords bibRecords = new BibRecords();
         bibRecords.setBibRecords(Arrays.asList(new BibRecord()));
-
+        assertNotNull(bibRecords.getBibRecords());
         assertNotNull(bibRecords);
     }
 }

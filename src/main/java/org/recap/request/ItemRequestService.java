@@ -103,6 +103,9 @@ public class ItemRequestService {
     private RequestItemDetailsRepository requestItemDetailsRepository;
 
     @Autowired
+    RestTemplate restTemplate;
+
+    @Autowired
     private EmailService emailService;
 
     @Autowired
@@ -897,13 +900,12 @@ public class ItemRequestService {
         List<SearchResultRow> statusResponse;
         SearchResultRow searchResultRow = null;
         try {
-            RestTemplate restTemplate = new RestTemplate();
+            //RestTemplate restTemplate = new RestTemplate();
             HttpEntity requestEntity = new HttpEntity<>(getRestHeaderService().getHttpHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
                     .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
                     .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
-            ResponseEntity<List<SearchResultRow>> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
-            });
+            ResponseEntity<List<SearchResultRow>> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {});
             statusResponse = responseEntity.getBody();
             if (statusResponse != null && !statusResponse.isEmpty()) {
                 searchResultRow = statusResponse.get(0);

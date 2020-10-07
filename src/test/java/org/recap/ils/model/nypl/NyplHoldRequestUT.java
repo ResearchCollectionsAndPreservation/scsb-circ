@@ -9,7 +9,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 3/4/17.
  */
-public class NyplHoldRequestUT extends BaseTestCase{
+public class NyplHoldRequestUT{
 
 
     @Test
@@ -22,8 +22,10 @@ public class NyplHoldRequestUT extends BaseTestCase{
         nyplHoldRequest.setPickupLocation("PB");
         nyplHoldRequest.setNumberOfCopies(1);
         nyplHoldRequest.setNeededBy("test");
+        nyplHoldRequest.setDeliveryLocation("test");
 
         assertNotNull(nyplHoldRequest.getPatron());
+        assertNotNull(nyplHoldRequest.getDeliveryLocation());
         assertNotNull(nyplHoldRequest.getRecordType());
         assertNotNull(nyplHoldRequest.getRecord());
         assertNotNull(nyplHoldRequest.getNyplSource());

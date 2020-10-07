@@ -410,6 +410,7 @@ public class NyplApiServiceConnectorUT{
         checkinResponse.setCount(1);
         checkinResponse.setStatusCode(1);
         checkinResponse.setDebugInfo(Arrays.asList(new DebugInfo()));
+        assertNotNull(checkinData.getId());
         return checkinResponse;
     }
 
@@ -579,6 +580,7 @@ public class NyplApiServiceConnectorUT{
         cancelHoldResponse.setStatusCode(1);
         cancelHoldResponse.setCount(1);
         cancelHoldResponse.setDebugInfo(Arrays.asList(new DebugInfo()));
+        assertNotNull(cancelHoldData.getId());
         return cancelHoldResponse;
     }
 

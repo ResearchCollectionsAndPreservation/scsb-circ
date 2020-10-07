@@ -7,22 +7,23 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.ItemRequestServiceUtil;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
 public class BulkItemRequestServiceUT {
     @InjectMocks
     BulkItemRequestService bulkItemRequestService;
@@ -69,8 +70,44 @@ public class BulkItemRequestServiceUT {
         int bulkRequestId = 1;
         ItemEntity itemEntity = getItemEntity();
         BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
-//        Mockito.when(itemDetailsRepository.findByBarcode("123456")).thenReturn(Arrays.asList(itemEntity));
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
+        ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
+        itemStatusEntity.setId(2);
+        itemStatusEntity.setStatusCode(RecapCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusDescription(RecapCommonConstants.AVAILABLE);
+        itemEntity.setItemStatusEntity(itemStatusEntity);
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
+        itemEntity.setOwningInstitutionId(1);
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
+    }
+    @Test
+    public void bulkRequestItemsForDifferentOwingInstId(){
+        int bulkRequestId = 1;
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setOwningInstitutionId(3);
+        ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
+        itemStatusEntity.setId(2);
+        itemStatusEntity.setStatusCode(RecapCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusDescription(RecapCommonConstants.AVAILABLE);
+        itemEntity.setItemStatusEntity(itemStatusEntity);
+        BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
+        itemEntity.setOwningInstitutionId(1);
+        ReflectionTestUtils.setField(bulkItemRequestService, "bulkRequestItemCountLimit", 0);
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
+    }
+    @Test
+    public void bulkRequestItemsForbulkRequestItemBarcodeExcessList(){
+        int bulkRequestId = 1;
+        ItemEntity itemEntity = getItemEntity();
+        BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
+        bulkRequestItemEntity.setBulkRequestStatus("PROCESSED");
+        Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
+        ReflectionTestUtils.setField(bulkItemRequestService, "bulkRequestItemCountLimit", 0);
         bulkItemRequestService.bulkRequestItems(bulkRequestId);
     }
     private BulkRequestItemEntity getBulkRequestItemEntity(){
@@ -107,6 +144,13 @@ public class BulkItemRequestServiceUT {
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setBarcode("123456");
         itemEntity.setCustomerCode("PA");
+        itemEntity.setOwningInstitutionItemId("13567");
+        itemEntity.setOwningInstitutionId(1);
+        ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
+        itemStatusEntity.setId(2);
+        itemStatusEntity.setStatusCode(RecapCommonConstants.NOT_AVAILABLE);
+        itemStatusEntity.setStatusDescription(RecapCommonConstants.NOT_AVAILABLE);
+        itemEntity.setItemStatusEntity(itemStatusEntity);
         return itemEntity;
     }
 

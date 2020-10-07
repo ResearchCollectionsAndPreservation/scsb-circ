@@ -1,19 +1,23 @@
 package org.recap.camel.accessionReconciliation;
 
-import org.apache.camel.*;
+import org.apache.camel.Exchange;
+import org.apache.camel.Header;
+import org.apache.camel.Message;
+import org.apache.camel.ProducerTemplate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.camel.accessionreconciliation.AccessionReconciliationEmailService;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by akulak on 25/5/17.
@@ -43,8 +47,11 @@ public class AccessionReconciliationEmailServiceUT {
 
     String ccEmailAddress = "testcc@mail.com";
 
+    String institutionCode = "CUL";
+
     @Before
     public  void setup(){
+        MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(accessionReconciliationEmailService,"pulEmailTo",emailAddress);
         ReflectionTestUtils.setField(accessionReconciliationEmailService,"pulEmailCC",ccEmailAddress);
     }
@@ -68,16 +75,13 @@ public class AccessionReconciliationEmailServiceUT {
         assertNotNull(emailPayLoad);
     }
 
-    /*@Test
+    @Test
     public void processInput(){
-        producerTemplate.setThreadedAsyncMode(true);
-        producerTemplate.setDefaultEndpointUri("endpoint.com");
-        producerTemplate.setEventNotifierEnabled(true);
-        AccessionReconciliationEmailService accessionReconciliationEmailService1 = new AccessionReconciliationEmailService("CUL",producerTemplate);
-        message.setHeader("CamelFileNameProduced",dataheader);
+        ReflectionTestUtils.setField(accessionReconciliationEmailService,"institutionCode",institutionCode);
+        message.setHeader("CamelFileNameProduced","AccessionReconciliationFile");
+        exchange.setIn(message);
         Mockito.when(exchange.getIn()).thenReturn(message);
-        Mockito.doNothing().when(producerTemplate).sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, "AccessionReconcilation");
-        accessionReconciliationEmailService1.processInput(exchange);
-    }*/
+        accessionReconciliationEmailService.processInput(exchange);
+    }
 
 }

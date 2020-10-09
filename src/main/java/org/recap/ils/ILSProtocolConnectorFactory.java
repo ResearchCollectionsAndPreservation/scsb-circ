@@ -1,6 +1,6 @@
 package org.recap.ils;
 
-import org.recap.ils.model.ILSConfigProperties;
+import org.recap.model.ILSConfigProperties;
 import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

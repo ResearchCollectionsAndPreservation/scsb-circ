@@ -396,7 +396,7 @@ public class ItemRequestService {
                     else {
                         itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
                     }
-                    String isRefileForCheckin = propertyUtil.getPropertyByInstitution(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
+                    String isRefileForCheckin = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
                     if (Boolean.TRUE.toString().equalsIgnoreCase(isRefileForCheckin)) {
                         requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
                     } else {
@@ -530,15 +530,15 @@ public class ItemRequestService {
      * @param exchange          the exchange
      */
     public void sendMessageToTopic(String owningInstituteId, String requestType, ItemInformationResponse itemResponseInfo, Exchange exchange) {
-        String selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.retrieval.request");
+        String selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.retrieval.request");
         if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-            selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.retrieval.request");
+            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.retrieval.request");
         } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-            selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.edd.request");
+            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.edd.request");
         } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-            selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.recall.request");
+            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.recall.request");
         } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
-            selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.borrowdirect.request");
+            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.borrowdirect.request");
         }
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "";
@@ -676,7 +676,7 @@ public class ItemRequestService {
             } else {// Not the Owning Institute
                 // Get Temporary bibId from SCSB DB
                 ItemCreateBibResponse createBibResponse;
-                String isCreateBibEnabled = propertyUtil.getPropertyByInstitution(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
+                String isCreateBibEnabled = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
                 if (Boolean.TRUE.toString().equalsIgnoreCase(isCreateBibEnabled)) {
                     createBibResponse = (ItemCreateBibResponse) requestItemController.createBibliogrphicItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
                 } else {

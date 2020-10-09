@@ -22,6 +22,15 @@ public interface CustomerCodeDetailsRepository extends BaseRepository<CustomerCo
     CustomerCodeEntity findByCustomerCode(@Param("customerCode") String customerCode);
 
     /**
+     * Find by customer code customer code entity.
+     *
+     * @param customerCode the customer code
+     * @return the customer code entity
+     */
+    @Query(value = "select customerCodeEntity from CustomerCodeEntity customerCodeEntity inner join customerCodeEntity.institutionEntity ie where ie.institutionCode = :institutionCode and customerCodeEntity.customerCode = :customerCode ")
+    CustomerCodeEntity findByCustomerCodeAndOwningInstitutionCode(@Param("customerCode") String customerCode, @Param("institutionCode") String institutionCode);
+
+    /**
      * Find by customer code in list.
      *
      * @param customerCodes the customer codes

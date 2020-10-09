@@ -22,4 +22,12 @@ public interface InstitutionDetailsRepository extends BaseRepository<Institution
      * @return the institution entity
      */
     InstitutionEntity findByInstitutionName(String institutionName);
+
+    /**
+     * Check if exists by institution code institution entity.
+     *
+     * @param institutionCode the institution code
+     * @return the institution entity
+     */
+    boolean existsByInstitutionCode(String institutionCode);
 }

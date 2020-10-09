@@ -1,14 +1,28 @@
 package org.recap.ils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.recap.RecapConstants;
 import org.recap.ils.model.ILSConfigProperties;
 import org.recap.model.AbstractResponseItem;
+import org.springframework.stereotype.Service;
 
+@Service
 @Slf4j
 public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
-    public NCIPProtocolConnector(ILSConfigProperties ilsConfigProperties) {
-        super(ilsConfigProperties);
+    @Override
+    public boolean supports(String protocol) {
+        return RecapConstants.NCIP_PROTOCOL.equalsIgnoreCase(protocol);
+    }
+
+    @Override
+    public void setInstitution(String institutionCode) {
+        this.institutionCode = institutionCode;
+    }
+
+    @Override
+    public void setIlsConfigProperties(ILSConfigProperties ilsConfigProperties) {
+        this.ilsConfigProperties = ilsConfigProperties;
     }
 
     @Override

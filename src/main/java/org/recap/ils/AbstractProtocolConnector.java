@@ -2,14 +2,18 @@ package org.recap.ils;
 
 import org.recap.ils.model.ILSConfigProperties;
 import org.recap.model.AbstractResponseItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractProtocolConnector {
 
     protected ILSConfigProperties ilsConfigProperties;
+    protected String institutionCode;
 
-    public AbstractProtocolConnector(ILSConfigProperties ilsConfigProperties) {
-        this.ilsConfigProperties = ilsConfigProperties;
-    }
+    public abstract boolean supports(String protocol);
+
+    public abstract void setInstitution(String institutionCode);
+
+    public abstract void setIlsConfigProperties(ILSConfigProperties ilsConfigProperties);
 
     public String getHost() {
         return ilsConfigProperties.getHost();

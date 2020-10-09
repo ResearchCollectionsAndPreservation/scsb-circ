@@ -5,6 +5,7 @@ import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.controller.ItemController;
 import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,9 @@ public class RequestParamaterValidatorService {
     @Autowired
     ItemController itemController;
 
+    @Autowired
+    InstitutionDetailsRepository institutionDetailsRepository;
+
     /**
      * Validate item request parameters response entity.
      *
@@ -56,8 +60,7 @@ public class RequestParamaterValidatorService {
             errorMessageMap.put(errorCount, RecapConstants.ITEM_BARCODE_IS_REQUIRED);
             errorCount++;
         }
-        if (StringUtils.isEmpty(itemRequestInformation.getRequestingInstitution()) || !itemRequestInformation.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.PRINCETON) && !itemRequestInformation.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.COLUMBIA)
-                && !itemRequestInformation.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+        if (StringUtils.isEmpty(itemRequestInformation.getRequestingInstitution()) || !institutionDetailsRepository.existsByInstitutionCode(itemRequestInformation.getRequestingInstitution())) {
             errorMessageMap.put(errorCount, RecapConstants.INVALID_REQUEST_INSTITUTION);
             errorCount++;
         }

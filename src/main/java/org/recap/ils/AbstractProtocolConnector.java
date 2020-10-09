@@ -1,8 +1,7 @@
 package org.recap.ils;
 
-import org.recap.ils.model.ILSConfigProperties;
 import org.recap.model.AbstractResponseItem;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.recap.model.ILSConfigProperties;
 
 public abstract class AbstractProtocolConnector {
 

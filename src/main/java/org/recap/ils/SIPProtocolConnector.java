@@ -10,9 +10,9 @@ import com.pkrete.jsip2.variables.HoldMode;
 import lombok.extern.slf4j.Slf4j;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
-import org.recap.ils.model.ILSConfigProperties;
 import org.recap.ils.model.response.*;
 import org.recap.model.AbstractResponseItem;
+import org.recap.model.ILSConfigProperties;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;

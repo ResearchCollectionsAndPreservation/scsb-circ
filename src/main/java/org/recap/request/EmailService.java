@@ -150,7 +150,7 @@ public class EmailService {
         } else if (institution.equalsIgnoreCase(RecapConstants.DELETED_MAIl_TO)) {
             return deletedRecordsMailTo;
         } else {
-            return propertyUtil.getPropertyByInstitution(institution, "email.recall.request.to");
+            return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.recall.request.to");
         }
     }
 
@@ -158,7 +158,7 @@ public class EmailService {
         if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
             return recapMailCC;
         } else {
-            return propertyUtil.getPropertyByInstitution(institution, "email.request.recall.cc");
+            return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.request.recall.cc");
         }
     }
 }

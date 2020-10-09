@@ -2,8 +2,8 @@ package org.recap.ils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.recap.RecapConstants;
-import org.recap.ils.model.ILSConfigProperties;
 import org.recap.model.AbstractResponseItem;
+import org.recap.model.ILSConfigProperties;
 import org.springframework.stereotype.Service;
 
 @Service

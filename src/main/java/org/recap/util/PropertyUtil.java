@@ -22,16 +22,8 @@ public class PropertyUtil {
     @Value("${institution:No data available}")
     private String ilsConfigProperties;
 
-    /**
-     * Gets property value for the key and the institution
-     * @param institution
-     * @param propertyKey
-     * @return String
-     */
-    public String getPropertyByInstitution(String institution, String propertyKey) {
-        JSONObject jsonObject = getPropsByInstitution(institution);
-        return jsonObject.get(propertyKey).toString();
-    }
+    @Value("${ims_location:No data available}")
+    private String imsConfigProperties;
 
     /**
      * Gets Json object with all properties for the institution
@@ -45,6 +37,39 @@ public class PropertyUtil {
     }
 
     /**
+     * Gets property value for the key and the institution
+     * @param institution
+     * @param propertyKey
+     * @return String
+     */
+    public String getPropertyByInstitution(String institution, String propertyKey) {
+        JSONObject jsonObject = getPropsByInstitution(institution);
+        return jsonObject.get(propertyKey).toString();
+    }
+
+    /**
+     * Gets Json object with all properties for the institution
+     * @param imsLocation
+     * @return JSONObject
+     */
+    public JSONObject getPropsByImsLocation(String imsLocation) {
+        JSONObject json = new JSONObject(imsConfigProperties);
+        JSONObject result = json.getJSONObject(imsLocation);
+        return result;
+    }
+
+    /**
+     * Gets property value for the key and the institution
+     * @param imsLocation
+     * @param propertyKey
+     * @return String
+     */
+    public String getPropertyByImsLocation(String imsLocation, String propertyKey) {
+        JSONObject jsonObject = getPropsByImsLocation(imsLocation);
+        return jsonObject.get(propertyKey).toString();
+    }
+
+    /**
      * Gets a DTO with all properties for the institution
      * @param institution
      * @return ILSConfigProperties
@@ -53,13 +78,14 @@ public class PropertyUtil {
         ILSConfigProperties ilsConfigProperties = null;
         try {
             JSONObject institutionSpecificJson = getPropsByInstitution(institution);
-            String protocol = institutionSpecificJson.get(RecapConstants.PROTOCOL).toString();
+            ilsConfigProperties = gson.fromJson(institutionSpecificJson.toString(), ILSConfigProperties.class);
+            /*String protocol = institutionSpecificJson.get(RecapConstants.PROTOCOL).toString();
             log.info("Protocol: {}", protocol);
             if (RecapConstants.REST_PROTOCOL.equalsIgnoreCase(protocol)) {
                 ilsConfigProperties = gson.fromJson(institutionSpecificJson.toString(), ILSOAuthConfigProperties.class);
             } else {
                 ilsConfigProperties = gson.fromJson(institutionSpecificJson.toString(), ILSConfigProperties.class);
-            }
+            }*/
             log.info(ilsConfigProperties.toString());
         } catch (Exception ex) {
             ex.printStackTrace();

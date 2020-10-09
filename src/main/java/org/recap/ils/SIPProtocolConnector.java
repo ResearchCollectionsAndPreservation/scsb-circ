@@ -13,17 +13,30 @@ import org.recap.RecapConstants;
 import org.recap.ils.model.ILSConfigProperties;
 import org.recap.ils.model.response.*;
 import org.recap.model.AbstractResponseItem;
+import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 
+@Service
 @Slf4j
 public class SIPProtocolConnector extends AbstractProtocolConnector {
 
-    public SIPProtocolConnector(ILSConfigProperties ilsConfigProperties) {
-        super(ilsConfigProperties);
+    @Override
+    public boolean supports(String protocol) {
+        return RecapConstants.SIP2_PROTOCOL.equalsIgnoreCase(protocol);
+    }
+
+    @Override
+    public void setInstitution(String institutionCode) {
+        this.institutionCode = institutionCode;
+    }
+
+    @Override
+    public void setIlsConfigProperties(ILSConfigProperties ilsConfigProperties) {
+        this.ilsConfigProperties = ilsConfigProperties;
     }
 
     private SIP2SocketConnection getSocketConnection() {

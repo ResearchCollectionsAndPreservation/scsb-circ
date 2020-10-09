@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.ils.ILSProtocolConnectorFactory;
 import org.recap.ils.JSIPConnectorFactory;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.BulkRequestInformation;
@@ -47,6 +48,9 @@ public class RequestItemController {
     @Autowired
     private ItemRequestService itemRequestService;
 
+    @Autowired
+    private ILSProtocolConnectorFactory ilsProtocolConnectorFactory;
+
     /**
      * Gets JSIPConectorFactory object.
      *
@@ -80,7 +84,7 @@ public class RequestItemController {
             String callInst = callingInsttution(callInstitition, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
-                itemCheckoutResponse = (ItemCheckoutResponse) getJsipConectorFactory().getJSIPConnector(callInst).checkOutItem(itemBarcode, itemRequestInformation.getPatronBarcode());
+                itemCheckoutResponse = (ItemCheckoutResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkOutItem(itemBarcode, itemRequestInformation.getPatronBarcode());
             } else {
                 itemCheckoutResponse.setSuccess(false);
                 itemCheckoutResponse.setScreenMessage("Item Id not found");
@@ -109,7 +113,7 @@ public class RequestItemController {
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
                 logger.info("Patron barcode and Institution info before CheckIn call : patron - {} , institution - {} ",itemRequestInformation.getPatronBarcode(),callInstitition);
-                itemCheckinResponse = (ItemCheckinResponse) getJsipConectorFactory().getJSIPConnector(callInst).checkInItem(itemBarcode, itemRequestInformation.getPatronBarcode());
+                itemCheckinResponse = (ItemCheckinResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkInItem(itemBarcode, itemRequestInformation.getPatronBarcode());
                 logger.info("CheckIn Response Message : {}",itemCheckinResponse.getScreenMessage());
             } else {
                 itemCheckinResponse = new ItemCheckinResponse();
@@ -138,7 +142,7 @@ public class RequestItemController {
         try {
             String callInst = callingInsttution(callInstitition, itemRequestInformation);
             String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
-            itemHoldResponse = (ItemHoldResponse) getJsipConectorFactory().getJSIPConnector(callInst).placeHold(itembarcode, itemRequestInformation.getPatronBarcode(),
+            itemHoldResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).placeHold(itembarcode, itemRequestInformation.getPatronBarcode(),
                     itemRequestInformation.getRequestingInstitution(),
                     itemRequestInformation.getItemOwningInstitution(),
                     itemRequestInformation.getExpirationDate(),
@@ -170,7 +174,7 @@ public class RequestItemController {
         String callInst = callingInsttution(callInstitition, itemRequestInformation);
         if (CollectionUtils.isNotEmpty(itemRequestInformation.getItemBarcodes())) {
             String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
-            itemHoldCancelResponse = (ItemHoldResponse) getJsipConectorFactory().getJSIPConnector(callInst).cancelHold(itembarcode, itemRequestInformation.getPatronBarcode(),
+            itemHoldCancelResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).cancelHold(itembarcode, itemRequestInformation.getPatronBarcode(),
                     itemRequestInformation.getRequestingInstitution(),
                     itemRequestInformation.getExpirationDate(),
                     itemRequestInformation.getBibId(),
@@ -196,7 +200,7 @@ public class RequestItemController {
             itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
             ItemInformationResponse itemInformation = (ItemInformationResponse) itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
             if (itemInformation.getScreenMessage().toUpperCase().contains(RecapConstants.REQUEST_ITEM_BARCODE_NOT_FOUND)) {
-                itemCreateBibResponse = (ItemCreateBibResponse) getJsipConectorFactory().getJSIPConnector(callInst).createBib(itemBarcode, itemRequestInformation.getPatronBarcode(), itemRequestInformation.getRequestingInstitution(), itemRequestInformation.getTitleIdentifier());
+                itemCreateBibResponse = (ItemCreateBibResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).createBib(itemBarcode, itemRequestInformation.getPatronBarcode(), itemRequestInformation.getRequestingInstitution(), itemRequestInformation.getTitleIdentifier());
             } else {
                 itemCreateBibResponse = new ItemCreateBibResponse();
                 itemCreateBibResponse.setSuccess(true);
@@ -222,7 +226,7 @@ public class RequestItemController {
         AbstractResponseItem itemInformationResponse;
         String callInst = callingInsttution(callInstitition, itemRequestInformation);
         String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
-        itemInformationResponse = getJsipConectorFactory().getJSIPConnector(callInst).lookupItem(itembarcode);
+        itemInformationResponse = ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).lookupItem(itembarcode);
         return itemInformationResponse;
     }
 
@@ -239,7 +243,7 @@ public class RequestItemController {
         logger.info("ESIP CALL FOR RECALL ITEM -> {}" , callInstitition);
         String callInst = callingInsttution(callInstitition, itemRequestInformation);
         String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
-        itemRecallResponse = (ItemRecallResponse) getJsipConectorFactory().getJSIPConnector(callInst).recallItem(itembarcode, itemRequestInformation.getPatronBarcode(),
+        itemRecallResponse = (ItemRecallResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).recallItem(itembarcode, itemRequestInformation.getPatronBarcode(),
                 itemRequestInformation.getRequestingInstitution(),
                 itemRequestInformation.getExpirationDate(),
                 itemRequestInformation.getBibId(),
@@ -258,7 +262,7 @@ public class RequestItemController {
     public AbstractResponseItem patronInformation(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         PatronInformationResponse patronInformationResponse;
         String callInst = callingInsttution(callInstitition, itemRequestInformation);
-        patronInformationResponse = (PatronInformationResponse) getJsipConectorFactory().getJSIPConnector(callInst).lookupPatron(itemRequestInformation.getPatronBarcode());
+        patronInformationResponse = (PatronInformationResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).lookupPatron(itemRequestInformation.getPatronBarcode());
         return patronInformationResponse;
     }
 
@@ -305,7 +309,7 @@ public class RequestItemController {
             String callInst = callingInsttution(callInstitition, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
-                itemRefileResponse = (ItemRefileResponse) getJsipConectorFactory().getJSIPConnector(callInst).refileItem(itemBarcode);
+                itemRefileResponse = (ItemRefileResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).refileItem(itemBarcode);
             } else {
                 itemRefileResponse = new ItemRefileResponse();
                 itemRefileResponse.setSuccess(false);

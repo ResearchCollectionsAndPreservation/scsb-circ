@@ -33,6 +33,7 @@ import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.service.RestHeaderService;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
+import org.recap.util.PropertyUtil;
 import org.recap.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,6 +145,9 @@ public class ItemRequestService {
     @Autowired
     private ItemEDDRequestService itemEDDRequestService;
 
+    @Autowired
+    private PropertyUtil propertyUtil;
+
     /**
      * @return
      */
@@ -182,7 +186,7 @@ public class ItemRequestService {
 
             if (itemEntities != null && !itemEntities.isEmpty()) {
                 itemEntity = itemEntities.get(0);
-                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation());
+                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInfo.getDeliveryLocation(), itemRequestInfo.getItemOwningInstitution());
                 if (StringUtils.isBlank(itemRequestInfo.getBibId())) {
                     itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 }
@@ -296,7 +300,7 @@ public class ItemRequestService {
                 itemResponseInformation.setSuccess(false);
             }
             logger.info(RecapConstants.FINISH_PROCESSING);
-                setItemResponseInformation(itemRequestInfo, itemResponseInformation);
+            setItemResponseInformation(itemRequestInfo, itemResponseInformation);
 
             if (isUseQueueLasCall()) {
                 updateChangesToDb(itemResponseInformation, RecapConstants.REQUEST_RECALL + "-" + itemResponseInformation.getRequestingInstitution());
@@ -380,31 +384,23 @@ public class ItemRequestService {
                         }
                     }
                     logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getId(), itemBarcode);
-                    if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.PRINCETON) || itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-                        //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
-                        if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)){
-                            if(itemRequestInfo.isOwningInstitutionItem()) {
-                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
-                            }else {
-                                //Interchanging the arguments since the checkin call is made based on Requesting Institution.
-                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
-                            }
+                    //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
+                    if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)){
+                        if(itemRequestInfo.isOwningInstitutionItem()) {
+                            itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                        }else {
+                            //Interchanging the arguments since the checkin call is made based on Requesting Institution.
+                            itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
                         }
-                        else {
-                            itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
-                        }
-                        requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
-                    } else if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-                        //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
-                        if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)){
-                            if(itemRequestInfo.isOwningInstitutionItem()) {
-                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
-                            }else {
-                                //Interchanging the arguments since the checkin call is made based on Requesting Institution
-                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
-                            }
-                        }
+                    }
+                    else {
+                        itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
+                    }
+                    String isRefileForCheckin = propertyUtil.getPropertyByInstitution(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
+                    if (Boolean.TRUE.toString().equalsIgnoreCase(isRefileForCheckin)) {
                         requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
+                    } else {
+                        requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
                     }
                     if (!itemRequestInfo.isOwningInstitutionItem()) {
                         //TODO - Check if EDD and change Patron accordingly to checkIn in ItemOwningInstitution
@@ -534,31 +530,15 @@ public class ItemRequestService {
      * @param exchange          the exchange
      */
     public void sendMessageToTopic(String owningInstituteId, String requestType, ItemInformationResponse itemResponseInfo, Exchange exchange) {
-        String selectTopic = RecapConstants.PUL_REQUEST_TOPIC;
-        if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-            selectTopic = RecapConstants.PUL_REQUEST_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-            selectTopic = RecapConstants.PUL_EDD_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-            selectTopic = RecapConstants.PUL_RECALL_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
-            selectTopic = RecapConstants.PUL_BORROW_DIRECT_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-            selectTopic = RecapConstants.CUL_REQUEST_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-            selectTopic = RecapConstants.CUL_EDD_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-            selectTopic = RecapConstants.CUL_RECALL_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
-            selectTopic = RecapConstants.CUL_BORROW_DIRECT_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-            selectTopic = RecapConstants.NYPL_REQUEST_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-            selectTopic = RecapConstants.NYPL_EDD_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-            selectTopic = RecapConstants.NYPL_RECALL_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
-            selectTopic = RecapConstants.NYPL_BORROW_DIRECT_TOPIC;
+        String selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.retrieval.request");
+        if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
+            selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.retrieval.request");
+        } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
+            selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.edd.request");
+        } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+            selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.recall.request");
+        } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
+            selectTopic = propertyUtil.getPropertyByInstitution(owningInstituteId, "ils.topic.borrowdirect.request");
         }
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "";
@@ -696,7 +676,8 @@ public class ItemRequestService {
             } else {// Not the Owning Institute
                 // Get Temporary bibId from SCSB DB
                 ItemCreateBibResponse createBibResponse;
-                if (!RecapCommonConstants.NYPL.equalsIgnoreCase(itemRequestInfo.getRequestingInstitution())) {
+                String isCreateBibEnabled = propertyUtil.getPropertyByInstitution(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
+                if (Boolean.TRUE.toString().equalsIgnoreCase(isCreateBibEnabled)) {
                     createBibResponse = (ItemCreateBibResponse) requestItemController.createBibliogrphicItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
                 } else {
                     createBibResponse = new ItemCreateBibResponse();

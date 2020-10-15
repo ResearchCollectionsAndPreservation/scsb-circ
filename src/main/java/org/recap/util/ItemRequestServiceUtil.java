@@ -5,9 +5,11 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.gfa.model.TtitemEDDResponse;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.BulkRequestItem;
+import org.recap.model.jpa.BulkRequestItemEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
-import org.recap.repository.jpa.GenericPatronDetailsRepository;
 import org.recap.request.EmailService;
 import org.recap.service.RestHeaderService;
 import org.slf4j.Logger;
@@ -79,12 +81,6 @@ public class ItemRequestServiceUtil {
 
     @Autowired
     private BulkRequestItemDetailsRepository bulkRequestItemDetailsRepository;
-
-    @Autowired
-    private GenericPatronDetailsRepository genericPatronDetailsRepository;
-
-    @Autowired
-    private PropertyUtil propertyUtil;
 
     public RestHeaderService getRestHeaderService(){
         return restHeaderService;
@@ -203,13 +199,50 @@ public class ItemRequestServiceUtil {
 
     public String getPatronIdBorrowingInstitution(String requestingInstitution, String owningInstitution, String requestType) {
         String patronId = "";
-        GenericPatronEntity genericPatronEntity = genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(requestingInstitution, owningInstitution);
-        if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
-            patronId = genericPatronEntity.getEddGenericPatron();
-        } else {
-            patronId = genericPatronEntity.getRetrievalGenericPatron();
+        if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = princetonEDDCULPatron;
+                } else {
+                    patronId = princetonCULPatron;
+                }
+            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = princetonEDDNYPLPatron;
+                } else {
+                    patronId = princetonNYPLPatron;
+                }
+            }
+        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = columbiaEDDPULPatron;
+                } else {
+                    patronId = columbiaPULPatron;
+                }
+            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = columbiaEDDNYPLPatron;
+                } else {
+                    patronId = columbiaNYPLPatron;
+                }
+            }
+        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = nyplEDDPrincetonPatron;
+                } else {
+                    patronId = nyplPrincetonPatron;
+                }
+            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+                if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                    patronId = nyplEDDColumbiaPatron;
+                } else {
+                    patronId = nyplColumbiaPatron;
+                }
+            }
         }
-        logger.info("Own Ins: {}, Req Ins: {}, Cross PatronId: {}", owningInstitution, requestingInstitution, patronId);
+        logger.info(patronId);
         return patronId;
     }
 }

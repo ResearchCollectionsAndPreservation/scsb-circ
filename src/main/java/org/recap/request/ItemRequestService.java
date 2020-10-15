@@ -33,7 +33,6 @@ import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.service.RestHeaderService;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
-import org.recap.util.PropertyUtil;
 import org.recap.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +103,9 @@ public class ItemRequestService {
     private RequestItemDetailsRepository requestItemDetailsRepository;
 
     @Autowired
+    RestTemplate restTemplate;
+
+    @Autowired
     private EmailService emailService;
 
     @Autowired
@@ -145,9 +147,6 @@ public class ItemRequestService {
     @Autowired
     private ItemEDDRequestService itemEDDRequestService;
 
-    @Autowired
-    private PropertyUtil propertyUtil;
-
     /**
      * @return
      */
@@ -186,7 +185,7 @@ public class ItemRequestService {
 
             if (itemEntities != null && !itemEntities.isEmpty()) {
                 itemEntity = itemEntities.get(0);
-                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInfo.getDeliveryLocation(), itemRequestInfo.getItemOwningInstitution());
+                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation());
                 if (StringUtils.isBlank(itemRequestInfo.getBibId())) {
                     itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 }
@@ -384,23 +383,31 @@ public class ItemRequestService {
                         }
                     }
                     logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getId(), itemBarcode);
-                    //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
-                    if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)){
-                        if(itemRequestInfo.isOwningInstitutionItem()) {
-                            itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
-                        }else {
-                            //Interchanging the arguments since the checkin call is made based on Requesting Institution.
-                            itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
+                    if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.PRINCETON) || itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+                        //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
+                        if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)){
+                            if(itemRequestInfo.isOwningInstitutionItem()) {
+                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                            }else {
+                                //Interchanging the arguments since the checkin call is made based on Requesting Institution.
+                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
+                            }
                         }
-                    }
-                    else {
-                        itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
-                    }
-                    String isRefileForCheckin = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
-                    if (Boolean.TRUE.toString().equalsIgnoreCase(isRefileForCheckin)) {
-                        requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
-                    } else {
+                        else {
+                            itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
+                        }
                         requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
+                    } else if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+                        //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
+                        if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)){
+                            if(itemRequestInfo.isOwningInstitutionItem()) {
+                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                            }else {
+                                //Interchanging the arguments since the checkin call is made based on Requesting Institution
+                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
+                            }
+                        }
+                        requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
                     }
                     if (!itemRequestInfo.isOwningInstitutionItem()) {
                         //TODO - Check if EDD and change Patron accordingly to checkIn in ItemOwningInstitution
@@ -494,15 +501,15 @@ public class ItemRequestService {
 
     private void setEddInformation(ItemRequestInformation itemRequestInfo, HashMap<String, String> eddNotesMap) {
         for (Map.Entry<String, String> eddNotes : eddNotesMap.entrySet()) {
-         if(eddNotes.getKey().contains("Start Page")){
-             itemRequestInfo.setStartPage(eddNotes.getValue());
+            if(eddNotes.getKey().contains("Start Page")){
+                itemRequestInfo.setStartPage(eddNotes.getValue());
             }
-         if(eddNotes.getKey().contains("End Page")){
+            if(eddNotes.getKey().contains("End Page")){
                 itemRequestInfo.setEndPage(eddNotes.getValue());
             }
-         if(eddNotes.getKey().contains("Chapter")){
-             itemRequestInfo.setChapterTitle(eddNotes.getValue());
-         }
+            if(eddNotes.getKey().contains("Chapter")){
+                itemRequestInfo.setChapterTitle(eddNotes.getValue());
+            }
             if(eddNotes.getKey().contains("Article Author")){
                 itemRequestInfo.setAuthor(eddNotes.getValue());
             }
@@ -530,15 +537,31 @@ public class ItemRequestService {
      * @param exchange          the exchange
      */
     public void sendMessageToTopic(String owningInstituteId, String requestType, ItemInformationResponse itemResponseInfo, Exchange exchange) {
-        String selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.retrieval.request");
-        if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.retrieval.request");
-        } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.edd.request");
-        } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.recall.request");
-        } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
-            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.borrowdirect.request");
+        String selectTopic = RecapConstants.PUL_REQUEST_TOPIC;
+        if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
+            selectTopic = RecapConstants.PUL_REQUEST_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
+            selectTopic = RecapConstants.PUL_EDD_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+            selectTopic = RecapConstants.PUL_RECALL_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
+            selectTopic = RecapConstants.PUL_BORROW_DIRECT_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
+            selectTopic = RecapConstants.CUL_REQUEST_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
+            selectTopic = RecapConstants.CUL_EDD_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+            selectTopic = RecapConstants.CUL_RECALL_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
+            selectTopic = RecapConstants.CUL_BORROW_DIRECT_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
+            selectTopic = RecapConstants.NYPL_REQUEST_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
+            selectTopic = RecapConstants.NYPL_EDD_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+            selectTopic = RecapConstants.NYPL_RECALL_TOPIC;
+        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
+            selectTopic = RecapConstants.NYPL_BORROW_DIRECT_TOPIC;
         }
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "";
@@ -676,8 +699,7 @@ public class ItemRequestService {
             } else {// Not the Owning Institute
                 // Get Temporary bibId from SCSB DB
                 ItemCreateBibResponse createBibResponse;
-                String isCreateBibEnabled = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
-                if (Boolean.TRUE.toString().equalsIgnoreCase(isCreateBibEnabled)) {
+                if (!RecapCommonConstants.NYPL.equalsIgnoreCase(itemRequestInfo.getRequestingInstitution())) {
                     createBibResponse = (ItemCreateBibResponse) requestItemController.createBibliogrphicItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
                 } else {
                     createBibResponse = new ItemCreateBibResponse();
@@ -878,13 +900,12 @@ public class ItemRequestService {
         List<SearchResultRow> statusResponse;
         SearchResultRow searchResultRow = null;
         try {
-            RestTemplate restTemplate = new RestTemplate();
+            //RestTemplate restTemplate = new RestTemplate();
             HttpEntity requestEntity = new HttpEntity<>(getRestHeaderService().getHttpHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
                     .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
                     .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
-            ResponseEntity<List<SearchResultRow>> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
-            });
+            ResponseEntity<List<SearchResultRow>> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {});
             statusResponse = responseEntity.getBody();
             if (statusResponse != null && !statusResponse.isEmpty()) {
                 searchResultRow = statusResponse.get(0);
@@ -1225,25 +1246,25 @@ public class ItemRequestService {
      * @return
      */
     private String buildRetrieveRequestInfoAndReplaceToSCSB(RequestItemEntity requestItemEntity) {
-            ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-            itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
-            itemRequestInformation.setItemBarcodes(Collections.singletonList(requestItemEntity.getItemEntity().getBarcode()));
-            itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
-            itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
-            itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
-            itemRequestInformation.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
-            itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-            itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
+        itemRequestInformation.setItemBarcodes(Collections.singletonList(requestItemEntity.getItemEntity().getBarcode()));
+        itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
+        itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
+        itemRequestInformation.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+        itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
 
-            String notes = requestItemEntity.getNotes();
-            new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
+        String notes = requestItemEntity.getNotes();
+        new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
 
-            String validationMessage = validateItemRequest(itemRequestInformation);
-            if (!RecapCommonConstants.VALID_REQUEST.equals(validationMessage)) {
-                return RecapCommonConstants.FAILURE + " : " + validationMessage;
-            }
-            return setRequestItemEntity(itemRequestInformation, requestItemEntity);
+        String validationMessage = validateItemRequest(itemRequestInformation);
+        if (!RecapCommonConstants.VALID_REQUEST.equals(validationMessage)) {
+            return RecapCommonConstants.FAILURE + " : " + validationMessage;
         }
+        return setRequestItemEntity(itemRequestInformation, requestItemEntity);
+    }
 
     /**
      * Builds EDD request information and replaces them to SCSB queue.
@@ -1251,29 +1272,29 @@ public class ItemRequestService {
      * @return
      */
     private String buildEddRequestInfoAndReplaceToSCSB(RequestItemEntity requestItemEntity) {
-            ItemEntity itemEntity = requestItemEntity.getItemEntity();
-            ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-            itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
-            itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
-            itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
-            itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
-            itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
-            itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
-            itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-            itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
+        ItemEntity itemEntity = requestItemEntity.getItemEntity();
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
+        itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
+        itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
+        itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
+        itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+        itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
 
-            String notes = requestItemEntity.getNotes();
-            new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
+        String notes = requestItemEntity.getNotes();
+        new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
 
-            SearchResultRow searchResultRow = searchRecords(itemEntity);
-            itemRequestInformation.setTitleIdentifier(searchResultRow.getTitle());
+        SearchResultRow searchResultRow = searchRecords(itemEntity);
+        itemRequestInformation.setTitleIdentifier(searchResultRow.getTitle());
 
-            String validationMessage = validateItemRequest(itemRequestInformation);
-            if (!RecapCommonConstants.VALID_REQUEST.equals(validationMessage)) {
-                return RecapCommonConstants.FAILURE + ":" + validationMessage;
-            }
-            return setRequestItemEntity(itemRequestInformation, requestItemEntity);
-         }
+        String validationMessage = validateItemRequest(itemRequestInformation);
+        if (!RecapCommonConstants.VALID_REQUEST.equals(validationMessage)) {
+            return RecapCommonConstants.FAILURE + ":" + validationMessage;
+        }
+        return setRequestItemEntity(itemRequestInformation, requestItemEntity);
+    }
 
     private String setRequestItemEntity(ItemRequestInformation itemRequestInformation, RequestItemEntity requestItemEntity) {
         try {

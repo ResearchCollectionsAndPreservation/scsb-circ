@@ -4,7 +4,6 @@ import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.camel.EmailPayLoad;
-import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -57,8 +56,6 @@ public class EmailService {
     @Autowired
     private ProducerTemplate producer;
 
-    @Autowired
-    private PropertyUtil propertyUtil;
 
     /**
      * Send email method for recall process, the information is send to the mail queue, with .
@@ -145,20 +142,30 @@ public class EmailService {
      * @return
      */
     private String emailIdTo(String institution) {
-        if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
+        if (institution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+            return nyplMailTo;
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+            return culMailTo;
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+            return pulMailTo;
+        } else if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
             return recapMailTo;
-        } else if (institution.equalsIgnoreCase(RecapConstants.DELETED_MAIl_TO)) {
+        } else if(institution.equalsIgnoreCase(RecapConstants.DELETED_MAIl_TO)){
             return deletedRecordsMailTo;
-        } else {
-            return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.recall.request.to");
         }
+        return null;
     }
 
     private String emailIdCC(String institution) {
-        if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
+        if (institution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
+            return nyplMailCC;
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
+            return culMailCC;
+        } else if (institution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
+            return pulMailCC;
+        } else if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
             return recapMailCC;
-        } else {
-            return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.request.recall.cc");
         }
+        return null;
     }
 }

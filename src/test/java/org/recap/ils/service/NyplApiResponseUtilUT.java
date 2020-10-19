@@ -1,26 +1,34 @@
 package org.recap.ils.service;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.ils.model.nypl.*;
 import org.recap.ils.model.nypl.response.ItemResponse;
 import org.recap.ils.model.nypl.response.RecallResponse;
 import org.recap.ils.model.nypl.response.RefileResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.ils.model.response.ItemRecallResponse;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemRefileResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.recap.repository.jpa.ItemDetailsRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+@RunWith(MockitoJUnitRunner.class)
+public class NyplApiResponseUtilUT {
 
-public class NyplApiResponseUtilUT extends BaseTestCase {
-    @Autowired
-    private NyplApiResponseUtil nyplApiResponseUtil;
+    @InjectMocks
+    NyplApiResponseUtil nyplApiResponseUtil;
+
+    @Mock
+    ItemDetailsRepository itemDetailsRepository;
 
     @Test
     public void testbuildItemInformationResponse(){
@@ -46,6 +54,12 @@ public class NyplApiResponseUtilUT extends BaseTestCase {
         itemData.setCallNumber("12");
         itemData.setItemType("test");
         itemData.setFixedFields("test");
+        LinkedHashMap<String,String> map = new LinkedHashMap<>();
+        map.put("dueDate",new Date().toString());
+        map.put("display","TEST");
+        map.put("name","testLocation");
+        itemData.setStatus(map);
+        itemData.setLocation(map);
         itemData.setVarFields(Arrays.asList(varField));
         ItemResponse itemResponse = new ItemResponse();
         itemResponse.setItemData(itemData);
@@ -56,32 +70,44 @@ public class NyplApiResponseUtilUT extends BaseTestCase {
         assertNotNull(itemInformationResponse);
     }
     @Test
+    public void getNyplSource(){
+        String result1 = nyplApiResponseUtil.getNyplSource("NYPL");
+        assertNull(result1);
+        String result2 = nyplApiResponseUtil.getNyplSource("CUL");
+        assertNull(result2);
+    }
+    @Test
+    public void getNormalizedItemIdForNypl() throws Exception {
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setItemId(123456);
+        itemEntity.setOwningInstitutionItemId("124567");
+        itemEntity.setInstitutionEntity(getInstitutionEntity());
+        Mockito.when(itemDetailsRepository.findByBarcode("123456")).thenReturn(Arrays.asList(itemEntity));
+        String itemId = nyplApiResponseUtil.getNormalizedItemIdForNypl("123456");
+        assertNotNull(itemId);
+    }
+
+    private InstitutionEntity getInstitutionEntity() {
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setId(3);
+        institutionEntity.setInstitutionName("NYPL");
+        institutionEntity.setInstitutionCode("NYPL");
+        return institutionEntity;
+    }
+
+    @Test
     public void testbuildItemRecallResponse(){
-        RecallData recallData = new RecallData();
-        recallData.setCreatedDate(new Date().toString());
-        recallData.setId(1);
-        recallData.setItemBarcode("33433001888415");
-        recallData.setJobId("879591d67acdf584");
-        recallData.setOwningInstitutionId("PUL");
-        recallData.setUpdatedDate(new Date().toString());
+        RecallData recallData = getRecallData();
         RecallResponse recallResponse = new RecallResponse();
         recallResponse.setData(recallData);
         ItemRecallResponse itemRecallResponse = nyplApiResponseUtil.buildItemRecallResponse(recallResponse);
         assertNotNull(itemRecallResponse);
         RefileResponse refileResponse = new RefileResponse();
-        RefileData refileData = new RefileData();
-        refileData.setCreatedDate(new Date().toString());
-        refileData.setId(1);
-        refileData.setItemBarcode("33433001888415");
-        refileData.setJobId("879591d67acdf584");
-        refileData.setUpdatedDate(new Date().toString());
+        RefileData refileData = getRefileData();
         refileResponse.setData(refileData);
         ItemRefileResponse itemRefileResponse = nyplApiResponseUtil.buildItemRefileResponse(refileResponse);
         assertNotNull(itemRefileResponse);
-        Notice notice = new Notice();
-        notice.setCreatedDate(new Date().toString());
-        notice.setData("data");
-        notice.setText("Data");
+        Notice notice = getNotice();
         JobData jobData = new JobData();
         List<Notice> notices = new ArrayList<>();
         notices.add(notice);
@@ -95,14 +121,13 @@ public class NyplApiResponseUtilUT extends BaseTestCase {
         assertNotNull(res);
 
         String resNypl = nyplApiResponseUtil.getNyplSource("PUL");
-        assertNotNull(resNypl);
+        assertNull(resNypl);
         String resItem= null;
         try {
             resItem  = nyplApiResponseUtil.getNormalizedItemIdForNypl("33433001888415");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        assertTrue(true);
         String resDate = null;
         try {
             resDate  = nyplApiResponseUtil.expirationDateForNypl();
@@ -111,5 +136,34 @@ public class NyplApiResponseUtilUT extends BaseTestCase {
         }
         assertNotNull(resDate);
 
+    }
+
+    private Notice getNotice() {
+        Notice notice = new Notice();
+        notice.setCreatedDate(new Date().toString());
+        notice.setData("data");
+        notice.setText("Data");
+        return notice;
+    }
+
+    private RefileData getRefileData() {
+        RefileData refileData = new RefileData();
+        refileData.setCreatedDate(new Date().toString());
+        refileData.setId(1);
+        refileData.setItemBarcode("33433001888415");
+        refileData.setJobId("879591d67acdf584");
+        refileData.setUpdatedDate(new Date().toString());
+        return refileData;
+    }
+
+    private RecallData getRecallData() {
+        RecallData recallData = new RecallData();
+        recallData.setCreatedDate(new Date().toString());
+        recallData.setId(1);
+        recallData.setItemBarcode("33433001888415");
+        recallData.setJobId("879591d67acdf584");
+        recallData.setOwningInstitutionId("PUL");
+        recallData.setUpdatedDate(new Date().toString());
+        return recallData;
     }
 }

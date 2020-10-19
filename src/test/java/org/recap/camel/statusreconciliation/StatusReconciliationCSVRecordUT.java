@@ -1,5 +1,6 @@
 package org.recap.camel.statusreconciliation;
 
+import org.apache.camel.dataformat.bindy.annotation.DataField;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.csv.StatusReconciliationCSVRecord;

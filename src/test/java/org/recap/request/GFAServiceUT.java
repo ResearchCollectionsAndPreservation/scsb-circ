@@ -4,16 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.util.json.JsonObject;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.recap.BaseTestCase;
+import org.mockito.MockitoAnnotations;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
-import org.recap.model.csv.StatusReconciliationCSVRecord;
-import org.recap.model.csv.StatusReconciliationErrorCSVRecord;
+import org.recap.ScsbCircApplication;
 import org.recap.gfa.model.*;
 import org.recap.ils.model.response.ItemInformationResponse;
+import org.recap.model.csv.StatusReconciliationCSVRecord;
+import org.recap.model.csv.StatusReconciliationErrorCSVRecord;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
@@ -22,27 +25,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.*;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.sql.Time;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
 
 /**
  * Created by hemalathas on 21/2/17.
  */
-public class GFAServiceUT extends BaseTestCase{
+@TestPropertySource("classpath:application.properties")
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ScsbCircApplication.class)
+public class GFAServiceUT{
 
     private static final Logger logger = LoggerFactory.getLogger(GFAServiceUT.class);
 
@@ -66,6 +69,9 @@ public class GFAServiceUT extends BaseTestCase{
 
     @Mock
     ObjectMapper objectMapper;
+
+    @Mock
+    ItemRequestServiceUtil itemRequestServiceUtil;
 
     @Value("${gfa.item.status}")
     private String gfaItemStatus;
@@ -117,13 +123,16 @@ public class GFAServiceUT extends BaseTestCase{
 
     @Mock
     private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
-    @PersistenceContext
-    private EntityManager entityManager;
+
     @Autowired
     RequestTypeDetailsRepository requestTypeDetailsRepository;
     @Autowired
     InstitutionDetailsRepository institutionDetailsRepository;
 
+    @Before
+    public void setUp(){
+        MockitoAnnotations.initMocks(this);
+    }
     @Test
     public void testGFAService() {
         GFARetrieveItemRequest gfaRetrieveItemRequest = new GFARetrieveItemRequest();
@@ -244,11 +253,27 @@ public class GFAServiceUT extends BaseTestCase{
         GFARetrieveItemResponse response = gfaService.itemRetrival(gfaRetrieveItemRequest);
     }
     @Test
-    public void buildRequestInfoAndReplaceToLAS(){
+    public void buildRequestInfoAndReplaceToLASForRETRIEVAL(){
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         RequestTypeEntity requestTypeEntity = getRequestTypeEntity();
         requestTypeEntity.setRequestTypeCode("RETRIEVAL");
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.when(gfaService.buildRequestInfoAndReplaceToLAS(requestItemEntity)).thenCallRealMethod();
+        gfaService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
+    }
+    @Test
+    public void buildRequestInfoAndReplaceToLASForEDD(){
+        RequestItemEntity requestItemEntity = getRequestItemEntity();
+        RequestTypeEntity requestTypeEntity = getRequestTypeEntity();
+        requestTypeEntity.setRequestTypeCode("EDD");
+        requestItemEntity.setRequestTypeEntity(requestTypeEntity);
+        SearchResultRow searchResultRow = new SearchResultRow();
+        searchResultRow.setAuthor("test");
+        searchResultRow.setTitle("TEST");
+        Mockito.doCallRealMethod().when(itemRequestServiceUtil).setEddInfoToGfaRequest(any(), any());
+        Mockito.when(itemRequestService.searchRecords(any())).thenReturn(searchResultRow);
+        Mockito.when(itemRequestService.getTitle(anyString(), any(), any())).thenReturn("Title Of the Book");
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Mockito.when(gfaService.buildRequestInfoAndReplaceToLAS(requestItemEntity)).thenCallRealMethod();
         gfaService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
@@ -261,7 +286,29 @@ public class GFAServiceUT extends BaseTestCase{
         itemEntities.add(getItemEntity());
         itemEntityChunkList.add(itemEntities);
         List<StatusReconciliationErrorCSVRecord> statusReconciliationErrorCSVRecordList = new ArrayList<>();
-        getGfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList);
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
+        Mockito.when(gfaService.getGFAItemStatusCheckResponse(anyList())).thenReturn(gfaItemStatusCheckResponse);
+        Mockito.when(gfaService.getItemChangeLogDetailsRepository()).thenReturn(itemChangeLogDetailsRepository);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCodeIn(any())).thenReturn(Arrays.asList(getRequestItemEntity().getRequestStatusEntity()));
+        Mockito.when(gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList)).thenCallRealMethod();
+        List<StatusReconciliationCSVRecord> statusReconciliationCSVRecords = gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList);
+        assertNotNull(statusReconciliationCSVRecords);
+    }
+    @Test
+    public void itemStatusComparisonWithDifferentBarcode(){
+        List<List<ItemEntity>> itemEntityChunkList= new ArrayList<>();
+        List<ItemEntity> itemEntities = new ArrayList<>();
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setBarcode("27494");
+        itemEntities.add(itemEntity);
+        itemEntityChunkList.add(itemEntities);
+        List<StatusReconciliationErrorCSVRecord> statusReconciliationErrorCSVRecordList = new ArrayList<>();
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
+        Mockito.when(gfaService.getGFAItemStatusCheckResponse(anyList())).thenReturn(gfaItemStatusCheckResponse);
+        Mockito.when(gfaService.getItemChangeLogDetailsRepository()).thenReturn(itemChangeLogDetailsRepository);
+        Mockito.when(gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList)).thenCallRealMethod();
+        List<StatusReconciliationCSVRecord> statusReconciliationCSVRecords = gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList);
+        assertNotNull(statusReconciliationCSVRecords);
     }
     @Test
     public void processLASEDDRetrieveResponse() throws JsonProcessingException {
@@ -313,6 +360,11 @@ public class GFAServiceUT extends BaseTestCase{
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
+        InstitutionEntity institutionEntity = new InstitutionEntity();
+        institutionEntity.setId(1);
+        institutionEntity.setInstitutionCode("PUL");
+        institutionEntity.setInstitutionName("PUL");
+        itemEntity.setInstitutionEntity(institutionEntity);
         return itemEntity;
     }
     @Test
@@ -399,7 +451,7 @@ public class GFAServiceUT extends BaseTestCase{
         requestTypeEntity.setRequestTypeCode("Recallhold");
         requestTypeEntity.setRequestTypeDesc("Recallhold");
 //        RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
- //       assertNotNull(savedRequestTypeEntity);
+        //       assertNotNull(savedRequestTypeEntity);
 
         RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
         requestStatusEntity.setRequestStatusCode("REFILE");
@@ -479,8 +531,8 @@ public class GFAServiceUT extends BaseTestCase{
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("UC");
         institutionEntity.setInstitutionName("University of Chicago");
-        InstitutionEntity entity = institutionDetailsRepository.save(institutionEntity);
-        assertNotNull(entity);
+        //InstitutionEntity entity = institutionDetailsRepository.save(institutionEntity);
+        assertNotNull(institutionEntity);
 
         Random random = new Random();
         //BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -489,7 +541,7 @@ public class GFAServiceUT extends BaseTestCase{
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionId(entity.getId());
+        bibliographicEntity.setOwningInstitutionId(institutionEntity.getId());
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
         bibliographicEntity.setCatalogingStatus("Complete");
         HoldingsEntity holdingsEntity = new HoldingsEntity();
@@ -552,7 +604,7 @@ public class GFAServiceUT extends BaseTestCase{
         institutionEntity.setInstitutionCode("UC");
         institutionEntity.setInstitutionName("University of Chicago");
 //        InstitutionEntity entity = institutionDetailsRepository.save(institutionEntity);
- //       assertNotNull(entity);
+        //       assertNotNull(entity);
 
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -594,7 +646,7 @@ public class GFAServiceUT extends BaseTestCase{
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
 
 //        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-   //     entityManager.refresh(savedBibliographicEntity);
+        //     entityManager.refresh(savedBibliographicEntity);
         return bibliographicEntity;
     }
 
@@ -631,6 +683,7 @@ public class GFAServiceUT extends BaseTestCase{
         assertNotNull(gfaPwiDsItemResponse.getProdsHasChanges());
         assertNotNull(gfaPwiDsItemResponse.getTtitem());
         gfaPwiResponse.setDsitem(gfaPwiDsItemResponse);
+        assertNotNull(gfaPwiResponse.getDsitem());
 
         ResponseEntity<GFAPwiResponse> responseEntity = new ResponseEntity(gfaPwiResponse, HttpStatus.OK);
         HttpEntity requestEntity = new HttpEntity(gfaPwiRequest, getHttpHeaders());
@@ -794,5 +847,104 @@ public class GFAServiceUT extends BaseTestCase{
         assertEquals("4", ttitem001.getArticleIssue());
         assertEquals("author", ttitem001.getArticleAuthor());
         assertEquals("title", ttitem001.getArticleTitle());*/
+    }
+
+    @Test
+    public void startPolling(){
+        String barcode = "25464";
+        Mockito.doCallRealMethod().when(gfaService).startPolling(barcode);
+        gfaService.startPolling(barcode);
+    }
+
+    @Test
+    public void callGfaItemStatus(){
+        String itemBarcode ="1346673";
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
+        Mockito.when(gfaService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
+        Mockito.when(gfaService.callGfaItemStatus(itemBarcode)).thenCallRealMethod();
+        String gfaItemStatusValue = gfaService.callGfaItemStatus(itemBarcode);
+        assertNotNull(gfaItemStatusValue);
+    }
+
+    private GFAItemStatusCheckResponse getGfaItemStatusCheckResponse() {
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = new GFAItemStatusCheckResponse();
+        Dsitem dsitem = new Dsitem();
+        Ttitem ttitem = new Ttitem();
+        ttitem.setItemBarcode("7020");
+        ttitem.setItemStatus("NOT ON FILE");
+        dsitem.setTtitem(Arrays.asList(ttitem));
+        gfaItemStatusCheckResponse.setDsitem(dsitem);
+        return gfaItemStatusCheckResponse;
+    }
+
+    @Test
+    public void callGfaDeaccessionServiceWithAvailableStatus(){
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
+        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
+        deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.AVAILABLE);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        String username = "test";
+        GFAPwdResponse gfaPwdResponse = getGfaPwdResponse();
+        Mockito.when(gfaService.gfaPermanentWithdrawlDirect(any())).thenReturn(gfaPwdResponse);
+        Mockito.doCallRealMethod().when(gfaService).callGfaDeaccessionService(deAccessionDBResponseEntities,username);
+        gfaService.callGfaDeaccessionService(deAccessionDBResponseEntities,username);
+    }
+
+    private GFAPwdResponse getGfaPwdResponse() {
+        GFAPwdResponse gfaPwdResponse = new GFAPwdResponse();
+        GFAPwdDsItemResponse gfaPwdDsItemResponse = new GFAPwdDsItemResponse();
+        GFAPwdTtItemResponse gfaPwdTtItemResponse = new GFAPwdTtItemResponse();
+        gfaPwdTtItemResponse.setErrorNote("ErrorNote");
+        gfaPwdDsItemResponse.setTtitem(Arrays.asList(gfaPwdTtItemResponse));
+        gfaPwdResponse.setDsitem(gfaPwdDsItemResponse);
+        return gfaPwdResponse;
+    }
+
+    @Test
+    public void callGfaDeaccessionServiceWithAvailableStatusWithoutResponse(){
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
+        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
+        deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.AVAILABLE);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        String username = "test";
+        Mockito.doCallRealMethod().when(gfaService).callGfaDeaccessionService(deAccessionDBResponseEntities,username);
+        gfaService.callGfaDeaccessionService(deAccessionDBResponseEntities,username);
+    }
+    @Test
+    public void callGfaDeaccessionServiceWithNotAvailableStatusWithoutResponse(){
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
+        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
+        deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.NOT_AVAILABLE);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        String username = "test";
+        Mockito.doCallRealMethod().when(gfaService).callGfaDeaccessionService(deAccessionDBResponseEntities,username);
+        gfaService.callGfaDeaccessionService(deAccessionDBResponseEntities,username);
+    }
+    @Test
+    public void callGfaDeaccessionServiceWithNotAvailableStatus(){
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
+        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
+        deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.NOT_AVAILABLE);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        String username = "test";
+        GFAPwiResponse gfaPwiResponse = getGfaPwiResponse();
+        Mockito.when(gfaService.gfaPermanentWithdrawlInDirect(any())).thenReturn(gfaPwiResponse);
+        Mockito.doCallRealMethod().when(gfaService).callGfaDeaccessionService(deAccessionDBResponseEntities,username);
+        gfaService.callGfaDeaccessionService(deAccessionDBResponseEntities,username);
+    }
+
+    private GFAPwiResponse getGfaPwiResponse() {
+        GFAPwiResponse gfaPwiResponse  = new GFAPwiResponse();
+        GFAPwiDsItemResponse gfaPwiDsItemResponse = new GFAPwiDsItemResponse();
+        GFAPwiTtItemResponse gfaPwiTtItemResponse = new GFAPwiTtItemResponse();
+        gfaPwiTtItemResponse.setCustomerCode("CA");
+        gfaPwiTtItemResponse.setErrorNote("ErrorNote");
+        gfaPwiDsItemResponse.setTtitem(Arrays.asList(gfaPwiTtItemResponse));
+        gfaPwiResponse.setDsitem(gfaPwiDsItemResponse);
+        return gfaPwiResponse;
     }
 }

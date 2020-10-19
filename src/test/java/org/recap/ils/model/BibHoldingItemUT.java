@@ -101,6 +101,8 @@ public class BibHoldingItemUT extends BaseTestCase{
         recordType.setId("1");
         recordType.setDatafield(Arrays.asList(getDataFieldType()));
         recordType.setType(RecordTypeType.BIBLIOGRAPHIC);
+        RecordTypeType.fromValue("Bibliographic");
+        RecordTypeType.values();
         recordType.setLeader(getLeaderFieldType());
         return recordType;
     }

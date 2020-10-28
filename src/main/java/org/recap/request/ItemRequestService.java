@@ -1,65 +1,66 @@
-package org.recap.request;
+        package org.recap.request;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.camel.Exchange;
-import org.apache.camel.FluentProducerTemplate;
-import org.apache.camel.ProducerTemplate;
-import org.apache.camel.impl.engine.DefaultFluentProducerTemplate;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
-import org.recap.model.ItemRefileRequest;
-import org.recap.controller.RequestItemController;
-import org.recap.ils.model.response.ItemCreateBibResponse;
-import org.recap.ils.model.response.ItemHoldResponse;
-import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.ils.model.response.ItemRecallResponse;
-import org.recap.model.jpa.CustomerCodeEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRefileResponse;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.ReplaceRequest;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.model.jpa.SearchResultRow;
-import org.recap.repository.jpa.CustomerCodeDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
-import org.recap.repository.jpa.RequestItemDetailsRepository;
-import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.recap.service.RestHeaderService;
-import org.recap.util.CommonUtil;
-import org.recap.util.ItemRequestServiceUtil;
-import org.recap.util.SecurityUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+        import com.fasterxml.jackson.core.JsonProcessingException;
+        import com.fasterxml.jackson.databind.ObjectMapper;
+        import org.apache.camel.Exchange;
+        import org.apache.camel.FluentProducerTemplate;
+        import org.apache.camel.ProducerTemplate;
+        import org.apache.camel.impl.engine.DefaultFluentProducerTemplate;
+        import org.apache.commons.collections.CollectionUtils;
+        import org.apache.commons.lang3.StringUtils;
+        import org.recap.RecapConstants;
+        import org.recap.RecapCommonConstants;
+        import org.recap.model.ItemRefileRequest;
+        import org.recap.controller.RequestItemController;
+        import org.recap.ils.model.response.ItemCreateBibResponse;
+        import org.recap.ils.model.response.ItemHoldResponse;
+        import org.recap.ils.model.response.ItemInformationResponse;
+        import org.recap.ils.model.response.ItemRecallResponse;
+        import org.recap.model.jpa.CustomerCodeEntity;
+        import org.recap.model.jpa.ItemEntity;
+        import org.recap.model.jpa.ItemRefileResponse;
+        import org.recap.model.jpa.ItemRequestInformation;
+        import org.recap.model.jpa.ItemStatusEntity;
+        import org.recap.model.jpa.ReplaceRequest;
+        import org.recap.model.jpa.RequestItemEntity;
+        import org.recap.model.jpa.RequestStatusEntity;
+        import org.recap.model.jpa.SearchResultRow;
+        import org.recap.repository.jpa.CustomerCodeDetailsRepository;
+        import org.recap.repository.jpa.ItemDetailsRepository;
+        import org.recap.repository.jpa.ItemStatusDetailsRepository;
+        import org.recap.repository.jpa.RequestItemDetailsRepository;
+        import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
+        import org.recap.service.RestHeaderService;
+        import org.recap.util.CommonUtil;
+        import org.recap.util.ItemRequestServiceUtil;
+        import org.recap.util.PropertyUtil;
+        import org.recap.util.SecurityUtil;
+        import org.slf4j.Logger;
+        import org.slf4j.LoggerFactory;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.beans.factory.annotation.Value;
+        import org.springframework.core.ParameterizedTypeReference;
+        import org.springframework.http.HttpEntity;
+        import org.springframework.http.HttpMethod;
+        import org.springframework.http.ResponseEntity;
+        import org.springframework.stereotype.Component;
+        import org.springframework.web.client.RestClientException;
+        import org.springframework.web.client.RestTemplate;
+        import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
-import java.text.Normalizer;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+        import java.io.BufferedReader;
+        import java.io.StringReader;
+        import java.text.Normalizer;
+        import java.text.ParseException;
+        import java.text.SimpleDateFormat;
+        import java.util.ArrayList;
+        import java.util.Arrays;
+        import java.util.Collections;
+        import java.util.Date;
+        import java.util.HashMap;
+        import java.util.List;
+        import java.util.Map;
+        import java.util.Optional;
 
 /**
  * Class for Request Item Service
@@ -147,6 +148,9 @@ public class ItemRequestService {
     @Autowired
     private ItemEDDRequestService itemEDDRequestService;
 
+    @Autowired
+    private PropertyUtil propertyUtil;
+
     /**
      * @return
      */
@@ -185,7 +189,7 @@ public class ItemRequestService {
 
             if (itemEntities != null && !itemEntities.isEmpty()) {
                 itemEntity = itemEntities.get(0);
-                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation());
+                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInfo.getDeliveryLocation(), itemRequestInfo.getItemOwningInstitution());
                 if (StringUtils.isBlank(itemRequestInfo.getBibId())) {
                     itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 }
@@ -383,31 +387,23 @@ public class ItemRequestService {
                         }
                     }
                     logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getId(), itemBarcode);
-                    if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.PRINCETON) || itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-                        //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
-                        if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)){
-                            if(itemRequestInfo.isOwningInstitutionItem()) {
-                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
-                            }else {
-                                //Interchanging the arguments since the checkin call is made based on Requesting Institution.
-                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
-                            }
+                    //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
+                    if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)){
+                        if(itemRequestInfo.isOwningInstitutionItem()) {
+                            itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                        }else {
+                            //Interchanging the arguments since the checkin call is made based on Requesting Institution.
+                            itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
                         }
-                        else {
-                            itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
-                        }
-                        requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
-                    } else if (itemRequestInfo.getRequestingInstitution().equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-                        //TODO - Check if EDD and change Patron accordingly to checkIn in RequestingInstitution
-                        if(itemRequestInfo.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)){
-                            if(itemRequestInfo.isOwningInstitutionItem()) {
-                                itemRequestInfo.setPatronBarcode(itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
-                            }else {
-                                //Interchanging the arguments since the checkin call is made based on Requesting Institution
-                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getItemOwningInstitution(),itemRequestInfo.getRequestingInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
-                            }
-                        }
+                    }
+                    else {
+                        itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
+                    }
+                    String isRefileForCheckin = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
+                    if (Boolean.TRUE.toString().equalsIgnoreCase(isRefileForCheckin)) {
                         requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
+                    } else {
+                        requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
                     }
                     if (!itemRequestInfo.isOwningInstitutionItem()) {
                         //TODO - Check if EDD and change Patron accordingly to checkIn in ItemOwningInstitution
@@ -537,31 +533,15 @@ public class ItemRequestService {
      * @param exchange          the exchange
      */
     public void sendMessageToTopic(String owningInstituteId, String requestType, ItemInformationResponse itemResponseInfo, Exchange exchange) {
-        String selectTopic = RecapConstants.PUL_REQUEST_TOPIC;
-        if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-            selectTopic = RecapConstants.PUL_REQUEST_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-            selectTopic = RecapConstants.PUL_EDD_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-            selectTopic = RecapConstants.PUL_RECALL_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.PRINCETON) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
-            selectTopic = RecapConstants.PUL_BORROW_DIRECT_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-            selectTopic = RecapConstants.CUL_REQUEST_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-            selectTopic = RecapConstants.CUL_EDD_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-            selectTopic = RecapConstants.CUL_RECALL_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.COLUMBIA) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
-            selectTopic = RecapConstants.CUL_BORROW_DIRECT_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-            selectTopic = RecapConstants.NYPL_REQUEST_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-            selectTopic = RecapConstants.NYPL_EDD_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-            selectTopic = RecapConstants.NYPL_RECALL_TOPIC;
-        } else if (owningInstituteId.equalsIgnoreCase(RecapCommonConstants.NYPL) && requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
-            selectTopic = RecapConstants.NYPL_BORROW_DIRECT_TOPIC;
+        String selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.retrieval.request");
+        if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
+            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.retrieval.request");
+        } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
+            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.edd.request");
+        } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.recall.request");
+        } else if (requestType.equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT)) {
+            selectTopic = propertyUtil.getPropertyByInstitutionAndKey(owningInstituteId, "ils.topic.borrowdirect.request");
         }
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "";
@@ -699,7 +679,8 @@ public class ItemRequestService {
             } else {// Not the Owning Institute
                 // Get Temporary bibId from SCSB DB
                 ItemCreateBibResponse createBibResponse;
-                if (!RecapCommonConstants.NYPL.equalsIgnoreCase(itemRequestInfo.getRequestingInstitution())) {
+                String isCreateBibEnabled = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
+                if (Boolean.TRUE.toString().equalsIgnoreCase(isCreateBibEnabled)) {
                     createBibResponse = (ItemCreateBibResponse) requestItemController.createBibliogrphicItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
                 } else {
                     createBibResponse = new ItemCreateBibResponse();
@@ -900,7 +881,6 @@ public class ItemRequestService {
         List<SearchResultRow> statusResponse;
         SearchResultRow searchResultRow = null;
         try {
-            //RestTemplate restTemplate = new RestTemplate();
             HttpEntity requestEntity = new HttpEntity<>(getRestHeaderService().getHttpHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
                     .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)

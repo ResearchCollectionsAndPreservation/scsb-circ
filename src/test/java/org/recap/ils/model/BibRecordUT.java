@@ -17,6 +17,7 @@ public class BibRecordUT {
         holdings.setHolding(Arrays.asList(holding));
         bibRecord.setHoldings(Arrays.asList(holdings));
         bibRecord.setBib(new Bib());
+        assertNotNull(holdings.getHolding());
         assertNotNull(bibRecord.getBib());
         assertNotNull(bibRecord.getHoldings());
     }

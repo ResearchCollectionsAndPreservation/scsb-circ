@@ -1,9 +1,7 @@
 package org.recap.callable;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -13,9 +11,10 @@ import org.recap.request.GFAService;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(MockitoJUnitRunner.class)
-public class LasItemStatusCheckPollingCallbleUT {
+public class LasItemStatusCheckPollingCallableUT {
 
     @Mock
     private GFAService gfaService;
@@ -28,9 +27,11 @@ public class LasItemStatusCheckPollingCallbleUT {
         gfaItemStatus.setItemBarCode("12345");
         gfaItemStatusCheckRequest.setItemStatus(Arrays.asList(gfaItemStatus));
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-//        Mockito.when(gfaService.itemStatusCheck(gfaItemStatusCheckRequest)).thenReturn(gfaItemStatusCheckResponse);
-        //GFAItemStatusCheckResponse gfaItemStatusCheckResponse1 = lasItemStatusCheckPollingCallable.call();
-       // assertNotNull(gfaItemStatusCheckResponse1);
+        lasItemStatusCheckPollingCallable.setBarcode("12346");
+        assertNotNull(lasItemStatusCheckPollingCallable.getBarcode());
+        Mockito.when(gfaService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse1 = lasItemStatusCheckPollingCallable.call();
+        assertNotNull(gfaItemStatusCheckResponse1);
     }
     private GFAItemStatusCheckResponse getGfaItemStatusCheckResponse(){
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = new GFAItemStatusCheckResponse();
@@ -40,6 +41,8 @@ public class LasItemStatusCheckPollingCallbleUT {
         ttitem.setItemStatus("SUCCESS");
         dsitem.setTtitem(Arrays.asList(ttitem));
         gfaItemStatusCheckResponse.setDsitem(dsitem);
+        assertNotNull(dsitem.getTtitem().get(0));
+        assertNotNull(gfaItemStatusCheckResponse.getDsitem());
         return gfaItemStatusCheckResponse;
     }
 }

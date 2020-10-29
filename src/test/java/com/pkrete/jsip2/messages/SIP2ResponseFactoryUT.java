@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
 
-public class SIP2ResponseFactoryUT extends BaseTestCase {
+public class SIP2ResponseFactoryUT {
     private static final Logger logger = LoggerFactory.getLogger(SIP2ResponseFactoryUT.class);
 
     SIP2ResponseFactory sip2ResponseFactory;
@@ -22,22 +22,22 @@ public class SIP2ResponseFactoryUT extends BaseTestCase {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("98Test");
+            sipResponseFactory.create("98Test2");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("24Test");
+            sipResponseFactory.create("24Test3");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("10Test");
+            sipResponseFactory.create("10Test4");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("12Test");
+            sipResponseFactory.create("12Test5");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
@@ -47,52 +47,52 @@ public class SIP2ResponseFactoryUT extends BaseTestCase {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("38Test");
+            sipResponseFactory.create("38Test6");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("18Test");
+            sipResponseFactory.create("18Test7");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("20Test");
+            sipResponseFactory.create("20Test8");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("26Test");
+            sipResponseFactory.create("26Test9");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("16Test");
+            sipResponseFactory.create("16Test10");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("30Test");
+            sipResponseFactory.create("30Test11");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("66Test");
+            sipResponseFactory.create("66Test12");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("82Test");
+            sipResponseFactory.create("82Test13");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("94Test");
+            sipResponseFactory.create("94Test14");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("89Test");
+            sipResponseFactory.create("89Test15");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }
@@ -102,7 +102,12 @@ public class SIP2ResponseFactoryUT extends BaseTestCase {
             logger.info("Exception"+e);
         }
         try {
-            sipResponseFactory.create("8");
+            sipResponseFactory.create("8Test16");
+        } catch (Exception e) {
+            logger.info("Exception"+e);
+        }
+        try {
+            sipResponseFactory.create("64Test17");
         } catch (Exception e) {
             logger.info("Exception"+e);
         }

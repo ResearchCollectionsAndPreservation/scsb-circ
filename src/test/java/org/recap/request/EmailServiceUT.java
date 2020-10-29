@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.util.PropertyUtil;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -21,6 +23,9 @@ public class EmailServiceUT {
 
     @Mock
     private ProducerTemplate producer;
+
+    @Mock
+    private PropertyUtil propertyUtil;
 
     @Test
     public void testRecalEmail() {
@@ -38,6 +43,5 @@ public class EmailServiceUT {
         emailService.sendEmail("NYPLTST67891","GFA","");
         emailService.sendEmail("NYPLTST67891","DELETED_MAIl_TO","");
         emailService.sendBulkRequestEmail("12","TestFirstBulkRequest","TestFirstBulkRequest","PROCESSED","Test","");
-        assertTrue(true);
     }
 }

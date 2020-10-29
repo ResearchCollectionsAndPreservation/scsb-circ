@@ -1,9 +1,9 @@
 package org.recap.camel;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
-public class EmailPayLoadUT extends BaseTestCase {
+public class EmailPayLoadUT extends BaseTestCaseUT {
     @Test
     public  void testEmailPayLoad(){
         EmailPayLoad emailPayLoad = new EmailPayLoad();
@@ -18,7 +18,9 @@ public class EmailPayLoadUT extends BaseTestCase {
         emailPayLoad.setReportFileName("test");
         emailPayLoad.getReportFileName();
         emailPayLoad.getXmlFileName();
+        emailPayLoad.setException(new Exception());
         emailPayLoad.getException();
+        emailPayLoad.setExceptionMessage("test");
         emailPayLoad.getExceptionMessage();
         emailPayLoad.getPendingRequestLimit();
         emailPayLoad.setPendingRequestLimit("test");

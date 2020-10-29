@@ -104,6 +104,9 @@ public class ItemRequestService {
     private RequestItemDetailsRepository requestItemDetailsRepository;
 
     @Autowired
+    RestTemplate restTemplate;
+
+    @Autowired
     private EmailService emailService;
 
     @Autowired
@@ -494,15 +497,15 @@ public class ItemRequestService {
 
     private void setEddInformation(ItemRequestInformation itemRequestInfo, HashMap<String, String> eddNotesMap) {
         for (Map.Entry<String, String> eddNotes : eddNotesMap.entrySet()) {
-         if(eddNotes.getKey().contains("Start Page")){
-             itemRequestInfo.setStartPage(eddNotes.getValue());
+            if(eddNotes.getKey().contains("Start Page")){
+                itemRequestInfo.setStartPage(eddNotes.getValue());
             }
-         if(eddNotes.getKey().contains("End Page")){
+            if(eddNotes.getKey().contains("End Page")){
                 itemRequestInfo.setEndPage(eddNotes.getValue());
             }
-         if(eddNotes.getKey().contains("Chapter")){
-             itemRequestInfo.setChapterTitle(eddNotes.getValue());
-         }
+            if(eddNotes.getKey().contains("Chapter")){
+                itemRequestInfo.setChapterTitle(eddNotes.getValue());
+            }
             if(eddNotes.getKey().contains("Article Author")){
                 itemRequestInfo.setAuthor(eddNotes.getValue());
             }
@@ -878,13 +881,11 @@ public class ItemRequestService {
         List<SearchResultRow> statusResponse;
         SearchResultRow searchResultRow = null;
         try {
-            RestTemplate restTemplate = new RestTemplate();
             HttpEntity requestEntity = new HttpEntity<>(getRestHeaderService().getHttpHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
                     .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
                     .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
-            ResponseEntity<List<SearchResultRow>> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
-            });
+            ResponseEntity<List<SearchResultRow>> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {});
             statusResponse = responseEntity.getBody();
             if (statusResponse != null && !statusResponse.isEmpty()) {
                 searchResultRow = statusResponse.get(0);
@@ -1225,25 +1226,25 @@ public class ItemRequestService {
      * @return
      */
     private String buildRetrieveRequestInfoAndReplaceToSCSB(RequestItemEntity requestItemEntity) {
-            ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-            itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
-            itemRequestInformation.setItemBarcodes(Collections.singletonList(requestItemEntity.getItemEntity().getBarcode()));
-            itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
-            itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
-            itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
-            itemRequestInformation.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
-            itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-            itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
+        itemRequestInformation.setItemBarcodes(Collections.singletonList(requestItemEntity.getItemEntity().getBarcode()));
+        itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
+        itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
+        itemRequestInformation.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+        itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
 
-            String notes = requestItemEntity.getNotes();
-            new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
+        String notes = requestItemEntity.getNotes();
+        new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
 
-            String validationMessage = validateItemRequest(itemRequestInformation);
-            if (!RecapCommonConstants.VALID_REQUEST.equals(validationMessage)) {
-                return RecapCommonConstants.FAILURE + " : " + validationMessage;
-            }
-            return setRequestItemEntity(itemRequestInformation, requestItemEntity);
+        String validationMessage = validateItemRequest(itemRequestInformation);
+        if (!RecapCommonConstants.VALID_REQUEST.equals(validationMessage)) {
+            return RecapCommonConstants.FAILURE + " : " + validationMessage;
         }
+        return setRequestItemEntity(itemRequestInformation, requestItemEntity);
+    }
 
     /**
      * Builds EDD request information and replaces them to SCSB queue.
@@ -1251,29 +1252,29 @@ public class ItemRequestService {
      * @return
      */
     private String buildEddRequestInfoAndReplaceToSCSB(RequestItemEntity requestItemEntity) {
-            ItemEntity itemEntity = requestItemEntity.getItemEntity();
-            ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-            itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
-            itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
-            itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
-            itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
-            itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
-            itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
-            itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-            itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
+        ItemEntity itemEntity = requestItemEntity.getItemEntity();
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
+        itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
+        itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
+        itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
+        itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+        itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
 
-            String notes = requestItemEntity.getNotes();
-            new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
+        String notes = requestItemEntity.getNotes();
+        new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
 
-            SearchResultRow searchResultRow = searchRecords(itemEntity);
-            itemRequestInformation.setTitleIdentifier(searchResultRow.getTitle());
+        SearchResultRow searchResultRow = searchRecords(itemEntity);
+        itemRequestInformation.setTitleIdentifier(searchResultRow.getTitle());
 
-            String validationMessage = validateItemRequest(itemRequestInformation);
-            if (!RecapCommonConstants.VALID_REQUEST.equals(validationMessage)) {
-                return RecapCommonConstants.FAILURE + ":" + validationMessage;
-            }
-            return setRequestItemEntity(itemRequestInformation, requestItemEntity);
-         }
+        String validationMessage = validateItemRequest(itemRequestInformation);
+        if (!RecapCommonConstants.VALID_REQUEST.equals(validationMessage)) {
+            return RecapCommonConstants.FAILURE + ":" + validationMessage;
+        }
+        return setRequestItemEntity(itemRequestInformation, requestItemEntity);
+    }
 
     private String setRequestItemEntity(ItemRequestInformation itemRequestInformation, RequestItemEntity requestItemEntity) {
         try {

@@ -79,8 +79,8 @@ public abstract class JSIPConnector implements IJSIPConnector {
             }
             if (connection.connect()) {
                 login = new SIP2LoginRequest(getOperatorUserId(), getOperatorPassword(), getOperatorLocation());
-                logger.error("username = {}", getOperatorUserId());
-                logger.error("password = {}", getOperatorPassword());
+                //logger.info("username = {}", getOperatorUserId());
+                //logger.info("password = {}", getOperatorPassword());
                 SIP2LoginResponse loginResponse = (SIP2LoginResponse) connection.send(login);
                 SIP2PatronInformationRequest request = new SIP2PatronInformationRequest(patronIdentifier);
                 SIP2PatronInformationResponse response = (SIP2PatronInformationResponse) connection.send(request);

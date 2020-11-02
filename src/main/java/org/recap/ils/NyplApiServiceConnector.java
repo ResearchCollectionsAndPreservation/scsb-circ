@@ -276,18 +276,14 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         try {
             String apiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_CHECKOUT_REQUEST_URL;
-            logger.error("API URL = {}" , apiUrl);
             CheckoutRequest checkoutRequest = getCheckOutRequest();
             checkoutRequest.setPatronBarcode(patronIdentifier);
             checkoutRequest.setItemBarcode(itemIdentifier);
             checkoutRequest.setDesiredDateDue(getNyplApiResponseUtil().getExpirationDateForNypl());
 
-            logger.error("CHECKOUT REQUEST {}", checkoutRequest);
             HttpEntity<CheckoutRequest> requestEntity = new HttpEntity(checkoutRequest, getHttpHeaders());
-            logger.error("CHECKOUT REQUEST ENTITY = {}" , requestEntity);
             ResponseEntity<CheckoutResponse> responseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, CheckoutResponse.class);
             CheckoutResponse checkoutResponse = responseEntity.getBody();
-            logger.error("CHECKOUT RESPONSE {}" , checkoutResponse);
             itemCheckoutResponse = getNyplApiResponseUtil().buildItemCheckoutResponse(checkoutResponse);
             CheckoutData checkoutData = checkoutResponse.getData();
             if (null != checkoutData) {

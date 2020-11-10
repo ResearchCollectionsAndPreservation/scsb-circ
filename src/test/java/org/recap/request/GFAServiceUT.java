@@ -295,6 +295,27 @@ public class GFAServiceUT{
         assertNotNull(statusReconciliationCSVRecords);
     }
     @Test
+    public void itemStatusComparisonWithAvailable(){
+        List<List<ItemEntity>> itemEntityChunkList= new ArrayList<>();
+        List<ItemEntity> itemEntities = new ArrayList<>();
+        itemEntities.add(getItemEntity());
+        itemEntityChunkList.add(itemEntities);
+        List<StatusReconciliationErrorCSVRecord> statusReconciliationErrorCSVRecordList = new ArrayList<>();
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = new GFAItemStatusCheckResponse();
+        Dsitem dsitem = new Dsitem();
+        Ttitem ttitem = new Ttitem();
+        ttitem.setItemBarcode("7020");
+        ttitem.setItemStatus("Not");
+        dsitem.setTtitem(Arrays.asList(ttitem));
+        gfaItemStatusCheckResponse.setDsitem(dsitem);
+        Mockito.when(gfaService.getGFAItemStatusCheckResponse(anyList())).thenReturn(gfaItemStatusCheckResponse);
+        Mockito.when(gfaService.getItemChangeLogDetailsRepository()).thenReturn(itemChangeLogDetailsRepository);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCodeIn(any())).thenReturn(Arrays.asList(getRequestItemEntity().getRequestStatusEntity()));
+        Mockito.when(gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList)).thenCallRealMethod();
+        List<StatusReconciliationCSVRecord> statusReconciliationCSVRecords = gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList);
+        assertNotNull(statusReconciliationCSVRecords);
+    }
+    @Test
     public void itemStatusComparisonWithDifferentBarcode(){
         List<List<ItemEntity>> itemEntityChunkList= new ArrayList<>();
         List<ItemEntity> itemEntities = new ArrayList<>();

@@ -53,9 +53,8 @@ public class NyplDataApiServiceUT extends BaseTestCase {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", authorization);
-
-        ResponseEntity<String> responseEntity1 = new ResponseEntity<>(HttpStatus.OK);
-        RestTemplate restTemplate = new RestTemplate();
+        String object = "{ \"access_token\":\"John\" }";
+        ResponseEntity<String> responseEntity1 = new ResponseEntity<>(object,HttpStatus.OK);
         HttpEntity<String> requestEntity = new HttpEntity("grant_type=client_credentials", headers);
         Mockito.when(restTemplate.exchange(nyplOauthTokenApiUrl, HttpMethod.POST, requestEntity, String.class)).thenReturn(responseEntity1);
         ResponseEntity<String> responseEntity = restTemplate.exchange(nyplOauthTokenApiUrl, HttpMethod.POST, requestEntity, String.class);

@@ -395,9 +395,6 @@ public class GFAServiceUT extends BaseTestCaseUT {
         assertNotEquals(gfaService.getGfaItemPermanentWithdrawlInDirect(), gfaItemPermanentWithdrawlInDirect);
         assertNotEquals(gfaService.getProducer(), producer);
         assertNotEquals(gfaService.getObjectMapper(), objectMapper);
-        assertNotEquals(gfaService.getGfaServerResponseTimeOutMilliseconds(), gfaServerResponseTimeOutMilliseconds);
-        assertNotEquals(gfaService.getGfaItemStatus(), gfaItemStatus);
-        assertNotEquals(gfaService.getGfaItemRetrival(), gfaItemRetrival);
 
     }
 

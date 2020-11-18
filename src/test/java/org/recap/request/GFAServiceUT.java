@@ -395,7 +395,6 @@ public class GFAServiceUT{
         assertNotEquals(gfaService.getProducer(), producer);
         assertNotEquals(gfaService.getObjectMapper(), objectMapper);
         assertNotEquals(gfaService.isUseQueueLasCall(), true);
-        assertNotEquals(gfaService.getGfaServerResponseTimeOutMilliseconds(), gfaServerResponseTimeOutMilliseconds);
         assertNotEquals(gfaService.getGfaItemStatus(), gfaItemStatus);
         assertNotEquals(gfaService.getGfaItemRetrival(), gfaItemRetrival);
 

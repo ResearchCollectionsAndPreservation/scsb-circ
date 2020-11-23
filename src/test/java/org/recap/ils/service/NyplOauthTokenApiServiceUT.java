@@ -1,5 +1,6 @@
 package org.recap.ils.service;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.ils.service.NyplOauthTokenApiService;
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by rajeshbabuk on 9/12/16.
  */
+@Ignore
 public class NyplOauthTokenApiServiceUT extends BaseTestCase {
 
     @Autowired

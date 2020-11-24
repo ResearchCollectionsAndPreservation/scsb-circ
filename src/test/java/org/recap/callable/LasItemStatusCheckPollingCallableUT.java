@@ -6,6 +6,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.gfa.model.*;
+import org.recap.model.gfa.Dsitem;
+import org.recap.model.gfa.GFAItemStatusCheckResponse;
+import org.recap.model.gfa.Ttitem;
 import org.recap.request.GFAService;
 
 import java.util.Arrays;

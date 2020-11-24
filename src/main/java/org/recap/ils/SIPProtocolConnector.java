@@ -51,8 +51,12 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
         return connection;
     }
 
+    public boolean checkSocketConnection() {
+        return getSocketConnection().connected();
+    }
+
     /**
-     * J sip login boolean.
+     * Jsip login boolean.
      *
      * @param connection       the connection
      * @param patronIdentifier the patron identifier

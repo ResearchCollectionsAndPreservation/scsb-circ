@@ -3,7 +3,7 @@ package org.recap.callable;
 import org.recap.RecapConstants;
 import org.recap.gfa.model.GFAItemStatus;
 import org.recap.gfa.model.GFAItemStatusCheckRequest;
-import org.recap.gfa.model.GFAItemStatusCheckResponse;
+import org.recap.model.gfa.GFAItemStatusCheckResponse;
 import org.recap.request.GFAService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -98,15 +98,14 @@ public class BulkItemRequestProcessService {
                 itemRequestServiceUtil.generateReportAndSendEmail(bulkRequestId);
                 logger.info("Bulk request processing completed for bulk request id : {}", bulkRequestId);
             }
-            } else {
-                    if(bulkRequestItemEntity.isPresent()) {
-                        processBulkRequestForBarcode(itemBarcode, bulkRequestItemEntity.get());
-                    }
-            }
+        } else {
+            bulkRequestItemEntity.ifPresent(requestItemEntity -> processBulkRequestForBarcode(itemBarcode, requestItemEntity));
+        }
     }
 
     /**
      * Process request for each barcode.
+     *
      * @param itemBarcode
      * @param bulkRequestItemEntity
      */
@@ -129,11 +128,10 @@ public class BulkItemRequestProcessService {
                 ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                 itemInformationResponse.setRequestId(requestId);
                 itemInformationResponse = gfaService.executeRetrieveOrder(itemRequestInformation, itemInformationResponse);
-                if(itemInformationResponse.isRequestTypeForScheduledOnWO()){
+                if (itemInformationResponse.isRequestTypeForScheduledOnWO()) {
                     logger.info("Bulk Request : Request received on first scan");
-                    itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.LAS_REFILE_REQUEST_PLACED,bulkRequestItemEntity);
-                }
-                else if (itemInformationResponse.isSuccess()) {
+                    itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.LAS_REFILE_REQUEST_PLACED, bulkRequestItemEntity);
+                } else if (itemInformationResponse.isSuccess()) {
                     itemInformationResponse.setScreenMessage(RecapConstants.SUCCESSFULLY_PROCESSED_REQUEST_ITEM);
                     itemRequestInformation.setRequestNotes(itemRequestInformation.getRequestNotes() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
                     if (!gfaService.isUseQueueLasCall()) {
@@ -153,12 +151,13 @@ public class BulkItemRequestProcessService {
             itemRequestServiceUtil.updateSolrIndex(itemEntity);
             logger.info("Request processing completed for barcode : {}", itemBarcode);
         } catch (Exception ex) {
-            logger.error(RecapCommonConstants.LOG_ERROR , itemBarcode);
+            logger.error(RecapCommonConstants.LOG_ERROR, itemBarcode);
         }
     }
 
     /**
      * Builds item request information object.
+     *
      * @param bulkRequestItemEntity
      * @return
      */

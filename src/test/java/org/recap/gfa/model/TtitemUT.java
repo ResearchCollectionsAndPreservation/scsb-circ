@@ -1,6 +1,7 @@
 package org.recap.gfa.model;
 
 import org.junit.Test;
+import org.recap.model.gfa.Ttitem;
 
 import java.util.Date;
 

@@ -13,9 +13,13 @@ import org.recap.gfa.model.*;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.ItemRefileRequest;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
+import org.recap.model.gfa.Dsitem;
+import org.recap.model.gfa.GFAItemStatusCheckResponse;
+import org.recap.model.gfa.Ttitem;
 import org.recap.model.jpa.*;
 import org.recap.processor.LasItemStatusCheckPollingProcessor;
 import org.recap.repository.jpa.*;
+import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +107,9 @@ public class GFAService {
 
     @Autowired
     RequestItemStatusDetailsRepository requestItemStatusDetailsRepository;
+
+    @Autowired
+    CommonUtil commonUtil;
 
 
     /**
@@ -395,19 +402,28 @@ public class GFAService {
      * @return the gfa item status check response
      */
     public GFAItemStatusCheckResponse getGFAItemStatusCheckResponse(List<ItemEntity> itemEntities) {
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = new GFAItemStatusCheckResponse();
-        List<GFAItemStatus> gfaItemStatusList = new ArrayList<>();
-        if (itemEntities != null) {
-            for (ItemEntity itemEntity : itemEntities) {
+        return getGFAItemStatusCheckResponseByBarcodes(commonUtil.getBarcodesList(itemEntities));
+    }
+
+    /**
+     * For the given item barcodes this method checks status with LAS.
+     *
+     * @param itemBarcodes the item entities
+     * @return the gfa item status check response
+     */
+    public GFAItemStatusCheckResponse getGFAItemStatusCheckResponseByBarcodes(List<String> itemBarcodes) {
+        if (itemBarcodes != null) {
+            List<GFAItemStatus> gfaItemStatusList = new ArrayList<>();
+            for (String itemBarcode : itemBarcodes) {
                 GFAItemStatus gfaItemStatus = new GFAItemStatus();
-                gfaItemStatus.setItemBarCode(itemEntity.getBarcode());
+                gfaItemStatus.setItemBarCode(itemBarcode);
                 gfaItemStatusList.add(gfaItemStatus);
             }
             GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
             gfaItemStatusCheckRequest.setItemStatus(gfaItemStatusList);
-            gfaItemStatusCheckResponse = itemStatusCheck(gfaItemStatusCheckRequest);
+            return itemStatusCheck(gfaItemStatusCheckRequest);
         }
-        return gfaItemStatusCheckResponse;
+        return new GFAItemStatusCheckResponse();
     }
 
     /**

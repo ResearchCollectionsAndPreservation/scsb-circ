@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.ScsbCircApplication;
@@ -48,7 +49,7 @@ import static org.mockito.ArgumentMatchers.*;
 @TestPropertySource("classpath:application.properties")
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ScsbCircApplication.class)
-public class GFAServiceUT{
+public class GFAServiceUT extends BaseTestCaseUT {
 
     private static final Logger logger = LoggerFactory.getLogger(GFAServiceUT.class);
 
@@ -397,9 +398,6 @@ public class GFAServiceUT{
         assertNotEquals(gfaService.getGfaItemPermanentWithdrawlInDirect(), gfaItemPermanentWithdrawlInDirect);
         assertNotEquals(gfaService.getProducer(), producer);
         assertNotEquals(gfaService.getObjectMapper(), objectMapper);
-        assertNotEquals(gfaService.isUseQueueLasCall(), true);
-        assertNotEquals(gfaService.getGfaItemStatus(), gfaItemStatus);
-        assertNotEquals(gfaService.getGfaItemRetrival(), gfaItemRetrival);
 
     }
 

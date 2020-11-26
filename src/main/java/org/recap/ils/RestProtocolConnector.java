@@ -40,6 +40,9 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
     @Autowired
     NyplOauthTokenApiService nyplOauthTokenApiService;
 
+    @Autowired
+    RestTemplate restTemplate;
+
     /**
      * The Nypl api response util.
      */
@@ -203,7 +206,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             headers.set("Authorization", authorization);
 
             HttpEntity requestEntity = getHttpEntity(headers);
-            ResponseEntity<ItemResponse> responseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class);
+            ResponseEntity<ItemResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class);
             ItemResponse itemResponse = responseEntity.getBody();
             itemInformationResponse = getNyplApiResponseUtil().buildItemInformationResponse(itemResponse);
         } catch (HttpClientErrorException httpException) {
@@ -240,7 +243,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             log.error("CHECKOUT REQUEST {}", checkoutRequest);
             HttpEntity<CheckoutRequest> requestEntity = new HttpEntity(checkoutRequest, getHttpHeaders());
             log.error("CHECKOUT REQUEST ENTITY = {}" , requestEntity);
-            ResponseEntity<CheckoutResponse> responseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, CheckoutResponse.class);
+            ResponseEntity<CheckoutResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, CheckoutResponse.class);
             CheckoutResponse checkoutResponse = responseEntity.getBody();
             log.error("CHECKOUT RESPONSE {}" , checkoutResponse);
             itemCheckoutResponse = getNyplApiResponseUtil().buildItemCheckoutResponse(checkoutResponse);
@@ -296,7 +299,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             checkinRequest.setItemBarcode(itemIdentifier);
 
             HttpEntity<CheckinRequest> requestEntity = new HttpEntity(checkinRequest, getHttpHeaders());
-            ResponseEntity<CheckinResponse> responseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, CheckinResponse.class);
+            ResponseEntity<CheckinResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, CheckinResponse.class);
             CheckinResponse checkinResponse = responseEntity.getBody();
             itemCheckinResponse = getNyplApiResponseUtil().buildItemCheckinResponse(checkinResponse);
             CheckinData checkinData = checkinResponse.getData();
@@ -372,7 +375,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             createHoldRequest.setDescription(description);
 
             HttpEntity<CreateHoldRequest> requestEntity = new HttpEntity(createHoldRequest, getHttpHeaders());
-            ResponseEntity<CreateHoldResponse> responseEntity = getRestTemplate().exchange(recapHoldApiUrl, HttpMethod.POST, requestEntity, CreateHoldResponse.class);
+            ResponseEntity<CreateHoldResponse> responseEntity = restTemplate.exchange(recapHoldApiUrl, HttpMethod.POST, requestEntity, CreateHoldResponse.class);
             CreateHoldResponse createHoldResponse = responseEntity.getBody();
             itemHoldResponse = getNyplApiResponseUtil().buildItemHoldResponse(createHoldResponse);
             CreateHoldData createHoldData = createHoldResponse.getData();
@@ -440,7 +443,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             cancelHoldRequest.setPatronBarcode(patronIdentifier);
 
             HttpEntity<CancelHoldRequest> requestEntity = new HttpEntity(cancelHoldRequest, getHttpHeaders());
-            ResponseEntity<CancelHoldResponse> responseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, CancelHoldResponse.class);
+            ResponseEntity<CancelHoldResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, CancelHoldResponse.class);
             CancelHoldResponse cancelHoldResponse = responseEntity.getBody();
             itemHoldResponse = getNyplApiResponseUtil().buildItemCancelHoldResponse(cancelHoldResponse);
             CancelHoldData cancelHoldData = cancelHoldResponse.getData();
@@ -546,7 +549,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
         nyplHoldRequest.setNumberOfCopies(1);
         nyplHoldRequest.setNeededBy(nyplApiResponseUtil.getExpirationDateForNypl());
 
-        RestTemplate restTemplate = new RestTemplate();
+        //RestTemplate restTemplate = new RestTemplate();
         HttpEntity<NyplHoldRequest> requestEntity = new HttpEntity(nyplHoldRequest, getHttpHeaders());
         ResponseEntity<NYPLHoldResponse> responseEntity = restTemplate.exchange(nyplHoldApiUrl, HttpMethod.POST, requestEntity, NYPLHoldResponse.class);
         NYPLHoldResponse nyplHoldResponse = responseEntity.getBody();
@@ -585,7 +588,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
     private NyplPatronResponse queryForPatronResponse(String patronIdentifier) throws Exception {
         String apiUrl = getRestDataApiUrl() + RecapConstants.NYPL_PATRON_BY_BARCODE_URL + patronIdentifier;
         log.info("NYPL patron response url : {}" , apiUrl );
-        RestTemplate restTemplate = new RestTemplate();
+        //RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = new HttpEntity(getHttpHeaders());
         ResponseEntity<NyplPatronResponse> jobResponseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, NyplPatronResponse.class);
         return jobResponseEntity.getBody();
@@ -686,7 +689,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             refileRequest.setItemBarcode(itemIdentifier);
 
             HttpEntity<RefileRequest> requestEntity = new HttpEntity(refileRequest, getHttpHeaders());
-            ResponseEntity<RefileResponse> responseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, RefileResponse.class);
+            ResponseEntity<RefileResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, RefileResponse.class);
             RefileResponse refileResponse = responseEntity.getBody();
             itemRefileResponse = getNyplApiResponseUtil().buildItemRefileResponse(refileResponse);
             RefileData refileData = refileResponse.getData();

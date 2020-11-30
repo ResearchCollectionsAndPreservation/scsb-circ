@@ -7,9 +7,11 @@ import org.recap.RecapCommonConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
+import org.recap.model.jpa.GenericPatronEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.SearchResultRow;
+import org.recap.repository.jpa.GenericPatronDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
@@ -17,7 +19,6 @@ import org.recap.util.ItemRequestServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
@@ -49,16 +50,8 @@ public class ItemEDDRequestService {
     @Autowired
     private RequestItemDetailsRepository requestItemDetailsRepository;
 
-    @Value("${ils.princeton.patron.edd}")
-    private String princetonPatronForEDD;
-
-    @Value("${ils.columbia.patron.edd}")
-    private String columbiaPatronForEDD;
-
-    @Value("${ils.nypl.patron.edd}")
-    private String nyplPatronForEDD;
-
-
+    @Autowired
+    private GenericPatronDetailsRepository genericPatronDetailsRepository;
 
     /**
      * Gets item details repository.
@@ -221,17 +214,9 @@ public class ItemEDDRequestService {
         return notes;
     }
 
-    public String getPatronIdForOwningInstitutionOnEdd(String owningInstitution){
-        String patronId = "";
-        if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-               patronId = princetonPatronForEDD;
-        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-               patronId = columbiaPatronForEDD;
-        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-                patronId = nyplPatronForEDD;
-        }
-        logger.info(patronId);
-        return patronId;
+    public String getPatronIdForOwningInstitutionOnEdd(String owningInstitution) {
+        GenericPatronEntity genericPatronEntity = genericPatronDetailsRepository.findByItemOwningInstitutionCode(owningInstitution);
+        return genericPatronEntity.getEddGenericPatron();
     }
 
 }

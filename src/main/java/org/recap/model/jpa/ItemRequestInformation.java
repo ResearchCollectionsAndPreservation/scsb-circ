@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  */
 @Setter
 @Getter
-public class ItemRequestInformation {
+public class ItemRequestInformation implements Serializable {
 
     private List<String> itemBarcodes;
     private String titleIdentifier;
@@ -43,6 +44,7 @@ public class ItemRequestInformation {
     private Integer requestId;
     private String pickupLocation;
     private String eddNotes;
+    private String imsLocationCode;
 
 
     /**

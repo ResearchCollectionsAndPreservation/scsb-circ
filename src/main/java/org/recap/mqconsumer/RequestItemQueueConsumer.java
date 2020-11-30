@@ -349,6 +349,10 @@ public class RequestItemQueueConsumer {
         setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_NYPL_BORROW_DIRECT_TOPIC);
     }
 
+    public void scsbOutgoingQOnCompletion(@Body String body) {
+        getLogger().info(body);
+    }
+
     /**
      * Las outgoing q on completion.
      *

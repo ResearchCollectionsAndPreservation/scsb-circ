@@ -3,8 +3,8 @@ package org.recap.camel.requestinitialdataload;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
 import org.recap.camel.EmailPayLoad;
+import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +24,11 @@ public class RequestDataLoadEmailService {
     @Autowired
     private ProducerTemplate producerTemplate;
 
-    @Value("${request.initial.load.email.subject}")
+    @Autowired
+    private PropertyUtil propertyUtil;
+
+    @Value("${email.request.initial.load.subject}")
     private String subjectForRequestInitialDataLoad;
-    @Value("${request.initial.load.email.to.pul}")
-    private String emailToPUL;
-    @Value("${request.initial.load.email.to.cul}")
-    private String emailToCUL;
-    @Value("${request.initial.load.email.to.nypl}")
-    private String emailToNYPL;
 
     private String institutionCode;
 
@@ -53,14 +50,7 @@ public class RequestDataLoadEmailService {
     }
 
     public String emailIdTo(String institution) {
-        if (RecapCommonConstants.NYPL.equalsIgnoreCase(institution)) {
-            return emailToNYPL;
-        } else if (RecapCommonConstants.COLUMBIA.equalsIgnoreCase(institution)) {
-            return emailToCUL;
-        } else if (RecapCommonConstants.PRINCETON.equalsIgnoreCase(institution)) {
-            return emailToPUL;
-        }
-        return null;
+        return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.request.initial.load.to");
     }
 
     public String messageDisplayForInstitution(String fileNameWithPath){

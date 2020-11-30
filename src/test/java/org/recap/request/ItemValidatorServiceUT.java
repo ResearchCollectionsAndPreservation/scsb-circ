@@ -37,7 +37,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(MockitoJUnitRunner.class)
 public class ItemValidatorServiceUT{
 
-    @Value("${scsb.solr.client.url}")
+    @Value("${scsb.solr.doc.url}")
     String scsbSolrClientUrl;
 
     @InjectMocks

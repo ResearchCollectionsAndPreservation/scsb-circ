@@ -16,8 +16,6 @@ import org.recap.RecapConstants;
 import org.recap.ScsbCircApplication;
 import org.recap.gfa.model.*;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.csv.StatusReconciliationCSVRecord;
-import org.recap.model.csv.StatusReconciliationErrorCSVRecord;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.gfa.Dsitem;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
@@ -147,7 +145,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         ttitemRequest.setItemBarcode("123");
         ttitemRequest.setItemStatus("Available");
         retrieveItemRequest.setTtitem(Arrays.asList(ttitemRequest));
-        gfaRetrieveItemRequest.setRetrieveItem(retrieveItemRequest);
+        gfaRetrieveItemRequest.setDsitem(retrieveItemRequest);
 
         RetrieveItem retrieveItem = new RetrieveItem();
         Ttitem ttitem = new Ttitem();
@@ -156,8 +154,8 @@ public class GFAServiceUT extends BaseTestCaseUT {
         retrieveItem.setTtitem(Arrays.asList(ttitem));
         GFARetrieveItemResponse gfaRetrieveItemResponse = new GFARetrieveItemResponse();
         gfaRetrieveItemResponse.setSuccess(true);
-        gfaRetrieveItemResponse.setRetrieveItem(retrieveItem);
-        gfaRetrieveItemResponse.setScrenMessage("Success");
+        gfaRetrieveItemResponse.setDsitem(retrieveItem);
+        gfaRetrieveItemResponse.setScreenMessage("Success");
 
         ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.OK);
         HttpEntity requestEntity = new HttpEntity(gfaRetrieveItemRequest, getHttpHeaders());
@@ -165,10 +163,10 @@ public class GFAServiceUT extends BaseTestCaseUT {
         Mockito.when(gfaService.getGfaItemStatus()).thenReturn(gfaItemStatus);
         Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(gfaService.getRestTemplate().exchange(gfaService.getGfaItemRetrival(), HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
-        Mockito.when(gfaService.itemRetrival(gfaRetrieveItemRequest)).thenCallRealMethod();
-        GFARetrieveItemResponse response = gfaService.itemRetrival(gfaRetrieveItemRequest);
+        Mockito.when(gfaService.itemRetrieval(gfaRetrieveItemRequest)).thenCallRealMethod();
+        GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
         assertNotNull(response);
-        assertNotNull(response.getRetrieveItem());
+        assertNotNull(response.getDsitem());
     }
     @Test
     public void testGFAServiceWithTTitemErrorMessage() {
@@ -180,7 +178,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         ttitemRequest.setItemBarcode("123");
         ttitemRequest.setItemStatus("Available");
         retrieveItemRequest.setTtitem(Arrays.asList(ttitemRequest));
-        gfaRetrieveItemRequest.setRetrieveItem(retrieveItemRequest);
+        gfaRetrieveItemRequest.setDsitem(retrieveItemRequest);
 
         RetrieveItem retrieveItem = new RetrieveItem();
         Ttitem ttitem = new Ttitem();
@@ -190,8 +188,8 @@ public class GFAServiceUT extends BaseTestCaseUT {
         retrieveItem.setTtitem(Arrays.asList(ttitem));
         GFARetrieveItemResponse gfaRetrieveItemResponse = new GFARetrieveItemResponse();
         gfaRetrieveItemResponse.setSuccess(true);
-        gfaRetrieveItemResponse.setRetrieveItem(retrieveItem);
-        gfaRetrieveItemResponse.setScrenMessage("Success");
+        gfaRetrieveItemResponse.setDsitem(retrieveItem);
+        gfaRetrieveItemResponse.setScreenMessage("Success");
 
         ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.OK);
         HttpEntity requestEntity = new HttpEntity(gfaRetrieveItemRequest, getHttpHeaders());
@@ -199,10 +197,10 @@ public class GFAServiceUT extends BaseTestCaseUT {
         Mockito.when(gfaService.getGfaItemStatus()).thenReturn(gfaItemStatus);
         Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(gfaService.getRestTemplate().exchange(gfaService.getGfaItemRetrival(), HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
-        Mockito.when(gfaService.itemRetrival(gfaRetrieveItemRequest)).thenCallRealMethod();
-        GFARetrieveItemResponse response = gfaService.itemRetrival(gfaRetrieveItemRequest);
+        Mockito.when(gfaService.itemRetrieval(gfaRetrieveItemRequest)).thenCallRealMethod();
+        GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
         assertNotNull(response);
-        assertNotNull(response.getRetrieveItem());
+        assertNotNull(response.getDsitem());
     }
     @Test
     public void testGFAServiceWithoutResponse() {
@@ -214,7 +212,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         ttitemRequest.setItemBarcode("123");
         ttitemRequest.setItemStatus("Available");
         retrieveItemRequest.setTtitem(Arrays.asList(ttitemRequest));
-        gfaRetrieveItemRequest.setRetrieveItem(retrieveItemRequest);
+        gfaRetrieveItemRequest.setDsitem(retrieveItemRequest);
         GFARetrieveItemResponse gfaRetrieveItemResponse = new GFARetrieveItemResponse();
         ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.OK);
         HttpEntity requestEntity = new HttpEntity(gfaRetrieveItemRequest, getHttpHeaders());
@@ -222,8 +220,8 @@ public class GFAServiceUT extends BaseTestCaseUT {
         Mockito.when(gfaService.getGfaItemStatus()).thenReturn(gfaItemStatus);
         Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(gfaService.getRestTemplate().exchange(gfaService.getGfaItemRetrival(), HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
-        Mockito.when(gfaService.itemRetrival(gfaRetrieveItemRequest)).thenCallRealMethod();
-        GFARetrieveItemResponse response = gfaService.itemRetrival(gfaRetrieveItemRequest);
+        Mockito.when(gfaService.itemRetrieval(gfaRetrieveItemRequest)).thenCallRealMethod();
+        GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
     }
     @Test
     public void testGFAServiceException() {
@@ -231,14 +229,14 @@ public class GFAServiceUT extends BaseTestCaseUT {
         RetrieveItemRequest retrieveItemRequest = new RetrieveItemRequest();
         TtitemRequest ttitemRequest = new TtitemRequest();
         retrieveItemRequest.setTtitem(Arrays.asList(ttitemRequest));
-        gfaRetrieveItemRequest.setRetrieveItem(retrieveItemRequest);
+        gfaRetrieveItemRequest.setDsitem(retrieveItemRequest);
         HttpEntity requestEntity = new HttpEntity(gfaRetrieveItemRequest, getHttpHeaders());
         Mockito.when(gfaService.getGfaItemRetrival()).thenReturn(gfaItemRetrival);
         Mockito.when(gfaService.getGfaItemStatus()).thenReturn(gfaItemStatus);
         Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(gfaService.getRestTemplate().exchange(gfaService.getGfaItemRetrival(), HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(null);
-        Mockito.when(gfaService.itemRetrival(gfaRetrieveItemRequest)).thenCallRealMethod();
-        GFARetrieveItemResponse response = gfaService.itemRetrival(gfaRetrieveItemRequest);
+        Mockito.when(gfaService.itemRetrieval(gfaRetrieveItemRequest)).thenCallRealMethod();
+        GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
     }
     @Test
     public void testGFAServiceWithBadRequest() {
@@ -253,8 +251,8 @@ public class GFAServiceUT extends BaseTestCaseUT {
         Mockito.when(gfaService.getGfaItemStatus()).thenReturn(gfaItemStatus);
         Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(gfaService.getRestTemplate().exchange(gfaService.getGfaItemRetrival(), HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
-        Mockito.when(gfaService.itemRetrival(gfaRetrieveItemRequest)).thenCallRealMethod();
-        GFARetrieveItemResponse response = gfaService.itemRetrival(gfaRetrieveItemRequest);
+        Mockito.when(gfaService.itemRetrieval(gfaRetrieveItemRequest)).thenCallRealMethod();
+        GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
     }
     @Test
     public void buildRequestInfoAndReplaceToLASForRETRIEVAL(){
@@ -284,49 +282,18 @@ public class GFAServiceUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void itemStatusComparison(){
-        List<List<ItemEntity>> itemEntityChunkList= new ArrayList<>();
-        List<ItemEntity> itemEntities = new ArrayList<>();
-        itemEntities.add(getItemEntity());
-        itemEntityChunkList.add(itemEntities);
-        List<StatusReconciliationErrorCSVRecord> statusReconciliationErrorCSVRecordList = new ArrayList<>();
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        Mockito.when(gfaService.getGFAItemStatusCheckResponse(anyList())).thenReturn(gfaItemStatusCheckResponse);
-        Mockito.when(gfaService.getItemChangeLogDetailsRepository()).thenReturn(itemChangeLogDetailsRepository);
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCodeIn(any())).thenReturn(Arrays.asList(getRequestItemEntity().getRequestStatusEntity()));
-        Mockito.when(gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList)).thenCallRealMethod();
-        List<StatusReconciliationCSVRecord> statusReconciliationCSVRecords = gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList);
-        assertNotNull(statusReconciliationCSVRecords);
-    }
-    @Test
-    public void itemStatusComparisonWithDifferentBarcode(){
-        List<List<ItemEntity>> itemEntityChunkList= new ArrayList<>();
-        List<ItemEntity> itemEntities = new ArrayList<>();
-        ItemEntity itemEntity = getItemEntity();
-        itemEntity.setBarcode("27494");
-        itemEntities.add(itemEntity);
-        itemEntityChunkList.add(itemEntities);
-        List<StatusReconciliationErrorCSVRecord> statusReconciliationErrorCSVRecordList = new ArrayList<>();
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        Mockito.when(gfaService.getGFAItemStatusCheckResponse(anyList())).thenReturn(gfaItemStatusCheckResponse);
-        Mockito.when(gfaService.getItemChangeLogDetailsRepository()).thenReturn(itemChangeLogDetailsRepository);
-        Mockito.when(gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList)).thenCallRealMethod();
-        List<StatusReconciliationCSVRecord> statusReconciliationCSVRecords = gfaService.itemStatusComparison(itemEntityChunkList,statusReconciliationErrorCSVRecordList);
-        assertNotNull(statusReconciliationCSVRecords);
-    }
-    @Test
     public void processLASEDDRetrieveResponse() throws JsonProcessingException {
         RetrieveItemEDDRequest retrieveItemEDDRequest = new RetrieveItemEDDRequest();
         JsonObject object = new JsonObject();
         String body = object.toString() ;
         GFAEddItemResponse gfaEddItemResponse = new GFAEddItemResponse();
-        gfaEddItemResponse.setScrenMessage("Success");
+        gfaEddItemResponse.setScreenMessage("Success");
         gfaEddItemResponse.setSuccess(true);
         TtitemEDDResponse ttitemEDDResponse = new TtitemEDDResponse();
         ttitemEDDResponse.setCustomerCode("123456");
         ttitemEDDResponse.setRequestId(1);
         retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitemEDDResponse));
-        gfaEddItemResponse.setRetrieveEDD(retrieveItemEDDRequest);
+        gfaEddItemResponse.setDsitem(retrieveItemEDDRequest);
         Mockito.when(objectMapper.readValue(body, GFAEddItemResponse.class)).thenReturn(new GFAEddItemResponse());
         Mockito.when(gfaService.processLASEDDRetrieveResponse(body)).thenCallRealMethod();
         gfaService.processLASEDDRetrieveResponse(body);
@@ -522,12 +489,10 @@ public class GFAServiceUT extends BaseTestCaseUT {
         retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitemEDDResponse));
 
         GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = new GFARetrieveEDDItemRequest();
-        gfaRetrieveEDDItemRequest.setRetrieveEDD(retrieveItemEDDRequest);
-        GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaService.itemEDDRetrival(gfaRetrieveEDDItemRequest);
+        gfaRetrieveEDDItemRequest.setDsitem(retrieveItemEDDRequest);
+        GFAEddItemResponse gfaEddItemResponse = getGfaService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setId(2);
-        StatusReconciliationCSVRecord statusReconciliationCSVRecord = getGfaService.getStatusReconciliationCSVRecord("7020", "Available"
-                , "232", "INT", new Date().toString(), itemStatusEntity);
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("UC");
         institutionEntity.setInstitutionName("University of Chicago");
@@ -573,19 +538,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         list.add(itemEntity);
         List<List<ItemEntity>> listList = new ArrayList<List<ItemEntity>>();
         listList.add(list);
-        StatusReconciliationErrorCSVRecord statusReconciliationErrorCSVRecord = new StatusReconciliationErrorCSVRecord();
-
-        statusReconciliationErrorCSVRecord.setBarcode("33245645454584");
-        statusReconciliationErrorCSVRecord.setReasonForFailure("Barcode not found in LAS");
-        statusReconciliationErrorCSVRecord.setInstitution("PUL");
-        List<StatusReconciliationErrorCSVRecord> CSVlist = new ArrayList<>();
-        CSVlist.add(statusReconciliationErrorCSVRecord);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaService.getGFAItemStatusCheckResponse(list);
-        try {
-            List<StatusReconciliationCSVRecord> StatusList = getGfaService.itemStatusComparison(listList, CSVlist);
-        } catch (Exception e) {
-
-        }
         String testres = getGfaService.callGfaItemStatus("33245645454584");
         //getGfaService.startPolling("33245645454584");
         assertNull(testres);
@@ -659,8 +612,8 @@ public class GFAServiceUT extends BaseTestCaseUT {
         Mockito.when(gfaService.getObjectMapper().writeValueAsString(gfaRetrieveEDDItemRequest)).thenReturn("test");
         Mockito.when(gfaService.getGFARetrieveEDDItemRequest()).thenReturn(gfaRetrieveEDDItemRequest);
         Mockito.when(gfaService.getProducer()).thenReturn(producer);
-        Mockito.when(gfaService.callItemEDDRetrivate(itemRequestInformation, itemInformationResponse)).thenCallRealMethod();
-        ItemInformationResponse response = gfaService.callItemEDDRetrivate(itemRequestInformation, itemInformationResponse);
+        Mockito.when(gfaService.callItemEDDRetrievable(itemRequestInformation, itemInformationResponse)).thenCallRealMethod();
+        ItemInformationResponse response = gfaService.callItemEDDRetrievable(itemRequestInformation, itemInformationResponse);
         assertNotNull(response);
         assertEquals(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL, response.getScreenMessage());
 

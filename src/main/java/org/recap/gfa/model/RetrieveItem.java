@@ -1,5 +1,6 @@
 package org.recap.gfa.model;
 
+import lombok.Data;
 import org.recap.model.gfa.Ttitem;
 
 import java.util.List;
@@ -7,25 +8,7 @@ import java.util.List;
 /**
  * Created by sudhishk on 27/1/17.
  */
+@Data
 public class RetrieveItem {
-
     private List<Ttitem> ttitem;
-
-    /**
-     * Gets ttitem.
-     *
-     * @return the ttitem
-     */
-    public List<Ttitem> getTtitem() {
-        return ttitem;
-    }
-
-    /**
-     * Sets ttitem.
-     *
-     * @param ttitem the ttitem
-     */
-    public void setTtitem(List<Ttitem> ttitem) {
-        this.ttitem = ttitem;
-    }
 }

@@ -16,20 +16,8 @@ import org.recap.ils.model.response.ItemCreateBibResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.ils.model.response.ItemRecallResponse;
-import org.recap.model.jpa.CustomerCodeEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRefileResponse;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.ReplaceRequest;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.model.jpa.SearchResultRow;
-import org.recap.repository.jpa.CustomerCodeDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
-import org.recap.repository.jpa.RequestItemDetailsRepository;
-import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
+import org.recap.model.jpa.*;
+import org.recap.repository.jpa.*;
 import org.recap.service.RestHeaderService;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
@@ -72,27 +60,8 @@ public class ItemRequestService {
 
     private static final Logger logger = LoggerFactory.getLogger(ItemRequestService.class);
 
-    @Value("${scsb.solr.client.url}")
+    @Value("${scsb.solr.doc.url}")
     private String scsbSolrClientUrl;
-
-    //EDD values
-    @Value("${ils.princeton.cul.patron.edd}")
-    private String princetonCULEDDPatron;
-
-    @Value("${ils.princeton.nypl.patron.edd}")
-    private String princetonNYPLEDDPatron;
-
-    @Value("${ils.columbia.pul.patron.edd}")
-    private String columbiaPULEDDPatron;
-
-    @Value("${ils.columbia.nypl.patron.edd}")
-    private String columbiaNYPLEDDPatron;
-
-    @Value("${ils.nypl.princeton.patron.edd}")
-    private String nyplPrincetonEDDPatron;
-
-    @Value("${ils.nypl.columbia.patron.edd}")
-    private String nyplColumbiaEDDPatron;
 
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;
@@ -149,6 +118,9 @@ public class ItemRequestService {
     private ItemEDDRequestService itemEDDRequestService;
 
     @Autowired
+    private GenericPatronDetailsRepository genericPatronDetailsRepository;
+
+    @Autowired
     private PropertyUtil propertyUtil;
 
     /**
@@ -194,6 +166,7 @@ public class ItemRequestService {
                     itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 }
                 itemRequestInfo.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+                itemRequestInfo.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
                 SearchResultRow searchResultRow = searchRecords(itemEntity); //Solr
 
                 itemRequestInfo.setTitleIdentifier(getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, searchResultRow));
@@ -724,7 +697,9 @@ public class ItemRequestService {
     }
 
     private ItemInformationResponse holdItem(String callingInst, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation, ItemEntity itemEntity) {
-        ItemHoldResponse itemHoldResponse = (ItemHoldResponse) requestItemController.holdItem(itemRequestInfo, callingInst);
+        //ItemHoldResponse itemHoldResponse = (ItemHoldResponse) requestItemController.holdItem(itemRequestInfo, callingInst);
+        ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
+        itemHoldResponse.setSuccess(true);
         if (itemHoldResponse.isSuccess()) { // IF Hold command is successfully
             itemResponseInformation.setExpirationDate(itemHoldResponse.getExpirationDate());
             itemRequestInfo.setExpirationDate(itemHoldResponse.getExpirationDate());
@@ -824,28 +799,9 @@ public class ItemRequestService {
     }
 
     private String getPatronIDForEDDBorrowingInstitution(String requestingInstitution, String owningInstitution) {
-        String patronId = "";
-        if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-                patronId = princetonCULEDDPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-                patronId = princetonNYPLEDDPatron;
-            }
-        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-                patronId = columbiaPULEDDPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-                patronId = columbiaNYPLEDDPatron;
-            }
-        } else if (owningInstitution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-            if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-                patronId = nyplPrincetonEDDPatron;
-            } else if (requestingInstitution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-                patronId = nyplColumbiaEDDPatron;
-            }
-        }
-        logger.info(patronId);
-        return patronId;
+        GenericPatronEntity genericPatronEntity = genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(requestingInstitution, owningInstitution);
+        logger.info(genericPatronEntity.getEddGenericPatron());
+        return genericPatronEntity.getEddGenericPatron();
     }
 
     private ItemInformationResponse createBibAndHold(ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation, ItemEntity itemEntity) {

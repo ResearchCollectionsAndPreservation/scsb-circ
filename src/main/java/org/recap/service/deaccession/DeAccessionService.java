@@ -147,7 +147,7 @@ public class DeAccessionService {
     /**
      * The Scsb solr client url.
      */
-    @Value("${scsb.solr.client.url}")
+    @Value("${scsb.solr.doc.url}")
     String scsbSolrClientUrl;
 
     @Value("${gfa.item.permanent.withdrawl.direct}")
@@ -156,7 +156,7 @@ public class DeAccessionService {
     @Value("${gfa.item.permanent.withdrawl.indirect}")
     private String gfaItemPermanentWithdrawlInDirect;
 
-    @Value("${recap.assist.email.to}")
+    @Value("${recap-las.email.recap.assist.email.to}")
     private String recapAssistanceEmailTo;
 
 

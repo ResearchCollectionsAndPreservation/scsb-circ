@@ -32,43 +32,7 @@ public class ItemRequestServiceUtil {
 
     private final Logger logger = LoggerFactory.getLogger(ItemRequestServiceUtil.class);
 
-    @Value("${ils.princeton.cul.patron}")
-    private String princetonCULPatron;
-
-    @Value("${ils.princeton.nypl.patron}")
-    private String princetonNYPLPatron;
-
-    @Value("${ils.columbia.pul.patron}")
-    private String columbiaPULPatron;
-
-    @Value("${ils.columbia.nypl.patron}")
-    private String columbiaNYPLPatron;
-
-    @Value("${ils.nypl.princeton.patron}")
-    private String nyplPrincetonPatron;
-
-    @Value("${ils.nypl.columbia.patron}")
-    private String nyplColumbiaPatron;
-
-    @Value("${ils.princeton.cul.patron.edd}")
-    private String princetonEDDCULPatron;
-
-    @Value("${ils.princeton.nypl.patron.edd}")
-    private String princetonEDDNYPLPatron;
-
-    @Value("${ils.columbia.pul.patron.edd}")
-    private String columbiaEDDPULPatron;
-
-    @Value("${ils.columbia.nypl.patron.edd}")
-    private String columbiaEDDNYPLPatron;
-
-    @Value("${ils.nypl.princeton.patron.edd}")
-    private String nyplEDDPrincetonPatron;
-
-    @Value("${ils.nypl.columbia.patron.edd}")
-    private String nyplEDDColumbiaPatron;
-
-    @Value("${scsb.solr.client.url}")
+    @Value("${scsb.solr.doc.url}")
     private String scsbSolrClientUrl;
 
     @Autowired

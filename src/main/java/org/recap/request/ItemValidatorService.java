@@ -1,20 +1,12 @@
 package org.recap.request;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.controller.ItemController;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.CustomerCodeEntity;
-import org.recap.model.jpa.DeliveryRestrictionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.repository.jpa.CustomerCodeDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
-import org.recap.repository.jpa.RequestItemDetailsRepository;
+import org.recap.model.jpa.*;
+import org.recap.repository.jpa.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -38,7 +30,7 @@ public class ItemValidatorService {
     /**
      * The Scsb solr client url.
      */
-    @Value("${scsb.solr.client.url}")
+    @Value("${scsb.solr.doc.url}")
     private String scsbSolrClientUrl;
 
     /**
@@ -46,6 +38,9 @@ public class ItemValidatorService {
      */
     @Autowired
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
+
+    @Autowired
+    private ImsLocationDetailsRepository imsLocationDetailsRepository;
 
     /**
      * The Item details repository.
@@ -79,37 +74,40 @@ public class ItemValidatorService {
         
         if (itemRequestInformation.getItemBarcodes().size() == 1) {
             if (itemEntityList != null && !itemEntityList.isEmpty()) {
-                if (!itemEntityList.isEmpty()) {
-                    for (ItemEntity itemEntity1 : itemEntityList) {
-                        if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)) {
-                            return new ResponseEntity(RecapConstants.INITIAL_LOAD_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
-                        }
-                        String availabilityStatus = getItemStatus(itemEntity1.getItemAvailabilityStatusId());
-                        if (availabilityStatus.equalsIgnoreCase(RecapCommonConstants.NOT_AVAILABLE) && (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.RETRIEVAL)
-                                || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)
-                                || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.BORROW_DIRECT))) {
-                            return new ResponseEntity(RecapConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
-                        } else if (availabilityStatus.equalsIgnoreCase(RecapCommonConstants.AVAILABLE) && itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-                            return new ResponseEntity(RecapConstants.RECALL_NOT_FOR_AVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
-                        }
+                for (ItemEntity itemEntity1 : itemEntityList) {
+                    if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)) {
+                        return new ResponseEntity(RecapConstants.INITIAL_LOAD_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                    }
+                    String availabilityStatus = getItemStatus(itemEntity1.getItemAvailabilityStatusId());
+                    if (availabilityStatus.equalsIgnoreCase(RecapCommonConstants.NOT_AVAILABLE) && (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.RETRIEVAL)
+                            || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)
+                            || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.BORROW_DIRECT))) {
+                        return new ResponseEntity(RecapConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                    } else if (availabilityStatus.equalsIgnoreCase(RecapCommonConstants.AVAILABLE) && itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+                        return new ResponseEntity(RecapConstants.RECALL_NOT_FOR_AVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                    }
 
-                        if(itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
-                            if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_EDD)) {
-                                return new ResponseEntity(RecapConstants.RECALL_FOR_EDD_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
-                            }else if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_CANCELED)) {
-                                return new ResponseEntity(RecapConstants.RECALL_FOR_CANCELLED_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
-                            }
-                        }
+                    String imsLocationCode = getImsLocation(itemEntity1.getImsLocationId());
+                    if (StringUtils.isBlank(imsLocationCode)) {
+                        return new ResponseEntity(RecapConstants.IMS_LOCATION_DOES_NOT_EXIST_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                    }
 
-                        if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)) {
-                            return new ResponseEntity(RecapConstants.RECALL_FOR_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                    if(itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+                        if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_EDD)) {
+                            return new ResponseEntity(RecapConstants.RECALL_FOR_EDD_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                        }else if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_CANCELED)) {
+                            return new ResponseEntity(RecapConstants.RECALL_FOR_CANCELLED_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                         }
+                    }
 
-                        if (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-                            CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndRecapDeliveryRestrictionLikeEDD(itemEntity1.getCustomerCode());
-                            if (customerCodeEntity == null) {
-                                return new ResponseEntity(RecapConstants.EDD_REQUEST_NOT_ALLOWED, getHttpHeaders(), HttpStatus.BAD_REQUEST);
-                            }
+                    if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)) {
+                        return new ResponseEntity(RecapConstants.RECALL_FOR_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                    }
+
+                    if (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
+                        CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndRecapDeliveryRestrictionLikeEDD(itemEntity1.getCustomerCode());
+                        if (customerCodeEntity == null) {
+                            return new ResponseEntity(RecapConstants.EDD_REQUEST_NOT_ALLOWED, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                         }
                     }
                 }
@@ -171,6 +169,21 @@ public class ItemValidatorService {
             status = itemStatusEntity.get().getStatusCode();
         }
         return status;
+    }
+
+    /**
+     * Gets item status.
+     *
+     * @param imsLocationId the item availability status id
+     * @return the item status
+     */
+    public String getImsLocation(Integer imsLocationId) {
+        String imsLocationCode = "";
+        Optional<ImsLocationEntity> imsLocationEntity = imsLocationDetailsRepository.findById(imsLocationId);
+        if (imsLocationEntity.isPresent()) {
+            imsLocationCode = imsLocationEntity.get().getImsLocationCode();
+        }
+        return imsLocationCode;
     }
 
     private ResponseEntity multipleRequestItemValidation(List<ItemEntity> itemEntityList, Set<Integer> bibliographicIds, ItemRequestInformation itemRequestInformation) {

@@ -97,7 +97,7 @@ public class CallGFAServicesUT extends BaseTestCase {
             ttitems.add(ttitem001);
             RetrieveItemRequest retrieveItem = new RetrieveItemRequest();
             retrieveItem.setTtitem(ttitems);
-            gfaRetrieveItemRequest.setRetrieveItem(retrieveItem);
+            gfaRetrieveItemRequest.setDsitem(retrieveItem);
             logger.info(parseToJason(gfaRetrieveItemRequest));
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity requestEntity = new HttpEntity(gfaRetrieveItemRequest,getHttpHeaders());

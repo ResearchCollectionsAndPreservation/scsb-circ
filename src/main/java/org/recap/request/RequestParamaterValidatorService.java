@@ -34,7 +34,7 @@ public class RequestParamaterValidatorService {
     /**
      * The Scsb solr client url.
      */
-    @Value("${scsb.solr.client.url}")
+    @Value("${scsb.solr.doc.url}")
     String scsbSolrClientUrl;
 
     /**

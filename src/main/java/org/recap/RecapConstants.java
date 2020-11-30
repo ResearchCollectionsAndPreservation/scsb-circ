@@ -33,6 +33,7 @@ public final class RecapConstants {
     public static final String EDD_REQUEST_NOT_ALLOWED = "EDD request is not allowed for this customer code";
     public static final String RECALL_FOR_EDD_ITEM = "Recall for existing EDD request is not allowed";
     public static final String RECALL_FOR_CANCELLED_ITEM = "Recall for Cancelled Request is not Allowed. Please Refile the existing Request.";
+    public static final String IMS_LOCATION_DOES_NOT_EXIST_ITEM = "IMS Location does not exist for the item in database.";
 
     public static final String CHAPTER_TITLE_IS_REQUIRED = "Chapter title is required for the request type EDD.";
 
@@ -83,6 +84,7 @@ public final class RecapConstants {
     public static final String BULK_REQUEST_ITEM_PROCESSING_QUEUE_ROUTEID = "BulkRequestItemProcessingRouteId";
     public static final String EMAIL_ROUTE_ID = "RequestRecallEmailRouteId";
     public static final String SCSB_OUTGOING_ROUTE_ID = "LasOutgoingRouteId";
+    public static final String LAS_OUTGOING_ROUTE_ID = "LasOutgoingQueueRouteId";
     public static final String LAS_INCOMING_ROUTE_ID = "LasIncomingQueueRouteId";
     public static final String REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID = "RequestItemLasStatusCheckRouteId";
 

@@ -15,43 +15,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    @Value("${request.recall.email.nypl.to}")
-    private String nyplMailTo;
-
-    @Value("${request.recall.email.pul.to}")
-    private String pulMailTo;
-
-    @Value("${request.recall.email.cul.to}")
-    private String culMailTo;
-
-    @Value("${request.cancel.email.recap.to}")
+    @Value("${recap-las.email.request.cancel.email.recap.to}")
     private String recapMailTo;
 
-    @Value("${deleted.records.email.to}")
+    @Value("${email.deleted.records.to}")
     private String deletedRecordsMailTo;
 
-    @Value("${request.recall.email.nypl.cc}")
-    private String nyplMailCC;
-
-    @Value("${request.recall.email.cul.cc}")
-    private String culMailCC;
-
-    @Value("${request.recall.email.pul.cc}")
-    private String pulMailCC;
-
-    @Value("${request.recall.email.recap.cc}")
+    @Value("${recap-las.email.request.recall.cc}")
     private String recapMailCC;
 
-    @Value("${request.refile.email.nypl.to}")
-    private String refileNyplMailTo;
-    @Value("${request.refile.email.cul.to}")
-    private String refileCulMailTo;
-    @Value("${request.refile.email.pul.to}")
-    private String refilePulMailTo;
-    @Value("${request.refile.email.recap.to}")
+    @Value("${recap-las.email.request.refile.to}")
     private String refileRecapMailTo;
 
-    @Value("${bulk.request.email.to}")
+    @Value("${email.bulk.request.to}")
     private String bulkRequestEmailTo;
 
     @Autowired
@@ -128,16 +104,11 @@ public class EmailService {
     }
 
     private String refileEmailIdTo(String institution) {
-        if (institution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-            return refileNyplMailTo;
-        } else if (institution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-            return refileCulMailTo;
-        } else if (institution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-            return refilePulMailTo;
-        } else if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
+        if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
             return refileRecapMailTo;
+        } else {
+            return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.request.refile.to");
         }
-        return null;
     }
 
     /**

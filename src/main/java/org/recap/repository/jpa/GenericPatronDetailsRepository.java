@@ -16,4 +16,8 @@ public interface GenericPatronDetailsRepository extends JpaRepository<GenericPat
      */
     @Query(value = "select genericPatronEntity from GenericPatronEntity genericPatronEntity inner join genericPatronEntity.requestingInstitutionEntity rie inner join genericPatronEntity.owningInstitutionEntity oie where rie.institutionCode = :requestingInstitutionCode and oie.institutionCode= :owningInstitutionCode ")
     GenericPatronEntity findByRequestingInstitutionCodeAndItemOwningInstitutionCode(@Param("requestingInstitutionCode") String requestingInstitutionCode, @Param("owningInstitutionCode") String owningInstitutionCode);
+
+
+    @Query(value = "select genericPatronEntity from GenericPatronEntity genericPatronEntity inner join genericPatronEntity.owningInstitutionEntity oie where oie.institutionCode= :owningInstitutionCode ")
+    GenericPatronEntity findByItemOwningInstitutionCode(@Param("owningInstitutionCode") String owningInstitutionCode);
 }

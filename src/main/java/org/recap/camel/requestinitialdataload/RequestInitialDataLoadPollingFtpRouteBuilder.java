@@ -48,9 +48,9 @@ public class RequestInitialDataLoadPollingFtpRouteBuilder {
      * @param nyplWorkDirectory          the nypl work directory
      */
     public RequestInitialDataLoadPollingFtpRouteBuilder(CamelContext camelContext, ApplicationContext applicationContext,
-                                                        @Value("${ftp.userName}") String ftpUserName, @Value("${request.initial.accession.pul}") String requestAccessionPulFolder,
+                                                        @Value("${ftp.server.userName}") String ftpUserName, @Value("${request.initial.accession.pul}") String requestAccessionPulFolder,
                                                         @Value("${request.initial.accession.cul}") String requestAccessionCulFolder, @Value("${request.initial.accession.nypl}") String requestAccessionNyplFolder,
-                                                        @Value("${ftp.knownHost}") String ftpKnownHost, @Value("${ftp.privateKey}") String ftpPrivateKey,
+                                                        @Value("${ftp.server.knownHost}") String ftpKnownHost, @Value("${ftp.server.privateKey}") String ftpPrivateKey,
                                                         @Value("${request.initial.accession.pul.error.file}") String requestInvalidPulFile,
                                                         @Value("${request.initial.accession.cul.error.file}") String requestInvalidCulFile,
                                                         @Value("${request.initial.accession.nypl.error.file}") String requestInvalidNyplFile,

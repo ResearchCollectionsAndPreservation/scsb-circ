@@ -6,14 +6,13 @@ import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.camel.route.StartRouteProcessor;
 import org.recap.mqconsumer.RequestItemQueueConsumer;
-import org.recap.request.BulkItemRequestProcessService;
-import org.recap.request.BulkItemRequestService;
-import org.recap.request.ItemEDDRequestService;
-import org.recap.request.ItemRequestService;
+import org.recap.processor.LasHeartBeatCheckPollingProcessor;
+import org.recap.request.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +31,7 @@ public class RequestItemRouteBuilder {
      * @param itemEDDRequestService the item edd request service
      */
     @Autowired
-    public RequestItemRouteBuilder(@Value("${bulk.request.concurrent.consumer.count}") Integer bulkRequestConsumerCount, CamelContext camelContext, ItemRequestService itemRequestService, ItemEDDRequestService itemEDDRequestService, BulkItemRequestService bulkItemRequestService, BulkItemRequestProcessService bulkItemRequestProcessService) {
+    public RequestItemRouteBuilder(@Value("${bulk.request.concurrent.consumer.count}") Integer bulkRequestConsumerCount, CamelContext camelContext, ApplicationContext applicationContext, ItemRequestService itemRequestService, ItemEDDRequestService itemEDDRequestService, BulkItemRequestService bulkItemRequestService, BulkItemRequestProcessService bulkItemRequestProcessService) {
         try {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
@@ -57,8 +56,19 @@ public class RequestItemRouteBuilder {
                 public void configure() throws Exception {
                     from(RecapConstants.SCSB_OUTGOING_QUEUE)
                         .routeId(RecapConstants.SCSB_OUTGOING_ROUTE_ID)
-                        .to(RecapConstants.LAS_OUTGOING_QUEUE)
-                        .onCompletion().bean(new RequestItemQueueConsumer(itemRequestService),"lasOutgoingQOnCompletion");
+                            .log("Message Received in SCSB OUTGOING QUEUE")
+                            .bean(applicationContext.getBean(LasHeartBeatCheckPollingProcessor.class), "pollLasHeartBeatResponse");
+                }
+            });
+
+            camelContext.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from(RecapConstants.LAS_OUTGOING_QUEUE)
+                            .routeId(RecapConstants.LAS_OUTGOING_ROUTE_ID)
+                            .log("Message Received in LAS OUTGOING QUEUE")
+                            .bean(applicationContext.getBean(GFAService.class), "gfaItemRequestProcessor");
+
                 }
             });
 

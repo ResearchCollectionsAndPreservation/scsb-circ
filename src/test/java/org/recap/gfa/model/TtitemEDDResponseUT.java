@@ -52,11 +52,11 @@ public class TtitemEDDResponseUT extends BaseTestCase{
         retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitemEDDResponse));
 
         GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = new GFARetrieveEDDItemRequest();
-        gfaRetrieveEDDItemRequest.setRetrieveEDD(retrieveItemEDDRequest);
+        gfaRetrieveEDDItemRequest.setDsitem(retrieveItemEDDRequest);
 
         GFAEddItemResponse gfaEddItemResponse = new GFAEddItemResponse();
-        gfaEddItemResponse.setRetrieveEDD(retrieveItemEDDRequest);
-        gfaEddItemResponse.setScrenMessage("Success");
+        gfaEddItemResponse.setDsitem(retrieveItemEDDRequest);
+        gfaEddItemResponse.setScreenMessage("Success");
         gfaEddItemResponse.setSuccess(true);
 
         assertNotNull(ttitemEDDResponse.getItemBarcode());
@@ -89,10 +89,10 @@ public class TtitemEDDResponseUT extends BaseTestCase{
         assertNotNull(ttitemEDDResponse.getErrorNote());
         assertNotNull(ttitemEDDResponse.getRequestId());
         assertNotNull(retrieveItemEDDRequest.getTtitem());
-        assertNotNull(gfaEddItemResponse.getScrenMessage());
-        assertNotNull(gfaEddItemResponse.getRetrieveEDD());
+        assertNotNull(gfaEddItemResponse.getScreenMessage());
+        assertNotNull(gfaEddItemResponse.getDsitem());
         assertNotNull(gfaEddItemResponse.isSuccess());
-        assertNotNull(gfaRetrieveEDDItemRequest.getRetrieveEDD());
+        assertNotNull(gfaRetrieveEDDItemRequest.getDsitem());
     }
 
 }

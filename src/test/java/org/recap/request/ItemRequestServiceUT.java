@@ -56,7 +56,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 @TestPropertySource("classpath:application.properties")
 @RunWith(SpringRunner.class)
 public class ItemRequestServiceUT {
-    @Value("${scsb.solr.client.url}")
+    @Value("${scsb.solr.doc.url}")
     private String scsbSolrClientUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(ItemRequestServiceUT.class);

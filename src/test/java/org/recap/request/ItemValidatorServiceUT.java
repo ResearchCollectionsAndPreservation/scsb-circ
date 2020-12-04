@@ -10,17 +10,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.ItemController;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.CustomerCodeEntity;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.CustomerCodeDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
-import org.recap.repository.jpa.RequestItemDetailsRepository;
+import org.recap.model.jpa.*;
+import org.recap.repository.jpa.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 
@@ -28,6 +19,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 
 
 /**
@@ -45,6 +37,9 @@ public class ItemValidatorServiceUT{
 
     @Mock
     BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Mock
+    ImsLocationDetailsRepository imsLocationDetailsRepository;
 
     @Mock
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
@@ -66,15 +61,13 @@ public class ItemValidatorServiceUT{
     public void testValidItem() throws Exception{
         List<String> itemBarcodes = new ArrayList<>();
         itemBarcodes.add("10123");
-        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setItemBarcodes(itemBarcodes);
-        itemRequestInformation.setDeliveryLocation("PB");
-        itemRequestInformation.setRequestType(RecapCommonConstants.RETRIEVAL);
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation(itemBarcodes);
         ItemEntity itemEntity = getItemEntity();
         ItemStatusEntity itemStatusEntity = getItemStatusEntity();
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         RequestItemEntity requestItemEntity1 = getRequestItemEntity();
         CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
+        ImsLocationEntity imsLocationEntity = getImsLocationEntity();
         Mockito.when(itemController.findByBarcodeIn(itemBarcodes.toString())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
         ResponseEntity responseEntity = itemValidatorService.itemValidation(itemRequestInformation);
@@ -89,6 +82,7 @@ public class ItemValidatorServiceUT{
         Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
         Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_EDD)).thenReturn(requestItemEntity1);
         Mockito.when(itemStatusDetailsRepository.findById(itemEntity.getItemAvailabilityStatusId())).thenReturn(Optional.of(itemStatusEntity));
+        Mockito.when(imsLocationDetailsRepository.findById(any())).thenReturn(Optional.of(imsLocationEntity));
         ResponseEntity responseEntity2 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity2);
         Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
@@ -118,14 +112,32 @@ public class ItemValidatorServiceUT{
 
     }
 
-    @Test
-    public void testValidateItemwithMultipleBarcodes(){
-        List<String> itemBarcodes = new ArrayList<>();
-        itemBarcodes.add("10123");
+    private ItemRequestInformation getItemRequestInformation(List<String> itemBarcodes) {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(itemBarcodes);
         itemRequestInformation.setDeliveryLocation("PB");
         itemRequestInformation.setRequestType(RecapCommonConstants.RETRIEVAL);
+        return itemRequestInformation;
+    }
+
+    private ImsLocationEntity getImsLocationEntity() {
+        ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
+        imsLocationEntity.setImsLocationCode("1");
+        imsLocationEntity.setImsLocationName("test");
+        imsLocationEntity.setCreatedBy("test");
+        imsLocationEntity.setCreatedDate(new Date());
+        imsLocationEntity.setActive(true);
+        imsLocationEntity.setDescription("test");
+        imsLocationEntity.setUpdatedBy("test");
+        imsLocationEntity.setUpdatedDate(new Date());
+        return imsLocationEntity;
+    }
+
+    @Test
+    public void testValidateItemwithMultipleBarcodes(){
+        List<String> itemBarcodes = new ArrayList<>();
+        itemBarcodes.add("10123");
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation(itemBarcodes);
         ItemEntity itemEntity = getItemEntity();
         ItemStatusEntity itemStatusEntity = getItemStatusEntity();
         RequestItemEntity requestItemEntity = getRequestItemEntity();
@@ -287,6 +299,7 @@ public class ItemValidatorServiceUT{
         itemEntity.setCatalogingStatus("Complete");
         BibliographicEntity bibliographicEntity = getBibliographicEntity(1, String.valueOf(random.nextInt()));
         itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
+        itemEntity.setImsLocationEntity(getImsLocationEntity());
         return itemEntity;
     }
 

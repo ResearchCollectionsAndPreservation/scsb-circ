@@ -1,7 +1,9 @@
 package org.recap.repository;
 
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 import org.recap.model.jpa.ImsLocationEntity;
 import org.recap.repository.jpa.ImsLocationDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;

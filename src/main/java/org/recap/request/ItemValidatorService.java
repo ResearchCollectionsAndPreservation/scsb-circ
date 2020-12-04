@@ -87,7 +87,7 @@ public class ItemValidatorService {
                         return new ResponseEntity(RecapConstants.RECALL_NOT_FOR_AVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                     }
 
-                    String imsLocationCode = getImsLocation(itemEntity1.getImsLocationId());
+                    String imsLocationCode = getImsLocation(itemEntity1.getImsLocationEntity().getImsLocationId());
                     if (StringUtils.isBlank(imsLocationCode)) {
                         return new ResponseEntity(RecapConstants.IMS_LOCATION_DOES_NOT_EXIST_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                     }

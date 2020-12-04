@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
@@ -48,16 +49,15 @@ import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;public class ItemRequestServiceUT extends BaseTestCaseUT {
 
-/**
- * Created by hemalathas on 20/3/17.
- */
-@TestPropertySource("classpath:application.properties")
-@RunWith(SpringRunner.class)
-public class ItemRequestServiceUT {
-    @Value("${scsb.solr.doc.url}")
-    private String scsbSolrClientUrl;
+
+    /**
+
+ * Created by hemalathas on 20/3/17. */
+
+    @Value("{service.url}")
+    private String scsbSolrClientUrl = "http://localhost:8161/jmxrmi";
 
     private static final Logger logger = LoggerFactory.getLogger(ItemRequestServiceUT.class);
     @Mock
@@ -67,7 +67,7 @@ public class ItemRequestServiceUT {
     @Mock
     IJSIPConnector ijsipConnector;
     @Mock
-    ItemRequestService itemRequestService;
+    GenericPatronDetailsRepository genericPatronDetailsRepository;
     @Mock
     RestHeaderService restHeaderService;
     @Mock
@@ -156,10 +156,10 @@ public class ItemRequestServiceUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
                 .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
                 .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(),HttpMethod.GET,requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {})).thenReturn(responseEntity);
+//        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(),HttpMethod.GET,requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {})).thenReturn(responseEntity);
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenReturn(Arrays.asList(itemEntity));
-        Mockito.when(mockedCustomerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(customerCodeEntity);
-        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
+//        Mockito.when(mockedCustomerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(customerCodeEntity);
+       /* Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(mockedItemDetailsRepository.findByItemId(itemEntity.getItemId())).thenReturn(itemEntity);
         Mockito.doNothing().when(mockedItemRequestDBService).updateItemAvailabilutyStatus(Arrays.asList(itemEntity), itemRequestInfo.getUsername());
         Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
@@ -167,7 +167,7 @@ public class ItemRequestServiceUT {
         Mockito.when(mockedGfaService.executeRetrieveOrder(any(), any())).thenReturn(itemResponseInformation);
         Mockito.when(mockedGfaService.isUseQueueLasCall()).thenReturn(true);
         Mockito.doNothing().when(mockedCommonUtil).rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
-        Mockito.doNothing().when(mockedCommonUtil).saveItemChangeLogEntity(itemRequestInfo.getRequestId(), itemRequestInfo.getUsername(), RecapConstants.REQUEST_RETRIEVAL, itemRequestInfo.getRequestNotes());
+        Mockito.doNothing().when(mockedCommonUtil).saveItemChangeLogEntity(itemRequestInfo.getRequestId(), itemRequestInfo.getUsername(), RecapConstants.REQUEST_RETRIEVAL, itemRequestInfo.getRequestNotes());*/
         ItemInformationResponse itemInformationResponse = mockedItemRequestService.requestItem(itemRequestInfo,exchange);
         assertNotNull(itemInformationResponse);
         itemRequestInfo.setItemOwningInstitution("test");
@@ -198,17 +198,17 @@ public class ItemRequestServiceUT {
         ItemInformationResponse itemInformationResponse = mockedItemRequestService.requestItem(itemRequestInfo,exchange);
         assertNotNull(itemInformationResponse);
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenReturn(Arrays.asList(itemEntity));
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(),HttpMethod.GET,requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {})).thenReturn(responseEntity);
-        Mockito.when(mockedCustomerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(customerCodeEntity);
+//        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(),HttpMethod.GET,requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {})).thenReturn(responseEntity);
+    /*    Mockito.when(mockedCustomerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(customerCodeEntity);
         Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(mockedItemDetailsRepository.findByItemId(itemEntity.getItemId())).thenReturn(itemEntity);
         Mockito.doNothing().when(mockedItemRequestDBService).updateItemAvailabilutyStatus(Arrays.asList(itemEntity), itemRequestInfo.getUsername());
         Mockito.when(mockedGfaService.isUseQueueLasCall()).thenReturn(true);
         Mockito.doNothing().when(mockedCommonUtil).rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
-        Mockito.doNothing().when(mockedCommonUtil).saveItemChangeLogEntity(itemRequestInfo.getRequestId(), itemRequestInfo.getUsername(), RecapConstants.REQUEST_RETRIEVAL, itemRequestInfo.getRequestNotes());
+        Mockito.doNothing().when(mockedCommonUtil).saveItemChangeLogEntity(itemRequestInfo.getRequestId(), itemRequestInfo.getUsername(), RecapConstants.REQUEST_RETRIEVAL, itemRequestInfo.getRequestNotes());*/
         ItemInformationResponse itemInformationResponse1 = mockedItemRequestService.requestItem(itemRequestInfo,exchange);
         assertNotNull(itemInformationResponse1);
-        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
+        //Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
         ItemInformationResponse itemInformationResponse2 = mockedItemRequestService.requestItem(itemRequestInfo,exchange);
         assertNotNull(itemInformationResponse2);
     }
@@ -259,7 +259,7 @@ public class ItemRequestServiceUT {
         Mockito.when(mockedGfaService.callGfaItemStatus(itemEntity.getBarcode())).thenReturn("REFILED SUCCESSFULLY");
         requestItemEntityRecalled.setRequestingInstitutionId(3);
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntityRecalled);
-        Mockito.doNothing().when(mockedIitemRequestServiceUtil).updateSolrIndex(itemEntity);
+//        Mockito.doNothing().when(mockedIitemRequestServiceUtil).updateSolrIndex(itemEntity);
         Mockito.when(mockedGfaService.executeRetrieveOrder(any(), any())).thenReturn(itemResponseInformation);
         ItemRefileResponse response = mockedItemRequestService.reFileItem(itemRefileRequest,itemRefileResponse);
         assertNotNull(response);
@@ -279,6 +279,7 @@ public class ItemRequestServiceUT {
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);
         ItemEntity itemEntity = requestItemEntity.getItemEntity();
         itemEntity.setItemAvailabilityStatusId(2);
+        GenericPatronEntity genericPatronEntity = getGenericPatronEntity();
         String itemBarcode = itemEntity.getBarcode();
         ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
         itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
@@ -294,10 +295,27 @@ public class ItemRequestServiceUT {
         Mockito.when(mockedRequestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution())).thenReturn(ijsipConnector);
         Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Mockito.when(mockedGfaService.callGfaItemStatus(itemEntity.getBarcode())).thenReturn("REFILED SUCCESSFULLY");
+        Mockito.when(genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(any(), any())).thenReturn(genericPatronEntity);
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(null);
         Mockito.when(mockedRequestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode)).thenReturn("");
         Mockito.doNothing().when(mockedIitemRequestServiceUtil).updateSolrIndex(itemEntity);
         mockedItemRequestService.reFileItem(itemRefileRequest,itemRefileResponse);
+    }
+
+    private GenericPatronEntity getGenericPatronEntity() {
+        GenericPatronEntity genericPatronEntity = new GenericPatronEntity();
+        genericPatronEntity.setGenericPatronId(1);
+        genericPatronEntity.setEddGenericPatron("edd");
+        genericPatronEntity.setCreatedBy("test");
+        genericPatronEntity.setCreatedDate(new Date());
+        genericPatronEntity.setRetrievalGenericPatron("retrieve");
+        genericPatronEntity.setItemOwningInstitutionId(1);
+        genericPatronEntity.setOwningInstitutionEntity(new InstitutionEntity());
+        genericPatronEntity.setRequestingInstitutionEntity(new InstitutionEntity());
+        genericPatronEntity.setRequestingInstitutionId(1);
+        genericPatronEntity.setUpdatedBy("test");
+        genericPatronEntity.setUpdatedDate(new Date());
+        return genericPatronEntity;
     }
 
     @Test
@@ -325,7 +343,7 @@ public class ItemRequestServiceUT {
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(null);
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes())).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedGfaService.isUseQueueLasCall()).thenReturn(true);
-        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING, null)).thenReturn(1);
+   //     Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING, null)).thenReturn(1);
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setAuthor("test");
         searchResultRow.setTitle("TEST");
@@ -641,7 +659,7 @@ public class ItemRequestServiceUT {
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(mockedGfaService.buildRequestInfoAndReplaceToLAS(any())).thenReturn(RecapCommonConstants.SUCCESS);
+//        Mockito.when(mockedGfaService.buildRequestInfoAndReplaceToLAS(any())).thenReturn(RecapCommonConstants.SUCCESS);
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
@@ -668,7 +686,7 @@ public class ItemRequestServiceUT {
         ResponseEntity responseEntity = new ResponseEntity<>("All request parameters are valid.Patron is eligible to raise a request", HttpStatus.OK);
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedGfaService.callGfaItemStatus(any())).thenReturn("IN");
-        Mockito.when(mockedGfaService.buildRequestInfoAndReplaceToLAS(any())).thenReturn(RecapCommonConstants.SUCCESS);
+//        Mockito.when(mockedGfaService.buildRequestInfoAndReplaceToLAS(any())).thenReturn(RecapCommonConstants.SUCCESS);
         Mockito.when(mockedItemValidatorService.itemValidation(any())).thenReturn(responseEntity);
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
@@ -699,7 +717,7 @@ public class ItemRequestServiceUT {
         Mockito.when(mockedItemValidatorService.itemValidation(any())).thenReturn(responseEntity1);
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedGfaService.callGfaItemStatus(any())).thenReturn("OUT");
-        Mockito.when(mockedGfaService.buildRequestInfoAndReplaceToLAS(any())).thenReturn(RecapCommonConstants.SUCCESS);
+//        Mockito.when(mockedGfaService.buildRequestInfoAndReplaceToLAS(any())).thenReturn(RecapCommonConstants.SUCCESS);
         Mockito.when(mockedRequestItemDetailsRepository.save(any())).thenReturn(requestItemEntity);
         Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
@@ -727,7 +745,7 @@ public class ItemRequestServiceUT {
         replaceRequest.setRequestStatus("PLACED");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
-        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
+//        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
     }
@@ -740,7 +758,7 @@ public class ItemRequestServiceUT {
         replaceRequest.setRequestStatus("");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
-        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
+//        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
     }

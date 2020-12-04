@@ -8,6 +8,7 @@ import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.RequestItemEntity;
 import org.recap.model.jpa.RequestTypeEntity;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
@@ -37,6 +38,9 @@ public class PatronDetailsRepositoryUT extends BaseTestCase {
 
     @Autowired
     RequestItemDetailsRepository requestItemDetailsRepository;
+
+    @Autowired
+    public BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Test
     public void createRequestItem() throws Exception {

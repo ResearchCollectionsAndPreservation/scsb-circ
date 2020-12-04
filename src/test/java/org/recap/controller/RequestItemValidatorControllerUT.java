@@ -4,11 +4,10 @@ import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.ImsLocationDetailsRepository;
+import org.recap.request.ItemValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
@@ -33,6 +32,12 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
 
     @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
+
+    @Autowired
+    ItemValidatorService itemValidatorService;
+
+    @Autowired
+    ImsLocationDetailsRepository imsLocationDetailsRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -65,7 +70,6 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         itemRequestInformation.setItemBarcodes(Arrays.asList(bibliographicEntity.getItemEntities().get(0).getBarcode()));
         ResponseEntity responseEntity = requestItemValidatorController.validateItemRequestInformations(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), RecapConstants.INVALID_PATRON);
     }
 
     @Test
@@ -81,13 +85,14 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         itemRequestInformation.setItemBarcodes(Arrays.asList(bibliographicEntity.getItemEntities().get(0).getBarcode()));
         ResponseEntity responseEntity = requestItemValidatorController.validateItemRequest(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals("Request Parameter ","All request parameters are valid.Patron is eligible to raise a request",responseEntity.getBody());
     }
     private BibliographicEntity saveBibSingleHoldingsMultipleItem() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = getBibliographicEntity(1, String.valueOf(random.nextInt()));
 
         HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
+
+        ImsLocationEntity imsLocationEntity = getImsLocationEntity();
 
         ItemEntity itemEntity1 = new ItemEntity();
         itemEntity1.setCreatedDate(new Date());
@@ -104,6 +109,7 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         itemEntity1.setCallNumberType("1");
         itemEntity1.setHoldingsEntities(Arrays.asList(holdingsEntity));
         itemEntity1.setCatalogingStatus("Complete");
+        itemEntity1.setImsLocationEntity(imsLocationEntity);
 
         ItemEntity itemEntity2 = new ItemEntity();
         itemEntity2.setCreatedDate(new Date());
@@ -120,6 +126,7 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         itemEntity2.setCallNumberType("1");
         itemEntity2.setHoldingsEntities(Arrays.asList(holdingsEntity));
         itemEntity2.setCatalogingStatus("Complete");
+        itemEntity2.setImsLocationEntity(imsLocationEntity);
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity1, itemEntity2));
@@ -127,17 +134,8 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity1, itemEntity2));
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
 
-        entityManager.refresh(savedBibliographicEntity);
-
-        assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getBibliographicId());
-        assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
-        assertNotNull(savedBibliographicEntity.getItemEntities().get(0).getItemId());
-        assertNotNull(savedBibliographicEntity.getItemEntities().get(1).getItemId());
-
-        return savedBibliographicEntity;
+        return bibliographicEntity;
     }
 
     private HoldingsEntity getHoldingsEntity(Random random, Integer institutionId) {
@@ -162,6 +160,19 @@ public class RequestItemValidatorControllerUT extends BaseTestCase {
         bibliographicEntity1.setOwningInstitutionId(institutionId);
         bibliographicEntity1.setOwningInstitutionBibId(owningInstitutionBibId1);
         return bibliographicEntity1;
+    }
+
+    private ImsLocationEntity getImsLocationEntity() {
+        ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
+        imsLocationEntity.setImsLocationCode("1");
+        imsLocationEntity.setImsLocationName("test");
+        imsLocationEntity.setCreatedBy("test");
+        imsLocationEntity.setCreatedDate(new Date());
+        imsLocationEntity.setActive(true);
+        imsLocationEntity.setDescription("test");
+        imsLocationEntity.setUpdatedBy("test");
+        imsLocationEntity.setUpdatedDate(new Date());
+        return imsLocationEntity;
     }
 
 }

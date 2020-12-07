@@ -31,15 +31,6 @@ public class RequestDataLoadServiceUT extends BaseTestCase{
     @Autowired
     RequestDataLoadService requestDataLoadService;
 
-    @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Autowired
-    InstitutionDetailsRepository institutionDetailsRepository;
-
     @Test
     public void testRequestDataService() throws Exception {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
@@ -55,7 +46,7 @@ public class RequestDataLoadServiceUT extends BaseTestCase{
         Set<String> barcodeSet = new HashSet<>();
 
         Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord),barcodeSet);
-        assertTrue(response.size() == 0);
+        assertTrue(response.size() == 1);
 
     }
 
@@ -64,8 +55,7 @@ public class RequestDataLoadServiceUT extends BaseTestCase{
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("UC");
         institutionEntity.setInstitutionName("University of Chicago");
-        InstitutionEntity entity = institutionDetailsRepository.save(institutionEntity);
-        assertNotNull(entity);
+
 
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -74,7 +64,7 @@ public class RequestDataLoadServiceUT extends BaseTestCase{
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionId(entity.getId());
+        bibliographicEntity.setOwningInstitutionId(institutionEntity.getId());
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings".getBytes());
@@ -103,9 +93,7 @@ public class RequestDataLoadServiceUT extends BaseTestCase{
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        return savedBibliographicEntity;
+        return bibliographicEntity;
     }
 
 }

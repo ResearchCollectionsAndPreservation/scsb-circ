@@ -1,20 +1,9 @@
 package org.recap.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.BibliographicPK;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.HoldingsPK;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemPK;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.InstitutionDetailsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.recap.BaseTestCaseUT;
+import org.recap.model.jpa.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
@@ -24,16 +13,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 20/3/17.
  */
-public class BibliographicEntityUT extends BaseTestCase{
-
-    @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Autowired
-    InstitutionDetailsRepository institutionDetailsRepository;
+public class BibliographicEntityUT extends BaseTestCaseUT {
 
     @Test
     public void saveBibSingleHoldingsSingleItem() throws Exception {
@@ -41,8 +21,6 @@ public class BibliographicEntityUT extends BaseTestCase{
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("UC");
         institutionEntity.setInstitutionName("University of Chicago");
-        InstitutionEntity entity = institutionDetailsRepository.save(institutionEntity);
-        assertNotNull(entity);
 
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
@@ -51,7 +29,7 @@ public class BibliographicEntityUT extends BaseTestCase{
         bibliographicEntity.setLastUpdatedDate(new Date());
         bibliographicEntity.setCreatedBy("tst");
         bibliographicEntity.setLastUpdatedBy("tst");
-        bibliographicEntity.setOwningInstitutionId(entity.getId());
+        bibliographicEntity.setOwningInstitutionId(institutionEntity.getId());
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
         HoldingsEntity holdingsEntity = new HoldingsEntity();
         holdingsEntity.setContent("mock holdings".getBytes());
@@ -79,12 +57,6 @@ public class BibliographicEntityUT extends BaseTestCase{
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
-
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
-        assertNotNull(savedBibliographicEntity.getItemEntities());
     }
 
     @Test

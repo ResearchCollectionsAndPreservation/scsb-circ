@@ -30,9 +30,6 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
     ItemController itemController;
 
     @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
-
-    @Autowired
     ItemDetailsRepository itemDetailsRepository;
 
     @PersistenceContext

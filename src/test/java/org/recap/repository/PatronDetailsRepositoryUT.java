@@ -1,66 +1,35 @@
 package org.recap.repository;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestTypeEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.InstitutionDetailsRepository;
-import org.recap.repository.jpa.RequestItemDetailsRepository;
-import org.recap.repository.jpa.RequestTypeDetailsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.recap.BaseTestCaseUT;
+import org.recap.model.jpa.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-import static org.junit.Assert.assertNotNull;
-
 /**
  * Created by sudhishk on 9/12/16.
  */
-public class PatronDetailsRepositoryUT extends BaseTestCase {
+public class PatronDetailsRepositoryUT extends BaseTestCaseUT {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Autowired
-    InstitutionDetailsRepository institutionDetailsRepository;
-
-    @Autowired
-    RequestTypeDetailsRepository requestTypeDetailsRepository;
-
-    @Autowired
-    RequestItemDetailsRepository requestItemDetailsRepository;
-
-    @Autowired
-    public BibliographicDetailsRepository bibliographicDetailsRepository;
 
     @Test
     public void createRequestItem() throws Exception {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("UOC");
         institutionEntity.setInstitutionName("University of Chicago");
-        InstitutionEntity entity = institutionDetailsRepository.save(institutionEntity);
-        assertNotNull(entity);
 
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
 
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
         requestTypeEntity.setRequestTypeCode("Recallhold");
         requestTypeEntity.setRequestTypeDesc("Recallhold");
-        RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
-        assertNotNull(savedRequestTypeEntity);
+
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
-        requestItemEntity.setRequestTypeId(savedRequestTypeEntity.getId());
+        requestItemEntity.setRequestTypeId(requestTypeEntity.getId());
         requestItemEntity.setRequestingInstitutionId(1);
         requestItemEntity.setPatronId("45678912");
         requestItemEntity.setStopCode("test");
@@ -70,9 +39,7 @@ public class PatronDetailsRepositoryUT extends BaseTestCase {
         requestItemEntity.setRequestExpirationDate(new Date());
         requestItemEntity.setRequestExpirationDate(new Date());
         requestItemEntity.setRequestStatusId(4);
-        RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
-        assertNotNull(savedRequestItemEntity);
-        assertNotNull(savedRequestItemEntity.getId());
+
     }
 
     public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
@@ -113,12 +80,7 @@ public class PatronDetailsRepositoryUT extends BaseTestCase {
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
 
-        BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-        entityManager.refresh(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getHoldingsEntities());
-        assertNotNull(savedBibliographicEntity.getItemEntities());
-        return savedBibliographicEntity;
+        return bibliographicEntity;
 
     }
 }

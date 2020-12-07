@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.recap.util.PropertyUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -26,11 +27,14 @@ public class RequestDataLoadEmailServiceUT {
     @Mock
     ProducerTemplate producerTemplate;
 
+    @Mock
+    PropertyUtil propertyUtil;
+
     @Before
     public void setUp() throws Exception {
-        ReflectionTestUtils.setField(requestDataLoadEmailService, "emailToNYPL","testNypl@gmail.com" );
-        ReflectionTestUtils.setField(requestDataLoadEmailService, "emailToCUL","testCul@gmail.com" );
-        ReflectionTestUtils.setField(requestDataLoadEmailService, "emailToPUL","testPul@gmail.com" );
+        //ReflectionTestUtils.setField(requestDataLoadEmailService, "emailToNYPL","testNypl@gmail.com" );
+        //ReflectionTestUtils.setField(requestDataLoadEmailService, "emailToCUL","testCul@gmail.com" );
+        ReflectionTestUtils.setField(requestDataLoadEmailService, "subjectForRequestInitialDataLoad","testPul@gmail.com" );
         MockitoAnnotations.initMocks(this);
     }
     @Test

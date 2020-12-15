@@ -100,18 +100,8 @@ public class RequestInitialDataLoadProcessor {
         if ((boolean)exchange.getProperty(RecapConstants.CAMEL_SPLIT_COMPLETE)){
             logger.info("split last index-->{}",index);
             try {
-                if(RecapConstants.REQUEST_INITIAL_LOAD_PUL.equalsIgnoreCase(institutionCode)){
-                    logger.info("{}", RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
-                    camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_PUL_FS_ROUTE);
-                }
-                if(RecapConstants.REQUEST_INITIAL_LOAD_CUL.equalsIgnoreCase(institutionCode)){
-                    logger.info("{}", RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
-                    camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE);
-                }
-                if(RecapConstants.REQUEST_INITIAL_LOAD_NYPL.equalsIgnoreCase(institutionCode)){
-                    logger.info("{}",RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
-                    camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE);
-                }
+                    logger.info("{}",RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institutionCode);
+                    camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institutionCode);
             } catch (Exception e) {
                 logger.error(RecapCommonConstants.LOG_ERROR, e);
             }

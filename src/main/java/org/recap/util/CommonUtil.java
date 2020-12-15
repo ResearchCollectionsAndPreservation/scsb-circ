@@ -9,6 +9,7 @@ import org.recap.repository.jpa.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -21,6 +22,17 @@ public class CommonUtil {
     private Map itemStatusMap;
     private Map collectionGroupMap;
     private Map institutionEntityMap;
+    private Map ftpPropertiesMap;
+
+
+    @Value("${ftp.server.userName}")
+    String ftpUserName;
+
+    @Value("${ftp.server.privateKey}")
+    String ftpPrivateKey;
+
+    @Value("${ftp.server.knownHost}")
+    String ftpKnownHost;
 
     @Autowired
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
@@ -227,5 +239,15 @@ public class CommonUtil {
             }
         }
         return itemBarcodes;
+    }
+
+    public Map getFTPPropertiesMap() {
+        if (null == ftpPropertiesMap) {
+            ftpPropertiesMap = new HashMap();
+            ftpPropertiesMap.put("userName",ftpUserName);
+            ftpPropertiesMap.put("knownHost",ftpKnownHost);
+            ftpPropertiesMap.put("privateKey",ftpPrivateKey);
+        }
+        return ftpPropertiesMap;
     }
 }

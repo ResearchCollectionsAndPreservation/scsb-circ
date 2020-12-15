@@ -30,9 +30,7 @@ public class StopRouteProcessor implements Processor {
             @Override
             public void run() {
                 try {
-                    if (routeId.equalsIgnoreCase(RecapConstants.REQUEST_INITIAL_LOAD_PUL_FTP_ROUTE) ||
-                            routeId.equalsIgnoreCase(RecapConstants.REQUEST_INITIAL_LOAD_CUL_FTP_ROUTE) ||
-                            routeId.equalsIgnoreCase(RecapConstants.REQUEST_INITIAL_LOAD_CUL_FS_ROUTE)) {
+                    if (routeId.contains(RecapConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE)) {
                         stopRouteWithTimeOutOption();
                     } else {
                         exchange.getContext().getRouteController().stopRoute(routeId);

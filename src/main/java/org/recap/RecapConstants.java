@@ -346,51 +346,23 @@ public final class RecapConstants {
     public static final String COMPLETE = "Complete";
 
     public static final String ACCESSION_RR_FTP_OPTIONS = "&sendEmptyMessageWhenIdle=true&move=.done&delay=2&localWorkDirectory=";
-    public static final String ACCESSION_RECONCILATION_FTP_PUL_ROUTE = "accessionReconcilationFtpPulRoute";
-    public static final String ACCESSION_RECONCILATION_FTP_CUL_ROUTE = "accessionReconcilationFtpCulRoute";
-    public static final String ACCESSION_RECONCILATION_FTP_NYPL_ROUTE = "accessionReconcilationFtpNyplRoute";
-    public static final String ACCESSION_RECONCILATION_FS_PUL_ROUTE = "accessionReconcilationFsPulRoute";
-    public static final String ACCESSION_RECONCILATION_FS_CUL_ROUTE = "accessionReconcilationFsCulRoute";
-    public static final String ACCESSION_RECONCILATION_FS_NYPL_ROUTE = "accessionReconcilationFsNyplRoute";
     public static final String ACCESSION_RECONCILATION_FILE_NAME = "AccessionReconcilation";
     public static final String ACCESSION_RECONCILATION_SOLR_CLIENT_URL = "accessionReconcilationService/startAccessionReconcilation";
     public static final String STARTING = "Starting {} ";
-
-    public static final String SUBMIT_COLLECTION_FTP_PUL_ROUTE = "pulSubmitCollectionFTPRoute";
-    public static final String SUBMIT_COLLECTION_FTP_CGD_PROTECTED_PUL_ROUTE = "pulSubmitCollectionFTPCgdProtectedRoute";
-    public static final String SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_PUL_ROUTE = "pulSubmitCollectionFTPCgdNotProtectedRoute";
-    public static final String SUBMIT_COLLECTION_FTP_CUL_ROUTE = "culSubmitCollectionFTPRoute";
-    public static final String SUBMIT_COLLECTION_FTP_CGD_PROTECTED_CUL_ROUTE = "culSubmitCollectionFTPCgdProtectedRoute";
-    public static final String SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_CUL_ROUTE = "culSubmitCollectionFTPCgdNotProtectedRoute";
-    public static final String SUBMIT_COLLECTION_FTP_NYPL_ROUTE = "nyplSubmitCollectionFTPRoute";
-    public static final String SUBMIT_COLLECTION_FTP_CGD_PROTECTED_NYPL_ROUTE = "nyplSubmitCollectionFTPCgdProtectedRoute";
-    public static final String SUBMIT_COLLECTION_FTP_CGD_NOT_PROTECTED_NYPL_ROUTE = "nyplSubmitCollectionFTPCgdNotProtectedRoute";
     public static final String SUBMIT_COLLECTION_COMPLETED_ROUTE = "submitCollectionCompletedRoute";
     public static final String SUBMIT_COLLECTION__CAUGHT_EXCEPTION_METHOD = "caughtException";
     public static final String SUBMIT_COLLECTION_EXCEPTION_BODY_VM = "submit_collection_exception_body.vm";
-
     public static final String DELETED_MAIL_QUEUE = "deletedRecordsMailSendQueue";
     public static final String COUNT_OF_PURGED_ACCESSION_REQUESTS = "countOfPurgedAccessionRequests";
-
     public static final String STATUS_RECONCILIATION_CHANGE_LOG_OPERATION_TYPE = "StatusReconciliation-ItemAvailablityStatusChange";
-
     public static final String REQUEST_DATA_LOAD_DATE_FORMAT = "MM/dd/yyyy HH:mm:ss";
     public static final String REQUEST_INITIAL_LOAD_FS_FILE = "file:";
-    public static final String REQUEST_INITIAL_LOAD_PUL_FS_ROUTE = "requestInitialLoadPulFsRoute";
-    public static final String REQUEST_INITIAL_LOAD_CUL_FS_ROUTE = "requestInitialLoadCulFsRoute";
-    public static final String REQUEST_INITIAL_LOAD_NYPL_FS_ROUTE = "requestInitialLoadNyplFsRoute";
-    public static final String REQUEST_INITIAL_LOAD_PUL_FTP_ROUTE = "requestInitialLoadPulFtpRoute";
-    public static final String REQUEST_INITIAL_LOAD_CUL_FTP_ROUTE = "requestInitialLoadCulFtpRoute";
-    public static final String REQUEST_INITIAL_LOAD_NYPL_FTP_ROUTE = "requestInitialLoadNyplFtpRoute";
+    public static final String REQUEST_INITIAL_LOAD_FS_ROUTE = "requestInitialLoadFsRoute";
+    public static final String REQUEST_INITIAL_LOAD_FTP_ROUTE = "requestInitialLoadFTPRoute";
     public static final String REQUEST_INITIAL_FILE_NAME = "InitialRequestLoadBarcodeFail_";
-
     public static final String FOR = "for";
     public static final String STATUS_RECONCILIATION = "StatusReconciliation";
     public static final String STATUS_RECONCILIATION_FAILURE = "StatusReconciliationFailure";
-
-    public static final String REQUEST_INITIAL_LOAD_PUL = "pul";
-    public static final String REQUEST_INITIAL_LOAD_CUL = "cul";
-    public static final String REQUEST_INITIAL_LOAD_NYPL = "nypl";
     public static final String CAMEL_SPLIT_INDEX = "CamelSplitIndex";
     public static final String REQUEST_INITIAL_LOAD_HEADER = "Barcodes Not Exist In SCSB";
     public static final String EMAIL_HEADER_REQUEST_PENDING = "Request_Pending";
@@ -418,12 +390,7 @@ public final class RecapConstants {
     public static final String CAMEL_SPLIT_COMPLETE = "CamelSplitComplete";
     public static final String DIRECT = "direct:";
     public static final String PROCESS_DAILY_RECONCILIATION = "processDailyReconciliaion";
-    public static final String ACCESSION_RECONCILATION_DIRECT_PUL_ROUTE = "accessionReconciliationDirectPulRoute";
-    public static final String ACCESSION_RECONCILATION_DIRECT_CUL_ROUTE = "accessionReconciliationDirectCulRoute";
-    public static final String ACCESSION_RECONCILATION_DIRECT_NYPL_ROUTE = "accessionReconciliationDirectNyplRoute";
-    public static final String REQUEST_INITIAL_LOAD_PUL_DIRECT_ROUTE = "requestInitialLoadPulDirectRoute";
-    public static final String REQUEST_INITIAL_LOAD_CUL_DIRECT_ROUTE = "requestInitialLoadCulDirectRoute";
-    public static final String REQUEST_INITIAL_LOAD_NYPL_DIRECT_ROUTE = "requestInitialLoadNyplDirectRoute";
+       public static final String REQUEST_INITIAL_LOAD_DIRECT_ROUTE = "requestInitialLoadDirectRoute";
     public static final String ACCESSION_RECONCILIATION_HEADER = "Barcodes not present in SCSB";
 
     public static final String LAS = "LAS";

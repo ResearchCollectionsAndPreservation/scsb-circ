@@ -3,6 +3,7 @@ package org.recap.model.jpa;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
@@ -22,13 +23,20 @@ public class HoldingsEntityUT {
         bibliographicEntity.setInstitutionEntity(institutionEntity);
         bibliographicEntities.add(bibliographicEntity);
         HoldingsEntity holdingsEntity = new HoldingsEntity();
+        holdingsEntity.setHoldingsId(1);
         holdingsEntity.setInstitutionEntity(institutionEntity);
         holdingsEntity.setBibliographicEntities(bibliographicEntities);
         holdingsEntity.setOwningInstitutionHoldingsId("113t56");
+        holdingsEntity.setItemEntities(Arrays.asList(new ItemEntity()));
         holdingsEntity.hashCode();
         holdingsEntity.equals(holdingsEntity);
         HoldingsEntity holdingsEntity1 = new HoldingsEntity();
         holdingsEntity1.setOwningInstitutionHoldingsId("235456");
         holdingsEntity1.equals(holdingsEntity);
+
+        assertNotNull(holdingsEntity.getInstitutionEntity());
+        assertNotNull(holdingsEntity.getBibliographicEntities());
+        assertNotNull(holdingsEntity.getItemEntities());
+        assertNotNull(holdingsEntity.getHoldingsId());
     }
 }

@@ -18,6 +18,7 @@ public class TtitemEDDResponseUT extends BaseTestCase{
     public void testTtitemEDDResponse(){
 
         TtitemEDDResponse ttitemEDDResponse = new TtitemEDDResponse();
+        TtitemEDDResponse ttitemEDDResponse1 = new TtitemEDDResponse();
         ttitemEDDResponse.setItemBarcode("332445645758458");
         ttitemEDDResponse.setCustomerCode("AD");
         ttitemEDDResponse.setRequestId(1);
@@ -47,6 +48,13 @@ public class TtitemEDDResponseUT extends BaseTestCase{
         ttitemEDDResponse.setRequestTime("06:05:00");
         ttitemEDDResponse.setErrorCode("test");
         ttitemEDDResponse.setErrorNote("test");
+        ttitemEDDResponse.equals(ttitemEDDResponse);
+        ttitemEDDResponse1.equals(ttitemEDDResponse);
+        ttitemEDDResponse.equals(ttitemEDDResponse1);
+        ttitemEDDResponse.hashCode();
+        ttitemEDDResponse1.hashCode();
+        ttitemEDDResponse.canEqual(ttitemEDDResponse);
+        ttitemEDDResponse.canEqual(ttitemEDDResponse1);
 
         RetrieveItemEDDRequest retrieveItemEDDRequest = new RetrieveItemEDDRequest();
         retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitemEDDResponse));
@@ -58,6 +66,9 @@ public class TtitemEDDResponseUT extends BaseTestCase{
         gfaEddItemResponse.setDsitem(retrieveItemEDDRequest);
         gfaEddItemResponse.setScreenMessage("Success");
         gfaEddItemResponse.setSuccess(true);
+        gfaEddItemResponse.canEqual(gfaEddItemResponse);
+        gfaEddItemResponse.equals(gfaEddItemResponse);
+        gfaEddItemResponse.hashCode();
 
         assertNotNull(ttitemEDDResponse.getItemBarcode());
         assertNotNull(ttitemEDDResponse.getCustomerCode());

@@ -1,5 +1,6 @@
 package org.recap.repository;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.CustomerCodeEntity;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertNotNull;
 
+@Ignore
 public class CustomerCodeDetailsRepositoryUT extends BaseTestCase {
 
     @Autowired

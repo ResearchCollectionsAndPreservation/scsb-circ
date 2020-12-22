@@ -342,6 +342,8 @@ public class DeAccessionServiceUT{
         itemEntity.setCollectionGroupEntity(collectionGroupEntity);
         itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
+        itemEntity.setCgdProtection(true);
+        assertTrue(itemEntity.isCgdProtection());
         return itemEntity;
     }
 
@@ -546,6 +548,8 @@ public class DeAccessionServiceUT{
 
         BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
         bibliographicEntity1.setOwningInstitutionBibId("345");
+        bibliographicEntity1.setInstitutionEntity(institutionEntity1);
+        assertNotNull(bibliographicEntity1.getInstitutionEntity());
         itemEntity1.setBibliographicEntities(Arrays.asList(bibliographicEntity1));
 
         List<RequestItemEntity> requestItemEntities = new ArrayList<>();

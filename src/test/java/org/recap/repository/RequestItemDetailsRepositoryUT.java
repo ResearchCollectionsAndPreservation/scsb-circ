@@ -1,5 +1,6 @@
 package org.recap.repository;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.*;
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by sudhishk on 20/1/17.
  */
+@Ignore
 public class RequestItemDetailsRepositoryUT extends BaseTestCase {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestItemDetailsRepositoryUT.class);

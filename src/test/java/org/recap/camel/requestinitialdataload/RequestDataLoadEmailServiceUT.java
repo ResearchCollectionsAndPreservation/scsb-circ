@@ -32,8 +32,6 @@ public class RequestDataLoadEmailServiceUT {
 
     @Before
     public void setUp() throws Exception {
-        //ReflectionTestUtils.setField(requestDataLoadEmailService, "emailToNYPL","testNypl@gmail.com" );
-        //ReflectionTestUtils.setField(requestDataLoadEmailService, "emailToCUL","testCul@gmail.com" );
         ReflectionTestUtils.setField(requestDataLoadEmailService, "subjectForRequestInitialDataLoad","testPul@gmail.com" );
         MockitoAnnotations.initMocks(this);
     }

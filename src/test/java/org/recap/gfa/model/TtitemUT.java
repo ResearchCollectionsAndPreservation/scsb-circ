@@ -12,6 +12,7 @@ public class TtitemUT {
     @Test
     public void getTtitem(){
         Ttitem ttitem = new Ttitem();
+        Ttitem ttitem1 = new Ttitem();
         ttitem.setArticleAuthor("test");
         ttitem.setArticleDate(new Date().toString());
         ttitem.setArticleIssue("test");
@@ -44,6 +45,12 @@ public class TtitemUT {
         ttitem.setRequestorOther("other");
         ttitem.setRequestTime("time");
         ttitem.setStartPage("test");
+        ttitem.equals(ttitem);
+        ttitem.equals(ttitem1);
+        ttitem1.equals(ttitem);
+        ttitem.hashCode();
+        ttitem1.hashCode();
+        ttitem.toString();
 
         assertNotNull(ttitem.getArticleAuthor());
         assertNotNull(ttitem.getArticleDate());

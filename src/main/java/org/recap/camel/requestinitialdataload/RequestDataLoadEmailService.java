@@ -36,7 +36,7 @@ public class RequestDataLoadEmailService {
 
     public void processInput(Exchange exchange) {
         logger.info("ReqeustDataLoad EMailservice started for {}", institutionCode);
-        String fileNameWithPath = (String)exchange.getIn().getHeader("CamelFileNameProduced");
+        String fileNameWithPath = (String)exchange.getIn().getHeader("CamelAwsS3Key");
         producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(fileNameWithPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.REQUEST_INITIAL_DATA_LOAD);
     }
 

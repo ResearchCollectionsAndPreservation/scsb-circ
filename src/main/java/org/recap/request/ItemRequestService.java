@@ -161,7 +161,7 @@ public class ItemRequestService {
 
             if (itemEntities != null && !itemEntities.isEmpty()) {
                 itemEntity = itemEntities.get(0);
-                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInfo.getDeliveryLocation(), itemRequestInfo.getItemOwningInstitution());
+                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation());
                 if (StringUtils.isBlank(itemRequestInfo.getBibId())) {
                     itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 }

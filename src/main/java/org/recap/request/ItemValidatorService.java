@@ -244,7 +244,7 @@ public class ItemValidatorService {
         CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution());
         if (customerCodeEntity != null && customerCodeEntity.getCustomerCode().equalsIgnoreCase(itemRequestInformation.getDeliveryLocation())) {
             if (itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())) {
-                customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(customerCode, itemRequestInformation.getItemOwningInstitution());
+                customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(customerCode);
                 String deliveryRestrictions = customerCodeEntity.getDeliveryRestrictions();
                 if (deliveryRestrictions != null && deliveryRestrictions.trim().length() > 0) {
                     if (deliveryRestrictions.contains(itemRequestInformation.getDeliveryLocation())) {

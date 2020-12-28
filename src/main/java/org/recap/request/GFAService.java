@@ -691,7 +691,7 @@ public class GFAService {
             if (isUseQueueLasCall()) { // Queue
                 ObjectMapper objectMapper = getObjectMapper();
                 String json = objectMapper.writeValueAsString(itemRequestInfo);
-                getProducer().sendBodyAndHeader(RecapConstants.SCSB_OUTGOING_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
+                getProducer().sendBodyAndHeader(RecapConstants.SCSB_OUTGOING_QUEUE, itemRequestInfo, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
                 itemResponseInformation.setSuccess(true);
                 itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {

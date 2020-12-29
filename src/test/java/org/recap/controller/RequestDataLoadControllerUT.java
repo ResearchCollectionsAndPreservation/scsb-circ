@@ -57,7 +57,7 @@ public class RequestDataLoadControllerUT extends BaseTestCaseUT {
         ILSConfigProperties ilsConfigProperties = new ILSConfigProperties();
         Mockito.when(institutionDetailsRepository.findAllInstitutionCodeExceptHTC()).thenReturn(institutionCodeList);
         for (String institution : institutionCodeList) {
-            Mockito.when(propertyUtil.getILSConfigProperties(institution)).thenReturn(ilsConfigProperties);
+           // Mockito.when(propertyUtil.getILSConfigProperties(institution)).thenReturn(ilsConfigProperties);
         }
         Mockito.when(camelContext.getRouteController()).thenReturn(routeController);
         String result = requestDataLoadController.startAccessionReconcilation();

@@ -1,5 +1,6 @@
 package org.recap.camel.requestinitialdataload.processor;
 
+import com.amazonaws.services.s3.AmazonS3;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -22,6 +23,7 @@ import java.text.ParseException;
 import java.util.*;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RequestInitialDataLoadProcessorUT {
@@ -38,6 +40,8 @@ public class RequestInitialDataLoadProcessorUT {
     Message message;
     @Mock
     RequestDataLoadService requestDataLoadService;
+    @Mock
+    AmazonS3 awsS3Client;
 
     private Set<String> barcodeSet = new HashSet<>();
     @Before
@@ -106,6 +110,8 @@ public class RequestInitialDataLoadProcessorUT {
         Exchange exchange = new DefaultExchange(ctx);
         exchange.getIn().setBody(requestDataLoadCSVRecordList);
         exchange.getIn().setHeader("John", "CUL");
+        exchange.getIn().setHeader("CamelAwsS3Key", "GEJGNSIKHIL");
+        exchange.getIn().setHeader("CamelAwsS3BucketName", "AWSS3Bucket/");
         exchange.setProperty("CamelSplitIndex",0);
         exchange.setProperty("CamelSplitComplete",true);
         Set<String> stringSet = new HashSet<>();

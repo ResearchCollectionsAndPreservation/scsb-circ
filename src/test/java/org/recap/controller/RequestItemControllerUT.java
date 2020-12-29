@@ -2,17 +2,17 @@ package org.recap.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.recap.BaseTestCase;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
-import org.recap.ils.*;
+import org.recap.ils.AbstractProtocolConnector;
+import org.recap.ils.IJSIPConnector;
+import org.recap.ils.ILSProtocolConnectorFactory;
+import org.recap.ils.JSIPConnectorFactory;
 import org.recap.ils.model.response.*;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.BulkRequestInformation;
@@ -45,6 +45,18 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     RequestItemController mockedRequestItemController;
 
     @Mock
+    AbstractProtocolConnector abstractProtocolConnector;
+
+    @Mock
+    IJSIPConnector ijsipConnector;
+
+    @Mock
+    private JSIPConnectorFactory jsipConectorFactory;
+
+    @Mock
+    private ILSProtocolConnectorFactory ilsProtocolConnectorFactory;
+
+    @Mock
     ItemRequestService itemRequestService;
 
     @Test
@@ -57,12 +69,10 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         ItemCheckoutResponse itemResponseInformation1 = new ItemCheckoutResponse();
         itemResponseInformation1.setScreenMessage("Checkout successfull");
         itemResponseInformation1.setSuccess(true);
-        try {
-            ItemCheckoutResponse itemResponseInformation = (ItemCheckoutResponse) mockedRequestItemController.checkoutItem(itemRequestInformation, callInstitition);
-            assertNotNull(itemResponseInformation);
-        } catch (Exception e) {
-        }
+        ItemCheckoutResponse itemResponseInformation = (ItemCheckoutResponse) mockedRequestItemController.checkoutItem(itemRequestInformation, callInstitition);
+        assertNotNull(itemResponseInformation);
     }
+
     @Test
     public void testCheckoutItemRequestException() {
         String callInstitition = "PUL";
@@ -86,17 +96,32 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         String callInstitition = "PUL";
         String itemBarcode = "PULTST54325";
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Arrays.asList("24657"));
+        itemRequestInformation.setPatronBarcode("198572368");
+        itemRequestInformation.setRequestingInstitution(callInstitition);
+        ItemCheckinResponse itemResponseInformation1 = new ItemCheckinResponse();
+        itemResponseInformation1.setScreenMessage("CheckIn successfull");
+        itemResponseInformation1.setSuccess(true);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.checkinItem(itemRequestInformation, "PUL");
+        assertNotNull(abstractResponseItem);
+    }
+
+    @Test
+    public void testCheckinItemRequestEmptyBarcode() {
+        String callInstitition = "PUL";
+        String itemBarcode = "PULTST54325";
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Collections.EMPTY_LIST);
         itemRequestInformation.setPatronBarcode("198572368");
         itemRequestInformation.setRequestingInstitution(callInstitition);
         ItemCheckinResponse itemResponseInformation1 = new ItemCheckinResponse();
         itemResponseInformation1.setScreenMessage("CheckIn successfull");
         itemResponseInformation1.setSuccess(true);
-        try {
-            AbstractResponseItem abstractResponseItem = mockedRequestItemController.checkinItem(itemRequestInformation, "PUL");
-            assertNotNull(abstractResponseItem);
-        }catch (Exception e){}
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.checkinItem(itemRequestInformation, "PUL");
+        assertNotNull(abstractResponseItem);
     }
+
     @Test
     public void testCheckinItemRequestException() {
         String callInstitition = "PUL";
@@ -111,7 +136,8 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         try {
             AbstractResponseItem abstractResponseItem = mockedRequestItemController.checkinItem(itemRequestInformation, "PUL");
             assertNotNull(abstractResponseItem);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     @Test
@@ -120,7 +146,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         itemRefileRequest.setItemBarcodes(Arrays.asList("123"));
         itemRefileRequest.setRequestIds(Arrays.asList(1));
         ItemRefileResponse itemRefileResponse = new ItemRefileResponse();
-        Mockito.when(itemRequestService.reFileItem(any(),any())).thenReturn(itemRefileResponse);
+        Mockito.when(itemRequestService.reFileItem(any(), any())).thenReturn(itemRefileResponse);
         ItemRefileResponse refileResponse = mockedRequestItemController.refileItem(itemRefileRequest);
         assertNotNull(refileResponse);
     }
@@ -154,11 +180,16 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         itemRequestInformation.setBibId("12");
         itemRequestInformation.setTrackingId("235");
         itemRequestInformation.setRequestingInstitution(callInstitition);
-        try {
-            AbstractResponseItem abstractResponseItem = mockedRequestItemController.cancelHoldItem(itemRequestInformation, callInstitition);
-            assertNotNull(abstractResponseItem);
-            assertTrue(abstractResponseItem.isSuccess());
-        }catch (Exception e){}
+        ItemHoldResponse itemHoldResponse = getItemHoldResponse();
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).cancelHold(itembarcode, itemRequestInformation.getPatronBarcode(),
+                itemRequestInformation.getRequestingInstitution(),
+                itemRequestInformation.getExpirationDate(),
+                itemRequestInformation.getBibId(),
+                getPickupLocationDB(itemRequestInformation, "PUL"), itemRequestInformation.getTrackingId())).thenReturn(itemHoldResponse);
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.cancelHoldItem(itemRequestInformation, callInstitition);
+        assertNotNull(abstractResponseItem);
+        assertTrue(abstractResponseItem.isSuccess());
     }
 
     private String getPickupLocationDB(ItemRequestInformation itemRequestInformation, String callInstitution) {
@@ -172,6 +203,33 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     public void testHoldItemRequest() {
         String callInstitition = "PUL";
         String itembarcode = "PULTST54325";
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation(callInstitition, itembarcode);
+        ItemHoldResponse itemHoldResponse = getItemHoldResponse();
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).placeHold(itembarcode, itemRequestInformation.getPatronBarcode(),
+                itemRequestInformation.getRequestingInstitution(),
+                itemRequestInformation.getItemOwningInstitution(),
+                itemRequestInformation.getExpirationDate(),
+                itemRequestInformation.getBibId(),
+                getPickupLocationDB(itemRequestInformation, "PUL"),
+                itemRequestInformation.getTrackingId(),
+                itemRequestInformation.getTitleIdentifier(),
+                itemRequestInformation.getAuthor(),
+                itemRequestInformation.getCallNumber())).thenReturn(itemHoldResponse);
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.holdItem(itemRequestInformation, callInstitition);
+        assertNotNull(abstractResponseItem);
+    }
+    @Test
+    public void testHoldItemRequestException() {
+        String callInstitition = "PUL";
+        String itembarcode = "PULTST54325";
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation(callInstitition, itembarcode);
+        ItemHoldResponse itemHoldResponse = getItemHoldResponse();
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.holdItem(itemRequestInformation, callInstitition);
+        assertNotNull(abstractResponseItem);
+    }
+
+    private ItemRequestInformation getItemRequestInformation(String callInstitition, String itembarcode) {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Arrays.asList(itembarcode));
         itemRequestInformation.setPatronBarcode("198572368");
@@ -183,11 +241,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         itemRequestInformation.setTitleIdentifier("test");
         itemRequestInformation.setTrackingId("235");
         itemRequestInformation.setRequestingInstitution(callInstitition);
-        try {
-            AbstractResponseItem abstractResponseItem = mockedRequestItemController.holdItem(itemRequestInformation, callInstitition);
-            assertNotNull(abstractResponseItem);
-        } catch (Exception e) {
-        }
+        return itemRequestInformation;
     }
 
     @Test
@@ -207,12 +261,13 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
             AbstractResponseItem abstractResponseItem = mockedRequestItemController.itemInformation(itemRequestInformation, callInstitition);
             assertNotNull(abstractResponseItem);
             assertTrue(abstractResponseItem.isSuccess());
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     @Test
     public void testBibCreation() {
-        String callInstitition = "PUL";
+        String callInstitition = null;
         String itembarcode = "PULTST54325";
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Arrays.asList(itembarcode));
@@ -224,12 +279,12 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
         itemInformationResponse.setScreenMessage("Item Barcode already Exist");
         itemInformationResponse.setSuccess(true);
-        try {
-            Mockito.when((ItemInformationResponse) mockedRequestItemController.itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution())).thenReturn(itemInformationResponse);
-            AbstractResponseItem abstractResponseItem = mockedRequestItemController.createBibliogrphicItem(itemRequestInformation, callInstitition);
-            assertNotNull(abstractResponseItem);
-        }catch (Exception e){}
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).lookupItem(itembarcode)).thenReturn(itemInformationResponse);
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.createBibliogrphicItem(itemRequestInformation, callInstitition);
+        assertNotNull(abstractResponseItem);
     }
+
     @Test
     public void testBibCreationWithoutItemBarcode() {
         String callInstitition = "PUL";
@@ -244,12 +299,13 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         try {
             AbstractResponseItem abstractResponseItem = mockedRequestItemController.createBibliogrphicItem(itemRequestInformation, callInstitition);
             assertNotNull(abstractResponseItem);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     @Test
     public void testRecallItemRequest() {
-        String callInstitition = "PUL";
+        String callInstitition = "NYPL";
         String itembarcode = "PULTST54325";
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Arrays.asList(itembarcode));
@@ -260,11 +316,14 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         itemRequestInformation.setRequestingInstitution(callInstitition);
         ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         itemRecallResponse.setSuccess(true);
-        try {
-            AbstractResponseItem abstractResponseItem = mockedRequestItemController.recallItem(itemRequestInformation, callInstitition);
-            assertNotNull(abstractResponseItem);
-        } catch (Exception e) {
-        }
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).recallItem(itembarcode, itemRequestInformation.getPatronBarcode(),
+                itemRequestInformation.getRequestingInstitution(),
+                itemRequestInformation.getExpirationDate(),
+                itemRequestInformation.getBibId(),
+                getPickupLocationDB(itemRequestInformation, "NYPL"))).thenReturn(itemRecallResponse);
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.recallItem(itemRequestInformation, callInstitition);
+        assertNotNull(abstractResponseItem);
     }
 
     @Test
@@ -280,11 +339,11 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         itemRequestInformation.setRequestingInstitution(callInstitition);
         PatronInformationResponse patronInformationResponse = new PatronInformationResponse();
         patronInformationResponse.setPatronIdentifier("198572368");
-        try {
-            AbstractResponseItem abstractResponseItem = mockedRequestItemController.patronInformation(itemRequestInformation, callInstitition);
-            assertNotNull(abstractResponseItem);
-        } catch (Exception e) {
-        }
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).lookupPatron(itemRequestInformation.getPatronBarcode())).thenReturn(patronInformationResponse);
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.patronInformation(itemRequestInformation, callInstitition);
+        assertNotNull(abstractResponseItem);
+
     }
 
 
@@ -303,11 +362,11 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         itemRefileRequest.setRequestIds(Arrays.asList(1));
         ItemRefileResponse itemRefileResponse = new ItemRefileResponse();
         itemRefileResponse.setRequestId(1);
-        Mockito.when(itemRequestService.reFileItem(any(),any())).thenReturn(itemRefileResponse);
+        Mockito.when(itemRequestService.reFileItem(any(), any())).thenReturn(itemRefileResponse);
         ItemRefileResponse itemRefileResponse1 = mockedRequestItemController.refileItem(itemRefileRequest);
         assertNotNull(itemRefileResponse1);
         itemRefileResponse.setSuccess(true);
-        ItemRefileResponse itemRefileResponse2= mockedRequestItemController.refileItem(itemRefileRequest);
+        ItemRefileResponse itemRefileResponse2 = mockedRequestItemController.refileItem(itemRefileRequest);
         assertNotNull(itemRefileResponse2);
     }
 
@@ -316,10 +375,10 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         BulkRequestInformation bulkRequestInformation = new BulkRequestInformation();
         bulkRequestInformation.setPatronBarcode("123456");
         bulkRequestInformation.setRequestingInstitution("PUL");
-        try {
+        Mockito.when(jsipConectorFactory.getJSIPConnector(any())).thenReturn(ijsipConnector);
+        Mockito.when(jsipConectorFactory.getJSIPConnector(bulkRequestInformation.getRequestingInstitution()).patronValidation(bulkRequestInformation.getRequestingInstitution(), bulkRequestInformation.getPatronBarcode())).thenReturn(true);
             boolean result = mockedRequestItemController.patronValidationBulkRequest(bulkRequestInformation);
             assertNotNull(result);
-        }catch (Exception e){}
     }
 
     @Test
@@ -342,6 +401,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         AbstractResponseItem abstractResponseItem = mockedRequestItemController.refileItemInILS(itemRequestInformation, callInstitition);
         assertNotNull(abstractResponseItem);
     }
+
     @Test
     public void replaceRequest() {
         ReplaceRequest replaceRequest = new ReplaceRequest();
@@ -364,6 +424,14 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         String pickUpLocation = mockedRequestItemController.getPickupLocation(institution);
         assertNotNull(pickUpLocation);
         assertEquals("lb", pickUpLocation);
+    }
+
+    @Test
+    public void getPickupLocationPUL() {
+        String institution = "PUL";
+        String pickUpLocation = mockedRequestItemController.getPickupLocation(institution);
+        assertNotNull(pickUpLocation);
+        assertEquals("rcpcirc", pickUpLocation);
     }
 
     @Test

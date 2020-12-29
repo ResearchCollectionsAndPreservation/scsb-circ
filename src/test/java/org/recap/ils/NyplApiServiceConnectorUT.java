@@ -93,15 +93,6 @@ public class NyplApiServiceConnectorUT{
     @Mock
     NyplApiResponseUtil nyplApiResponseUtil;
 
-    @Autowired
-    BibliographicDetailsRepository bibliographicDetailsRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Autowired
-    InstitutionDetailsRepository institutionDetailsRepository;
-
     @Mock
     ItemDetailsRepository itemDetailsRepository;
 

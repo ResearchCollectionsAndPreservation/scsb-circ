@@ -4,13 +4,12 @@ import org.apache.camel.CamelContext;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.camel.requestinitialdataload.RequestInitialLoadRouteBuilder;
-import org.recap.model.ILSConfigProperties;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.util.CommonUtil;
-import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,23 +36,29 @@ public class RequestDataLoadController {
     ApplicationContext applicationContext;
 
     @Autowired
-    PropertyUtil propertyUtil;
-
-    @Autowired
     InstitutionDetailsRepository institutionDetailsRepository;
+
+    @Value("${request.initial.accession}")
+    String requestInitialAccessionS3Dir;
+
+    @Value("${request.initial.load.filepath}")
+    String requestInitialLoadFilepath;
+
+    @Value("${request.initial.accession.error.file}")
+    String requestInitialAccessionErrorFileS3Dir;
 
     @PostMapping(value = "/startRequestInitialLoad")
     public String startAccessionReconcilation() throws Exception{
         logger.info("Request Initial DataLoad Starting.....");
         List<String> allInstitutionCodeExceptHTC = institutionDetailsRepository.findAllInstitutionCodeExceptHTC();
         for (String institution : allInstitutionCodeExceptHTC) {
-            ILSConfigProperties ilsConfigProperties = propertyUtil.getILSConfigProperties(institution);
-            camelContext.addRoutes(new RequestInitialLoadRouteBuilder(camelContext,applicationContext,commonUtil,ilsConfigProperties,
-                    institution));
+            camelContext.addRoutes(new RequestInitialLoadRouteBuilder(camelContext, applicationContext, commonUtil,
+                    institution, requestInitialAccessionS3Dir, requestInitialLoadFilepath, requestInitialAccessionErrorFileS3Dir));
         }
         for (String institution : allInstitutionCodeExceptHTC) {
             camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE+institution);
         }
+        logger.info("After Request Initial DataLoad process : {}", camelContext.getRoutes().size());
         return RecapCommonConstants.SUCCESS;
     }
 }

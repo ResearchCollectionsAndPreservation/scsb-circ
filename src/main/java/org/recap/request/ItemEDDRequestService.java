@@ -113,6 +113,7 @@ public class ItemEDDRequestService {
                 SearchResultRow searchResultRow = getItemRequestService().searchRecords(itemEntity);
 
                 itemRequestInfo.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+                itemRequestInfo.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
                 itemRequestInfo.setTitleIdentifier(getItemRequestService().removeDiacritical(searchResultRow.getTitle().replaceAll("[^\\x00-\\x7F]", "?")));
                 itemRequestInfo.setItemAuthor(getItemRequestService().removeDiacritical(searchResultRow.getAuthor()));
                 itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
@@ -215,7 +216,7 @@ public class ItemEDDRequestService {
     }
 
     public String getPatronIdForOwningInstitutionOnEdd(String owningInstitution) {
-        GenericPatronEntity genericPatronEntity = genericPatronDetailsRepository.findByItemOwningInstitutionCode(owningInstitution);
+        GenericPatronEntity genericPatronEntity = genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(owningInstitution, owningInstitution);
         return genericPatronEntity.getEddGenericPatron();
     }
 

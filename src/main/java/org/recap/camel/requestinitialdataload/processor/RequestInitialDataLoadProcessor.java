@@ -1,9 +1,10 @@
 package org.recap.camel.requestinitialdataload.processor;
 
+import com.amazonaws.services.s3.AmazonS3;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.service.requestdataload.RequestDataLoadService;
 import org.slf4j.Logger;
@@ -43,6 +44,9 @@ public class RequestInitialDataLoadProcessor {
 
     @Autowired
     private CamelContext camelContext;
+
+    @Autowired
+    AmazonS3 awsS3Client;
 
     /**
      * Instantiates a new request initial data load processor.
@@ -94,6 +98,15 @@ public class RequestInitialDataLoadProcessor {
         totalCount = 0;
 
         startFileSystemRoutesForAccessionReconciliation(exchange,index);
+        String xmlFileName = exchange.getIn().getHeader("CamelAwsS3Key").toString();
+        String bucketName = exchange.getIn().getHeader("CamelAwsS3BucketName").toString();
+        if (awsS3Client.doesObjectExist(bucketName, xmlFileName)) {
+            String basepath = xmlFileName.substring(0, xmlFileName.lastIndexOf('/'));
+            basepath = basepath.substring(0, basepath.lastIndexOf('/'));
+            String fileName = xmlFileName.substring(xmlFileName.lastIndexOf('/'));
+            awsS3Client.copyObject(bucketName, xmlFileName, bucketName, basepath + "/.done-" + institutionCode + fileName);
+            awsS3Client.deleteObject(bucketName, xmlFileName);
+        }
     }
 
     private void startFileSystemRoutesForAccessionReconciliation(Exchange exchange, Integer index) {

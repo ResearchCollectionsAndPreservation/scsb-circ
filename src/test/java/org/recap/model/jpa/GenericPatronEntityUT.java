@@ -25,7 +25,9 @@ public class GenericPatronEntityUT {
         GenericPatronEntity genericPatronEntity1 = new GenericPatronEntity();
         genericPatronEntity.equals(genericPatronEntity1);
         genericPatronEntity.equals(genericPatronEntity);
+        genericPatronEntity1.equals(genericPatronEntity);
         genericPatronEntity.canEqual(genericPatronEntity);
+        genericPatronEntity1.canEqual(genericPatronEntity);
         genericPatronEntity.hashCode();
         assertNotNull(genericPatronEntity.getCreatedBy());
         assertNotNull(genericPatronEntity.getCreatedDate());

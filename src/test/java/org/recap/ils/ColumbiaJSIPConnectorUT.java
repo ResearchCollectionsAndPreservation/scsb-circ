@@ -5,9 +5,12 @@ import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
 import com.pkrete.jsip2.messages.SIP2MessageResponse;
 import com.pkrete.jsip2.parser.SIP2CreateBibResponseParser;
 import com.pkrete.jsip2.util.MessageUtil;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCase;
 import org.recap.ils.model.response.ItemCheckinResponse;
 import org.recap.ils.model.response.ItemCheckoutResponse;
@@ -18,6 +21,7 @@ import org.recap.ils.model.response.ItemRecallResponse;
 import org.recap.ils.model.response.PatronInformationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Date;
 
@@ -40,11 +44,26 @@ public class ColumbiaJSIPConnectorUT extends BaseTestCase {
     private String patronIdentifier = "RECAPTST01";
     private String institutionId = "";
 
+
+    @InjectMocks
+    ColumbiaJSIPConnector MockedColumbiaJSIPConnector;
+
+    @Before
+    public  void setup(){
+        MockitoAnnotations.initMocks(this);
+        ReflectionTestUtils.setField(MockedColumbiaJSIPConnector, "columbiaILSPort", 9090);
+    }
+
     @Test
     public void login() throws Exception {
         Mockito.when(columbiaJSIPConnector.jSIPLogin(null,patronIdentifier)).thenReturn(true);
         boolean sip2LoginRequest = columbiaJSIPConnector.jSIPLogin(null,patronIdentifier);
         assertTrue(sip2LoginRequest);
+    }
+
+    @Test
+    public void getPort(){
+        MockedColumbiaJSIPConnector.getPort();
     }
 
     @Test

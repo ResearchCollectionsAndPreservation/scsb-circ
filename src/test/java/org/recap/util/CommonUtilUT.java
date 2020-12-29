@@ -10,15 +10,9 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.ReportEntity;
+import org.recap.model.jpa.*;
 import org.recap.model.report.SubmitCollectionReportInfo;
-import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
+import org.recap.repository.jpa.*;
 
 import java.util.*;
 
@@ -34,6 +28,12 @@ public class CommonUtilUT extends BaseTestCaseUT {
     ItemStatusDetailsRepository itemStatusDetailsRepository;
 
     @Mock
+    private InstitutionDetailsRepository institutionDetailsRepository;
+
+    @Mock
+    private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
+
+    @Mock
     ItemDetailsRepository itemDetailsRepository;
 
     @Mock
@@ -46,6 +46,15 @@ public class CommonUtilUT extends BaseTestCaseUT {
 
     @Test
     public void buildHoldingsEntity(){
+        BibliographicEntity bibliographicEntity= new BibliographicEntity();
+        Date currentDate = new Date();
+        StringBuilder errorMessage = new StringBuilder();
+        String holdingsContent = "PUL";
+        HoldingsEntity holdingsEntity = commonUtil.buildHoldingsEntity(bibliographicEntity,currentDate,errorMessage,holdingsContent);
+        assertNotNull(holdingsEntity);
+    }
+    @Test
+    public void buildHoldingsEntitywithErrorMessage(){
         BibliographicEntity bibliographicEntity= new BibliographicEntity();
         Date currentDate = new Date();
         StringBuilder errorMessage = new StringBuilder();
@@ -89,11 +98,25 @@ public class CommonUtilUT extends BaseTestCaseUT {
         commonUtil.addItemAndReportEntities(itemEntities,reportEntities,processHoldings,holdingsEntity,itemMap);
     }
     @Test
+    public void addItemAndReportEntitiesWithoutitemReportEntity(){
+        List<ItemEntity> itemEntities = new ArrayList<>();
+        List<ReportEntity > reportEntities = new ArrayList<>();
+        boolean processHoldings = true;
+        HoldingsEntity holdingsEntity = getHoldingsEntity();
+        Map<String, Object> itemMap = new HashMap<>();
+        itemMap.put("itemEntity",getBibliographicEntity().getItemEntities().get(0));
+        commonUtil.addItemAndReportEntities(itemEntities,reportEntities,processHoldings,holdingsEntity,itemMap);
+    }
+    @Test
     public void rollbackUpdateItemAvailabilutyStatus(){
         ItemEntity itemEntity = getBibliographicEntity().getItemEntities().get(0);
         String userName = "Test";
         Mockito.when(itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.AVAILABLE)).thenReturn(getItemStatusEntity());
         commonUtil.rollbackUpdateItemAvailabilutyStatus(itemEntity,userName);
+    }
+    @Test
+    public void getFTPPropertiesMap(){
+        commonUtil.getFTPPropertiesMap();
     }
     @Test
     public void getItemStatusMap(){
@@ -107,6 +130,38 @@ public class CommonUtilUT extends BaseTestCaseUT {
         CommonUtil commonUtil = new CommonUtil();
         commonUtil.getItemStatusMap();
     }
+    @Test
+    public void getInstitutionEntityMap(){
+        InstitutionEntity institutionEntity = getInstitutionEntity();
+        Mockito.when(institutionDetailsRepository.findAll()).thenReturn(Arrays.asList(institutionEntity));
+        Map map = commonUtil.getInstitutionEntityMap();
+        assertNotNull(map);
+    }
+    @Test
+    public void getCollectionGroupMap(){
+        CollectionGroupEntity collectionGroupEntity = getCollectionGroupEntity();
+        Mockito.when(collectionGroupDetailsRepository.findAll()).thenReturn(Arrays.asList(collectionGroupEntity));
+        Map map = commonUtil.getCollectionGroupMap();
+        assertNotNull(map);
+    }
+
+    private CollectionGroupEntity getCollectionGroupEntity() {
+        CollectionGroupEntity collectionGroupEntity = new CollectionGroupEntity();
+        collectionGroupEntity.setCreatedDate(new Date());
+        collectionGroupEntity.setCollectionGroupCode("others");
+        collectionGroupEntity.setCollectionGroupDescription("others");
+        collectionGroupEntity.setLastUpdatedDate(new Date());
+        return collectionGroupEntity;
+    }
+
+    private InstitutionEntity getInstitutionEntity() {
+        InstitutionEntity institutionEntity =new InstitutionEntity();
+        institutionEntity.setId(1);
+        institutionEntity.setInstitutionCode("PUL");
+        institutionEntity.setInstitutionName("PUL");
+        return institutionEntity;
+    }
+
     @Test
     public void getUser(){
         String user1 = commonUtil.getUser("1");

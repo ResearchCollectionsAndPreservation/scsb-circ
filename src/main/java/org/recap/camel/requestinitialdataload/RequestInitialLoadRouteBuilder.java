@@ -47,7 +47,7 @@ public class RequestInitialLoadRouteBuilder extends RouteBuilder {
                 return false;
         };
 
-        from("aws-s3://{{scsbBucketName}}?prefix="+requestInitialAccessionS3Dir + institution + "/&deleteAfterRead=false&sendEmptyMessageWhenIdle=true&autocloseBody=false&region={{awsRegion}}&accessKey=RAW({{awsAccessKey}})&secretKey=RAW({{awsAccessSecretKey}})")
+        from("aws-s3://{{scsbBucketName}}?prefix="+requestInitialAccessionS3Dir + institution + "/{{s3DataFeedFileNamePrefix}}&deleteAfterRead=false&sendEmptyMessageWhenIdle=true&autocloseBody=false&region={{awsRegion}}&accessKey=RAW({{awsAccessKey}})&secretKey=RAW({{awsAccessSecretKey}})")
                 .routeId(RecapConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE+institution)
                 .noAutoStartup()
                 .choice()
@@ -60,10 +60,9 @@ public class RequestInitialLoadRouteBuilder extends RouteBuilder {
                 .when(body().isNull())
                 .process(new StopRouteProcessor(RecapConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE+institution))
                 .log("No File To Process "+institution+" Request Initial load")
-                //Below portion is commented since otherwise block is getting triggered always - TO DO - to fix the compatibility for s3
-//                .otherwise()
-//                .process(new StartRouteProcessor(RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution))
-//                .to(RecapConstants.DIRECT+ RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
+                .otherwise()
+                .process(new StartRouteProcessor(RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution))
+                .to(RecapConstants.DIRECT+ RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
                 .endChoice();
 
         from(RecapConstants.DIRECT+ RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)

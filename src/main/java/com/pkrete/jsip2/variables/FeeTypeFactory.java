@@ -6,7 +6,6 @@
 package com.pkrete.jsip2.variables;
 
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
-import com.pkrete.jsip2.variables.FeeType;
 
 /**
  * The type Fee type factory.

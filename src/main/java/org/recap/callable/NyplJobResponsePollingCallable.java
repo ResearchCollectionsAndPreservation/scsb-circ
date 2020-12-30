@@ -3,8 +3,6 @@ package org.recap.callable;
 import org.recap.ils.NyplApiServiceConnector;
 import org.recap.ils.model.nypl.JobData;
 import org.recap.ils.model.nypl.response.JobResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 
@@ -13,8 +11,6 @@ import java.util.concurrent.Callable;
  * @author rajeshbabuk
  */
 public class NyplJobResponsePollingCallable implements Callable {
-
-    private static final Logger logger = LoggerFactory.getLogger(NyplJobResponsePollingCallable.class);
 
     private String jobId;
     private NyplApiServiceConnector nyplApiServiceConnector;

@@ -75,6 +75,8 @@ public class DeAccessionService {
 
     private static final Logger logger = LoggerFactory.getLogger(DeAccessionService.class);
 
+    private static final String EXCEPTION_CONSTANT = "Exception :";
+
     /**
      * The Bibliographic details repository.
      */
@@ -263,7 +265,7 @@ public class DeAccessionService {
                 }
             }
         } catch (Exception e) {
-            logger.error("Exception : ", e);
+            logger.error(EXCEPTION_CONSTANT, e);
         }
     }
 
@@ -417,7 +419,7 @@ public class DeAccessionService {
                     }
                 } catch (Exception e) {
                     deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, RecapCommonConstants.FAILURE + " - " + e, null));
-                    logger.error("Exception : ", e);
+                    logger.error(EXCEPTION_CONSTANT, e);
                 }
             }
         }
@@ -751,13 +753,13 @@ public class DeAccessionService {
                     deAccessionSolrRequest.setItemIds(itemIds);
 
                     RestTemplate restTemplate = new RestTemplate();
-                    HttpEntity<DeAccessionSolrRequest> requestEntity = new HttpEntity(deAccessionSolrRequest, getRestHeaderService().getHttpHeaders());
+                    HttpEntity<DeAccessionSolrRequest> requestEntity = new HttpEntity<>(deAccessionSolrRequest, getRestHeaderService().getHttpHeaders());
                     ResponseEntity<String> responseEntity = restTemplate.exchange(deAccessionSolrClientUrl, HttpMethod.POST, requestEntity, String.class);
                     logger.info("Deaccession Item Solr update status : {}" , responseEntity.getBody());
                 }
             }
         } catch (Exception e) {
-            logger.error("Exception : ", e);
+            logger.error(EXCEPTION_CONSTANT, e);
         }
     }
 

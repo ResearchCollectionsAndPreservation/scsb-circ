@@ -91,14 +91,13 @@ public class RequestParamaterValidatorService {
                     errorMessageMap.put(errorCount, RecapConstants.START_PAGE_AND_END_PAGE_REQUIRED);
                     errorCount++;
                 }
-            } else if (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL) || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.RETRIEVAL)) {
-                if (StringUtils.isEmpty(itemRequestInformation.getDeliveryLocation())) {
+            } else if ((itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL) || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.RETRIEVAL)) &&
+                 (StringUtils.isEmpty(itemRequestInformation.getDeliveryLocation()))) {
                     errorMessageMap.put(errorCount, RecapConstants.DELIVERY_LOCATION_REQUIRED);
                     errorCount++;
                 }
             }
-        }
-
+       
         if (errorMessageMap.size() > 0) {
             return new ResponseEntity(buildErrorMessage(errorMessageMap), getHttpHeaders(), HttpStatus.BAD_REQUEST);
         }

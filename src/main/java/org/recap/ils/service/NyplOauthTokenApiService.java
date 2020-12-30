@@ -2,8 +2,6 @@ package org.recap.ils.service;
 
 
 import org.codehaus.jettison.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -21,8 +19,6 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class NyplOauthTokenApiService {
-
-    private static final Logger logger = LoggerFactory.getLogger(NyplOauthTokenApiService.class);
 
     @Value("${ils.nypl.oauth.token.api}")
     public String nyplOauthTokenApiUrl;

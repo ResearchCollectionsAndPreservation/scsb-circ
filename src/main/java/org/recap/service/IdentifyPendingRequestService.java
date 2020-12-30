@@ -83,10 +83,7 @@ public class IdentifyPendingRequestService {
 
     private boolean isRequestExceedsfiveMins(RequestItemEntity requestItemEntity){
         long minutes = getDifferenceInMinutes(requestItemEntity.getCreatedDate());
-        if (minutes > 5) {
-            return true;
-        }
-        return false;
+        return minutes > 5;
     }
 
     private void sendEmailAndSaveList(List<RequestItemEntity> requestItemEntitiesInPendingList, List<RequestItemEntity> requestItemEntitiesInLASList){

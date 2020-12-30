@@ -2,7 +2,6 @@ package org.recap.request;
 
 import org.apache.camel.ProducerTemplate;
 import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,7 +117,7 @@ public class EmailService {
     private String emailIdTo(String institution) {
         if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
             return recapMailTo;
-        } else if (institution.equalsIgnoreCase(RecapConstants.DELETED_MAIl_TO)) {
+        } else if (institution.equalsIgnoreCase(RecapConstants.DELETED_MAIL_TO)) {
             return deletedRecordsMailTo;
         } else {
             return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.recall.request.to");

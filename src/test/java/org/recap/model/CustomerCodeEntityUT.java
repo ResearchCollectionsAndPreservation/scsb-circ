@@ -41,10 +41,10 @@ public class CustomerCodeEntityUT{
         customerCodeEntity.equals(customerCodeEntity);
 
         assertNotNull(customerCodeEntity.getId());
-        assertEquals(customerCodeEntity.getCustomerCode(),"AB");
-        assertEquals(customerCodeEntity.getDeliveryRestrictions(),"AC,BC");
-        assertEquals(customerCodeEntity.getDescription(),"test");
-        assertEquals(customerCodeEntity.getPickupLocation(),"Discovery");
+        assertEquals("AB", customerCodeEntity.getCustomerCode());
+        assertEquals("AC,BC", customerCodeEntity.getDeliveryRestrictions());
+        assertEquals("test", customerCodeEntity.getDescription());
+        assertEquals("Discovery", customerCodeEntity.getPickupLocation());
         assertNotNull(customerCodeEntity.getOwningInstitutionId());
         assertNotNull(customerCodeEntity.getInstitutionEntity());
         assertNotNull(customerCodeEntity.getRecapDeliveryRestrictions());

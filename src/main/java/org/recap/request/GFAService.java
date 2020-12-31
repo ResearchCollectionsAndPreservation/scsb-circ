@@ -280,7 +280,7 @@ public class GFAService {
                 gfaItemStatusCheckResponse = responseEntity.getBody();
             }
             if (responseEntity != null && responseEntity.getStatusCode() != null) {
-                logger.info("Item status check response during Refile process :" + responseEntity.getStatusCode());
+                logger.info(String.format("Item status check response during Refile process : %s" , responseEntity.getStatusCode()));
             }
         } catch (JsonProcessingException e) {
             logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
@@ -315,9 +315,6 @@ public class GFAService {
                 gfaLasStatusCheckResponse = responseEntity.getBody();
                 logger.info("Heart Beat Response: {}", gfaLasStatusCheckResponse);
             }
-            /*if (responseEntity != null && responseEntity.getStatusCode() != null) {
-                logger.info("Item status check response during Refile process :" + responseEntity.getStatusCode());
-            }*/
         } catch (JsonProcessingException e) {
             logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
@@ -346,9 +343,9 @@ public class GFAService {
         if (itemBarcodes != null) {
             List<GFAItemStatus> gfaItemStatusList = new ArrayList<>();
             for (String itemBarcode : itemBarcodes) {
-                GFAItemStatus gfaItemStatus = new GFAItemStatus();
-                gfaItemStatus.setItemBarCode(itemBarcode);
-                gfaItemStatusList.add(gfaItemStatus);
+                GFAItemStatus gfaItemStatusResponse = new GFAItemStatus();
+                gfaItemStatusResponse.setItemBarCode(itemBarcode);
+                gfaItemStatusList.add(gfaItemStatusResponse);
             }
             GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
             gfaItemStatusCheckRequest.setItemStatus(gfaItemStatusList);
@@ -367,7 +364,7 @@ public class GFAService {
         GFARetrieveItemResponse gfaRetrieveItemResponse = null;
         ResponseEntity<GFARetrieveItemResponse> responseEntity = null;
         try {
-            HttpEntity requestEntity = new HttpEntity(gfaRetrieveItemRequest, getHttpHeaders());
+            HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
             responseEntity = getRestTemplate().exchange(getGfaItemRetrival(), HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class);
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 gfaRetrieveItemResponse = responseEntity.getBody();
@@ -454,7 +451,7 @@ public class GFAService {
                     && gfaItemStatusCheckResponse.getDsitem().getTtitem() != null && !gfaItemStatusCheckResponse.getDsitem().getTtitem().isEmpty()) {
 
                 RestTemplate restTemplate = new RestTemplate();
-                HttpEntity requestEntity = new HttpEntity(gfaRetrieveEDDItemRequest, getHttpHeaders());
+                HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
                 logger.info("{}" , convertJsontoString(requestEntity.getBody()));
                 ResponseEntity<GFAEddItemResponse> responseEntity = restTemplate.exchange(getGfaItemEDDRetrival(), HttpMethod.POST, requestEntity, GFAEddItemResponse.class);
                 logger.info("{}", responseEntity.getStatusCode() + " - " + convertJsontoString(responseEntity.getBody()));
@@ -467,9 +464,7 @@ public class GFAService {
                     gfaEddItemResponse.setScreenMessage(RecapConstants.REQUEST_LAS_EXCEPTION + "HTTP Error response from LAS");
                 }
             } else {
-                if (gfaEddItemResponse == null) {
-                    gfaEddItemResponse = new GFAEddItemResponse();
-                }
+                gfaEddItemResponse = new GFAEddItemResponse();
                 gfaEddItemResponse.setSuccess(false);
                 gfaEddItemResponse.setScreenMessage(RecapConstants.GFA_ITEM_STATUS_CHECK_FAILED);
             }
@@ -776,7 +771,7 @@ public class GFAService {
     public GFAPwdResponse gfaPermanentWithdrawlDirect(GFAPwdRequest gfaPwdRequest) {
         GFAPwdResponse gfaPwdResponse = null;
         try {
-            HttpEntity<GFAPwdRequest> requestEntity = new HttpEntity(gfaPwdRequest, getHttpHeaders());
+            HttpEntity<GFAPwdRequest> requestEntity = new HttpEntity<>(gfaPwdRequest, getHttpHeaders());
             logger.info("GFA PWD Request : {}", convertJsontoString(requestEntity.getBody()));
             RestTemplate restTemplate = getRestTemplate();
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(getGfaServerResponseTimeOutMilliseconds());
@@ -801,7 +796,7 @@ public class GFAService {
     public GFAPwiResponse gfaPermanentWithdrawlInDirect(GFAPwiRequest gfaPwiRequest) {
         GFAPwiResponse gfaPwiResponse = null;
         try {
-            HttpEntity<GFAPwiRequest> requestEntity = new HttpEntity(gfaPwiRequest, getHttpHeaders());
+            HttpEntity<GFAPwiRequest> requestEntity = new HttpEntity<>(gfaPwiRequest, getHttpHeaders());
             logger.info("GFA PWI Request : {}", convertJsontoString(requestEntity.getBody()));
             RestTemplate restTemplate = getRestTemplate();
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(getGfaServerResponseTimeOutMilliseconds());
@@ -861,9 +856,9 @@ public class GFAService {
                 itemInformationResponse.setSuccess(true);
                 itemInformationResponse.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
-                itemInformationResponse.setRequestId(gfaEddItemResponse.getDsitem().getTtitem().get(0).getRequestId());
+                itemInformationResponse.setRequestId(gfaEddItemResponse != null ? gfaEddItemResponse.getDsitem().getTtitem().get(0).getRequestId() : 0);
                 itemInformationResponse.setSuccess(false);
-                itemInformationResponse.setScreenMessage(gfaEddItemResponse.getScreenMessage());
+                itemInformationResponse.setScreenMessage(gfaEddItemResponse != null ? gfaEddItemResponse.getScreenMessage() : "");
             }
         } catch (Exception e) {
             logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
@@ -1041,9 +1036,9 @@ public class GFAService {
     public String callGfaItemStatus(String itemBarcode) {
         String gfaItemStatusValue = null;
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
-        GFAItemStatus gfaItemStatus = new GFAItemStatus();
-        gfaItemStatus.setItemBarCode(itemBarcode);
-        gfaItemStatusCheckRequest.setItemStatus(Collections.singletonList(gfaItemStatus));
+        GFAItemStatus gfaItemStatusCall = new GFAItemStatus();
+        gfaItemStatusCall.setItemBarCode(itemBarcode);
+        gfaItemStatusCheckRequest.setItemStatus(Collections.singletonList(gfaItemStatusCall));
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = itemStatusCheck(gfaItemStatusCheckRequest);
         if (null != gfaItemStatusCheckResponse) {
             Dsitem dsitem = gfaItemStatusCheckResponse.getDsitem();

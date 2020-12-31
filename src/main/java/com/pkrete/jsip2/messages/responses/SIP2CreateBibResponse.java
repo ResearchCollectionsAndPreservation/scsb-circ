@@ -57,19 +57,19 @@ public class SIP2CreateBibResponse  extends SIP2CirculationTransactionResponse {
             builder.append(this.bibId);
         }
 
-        Iterator i$ = this.screenMessage.iterator();
+        Iterator<String> scrMessageIterator = this.screenMessage.iterator();
 
         String msg;
-        while(i$.hasNext()) {
-            msg = (String)i$.next();
+        while(scrMessageIterator.hasNext()) {
+            msg = scrMessageIterator.next();
             builder.append("|AF");
             builder.append(msg);
         }
 
-        i$ = this.printLine.iterator();
+        scrMessageIterator = this.printLine.iterator();
 
-        while(i$.hasNext()) {
-            msg = (String)i$.next();
+        while(scrMessageIterator.hasNext()) {
+            msg = scrMessageIterator.next();
             builder.append("|AG");
             builder.append(msg);
         }

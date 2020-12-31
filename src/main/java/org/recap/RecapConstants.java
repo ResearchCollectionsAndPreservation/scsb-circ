@@ -211,7 +211,7 @@ public final class RecapConstants {
     public static final String GFA_STATUS_VER_ON_RET_WORK_ORDER = "VER ON RET WO:";
     public static final String GFA_STATUS_VER_ON_WORK_ORDER = "VER ON WO:";
     public static final String CANNOT_REFILE_FIRST_SCAN_REQUEST ="Cannot place recall for requests placed on first scan LAS status";
-    public static final String REQUESTS_STUCK_IN__PENDING = "Requests stuck in pending";
+    public static final String REQUESTS_STUCK_IN_PENDING = "Requests stuck in pending";
     public static final String NO_PENDING_REQUESTS_FOUND = "There are no pending requests or no new pending request";
 
     protected static final List<String> GFA_STATUS_AVAILABLE_LIST = Arrays.asList(GFA_STATUS_INCOMING_ON_WORK_ORDER, GFA_STATUS_REACC_ON_WORK_ORDER, GFA_STATUS_VER_ON_REFILE_WORK_ORDER, GFA_STATUS_IN);
@@ -303,7 +303,7 @@ public final class RecapConstants {
 
     public static final String DELETED_STATUS_NOT_REPORTED = "Not Reported";
     public static final String DELETED_STATUS_REPORTED = "Reported";
-    public static final String DELETED_MAIl_TO = "DELETED_MAIl_TO";
+    public static final String DELETED_MAIL_TO = "DELETED_MAIl_TO";
     public static final String EMAIL_SUBJECT_DELETED_RECORDS = "List of Deleted Records";
     public static final String EMAIL_DELETED_RECORDS_DISPLAY_MESSAGE = "Total No. of Records Deleted : ";
     public static final String DAILY_RECONCILIATION = "DailyReconciliation";
@@ -350,7 +350,7 @@ public final class RecapConstants {
     public static final String ACCESSION_RECONCILATION_SOLR_CLIENT_URL = "accessionReconcilationService/startAccessionReconcilation";
     public static final String STARTING = "Starting {} ";
     public static final String SUBMIT_COLLECTION_COMPLETED_ROUTE = "submitCollectionCompletedRoute";
-    public static final String SUBMIT_COLLECTION__CAUGHT_EXCEPTION_METHOD = "caughtException";
+    public static final String SUBMIT_COLLECTION_CAUGHT_EXCEPTION_METHOD = "caughtException";
     public static final String SUBMIT_COLLECTION_EXCEPTION_BODY_VM = "submit_collection_exception_body.vm";
     public static final String DELETED_MAIL_QUEUE = "deletedRecordsMailSendQueue";
     public static final String COUNT_OF_PURGED_ACCESSION_REQUESTS = "countOfPurgedAccessionRequests";
@@ -443,15 +443,15 @@ public final class RecapConstants {
     private RecapConstants() {
     }
 
-    public static List getGFAStatusAvailableList() {
+    public static List<String> getGFAStatusAvailableList() {
         return GFA_STATUS_AVAILABLE_LIST;
     }
 
-    public static List getGFAStatusNotAvailableList() {
+    public static List<String> getGFAStatusNotAvailableList() {
         return GFA_STATUS_NOT_AVAILABLE_LIST;
     }
 
-    public static List getRequestTypeList() {
+    public static List<String> getRequestTypeList() {
         return REQUEST_TYPE_LIST;
     }
 
@@ -464,4 +464,5 @@ public final class RecapConstants {
 
     public static final String PROTOCOL = "protocol";
     public static final String SCSB_CAMEL_S3_TO_ENDPOINT = "aws-s3://{{scsbBucketName}}?autocloseBody=false&region={{awsRegion}}&accessKey=RAW({{awsAccessKey}})&secretKey=RAW({{awsAccessSecretKey}})";
+    public static final String DATE_FORMAT = "MM-dd-yyyy HH:mm:ss";
 }

@@ -153,6 +153,8 @@ public class SIP2ResponseFactory {
             case "88":
                 parser = new SIP2RecallResponseParser();
                 return parser.parse(data);
+            default:
+                //No Action
         }
         throw new InvalidSIP2ResponseException("Unsupported responses type! Command identifier: " + code);
     }

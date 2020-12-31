@@ -3,8 +3,6 @@ package org.recap.controller;
 import org.recap.RecapCommonConstants;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.service.deaccession.DeAccessionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,8 +23,6 @@ import java.util.Date;
 @RestController
 @RequestMapping("/sharedCollection")
 public class SharedCollectionRestController {
-
-    private static final Logger logger = LoggerFactory.getLogger(SharedCollectionRestController.class);
 
     /**
      * The De accession service.

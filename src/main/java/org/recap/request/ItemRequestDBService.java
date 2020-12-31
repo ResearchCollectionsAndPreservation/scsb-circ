@@ -43,7 +43,7 @@ public class ItemRequestDBService {
 
     private static final Logger logger = LoggerFactory.getLogger(ItemRequestDBService.class);
 
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
 
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;

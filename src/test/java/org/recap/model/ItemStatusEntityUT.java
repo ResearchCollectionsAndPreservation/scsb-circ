@@ -24,8 +24,8 @@ public class ItemStatusEntityUT extends BaseTestCase {
         itemStatusEntity.setStatusDescription("test");
         ItemStatusEntity savedItemStatusEntity = itemStatusDetailsRepository.save(itemStatusEntity);
         assertNotNull(savedItemStatusEntity);
-        assertEquals(savedItemStatusEntity.getStatusCode(),"test");
-        assertEquals(savedItemStatusEntity.getStatusDescription(),"test");
+        assertEquals("test", savedItemStatusEntity.getStatusCode());
+        assertEquals("test", savedItemStatusEntity.getStatusDescription());
     }
 
 }

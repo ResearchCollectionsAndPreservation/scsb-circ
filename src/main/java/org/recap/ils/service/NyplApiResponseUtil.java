@@ -106,13 +106,13 @@ public class NyplApiResponseUtil {
 
     private String formatFromSipDate(String sipDate) {
         SimpleDateFormat sipFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        SimpleDateFormat requiredFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+        SimpleDateFormat requiredFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
         return requiredFormattedDate(sipDate, sipFormat, requiredFormat);
     }
 
     private String formatDueDate(String sipDate) {
         SimpleDateFormat sipFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat requiredFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+        SimpleDateFormat requiredFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
         return requiredFormattedDate(sipDate, sipFormat, requiredFormat);
     }
 
@@ -298,7 +298,7 @@ public class NyplApiResponseUtil {
 
     public String expirationDateForNypl() throws Exception {
         Date expirationDate = DateUtils.addYears(new Date(), 1);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
         return simpleDateFormat.format(expirationDate);
     }
 

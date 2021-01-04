@@ -126,10 +126,6 @@ public class GFAServiceUT extends BaseTestCaseUT {
     @Mock
     private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
 
-    @Autowired
-    RequestTypeDetailsRepository requestTypeDetailsRepository;
-    @Autowired
-    InstitutionDetailsRepository institutionDetailsRepository;
 
     @Before
     public void setUp(){
@@ -817,6 +813,13 @@ public class GFAServiceUT extends BaseTestCaseUT {
         Mockito.when(gfaService.callGfaItemStatus(itemBarcode)).thenCallRealMethod();
         String gfaItemStatusValue = gfaService.callGfaItemStatus(itemBarcode);
         assertNotNull(gfaItemStatusValue);
+    }
+
+    @Test
+    public void heartBeatCheck(){
+        GFALasStatusCheckRequest gfaLasStatusCheckRequest = new GFALasStatusCheckRequest();
+        gfaLasStatusCheckRequest.setLasStatus(new ArrayList<>());
+        getGfaService.heartBeatCheck(gfaLasStatusCheckRequest);
     }
 
     private GFAItemStatusCheckResponse getGfaItemStatusCheckResponse() {

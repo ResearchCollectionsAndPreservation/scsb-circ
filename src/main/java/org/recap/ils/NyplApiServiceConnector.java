@@ -516,9 +516,8 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
      */
     public JobResponse queryForJob(String jobId) throws Exception {
         String apiUrl = nyplDataApiUrl + "/jobs/" + jobId;
-        RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = new HttpEntity<>(getHttpHeaders());
-        ResponseEntity<JobResponse> jobResponseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, JobResponse.class);
+        ResponseEntity<JobResponse> jobResponseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.GET, requestEntity, JobResponse.class);
         return jobResponseEntity.getBody();
     }
 

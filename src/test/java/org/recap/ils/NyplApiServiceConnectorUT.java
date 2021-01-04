@@ -7,21 +7,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.recap.BaseTestCaseUT;
 import org.recap.RecapConstants;
 import org.recap.ils.model.nypl.request.RecallRequest;
 import org.recap.ils.model.nypl.request.CheckinRequest;
 import org.recap.ils.model.nypl.request.CheckoutRequest;
 import org.recap.ils.model.nypl.request.CancelHoldRequest;
 import org.recap.ils.model.nypl.request.CreateHoldRequest;
-import org.recap.ils.model.nypl.response.CancelHoldResponse;
-import org.recap.ils.model.nypl.response.CheckinResponse;
-import org.recap.ils.model.nypl.response.CheckoutResponse;
-import org.recap.ils.model.nypl.response.CreateHoldResponse;
-import org.recap.ils.model.nypl.response.RecallResponse;
-import org.recap.ils.model.nypl.response.RefileResponse;
-import org.recap.ils.model.nypl.response.ItemResponse;
-import org.recap.ils.model.nypl.response.NYPLHoldResponse;
-import org.recap.ils.model.nypl.response.NyplPatronResponse;
+import org.recap.ils.model.nypl.response.*;
 import org.recap.ils.model.nypl.NyplPatronData;
 import org.recap.ils.model.nypl.RefileData;
 import org.recap.ils.model.nypl.CheckoutData;
@@ -41,6 +34,7 @@ import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.ils.service.NyplApiResponseUtil;
 import org.recap.ils.service.NyplOauthTokenApiService;
+import org.recap.model.AbstractResponseItem;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -59,20 +53,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
-import static org.junit.Assert.assertNotNull;
+
+import static org.junit.Assert.*;
 
 
 /**
  * Created by rajeshbabuk on 19/12/16.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class NyplApiServiceConnectorUT{
+public class NyplApiServiceConnectorUT extends BaseTestCaseUT {
 
     private static final Logger logger = LoggerFactory.getLogger(NyplApiServiceConnector.class);
 
@@ -120,7 +115,7 @@ public class NyplApiServiceConnectorUT{
     @Before
     public  void setup(){
         MockitoAnnotations.initMocks(this);
-        ReflectionTestUtils.setField(nyplApiServiceConnector, "nyplApiResponseUtil", nyplApiResponseUtil);
+        ReflectionTestUtils.setField(nyplApiServiceConnector, "nyplDataApiUrl", nyplDataApiUrl);
     }
 
     @Test
@@ -152,7 +147,44 @@ public class NyplApiServiceConnectorUT{
         Mockito.when(nyplApiServiceConnector.lookupItem(itemIdentifier)).thenCallRealMethod();
         ItemInformationResponse itemInformationResponse = nyplApiServiceConnector.lookupItem(itemIdentifier);
         assertNotNull(itemInformationResponse);
-
+    }
+    @Test
+    public void lookupItemHttpClientErrorException() throws Exception {
+        String itemIdentifier = getBibEntity().getItemEntities().get(0).getBarcode();
+        String itemBarcode = getBibEntity().getItemEntities().get(0).getBarcode();
+        String institutionId = "NYPL";
+        String source = "recap-NYPL";
+        HttpHeaders headers = new HttpHeaders();
+        Mockito.when(nyplApiServiceConnector.getHttpHeader()).thenReturn(headers);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.set("Authorization", "Bearer");
+        HttpEntity requestEntity = new HttpEntity(headers);
+        String apiUrl = nyplDataApiUrl + "/items/" + source + "/" + itemIdentifier;
+        Mockito.when(nyplApiServiceConnector.getRestTemplate()).thenReturn(restTemplate);
+        Mockito.when(nyplApiServiceConnector.getHttpEntity(headers)).thenReturn(requestEntity);
+        Mockito.when(nyplApiServiceConnector.getApiUrl(source, itemIdentifier)).thenReturn(apiUrl);
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil()).thenReturn(nyplApiResponseUtil);
+        Mockito.when(nyplApiServiceConnector.getNyplOauthTokenApiService()).thenReturn(nyplOauthTokenApiService);
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenReturn(institutionId);
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().getNyplSource(institutionId)).thenReturn(source);
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().getNormalizedItemIdForNypl(itemIdentifier)).thenReturn(itemIdentifier);
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
+        Mockito.when(restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+        Mockito.when(nyplApiServiceConnector.lookupItem(itemIdentifier)).thenCallRealMethod();
+        ItemInformationResponse itemInformationResponse = nyplApiServiceConnector.lookupItem(itemIdentifier);
+        assertNotNull(itemInformationResponse);
+    }
+    @Test
+    public void lookupItemException() throws Exception {
+        String itemIdentifier = getBibEntity().getItemEntities().get(0).getBarcode();
+        String itemBarcode = getBibEntity().getItemEntities().get(0).getBarcode();
+        String institutionId = "NYPL";
+        String source = "recap-NYPL";
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
+        Mockito.when(nyplApiServiceConnector.lookupItem(itemIdentifier)).thenCallRealMethod();
+        ItemInformationResponse itemInformationResponse = nyplApiServiceConnector.lookupItem(itemIdentifier);
+        assertNotNull(itemInformationResponse);
     }
 
     @Test
@@ -180,6 +212,41 @@ public class NyplApiServiceConnectorUT{
         assertNotNull(itemCheckoutResponse);
 
     }
+    @Test
+    public void checkoutItemHttpClientErrorException() throws Exception {
+        String itemBarcode = "33433001888415";
+        String patronBarcode = "23333095887111";
+        CheckoutRequest checkoutRequest = new CheckoutRequest();
+        ResponseEntity<CheckoutResponse> responseEntity = new ResponseEntity<CheckoutResponse>(getCheckOutItemResponse(),HttpStatus.OK);
+        CheckoutResponse checkoutResponse = responseEntity.getBody();
+        String apiUrl = nyplDataApiUrl + "/checkout-requests";
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil()).thenReturn(nyplApiResponseUtil);
+        Mockito.when(nyplApiServiceConnector.getNyplDataApiUrl()).thenReturn(nyplDataApiUrl);
+        Mockito.when(nyplApiServiceConnector.getNyplOauthTokenApiService()).thenReturn(nyplOauthTokenApiService);
+//        Mockito.when(nyplApiServiceConnector.getNyplJobResponsePollingProcessor()).thenReturn(nyplJobResponsePollingProcessor);
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
+        Mockito.when(nyplApiServiceConnector.getCheckOutRequest()).thenReturn(checkoutRequest);
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().getExpirationDateForNypl()).thenCallRealMethod();
+        HttpEntity<CheckoutRequest> requestEntity = new HttpEntity(checkoutRequest, getHttpHeaders());
+        Mockito.when(nyplApiServiceConnector.getRestTemplate()).thenReturn(restTemplate);
+        Mockito.when(nyplApiServiceConnector.getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, CheckoutResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+        Mockito.when((ItemCheckoutResponse) nyplApiServiceConnector.checkOutItem(itemBarcode, patronBarcode)).thenCallRealMethod();
+        ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) nyplApiServiceConnector.checkOutItem(itemBarcode, patronBarcode);
+        assertNotNull(itemCheckoutResponse);
+    }
+    @Test
+    public void checkoutItemException() throws Exception {
+        String itemBarcode = "33433001888415";
+        String patronBarcode = "23333095887111";
+        CheckoutRequest checkoutRequest = new CheckoutRequest();
+        ResponseEntity<CheckoutResponse> responseEntity = new ResponseEntity<CheckoutResponse>(getCheckOutItemResponse(),HttpStatus.OK);
+        CheckoutResponse checkoutResponse = responseEntity.getBody();
+        String apiUrl = nyplDataApiUrl + "/checkout-requests";
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
+        Mockito.when((ItemCheckoutResponse) nyplApiServiceConnector.checkOutItem(itemBarcode, patronBarcode)).thenCallRealMethod();
+        ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) nyplApiServiceConnector.checkOutItem(itemBarcode, patronBarcode);
+        assertNotNull(itemCheckoutResponse);
+    }
 
     @Test
     public void checkinItem() throws Exception {
@@ -201,6 +268,40 @@ public class NyplApiServiceConnectorUT{
         Mockito.when(nyplApiServiceConnector.getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, CheckinResponse.class)).thenReturn(responseEntity);
         Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().buildItemCheckinResponse(checkinResponse)).thenCallRealMethod();
         Mockito.when(nyplApiServiceConnector.getNyplJobResponsePollingProcessor().pollNyplRequestItemJobResponse(Mockito.any())).thenCallRealMethod();
+        Mockito.when((ItemCheckinResponse) nyplApiServiceConnector.checkInItem(itemBarcode, patronBarcode)).thenCallRealMethod();
+        ItemCheckinResponse itemCheckinResponse = (ItemCheckinResponse) nyplApiServiceConnector.checkInItem(itemBarcode, patronBarcode);
+        assertNotNull(itemCheckinResponse);
+    }
+    @Test
+    public void checkinItemHttpClientErrorException() throws Exception {
+        String itemBarcode = "33433001888415";
+        String patronBarcode = "23333095887111";
+        CheckinRequest checkinRequest = new CheckinRequest();
+        ResponseEntity<CheckinResponse> responseEntity = new ResponseEntity<CheckinResponse>(getCheckinResponse(),HttpStatus.OK);
+        CheckinResponse checkinResponse = responseEntity.getBody();
+        String apiUrl = nyplDataApiUrl + "/checkin-requests";
+//        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil()).thenReturn(nyplApiResponseUtil);
+        Mockito.when(nyplApiServiceConnector.getNyplDataApiUrl()).thenReturn(nyplDataApiUrl);
+        Mockito.when(nyplApiServiceConnector.getNyplOauthTokenApiService()).thenReturn(nyplOauthTokenApiService);
+//        Mockito.when(nyplApiServiceConnector.getNyplJobResponsePollingProcessor()).thenReturn(nyplJobResponsePollingProcessor);
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
+        Mockito.when(nyplApiServiceConnector.getCheckInRequest()).thenReturn(checkinRequest);
+        HttpEntity<CheckoutRequest> requestEntity = new HttpEntity(checkinRequest, getHttpHeaders());
+        Mockito.when(nyplApiServiceConnector.getRestTemplate()).thenReturn(restTemplate);
+        Mockito.when(nyplApiServiceConnector.getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, CheckinResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+        Mockito.when((ItemCheckinResponse) nyplApiServiceConnector.checkInItem(itemBarcode, patronBarcode)).thenCallRealMethod();
+        ItemCheckinResponse itemCheckinResponse = (ItemCheckinResponse) nyplApiServiceConnector.checkInItem(itemBarcode, patronBarcode);
+        assertNotNull(itemCheckinResponse);
+    }
+    @Test
+    public void checkinItemException() throws Exception {
+        String itemBarcode = "33433001888415";
+        String patronBarcode = "23333095887111";
+        CheckinRequest checkinRequest = new CheckinRequest();
+        ResponseEntity<CheckinResponse> responseEntity = new ResponseEntity<CheckinResponse>(getCheckinResponse(),HttpStatus.OK);
+        CheckinResponse checkinResponse = responseEntity.getBody();
+        String apiUrl = nyplDataApiUrl + "/checkin-requests";
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
         Mockito.when((ItemCheckinResponse) nyplApiServiceConnector.checkInItem(itemBarcode, patronBarcode)).thenCallRealMethod();
         ItemCheckinResponse itemCheckinResponse = (ItemCheckinResponse) nyplApiServiceConnector.checkInItem(itemBarcode, patronBarcode);
         assertNotNull(itemCheckinResponse);
@@ -245,6 +346,57 @@ public class NyplApiServiceConnectorUT{
         Mockito.when(nyplApiServiceConnector.getNyplJobResponsePollingProcessor().pollNyplRequestItemJobResponse(Mockito.any())).thenCallRealMethod();
         ItemHoldResponse itemHoldResponse1 = new ItemHoldResponse();
         itemHoldResponse1.setSuccess(true);
+        Mockito.when((ItemHoldResponse)nyplApiServiceConnector.placeHold(itemBarcode, patronBarcode, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber)).thenCallRealMethod();
+        ItemHoldResponse itemHoldResponse = (ItemHoldResponse)nyplApiServiceConnector.placeHold(itemBarcode, patronBarcode, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
+        assertNotNull(itemHoldResponse);
+    }
+ @Test
+    public void placeHoldHttpClientErrorException() throws Exception {
+        String itemBarcode = "33433001888415";
+        String patronBarcode = "23333095887111";
+        String callInstitutionId = "NYPL";
+        String itemInstitutionId = "NYPL";
+        String expirationDate = new Date().toString();
+        String bibId = "";
+        String pickupLocation = "";
+        String trackingId = "1231";
+        String title = "";
+        String author = "";
+        String callNumber = "";
+        String recapHoldApiUrl = nyplDataApiUrl + "/recap/hold-requests";
+        String apiUrl = nyplDataApiUrl + "/hold-requests/" + trackingId;
+        String dataApiUrl = nyplDataApiUrl + RecapConstants.NYPL_PATRON_BY_BARCODE_URL + patronBarcode;
+        CreateHoldRequest createHoldRequest = new CreateHoldRequest();
+        HttpHeaders headers = getHttpHeaders();
+        Mockito.when(nyplApiServiceConnector.getNyplDataApiUrl()).thenReturn(nyplDataApiUrl);
+        Mockito.when(nyplApiServiceConnector.getNyplOauthTokenApiService()).thenReturn(nyplOauthTokenApiService);
+//        Mockito.when(nyplApiServiceConnector.getNyplJobResponsePollingProcessor()).thenReturn(nyplJobResponsePollingProcessor);
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
+        Mockito.when(nyplApiServiceConnector.getRestTemplate()).thenReturn(restTemplate);
+        Mockito.when(nyplApiServiceConnector.getCreateHoldRequest()).thenReturn(createHoldRequest);
+        ResponseEntity<CreateHoldResponse> responseEntity = new ResponseEntity<CreateHoldResponse>(getCreateHoldResponse(),HttpStatus.OK);
+        ResponseEntity<NYPLHoldResponse> responseEntity1 = new ResponseEntity<NYPLHoldResponse>(getNyplHoldResponse(),HttpStatus.OK);
+        CreateHoldResponse createHoldResponse = responseEntity.getBody();
+        HttpEntity<CreateHoldRequest> requestEntity = new HttpEntity(createHoldRequest, getHttpHeaders());
+        Mockito.when(restTemplate.exchange(recapHoldApiUrl, HttpMethod.POST, requestEntity, CreateHoldResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+        Mockito.when((ItemHoldResponse)nyplApiServiceConnector.placeHold(itemBarcode, patronBarcode, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber)).thenCallRealMethod();
+        ItemHoldResponse itemHoldResponse = (ItemHoldResponse)nyplApiServiceConnector.placeHold(itemBarcode, patronBarcode, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
+        assertNotNull(itemHoldResponse);
+    }
+    @Test
+    public void placeHoldException() throws Exception {
+        String itemBarcode = "33433001888415";
+        String patronBarcode = "23333095887111";
+        String callInstitutionId = "NYPL";
+        String itemInstitutionId = "NYPL";
+        String expirationDate = new Date().toString();
+        String bibId = "";
+        String pickupLocation = "";
+        String trackingId = "1231";
+        String title = "";
+        String author = "";
+        String callNumber = "";
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
         Mockito.when((ItemHoldResponse)nyplApiServiceConnector.placeHold(itemBarcode, patronBarcode, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber)).thenCallRealMethod();
         ItemHoldResponse itemHoldResponse = (ItemHoldResponse)nyplApiServiceConnector.placeHold(itemBarcode, patronBarcode, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
         assertNotNull(itemHoldResponse);
@@ -299,6 +451,93 @@ public class NyplApiServiceConnectorUT{
         ItemHoldResponse itemHoldResponse = (ItemHoldResponse)nyplApiServiceConnector.cancelHold(itemBarcode, patronBarcode, institutionId, expirationDate, bibId, pickupLocation, trackingId);
         assertNotNull(itemHoldResponse);
 
+    }
+    @Test
+    public void cancelHoldHttpClientErrorException() throws Exception {
+        String itemBarcode = getBibEntity().getItemEntities().get(0).getBarcode();
+        String itemIdentifier = getBibEntity().getItemEntities().get(0).getBarcode();
+        String patronBarcode = "23333095887111";
+        String institutionId = "NYPL";
+        String expirationDate = "";
+        String bibId = "";
+        String pickupLocation = "";
+        String trackingId = "1231";
+
+        String apiUrl = nyplDataApiUrl + "/recap/cancel-hold-requests";
+        CancelHoldRequest cancelHoldRequest = new CancelHoldRequest();
+        HttpEntity<CancelHoldRequest> requestEntity = new HttpEntity(cancelHoldRequest, getHttpHeaders());
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil()).thenReturn(nyplApiResponseUtil);
+        Mockito.when(nyplApiServiceConnector.getNyplDataApiUrl()).thenReturn(nyplDataApiUrl);
+        Mockito.when(nyplApiServiceConnector.getNyplOauthTokenApiService()).thenReturn(nyplOauthTokenApiService);
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
+        Mockito.when(nyplApiServiceConnector.getRestTemplate()).thenReturn(restTemplate);
+        Mockito.when(nyplApiServiceConnector.getCancelHoldRequest()).thenReturn(cancelHoldRequest);
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenCallRealMethod();
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().getItemDetailsRepository()).thenReturn(itemDetailsRepository);
+        Mockito.when(nyplApiServiceConnector.getNyplApiResponseUtil().getItemDetailsRepository().findByBarcode(itemBarcode)).thenReturn(getBibEntity().getItemEntities());
+        ResponseEntity<CancelHoldResponse> responseEntity = new ResponseEntity<CancelHoldResponse>(getCancelHoldResponse(),HttpStatus.OK);
+        Mockito.when(restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, CancelHoldResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+        Mockito.when((ItemHoldResponse)nyplApiServiceConnector.cancelHold(itemBarcode, patronBarcode, institutionId, expirationDate, bibId, pickupLocation, trackingId)).thenCallRealMethod();
+        ItemHoldResponse itemHoldResponse = (ItemHoldResponse)nyplApiServiceConnector.cancelHold(itemBarcode, patronBarcode, institutionId, expirationDate, bibId, pickupLocation, trackingId);
+        assertNotNull(itemHoldResponse);
+
+    }
+    @Test
+    public void cancelHoldException() throws Exception {
+        String itemBarcode = getBibEntity().getItemEntities().get(0).getBarcode();
+        String patronBarcode = "23333095887111";
+        String institutionId = "NYPL";
+        String expirationDate = "";
+        String bibId = "";
+        String pickupLocation = "";
+        String trackingId = "1231";
+        Mockito.when(nyplApiServiceConnector.getLogger()).thenReturn(logger);
+        Mockito.when((ItemHoldResponse)nyplApiServiceConnector.cancelHold(itemBarcode, patronBarcode, institutionId, expirationDate, bibId, pickupLocation, trackingId)).thenCallRealMethod();
+        ItemHoldResponse itemHoldResponse = (ItemHoldResponse)nyplApiServiceConnector.cancelHold(itemBarcode, patronBarcode, institutionId, expirationDate, bibId, pickupLocation, trackingId);
+        assertNotNull(itemHoldResponse);
+
+    }
+
+    @Test
+    public void queryForJob() throws Exception {
+        String jobId = "1245";
+        String apiUrl = nyplDataApiUrl + "/jobs/" + jobId;
+        HttpEntity requestEntity = new HttpEntity<>(getHttpHeaders());
+        JobResponse jobResponse = new JobResponse();
+        jobResponse.setCount(1);
+        jobResponse.setStatusCode(1);
+        ResponseEntity<JobResponse> responseEntity = new ResponseEntity<JobResponse>(jobResponse,HttpStatus.OK);
+        Mockito.when(nyplApiServiceConnector.getNyplOauthTokenApiService()).thenReturn(nyplOauthTokenApiService);
+        Mockito.when(nyplApiServiceConnector.getRestTemplate()).thenReturn(restTemplate);
+        Mockito.when(restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, JobResponse.class)).thenReturn(responseEntity);
+        Mockito.when(nyplApiServiceConnector.queryForJob(jobId)).thenCallRealMethod();
+        JobResponse response =nyplApiServiceConnector.queryForJob(jobId);
+        assertNotNull(response);
+    }
+    @Test
+    public void createBib(){
+        String itemIdentifier = "2344656";
+        String patronIdentifier = "357625";
+        String institutionId = "2";
+        String titleIdentifier = "3456521";
+        Mockito.when(nyplApiServiceConnector.createBib(itemIdentifier,patronIdentifier,institutionId,titleIdentifier)).thenCallRealMethod();
+        Object obj = nyplApiServiceConnector.createBib(itemIdentifier,patronIdentifier,institutionId,titleIdentifier);
+        assertNull(obj);
+    }
+    @Test
+    public void patronValidation(){
+        String institutionId = "2";
+        String patronIdentifier = "3254657";
+        Mockito.when(nyplApiServiceConnector.patronValidation(institutionId,patronIdentifier)).thenCallRealMethod();
+        Boolean res = nyplApiServiceConnector.patronValidation(institutionId,patronIdentifier);
+        assertTrue(res);
+    }
+    @Test
+    public void lookupPatron(){
+        String patronIdentifier = "3254657";
+        Mockito.when(nyplApiServiceConnector.lookupPatron(patronIdentifier)).thenCallRealMethod();
+        AbstractResponseItem responseItem = nyplApiServiceConnector.lookupPatron(patronIdentifier);
+        assertNull(responseItem);
     }
     @Test
     public void recallItem() throws Exception {

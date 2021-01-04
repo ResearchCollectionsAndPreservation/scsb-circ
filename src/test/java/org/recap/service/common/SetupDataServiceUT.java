@@ -113,12 +113,12 @@ public class SetupDataServiceUT {
         CollectionGroupEntity collectionGroupEntity = getCollectionGroupEntity();
         Mockito.when(repositoryService.getCollectionGroupDetailsRepository()).thenReturn(collectionGroupDetailsRepository);
         Mockito.when(repositoryService.getCollectionGroupDetailsRepository().findAll()).thenReturn(Arrays.asList(collectionGroupEntity));
-        Map<Integer,String> collectionGroupMap = setupDataService.getCollectionGroupMap();
+        Map<String,Integer> collectionGroupMap = setupDataService.getCollectionGroupMap();
         assertNotNull(collectionGroupMap);
     }
     @Test
     public void getCollectionGroupMapForException(){
-        Map<Integer,String> collectionGroupMap = setupDataService.getCollectionGroupMap();
+        Map<String,Integer> collectionGroupMap = setupDataService.getCollectionGroupMap();
         assertNotNull(collectionGroupMap);
     }
 

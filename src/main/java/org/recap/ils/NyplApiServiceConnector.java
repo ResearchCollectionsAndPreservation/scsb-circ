@@ -209,6 +209,22 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
     public CancelHoldRequest getCancelHoldRequest(){
         return new CancelHoldRequest();
     }
+    /**
+     * Get nypl hold request nypl hold request.
+     *
+     * @return the nypl hold request
+     */
+    public NyplHoldRequest getNyplHoldRequest(){
+        return new NyplHoldRequest();
+    }
+    /**
+     * Get refile request refile request.
+     *
+     * @return the refile request
+     */
+    public RefileRequest getRefileRequest(){
+        return new RefileRequest();
+    }
 
     /**
      * Look up item in NYPL for the given item identifier.
@@ -564,20 +580,20 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
     private String initiateNyplHoldRequest(String itemIdentifier, String patronIdentifier, String itemInstitutionId, String deliveryLocation) throws Exception {
         String trackingId = null;
         String nyplHoldApiUrl = nyplDataApiUrl + RecapConstants.NYPL_HOLD_REQUEST_URL;
-        String nyplSource = nyplApiResponseUtil.getNyplSource(itemInstitutionId);
+        String nyplSource = getNyplApiResponseUtil().getNyplSource(itemInstitutionId);
         NyplHoldRequest nyplHoldRequest = new NyplHoldRequest();
-        nyplHoldRequest.setRecord(nyplApiResponseUtil.getNormalizedItemIdForNypl(itemIdentifier));
+        nyplHoldRequest.setRecord(getNyplApiResponseUtil().getNormalizedItemIdForNypl(itemIdentifier));
         nyplHoldRequest.setPatron(getPatronIdByPatronBarcode(patronIdentifier));
         nyplHoldRequest.setNyplSource(nyplSource);
         nyplHoldRequest.setRecordType(RecapConstants.NYPL_RECORD_TYPE);
         nyplHoldRequest.setPickupLocation("");
         nyplHoldRequest.setDeliveryLocation(deliveryLocation);
         nyplHoldRequest.setNumberOfCopies(1);
-        nyplHoldRequest.setNeededBy(nyplApiResponseUtil.getExpirationDateForNypl());
+        nyplHoldRequest.setNeededBy(getNyplApiResponseUtil().getExpirationDateForNypl());
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<NyplHoldRequest> requestEntity = new HttpEntity<>(nyplHoldRequest, getHttpHeaders());
-        ResponseEntity<NYPLHoldResponse> responseEntity = restTemplate.exchange(nyplHoldApiUrl, HttpMethod.POST, requestEntity, NYPLHoldResponse.class);
+        //RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<NyplHoldRequest> requestEntity = new HttpEntity<>(getNyplHoldRequest(), getHttpHeaders());
+        ResponseEntity<NYPLHoldResponse> responseEntity = getRestTemplate().exchange(nyplHoldApiUrl, HttpMethod.POST, requestEntity, NYPLHoldResponse.class);
         NYPLHoldResponse nyplHoldResponse = responseEntity.getBody();
         NYPLHoldData nyplHoldData = nyplHoldResponse.getData();
         if (null != nyplHoldData) {
@@ -614,9 +630,9 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
     private NyplPatronResponse queryForPatronResponse(String patronIdentifier) throws Exception {
         String apiUrl = nyplDataApiUrl + RecapConstants.NYPL_PATRON_BY_BARCODE_URL + patronIdentifier;
         getLogger().info("NYPL patron response url : {}" , apiUrl );
-        RestTemplate restTemplate = new RestTemplate();
+        //RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = new HttpEntity<>(getHttpHeaders());
-        ResponseEntity<NyplPatronResponse> jobResponseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, NyplPatronResponse.class);
+        ResponseEntity<NyplPatronResponse> jobResponseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.GET, requestEntity, NyplPatronResponse.class);
         return jobResponseEntity.getBody();
     }
 
@@ -711,7 +727,7 @@ public abstract class NyplApiServiceConnector implements IJSIPConnector {
         try {
             String apiUrl = getNyplDataApiUrl() + RecapConstants.NYPL_RECAP_REFILE_REQUEST_URL;
 
-            RefileRequest refileRequest = new RefileRequest();
+            RefileRequest refileRequest = getRefileRequest();
             refileRequest.setItemBarcode(itemIdentifier);
 
             HttpEntity<RefileRequest> requestEntity = new HttpEntity<>(refileRequest, getHttpHeaders());

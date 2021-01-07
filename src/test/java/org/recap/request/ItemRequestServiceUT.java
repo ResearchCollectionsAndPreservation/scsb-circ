@@ -109,13 +109,28 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
     private ItemStatusDetailsRepository mockedItemStatusDetailsRepository;
 
     @Mock
+    private RestHeaderService mockedRestHeaderService;
+
+    @Mock
     private ItemRequestServiceUtil mockedIitemRequestServiceUtil;
+
+    @Mock
+    private ProducerTemplate mockedProducerTemplate;
+
+    @Mock
+    private RequestParamaterValidatorService mockedRequestParamaterValidatorService;
 
     @Mock
     private ItemValidatorService mockedItemValidatorService;
 
     @Mock
+    private SecurityUtil mockedSecurityUtil;
+
+    @Mock
     private CommonUtil mockedCommonUtil;
+
+    @Mock
+    private ItemEDDRequestService mockedItemEDDRequestService;
 
 
     @Before

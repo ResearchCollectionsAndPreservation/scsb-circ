@@ -103,7 +103,7 @@ public class ItemRequestDBService {
                 requestItemEntity.setLastUpdatedDate(new Date());
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
             } else {
-                requestItemEntity.setItemId(itemEntity.getItemId());
+                requestItemEntity.setItemId(itemEntity.getId());
                 requestItemEntity.setRequestingInstitutionId(institutionEntity.getId());
                 requestItemEntity.setRequestTypeId(requestTypeEntity.getId());
                 requestItemEntity.setRequestExpirationDate(getExpirationDate(itemRequestInformation.getExpirationDate()));
@@ -259,13 +259,13 @@ public class ItemRequestDBService {
      * @param itemEntities the item entities
      * @param userName     the user name
      */
-    public void updateItemAvailabilutyStatus(List<ItemEntity> itemEntities, String userName) {
+    public void updateItemAvailabilityStatus(List<ItemEntity> itemEntities, String userName) {
         ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE);
         for (ItemEntity itemEntity : itemEntities) {
             itemEntity.setItemAvailabilityStatusId(itemStatusEntity.getId()); // Not Available
             itemEntity.setLastUpdatedBy(commonUtil.getUser(userName));
 
-            commonUtil.saveItemChangeLogEntity(itemEntity.getItemId(), commonUtil.getUser(userName), RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
+            commonUtil.saveItemChangeLogEntity(itemEntity.getId(), commonUtil.getUser(userName), RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
         }
         // Not Available
         itemDetailsRepository.saveAll(itemEntities);
@@ -295,7 +295,7 @@ public class ItemRequestDBService {
         Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemInformationResponse.getRequestId());
         if(requestItemEntity.isPresent()) {
             CustomerCodeEntity customerCodeEntity= customerCodeDetailsRepository.findByCustomerCode(requestItemEntity.get().getItemEntity().getCustomerCode());
-            commonUtil.rollbackUpdateItemAvailabilutyStatus(requestItemEntity.get().getItemEntity(), RecapConstants.GUEST_USER);
+            commonUtil.rollbackUpdateItemAvailabilityStatus(requestItemEntity.get().getItemEntity(), RecapConstants.GUEST_USER);
             commonUtil.saveItemChangeLogEntity(itemInformationResponse.getRequestId(), requestItemEntity.get().getCreatedBy(), RecapConstants.REQUEST_ITEM_GFA_FAILURE, RecapConstants.REQUEST_ITEM_GFA_FAILURE + itemInformationResponse.getScreenMessage());
             itemRequestInformation.setBibId(requestItemEntity.get().getItemEntity().getBibliographicEntities().get(0).getOwningInstitutionBibId());
             itemRequestInformation.setPatronBarcode(requestItemEntity.get().getPatronId());

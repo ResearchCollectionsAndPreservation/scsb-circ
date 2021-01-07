@@ -28,7 +28,7 @@ public class PatronDetailsRepositoryUT extends BaseTestCaseUT {
 
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
-        requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
+        requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getId());
         requestItemEntity.setRequestTypeId(requestTypeEntity.getId());
         requestItemEntity.setRequestingInstitutionId(1);
         requestItemEntity.setPatronId("45678912");

@@ -238,15 +238,15 @@ public class ItemRequestDBServiceUT{
         assertNotNull(itemInformationResponse1);
     }
     @Test
-    public void updateItemAvailabilutyStatus(){
+    public void updateItemAvailabilityStatus(){
         List<ItemEntity> itemEntities = new ArrayList<>();
         itemEntities.add(getItemEntity());
         String userName = "userName";
         ItemStatusEntity itemStatusEntity = getItemEntity().getItemStatusEntity();
         Mockito.when(commonUtil.getUser(userName)).thenReturn("userName");
         Mockito.when(itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
-        Mockito.doNothing().when(commonUtil).saveItemChangeLogEntity(itemEntities.get(0).getItemId(),userName, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
-        itemRequestDBService.updateItemAvailabilutyStatus(itemEntities,userName);
+        Mockito.doNothing().when(commonUtil).saveItemChangeLogEntity(itemEntities.get(0).getId(),userName, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
+        itemRequestDBService.updateItemAvailabilityStatus(itemEntities,userName);
     }
     @Test
     public void rollbackAfterGFA(){

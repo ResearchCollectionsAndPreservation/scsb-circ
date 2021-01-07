@@ -59,7 +59,7 @@ public class BibliographicEntityUT extends BaseTestCaseUT {
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
     }
 
-    @Test
+   /* @Test
     public void testBibliographicPK(){
         BibliographicPK bibliographicPK = new BibliographicPK();
         BibliographicPK bibliographicPK1 = new BibliographicPK(1,".b000213654");
@@ -88,5 +88,5 @@ public class BibliographicEntityUT extends BaseTestCaseUT {
         assertNotNull(itemPK.getOwningInstitutionId());
         assertNotNull(itemPK.getOwningInstitutionItemId());
     }
-
+*/
 }

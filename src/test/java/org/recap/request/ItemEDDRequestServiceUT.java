@@ -99,7 +99,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING)).thenReturn(1);
         Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING)).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
-        Mockito.when(itemRequestService.updateItemAvailabilutyStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
+        Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
         Mockito.when(itemRequestService.getGfaService()).thenReturn(gfaService);
         Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
@@ -139,7 +139,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING)).thenReturn(1);
         Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING)).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
-        Mockito.when(itemRequestService.updateItemAvailabilutyStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
+        Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
         Mockito.when(itemRequestService.getGfaService()).thenReturn(gfaService);
         Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
@@ -166,7 +166,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.removeDiacritical(searchResultRow.getTitle().replaceAll("[^\\x00-\\x7F]", "?"))).thenReturn("Title Of the Book");
         Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING)).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
-        Mockito.when(itemRequestService.updateItemAvailabilutyStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(false);
+        Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(false);
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
         ItemInformationResponse itemInfoResponse = itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange);
         assertNotNull(itemInfoResponse);

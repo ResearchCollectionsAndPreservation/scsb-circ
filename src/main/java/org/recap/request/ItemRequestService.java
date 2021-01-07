@@ -173,12 +173,12 @@ public class ItemRequestService {
                 itemRequestInfo.setAuthor(searchResultRow.getAuthor());
                 itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
                 itemRequestInfo.setPickupLocation(customerCodeEntity.getPickupLocation());
-                itemResponseInformation.setItemId(itemEntity.getItemId());
+                itemResponseInformation.setItemId(itemEntity.getId());
 
                 boolean isItemStatusAvailable;
                 synchronized (this) {
                     // Change Item Availablity
-                    isItemStatusAvailable = updateItemAvailabilutyStatus(itemEntities, itemRequestInfo.getUsername());
+                    isItemStatusAvailable = updateItemAvailabilityStatus(itemEntities, itemRequestInfo.getUsername());
                 }
 
                 Integer requestId = updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING);
@@ -186,7 +186,7 @@ public class ItemRequestService {
                 itemResponseInformation.setRequestId(requestId);
 
                 if (requestId == 0) {
-                    rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
+                    rollbackUpdateItemAvailabilityStatus(itemEntity, itemRequestInfo.getUsername());
                     itemResponseInformation.setScreenMessage(RecapCommonConstants.REQUEST_EXCEPTION + RecapConstants.INTERNAL_ERROR_DURING_REQUEST);
                     itemResponseInformation.setSuccess(false);
                 } else if (!isItemStatusAvailable) {
@@ -256,7 +256,7 @@ public class ItemRequestService {
                     itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                     itemRequestInfo.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
                     itemRequestInfo.setPickupLocation(getPickupLocation(itemRequestInfo.getDeliveryLocation()));
-                    itemResponseInformation.setItemId(itemEntity.getItemId());
+                    itemResponseInformation.setItemId(itemEntity.getId());
                     Integer requestId = updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING);
                     itemRequestInfo.setRequestId(requestId);
                     itemResponseInformation.setRequestId(requestId);
@@ -325,7 +325,7 @@ public class ItemRequestService {
                         requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                         requestItemEntity.setLastUpdatedDate(new Date());
                         requestItemDetailsRepository.save(requestItemEntity);
-                        rollbackUpdateItemAvailabilutyStatus(itemEntity, RecapConstants.GUEST_USER);
+                        rollbackUpdateItemAvailabilityStatus(itemEntity, RecapConstants.GUEST_USER);
                         itemRequestServiceUtil.updateSolrIndex(itemEntity);
                         itemRefileResponse.setSuccess(true);
                     } else { // Recall Request Exist
@@ -336,7 +336,7 @@ public class ItemRequestService {
                             requestItemEntityRecalled.setLastUpdatedDate(new Date());
                             requestItemDetailsRepository.save(requestItemEntity);
                             requestItemDetailsRepository.save(requestItemEntityRecalled);
-                            rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
+                            rollbackUpdateItemAvailabilityStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
                             itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
                             itemRefileResponse.setSuccess(true);
                             itemRefileResponse.setScreenMessage("Successfully Refiled");
@@ -582,21 +582,24 @@ public class ItemRequestService {
         return itemRequestDBService.updateRecapRequestStatus(itemInformationResponse);
     }
 
-    public boolean updateItemAvailabilutyStatus(List<ItemEntity> itemEntities, String username) {
+    public boolean updateItemAvailabilityStatus(List<ItemEntity> itemEntities, String username) {
         ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE);
         for (ItemEntity itemEntity : itemEntities) {
-            ItemEntity itemEntityByItemId = itemDetailsRepository.findByItemId(itemEntity.getItemId());
-            logger.info("Item status : {}" , itemEntityByItemId.getItemStatusEntity().getStatusCode());
-            if (itemStatusEntity.getId().equals(itemEntityByItemId.getItemAvailabilityStatusId())) {  //Condition should be checked with equals not == ?
-                return false;
-            }
+            Optional<ItemEntity> optionalItemEntity = itemDetailsRepository.findById(itemEntity.getId());
+             if(optionalItemEntity.isPresent()) {
+                 ItemEntity itemEntityByItemId = optionalItemEntity.get();
+                 logger.info("Item status : {}", itemEntityByItemId.getItemStatusEntity().getStatusCode());
+                 if (itemStatusEntity.getId().equals(itemEntityByItemId.getItemAvailabilityStatusId())) {  //Condition should be checked with equals not == ?
+                     return false;
+                 }
+             }
         }
-        itemRequestDBService.updateItemAvailabilutyStatus(itemEntities, username);
+        itemRequestDBService.updateItemAvailabilityStatus(itemEntities, username);
         return true;
     }
 
-    public void rollbackUpdateItemAvailabilutyStatus(ItemEntity itemEntity, String username) {
-        commonUtil.rollbackUpdateItemAvailabilutyStatus(itemEntity, username);
+    public void rollbackUpdateItemAvailabilityStatus(ItemEntity itemEntity, String username) {
+        commonUtil.rollbackUpdateItemAvailabilityStatus(itemEntity, username);
     }
 
     /**
@@ -665,15 +668,15 @@ public class ItemRequestService {
                 } else {
                     itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_ILS_EXCEPTION + RecapConstants.CREATING_A_BIB_RECORD_FAILED_IN_ILS);
                     itemResponseInformation.setSuccess(createBibResponse.isSuccess());
-                    rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
-                    saveItemChangeLogEntity(itemEntity.getItemId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_HOLD_FAILURE, createBibResponse.getBibId() + " - " + createBibResponse.getScreenMessage());
+                    rollbackUpdateItemAvailabilityStatus(itemEntity, itemRequestInfo.getUsername());
+                    saveItemChangeLogEntity(itemEntity.getId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_HOLD_FAILURE, createBibResponse.getBibId() + " - " + createBibResponse.getScreenMessage());
                 }
             }
         } catch (Exception e) {
             logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_SCSB_EXCEPTION + e.getMessage());
             itemResponseInformation.setSuccess(false);
-            saveItemChangeLogEntity(itemEntity.getItemId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_ITEM_CHANGE_LOG_EXCEPTION, itemRequestInfo.getItemBarcodes() + " - " + e.getMessage());
+            saveItemChangeLogEntity(itemEntity.getId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_ITEM_CHANGE_LOG_EXCEPTION, itemRequestInfo.getItemBarcodes() + " - " + e.getMessage());
         }
         return itemResponseInformation;
     }
@@ -706,8 +709,8 @@ public class ItemRequestService {
         } else { // If Hold command Failure
             itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_ILS_EXCEPTION + itemHoldResponse.getScreenMessage());
             itemResponseInformation.setSuccess(itemHoldResponse.isSuccess());
-            rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
-            saveItemChangeLogEntity(itemEntity.getItemId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_HOLD_FAILURE, itemHoldResponse.getPatronIdentifier() + " - " + itemHoldResponse.getScreenMessage());
+            rollbackUpdateItemAvailabilityStatus(itemEntity, itemRequestInfo.getUsername());
+            saveItemChangeLogEntity(itemEntity.getId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_HOLD_FAILURE, itemHoldResponse.getPatronIdentifier() + " - " + itemHoldResponse.getScreenMessage());
         }
         return itemResponseInformation;
     }
@@ -773,7 +776,7 @@ public class ItemRequestService {
                         messagePublish = recallError(itemRecallResponse);
                         bsuccess = false;
                         requestItemController.cancelHoldItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
-                        saveItemChangeLogEntity(itemEntity.getItemId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_HOLD_FAILURE, itemRequestInfo.getPatronBarcode() + " - " + itemResponseInformation.getScreenMessage());
+                        saveItemChangeLogEntity(itemEntity.getId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_HOLD_FAILURE, itemRequestInfo.getPatronBarcode() + " - " + itemResponseInformation.getScreenMessage());
                     }
                 } else { // If Hold command Failure
                     messagePublish = itemResponseInformation.getScreenMessage();
@@ -820,7 +823,7 @@ public class ItemRequestService {
             itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_ILS_EXCEPTION + RecapConstants.CREATING_A_BIB_RECORD_FAILED_IN_ILS);
             itemResponseInformation.setSuccess(createBibResponse.isSuccess());
             if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-                rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
+                rollbackUpdateItemAvailabilityStatus(itemEntity, itemRequestInfo.getUsername());
             }
         }
         return itemResponseInformation;
@@ -895,8 +898,8 @@ public class ItemRequestService {
 
     private void rollbackAfterGFA(ItemEntity itemEntity, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation) {
         if (!itemResponseInformation.getScreenMessage().equalsIgnoreCase(RecapConstants.GFA_ITEM_STATUS_CHECK_FAILED)) {
-            rollbackUpdateItemAvailabilutyStatus(itemEntity, itemRequestInfo.getUsername());
-            saveItemChangeLogEntity(itemEntity.getItemId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_GFA_FAILURE, itemRequestInfo.getPatronBarcode() + " - " + itemResponseInformation.getScreenMessage());
+            rollbackUpdateItemAvailabilityStatus(itemEntity, itemRequestInfo.getUsername());
+            saveItemChangeLogEntity(itemEntity.getId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_GFA_FAILURE, itemRequestInfo.getPatronBarcode() + " - " + itemResponseInformation.getScreenMessage());
         }
         requestItemController.cancelHoldItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
     }

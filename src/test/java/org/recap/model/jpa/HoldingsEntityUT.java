@@ -23,7 +23,7 @@ public class HoldingsEntityUT {
         bibliographicEntity.setInstitutionEntity(institutionEntity);
         bibliographicEntities.add(bibliographicEntity);
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setHoldingsId(1);
+        holdingsEntity.setId(1);
         holdingsEntity.setInstitutionEntity(institutionEntity);
         holdingsEntity.setBibliographicEntities(bibliographicEntities);
         holdingsEntity.setOwningInstitutionHoldingsId("113t56");
@@ -37,6 +37,6 @@ public class HoldingsEntityUT {
         assertNotNull(holdingsEntity.getInstitutionEntity());
         assertNotNull(holdingsEntity.getBibliographicEntities());
         assertNotNull(holdingsEntity.getItemEntities());
-        assertNotNull(holdingsEntity.getHoldingsId());
+        assertNotNull(holdingsEntity.getId());
     }
 }

@@ -137,7 +137,7 @@ public class RequestDataLoadService {
             Integer itemInstitutionId = itemEntityList.get(0).getOwningInstitutionId();
             for(ItemEntity itemEntity : itemEntityList){
                 if(itemEntity.getOwningInstitutionId().equals(itemInstitutionId)){
-                    itemId = itemEntityList.get(0).getItemId();
+                    itemId = itemEntityList.get(0).getId();
                     owningInstitutionId = itemEntityList.get(0).getOwningInstitutionId();
                 }else{
                     logger.info("Barcodes duplicated in database with different institution {}",barcode);

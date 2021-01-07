@@ -77,7 +77,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
 
         ItemEntity itemEntity1 = new ItemEntity();
-        itemEntity1.setItemId(1);
+        itemEntity1.setId(1);
         itemEntity1.setCreatedDate(new Date());
         itemEntity1.setCreatedBy("etl");
         itemEntity1.setLastUpdatedDate(new Date());
@@ -94,7 +94,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         itemEntity1.setCatalogingStatus("Complete");
 
         ItemEntity itemEntity2 = new ItemEntity();
-        itemEntity2.setItemId(2);
+        itemEntity2.setId(2);
         itemEntity2.setCreatedDate(new Date());
         itemEntity2.setCreatedBy("etl");
         itemEntity2.setLastUpdatedDate(new Date());
@@ -119,10 +119,10 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
 
 
         assertNotNull(bibliographicEntity);
-        assertNotNull(bibliographicEntity.getBibliographicId());
-        assertNotNull(bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
-        assertNotNull(bibliographicEntity.getItemEntities().get(0).getItemId());
-        assertNotNull(bibliographicEntity.getItemEntities().get(1).getItemId());
+        assertNotNull(bibliographicEntity.getId());
+        assertNotNull(bibliographicEntity.getHoldingsEntities().get(0).getId());
+        assertNotNull(bibliographicEntity.getItemEntities().get(0).getId());
+        assertNotNull(bibliographicEntity.getItemEntities().get(1).getId());
 
         return bibliographicEntity;
     }
@@ -134,7 +134,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
 
         ItemEntity itemEntity1 = new ItemEntity();
-        itemEntity1.setItemId(1);
+        itemEntity1.setId(1);
         itemEntity1.setCreatedDate(new Date());
         itemEntity1.setCreatedBy("etl");
         itemEntity1.setLastUpdatedDate(new Date());
@@ -151,7 +151,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         itemEntity1.setCatalogingStatus("Complete");
 
         ItemEntity itemEntity2 = new ItemEntity();
-        itemEntity2.setItemId(2);
+        itemEntity2.setId(2);
         itemEntity2.setCreatedDate(new Date());
         itemEntity2.setCreatedBy("etl");
         itemEntity2.setLastUpdatedDate(new Date());
@@ -168,7 +168,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
         itemEntity2.setCatalogingStatus("Complete");
 
         ItemEntity itemEntity3 = new ItemEntity();
-        itemEntity3.setItemId(3);
+        itemEntity3.setId(3);
         itemEntity3.setCreatedDate(new Date());
         itemEntity3.setCreatedBy("etl");
         itemEntity3.setLastUpdatedDate(new Date());
@@ -190,15 +190,15 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
 
 
         assertNotNull(bibliographicEntity);
-        assertNotNull(bibliographicEntity.getBibliographicId());
-        assertNotNull(bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
-        assertNotNull(bibliographicEntity.getItemEntities().get(0).getItemId());
-        assertNotNull(bibliographicEntity.getItemEntities().get(1).getItemId());
+        assertNotNull(bibliographicEntity.getId());
+        assertNotNull(bibliographicEntity.getHoldingsEntities().get(0).getId());
+        assertNotNull(bibliographicEntity.getItemEntities().get(0).getId());
+        assertNotNull(bibliographicEntity.getItemEntities().get(1).getId());
     }
 
     private HoldingsEntity getHoldingsEntity(Random random, Integer institutionId) {
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setHoldingsId(1);
+        holdingsEntity.setId(1);
         holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
@@ -211,7 +211,7 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
 
     private BibliographicEntity getBibliographicEntity(Integer institutionId, String owningInstitutionBibId1) {
         BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setBibliographicId(1);
+        bibliographicEntity1.setId(1);
         bibliographicEntity1.setContent("mock Content".getBytes());
         bibliographicEntity1.setCreatedDate(new Date());
         bibliographicEntity1.setCreatedBy("etl");

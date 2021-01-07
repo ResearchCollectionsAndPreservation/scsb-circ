@@ -114,7 +114,7 @@ public class BulkItemRequestProcessService {
             List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
             ItemEntity itemEntity = itemEntities.get(0);
             ItemRequestInformation itemRequestInformation = buildItemRequestInformation(bulkRequestItemEntity);
-            itemRequestDBService.updateItemAvailabilutyStatus(itemEntities, bulkRequestItemEntity.getCreatedBy());
+            itemRequestDBService.updateItemAvailabilityStatus(itemEntities, bulkRequestItemEntity.getCreatedBy());
             Integer requestId = itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, bulkRequestItemEntity);
             itemRequestInformation.setRequestId(requestId);
             itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
@@ -139,12 +139,12 @@ public class BulkItemRequestProcessService {
                     }
                 } else {
                     requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
-                    commonUtil.rollbackUpdateItemAvailabilutyStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
+                    commonUtil.rollbackUpdateItemAvailabilityStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
                     itemRequestInformation.setRequestNotes(RecapConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + itemInformationResponse.getScreenMessage());
                     itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
                 }
             } else {
-                commonUtil.rollbackUpdateItemAvailabilutyStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
+                commonUtil.rollbackUpdateItemAvailabilityStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
                 itemRequestInformation.setRequestNotes(RecapConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + RecapConstants.REQUEST_ILS_EXCEPTION + itemCheckoutResponse.getScreenMessage());
                 itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
             }

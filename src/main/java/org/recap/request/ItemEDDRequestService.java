@@ -124,7 +124,7 @@ public class ItemEDDRequestService {
                 boolean isItemStatusAvailable;
                 synchronized (this) {
                     // Change Item Availability
-                    isItemStatusAvailable = getItemRequestService().updateItemAvailabilutyStatus(itemEntities, itemRequestInfo.getUsername());
+                    isItemStatusAvailable = getItemRequestService().updateItemAvailabilityStatus(itemEntities, itemRequestInfo.getUsername());
                 }
                 requestId = getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING);
                 itemRequestInfo.setRequestId(requestId);
@@ -133,7 +133,7 @@ public class ItemEDDRequestService {
                 if (requestId == 0) {
                     itemResponseInformation.setScreenMessage(RecapConstants.INTERNAL_ERROR_DURING_REQUEST);
                     itemResponseInformation.setSuccess(false);
-                    getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, RecapConstants.GUEST_USER);
+                    getItemRequestService().rollbackUpdateItemAvailabilityStatus(itemEntity, RecapConstants.GUEST_USER);
                 } else if (!isItemStatusAvailable) {
                     itemResponseInformation.setScreenMessage(RecapConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM);
                     itemResponseInformation.setSuccess(false);
@@ -143,7 +143,7 @@ public class ItemEDDRequestService {
                     if (getItemRequestService().getGfaService().isUseQueueLasCall()) {
                         getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING);
                     }
-                    itemResponseInformation.setItemId(itemEntity.getItemId());
+                    itemResponseInformation.setItemId(itemEntity.getId());
                     if(itemRequestInfo.isOwningInstitutionItem()){
                         itemRequestInfo.setPatronBarcode(getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
                     }
@@ -158,7 +158,7 @@ public class ItemEDDRequestService {
                         logger.info("Updated EDD request id {} on first scan", requestId);
                     }
                     if (!itemResponseInformation.isSuccess()) {
-                        getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, RecapConstants.GUEST_USER);
+                        getItemRequestService().rollbackUpdateItemAvailabilityStatus(itemEntity, RecapConstants.GUEST_USER);
                     }
                     else {
 

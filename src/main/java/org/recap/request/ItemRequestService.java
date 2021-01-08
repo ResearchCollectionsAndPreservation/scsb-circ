@@ -355,6 +355,7 @@ public class ItemRequestService {
                             setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntityRecalled);
                             ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                             // Put back the Recall order to LAS. On success from LAS, recall order is updated to retrieval.
+                            itemRequestInfo.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
                             updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
                             itemRefileResponse.setSuccess(true);
                         }
@@ -372,9 +373,9 @@ public class ItemRequestService {
                     else {
                         itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
                     }
-                    String isRefileForCheckin = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
+                    String isRefileForCheckin = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.use.refile.for.checkin");
                     if (Boolean.TRUE.toString().equalsIgnoreCase(isRefileForCheckin)) {
-                        requestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
+                        requestItemController.getIlsProtocolConnectorFactory().getIlsProtocolConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode);
                     } else {
                         requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
                     }
@@ -685,9 +686,22 @@ public class ItemRequestService {
             itemResponseInformation = updateScsbAndGfa(itemRequestInfo, itemResponseInformation, itemEntity);
             logger.info("GFA Response for Retrieval request : {}",itemResponseInformation.isSuccess());
             if(itemResponseInformation.isSuccess()){
-                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_RETRIEVAL));
-                logger.info("Performing CheckOut using the generic patron : {}",itemRequestInfo.getPatronBarcode());
-                requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+                try {
+                    String useGenericPatronRetrievalForCross = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "use.generic.patron.retrieval.cross");
+                    if (Boolean.TRUE.toString().equalsIgnoreCase(useGenericPatronRetrievalForCross)) {
+                        try {
+                            itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_RETRIEVAL));
+                        } catch (Exception e) {
+                            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                            itemRequestInfo.setPatronBarcode("");
+                        }
+                    }
+                    logger.info("Performing CheckOut using the generic patron : {} in Owning Institution : {}",itemRequestInfo.getPatronBarcode(), itemRequestInfo.getItemOwningInstitution());
+                    requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
+                } catch (Exception e) {
+                    logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                    logger.error("Cross Partner Request Item Checkout Failed. Own Ins: {}, Req Ins: {}, Cross PatronId: {}", itemResponseInformation.getItemOwningInstitution(), itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getPatronBarcode());
+                }
             }
         }
         if (itemResponseInformation.isSuccess()) {
@@ -697,8 +711,7 @@ public class ItemRequestService {
     }
 
     private ItemInformationResponse holdItem(String callingInst, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation, ItemEntity itemEntity) {
-        ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
-        itemHoldResponse.setSuccess(true);
+        ItemHoldResponse itemHoldResponse = (ItemHoldResponse) requestItemController.holdItem(itemRequestInfo, callingInst);
         if (itemHoldResponse.isSuccess()) { // IF Hold command is successfully
             itemResponseInformation.setExpirationDate(itemHoldResponse.getExpirationDate());
             itemRequestInfo.setExpirationDate(itemHoldResponse.getExpirationDate());
@@ -760,10 +773,20 @@ public class ItemRequestService {
                 if (itemResponseInformation.isSuccess()) { // IF Hold command is successfully
                     itemRequestInfo.setExpirationDate(itemRequestInfo.getExpirationDate());
                     String requestingPatron = itemRequestInfo.getPatronBarcode();
-                    itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), requestItemEntity.getInstitutionEntity().getInstitutionCode(), RecapCommonConstants.REQUEST_TYPE_RETRIEVAL));
-                    itemRequestInfo.setPickupLocation(getPickupLocation(requestItemEntity.getStopCode()));
-                    itemRequestInfo.setBibId(itemInformation.getBibID());
-                    ItemRecallResponse itemRecallResponse = (ItemRecallResponse) requestItemController.recallItem(itemRequestInfo, requestItemEntity.getInstitutionEntity().getInstitutionCode());
+                    String useGenericPatronRetrievalForCross = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "use.generic.patron.retrieval.cross");
+                    ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
+                    if (Boolean.TRUE.toString().equalsIgnoreCase(useGenericPatronRetrievalForCross)) {
+                        try {
+                            itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), requestItemEntity.getInstitutionEntity().getInstitutionCode(), RecapCommonConstants.REQUEST_TYPE_RETRIEVAL));
+                            itemRequestInfo.setPickupLocation(getPickupLocation(requestItemEntity.getStopCode()));
+                            itemRequestInfo.setBibId(itemInformation.getBibID());
+                            itemRecallResponse = (ItemRecallResponse) requestItemController.recallItem(itemRequestInfo, requestItemEntity.getInstitutionEntity().getInstitutionCode());
+                        } catch (Exception e) {
+                            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                            itemRecallResponse.setSuccess(false);
+                            itemRecallResponse.setScreenMessage(RecapConstants.GENERIC_PATRON_NOT_FOUND_ERROR);
+                        }
+                    }
                     itemRequestInfo.setPatronBarcode(requestingPatron);
                     if (itemRecallResponse.isSuccess()) {
                         sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), itemRequestInfo.getItemBarcodes().get(0), itemRequestInfo.getPatronBarcode(), requestItemEntity.getInstitutionEntity().getInstitutionCode());

@@ -48,7 +48,7 @@ public class LasHeartBeatCheckPollingProcessor {
         try {
             Future<GFALasStatusCheckResponse> future = executor.submit(new LasHeartBeatCheckPollingCallable(pollingTimeInterval, gfaService, itemRequestInformation.getImsLocationCode()));
             gfaLasStatusCheckResponse = future.get();
-            log.info("Process -1 -> {}", gfaLasStatusCheckResponse);
+            log.info("GFA Las Status Poll Response: {}", gfaLasStatusCheckResponse);
             if (null != gfaLasStatusCheckResponse
                     && null != gfaLasStatusCheckResponse.getDsitem()
                     && null != gfaLasStatusCheckResponse.getDsitem().getTtitem()

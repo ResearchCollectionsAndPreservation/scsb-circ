@@ -34,6 +34,7 @@ public final class RecapConstants {
     public static final String RECALL_FOR_EDD_ITEM = "Recall for existing EDD request is not allowed";
     public static final String RECALL_FOR_CANCELLED_ITEM = "Recall for Cancelled Request is not Allowed. Please Refile the existing Request.";
     public static final String IMS_LOCATION_DOES_NOT_EXIST_ITEM = "IMS Location does not exist for the item in database.";
+    public static final String GENERIC_PATRON_NOT_FOUND_ERROR = "Could not get generic patron for item.";
 
     public static final String CHAPTER_TITLE_IS_REQUIRED = "Chapter title is required for the request type EDD.";
 

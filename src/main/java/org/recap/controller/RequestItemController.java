@@ -70,6 +70,15 @@ public class RequestItemController {
     }
 
     /**
+     * Gets JSIPConectorFactory object.
+     *
+     * @return the jsip conector factory
+     */
+    public ILSProtocolConnectorFactory getIlsProtocolConnectorFactory() {
+        return ilsProtocolConnectorFactory;
+    }
+
+    /**
      * Checkout item method is for processing SIP2 protocol function check out, This function converts SIP data to JSON format.
      *
      * @param itemRequestInformation the item request information

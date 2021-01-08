@@ -2,8 +2,8 @@ package org.recap.request;
 
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -16,6 +16,7 @@ import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
 import org.recap.util.ItemRequestServiceUtil;
+import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,9 @@ public class ItemEDDRequestService {
 
     @Autowired
     private GenericPatronDetailsRepository genericPatronDetailsRepository;
+
+    @Autowired
+    private PropertyUtil propertyUtil;
 
     /**
      * Gets item details repository.
@@ -99,7 +103,7 @@ public class ItemEDDRequestService {
     public ItemInformationResponse eddRequestItem(ItemRequestInformation itemRequestInfo, Exchange exchange) {
 
         List<ItemEntity> itemEntities;
-        ItemEntity itemEntity=null;
+        ItemEntity itemEntity = null;
         ItemInformationResponse itemResponseInformation = getItemInformationResponse();
         Integer requestId;
         try {
@@ -144,11 +148,29 @@ public class ItemEDDRequestService {
                         getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING);
                     }
                     itemResponseInformation.setItemId(itemEntity.getItemId());
-                    if(itemRequestInfo.isOwningInstitutionItem()){
-                        itemRequestInfo.setPatronBarcode(getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
-                    }
-                    else {
-                        itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
+
+                    if (itemRequestInfo.isOwningInstitutionItem()) {
+                        String useGenericPatronEddForSelf = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "use.generic.patron.edd.self");
+                        if (Boolean.TRUE.toString().equalsIgnoreCase(useGenericPatronEddForSelf)) {
+                            try {
+                                itemRequestInfo.setPatronBarcode(getPatronIdForOwningInstitutionOnEdd(itemRequestInfo.getItemOwningInstitution()));
+                            } catch (Exception e) {
+                                logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                                itemResponseInformation.setScreenMessage(RecapConstants.GENERIC_PATRON_NOT_FOUND_ERROR);
+                                itemResponseInformation.setSuccess(false);
+                            }
+                        }
+                    } else {
+                        String useGenericPatronEddForCrossInst = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "use.generic.patron.edd.cross");
+                        if (Boolean.TRUE.toString().equalsIgnoreCase(useGenericPatronEddForCrossInst)) {
+                            try {
+                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution(), itemRequestInfo.getItemOwningInstitution(), RecapCommonConstants.REQUEST_TYPE_EDD));
+                            } catch (Exception e) {
+                                logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                                itemResponseInformation.setScreenMessage(RecapConstants.GENERIC_PATRON_NOT_FOUND_ERROR);
+                                itemResponseInformation.setSuccess(false);
+                            }
+                        }
                     }
 
                     itemResponseInformation = getItemRequestService().updateGFA(itemRequestInfo, itemResponseInformation);
@@ -159,10 +181,8 @@ public class ItemEDDRequestService {
                     }
                     if (!itemResponseInformation.isSuccess()) {
                         getItemRequestService().rollbackUpdateItemAvailabilutyStatus(itemEntity, RecapConstants.GUEST_USER);
-                    }
-                    else {
-
-                        logger.info("Patron and Institution info before CheckOut Call in EDD : patron - {} , institution - {}",itemRequestInfo.getPatronBarcode(),itemRequestInfo.getItemOwningInstitution());
+                    } else {
+                        logger.info("Patron and Institution info before CheckOut Call in EDD : patron - {} , institution - {}", itemRequestInfo.getPatronBarcode(), itemRequestInfo.getItemOwningInstitution());
                         ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                         if (itemCheckoutResponse.isSuccess()) {
                             itemResponseInformation.setEddSuccessResponseScreenMsg(itemCheckoutResponse.getScreenMessage());
@@ -192,7 +212,7 @@ public class ItemEDDRequestService {
                 getItemRequestService().updateChangesToDb(itemResponseInformation, RecapCommonConstants.REQUEST_TYPE_EDD + "-" + itemResponseInformation.getRequestingInstitution());
             } else {
                 itemResponseInformation.setRequestNotes(itemRequestInfo.getRequestNotes());
-                if(itemEntity != null) {
+                if (itemEntity != null) {
                     itemRequestServiceUtil.updateSolrIndex(itemEntity);
                 }
             }
@@ -209,7 +229,7 @@ public class ItemEDDRequestService {
     private String getNotes(ItemRequestInformation itemRequestInfo) {
         String notes = "";
         if (!StringUtils.isBlank(itemRequestInfo.getRequestNotes())) {
-            notes = String.format("User: %s", itemRequestInfo.getRequestNotes().replace("\n"," "));
+            notes = String.format("User: %s", itemRequestInfo.getRequestNotes().replace("\n", " "));
         }
         notes += String.format("\n\nStart Page: %s \nEnd Page: %s \nVolume Number: %s \nIssue: %s \nArticle Author: %s \nArticle/Chapter Title: %s ", itemRequestInfo.getStartPage(), itemRequestInfo.getEndPage(), itemRequestInfo.getVolume(), itemRequestInfo.getIssue(), itemRequestInfo.getAuthor(), itemRequestInfo.getChapterTitle());
         return notes;

@@ -47,7 +47,7 @@ public interface HoldingsDetailsRepository extends BaseRepository<HoldingsEntity
      */
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE HoldingsEntity holdings SET holdings.isDeleted = true, holdings.lastUpdatedBy = :lastUpdatedBy, holdings.lastUpdatedDate = :lastUpdatedDate WHERE holdings.holdingsId IN :holdingIds")
+    @Query("UPDATE HoldingsEntity holdings SET holdings.isDeleted = true, holdings.lastUpdatedBy = :lastUpdatedBy, holdings.lastUpdatedDate = :lastUpdatedDate WHERE holdings.id IN :holdingIds")
     int markHoldingsAsDeleted(@Param("holdingIds") List<Integer> holdingIds, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
 
     /**
@@ -60,7 +60,7 @@ public interface HoldingsDetailsRepository extends BaseRepository<HoldingsEntity
      */
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE HoldingsEntity holdings SET holdings.isDeleted = false, holdings.lastUpdatedBy = :lastUpdatedBy, holdings.lastUpdatedDate = :lastUpdatedDate WHERE holdings.holdingsId IN :holdingIds")
+    @Query("UPDATE HoldingsEntity holdings SET holdings.isDeleted = false, holdings.lastUpdatedBy = :lastUpdatedBy, holdings.lastUpdatedDate = :lastUpdatedDate WHERE holdings.id IN :holdingIds")
     int markHoldingsAsNotDeleted(@Param("holdingIds") List<Integer> holdingIds, @Param("lastUpdatedBy") String lastUpdatedBy, @Param("lastUpdatedDate") Date lastUpdatedDate);
 
 }

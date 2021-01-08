@@ -280,7 +280,7 @@ public class GFAService {
                 gfaItemStatusCheckResponse = responseEntity.getBody();
             }
             if (responseEntity != null && responseEntity.getStatusCode() != null) {
-                logger.info(String.format("Item status check response during Refile process : %s" , responseEntity.getStatusCode()));
+                logger.info(String.format("Item status check response : %s" , responseEntity.getStatusCode()));
             }
         } catch (JsonProcessingException e) {
             logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
@@ -520,7 +520,7 @@ public class GFAService {
                     gfaOnlyStatus = itemStatus.toUpperCase();
                 }
 
-                logger.info("Item status check before executing Retrieval Order.Status received : {}",gfaOnlyStatus);
+                logger.info("Item status check before executing {} Order. Status received : {}", itemRequestInfo.getRequestType(), gfaOnlyStatus);
                 // Call Retrival Order
                 if (RecapConstants.getGFAStatusAvailableList().contains(gfaOnlyStatus)) {
                     if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {

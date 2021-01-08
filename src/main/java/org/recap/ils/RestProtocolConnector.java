@@ -10,11 +10,12 @@ import org.recap.ils.model.nypl.request.*;
 import org.recap.ils.model.nypl.response.*;
 import org.recap.ils.model.response.*;
 import org.recap.ils.service.NyplApiResponseUtil;
-import org.recap.ils.service.NyplOauthTokenApiService;
+import org.recap.ils.service.RestOauthTokenApiService;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.jpa.ItemRefileResponse;
 import org.recap.processor.NyplJobResponsePollingProcessor;
+import org.recap.processor.RestProtocolJobResponsePollingProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      * The Nypl oauth token api service.
      */
     @Autowired
-    NyplOauthTokenApiService nyplOauthTokenApiService;
+    RestOauthTokenApiService restOauthTokenApiService;
 
     @Autowired
     RestTemplate restTemplate;
@@ -47,12 +48,12 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      */
     @Autowired
     NyplApiResponseUtil nyplApiResponseUtil;
-
+    
     /**
-     * The Nypl job response polling processor.
+     * The Rest job response polling processor.
      */
     @Autowired
-    NyplJobResponsePollingProcessor nyplJobResponsePollingProcessor;
+    RestProtocolJobResponsePollingProcessor restProtocolJobResponsePollingProcessor;
 
 
     /**
@@ -62,6 +63,15 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      */
     public String getRestDataApiUrl() {
         return ilsConfigProperties.getIlsRestDataApi();
+    }
+
+    /**
+     * Gets oauth token api url.
+     *
+     * @return the oauth token api url
+     */
+    public String getOauthTokenApiUrl() {
+        return ilsConfigProperties.getOauthTokenApiUrl();
     }
 
     /**
@@ -118,8 +128,8 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      *
      * @return the nypl oauth token api service
      */
-    public NyplOauthTokenApiService getNyplOauthTokenApiService() {
-        return nyplOauthTokenApiService;
+    public RestOauthTokenApiService getRestOauthTokenApiService() {
+        return restOauthTokenApiService;
     }
 
     /**
@@ -127,8 +137,8 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      *
      * @return the nypl job response polling processor
      */
-    public NyplJobResponsePollingProcessor getNyplJobResponsePollingProcessor() {
-        return nyplJobResponsePollingProcessor;
+    public RestProtocolJobResponsePollingProcessor getRestProtocolJobResponsePollingProcessor() {
+        return restProtocolJobResponsePollingProcessor;
     }
 
     @Override
@@ -197,7 +207,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             String source = getNyplApiResponseUtil().getNyplSource(institutionId);
             itemIdentifier = getNyplApiResponseUtil().getNormalizedItemIdForNypl(itemIdentifier);
             String apiUrl = getApiUrl(source,itemIdentifier);
-            String authorization = "Bearer " + getNyplOauthTokenApiService().generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword());
+            String authorization = "Bearer " + getRestOauthTokenApiService().generateAccessTokenForRestApi(getOauthTokenApiUrl(), getOperatorUserId(), getOperatorPassword());
 
             HttpHeaders headers = getHttpHeader();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -252,7 +262,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 itemCheckoutResponse.setJobId(jobId);
                 log.info("Initiated checkout on NYPL");
                 log.info("Nypl checkout job id -> {} " , jobId);
-                JobResponse jobResponse = getNyplJobResponsePollingProcessor().pollNyplRequestItemJobResponse(itemCheckoutResponse.getJobId());
+                JobResponse jobResponse = getRestProtocolJobResponsePollingProcessor().pollRestApiRequestItemJobResponse(itemCheckoutResponse.getJobId(), institutionCode);
                 String statusMessage = jobResponse.getStatusMessage();
                 itemCheckoutResponse.setScreenMessage(statusMessage);
                 JobData jobData = jobResponse.getData();
@@ -307,7 +317,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 itemCheckinResponse.setJobId(jobId);
                 log.info("Initiated checkin on NYPL");
                 log.info("Nypl checkin job id -> {} " , jobId);
-                JobResponse jobResponse = getNyplJobResponsePollingProcessor().pollNyplRequestItemJobResponse(itemCheckinResponse.getJobId());
+                JobResponse jobResponse = getRestProtocolJobResponsePollingProcessor().pollRestApiRequestItemJobResponse(itemCheckinResponse.getJobId(), institutionCode);
                 String statusMessage = jobResponse.getStatusMessage();
                 itemCheckinResponse.setScreenMessage(statusMessage);
                 JobData jobData = jobResponse.getData();
@@ -387,7 +397,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                     itemHoldResponse.setJobId(jobId);
                     log.info("Initiated recap hold request on NYPL");
                     log.info("Nypl Hold request job id -> {} " , jobId);
-                    JobResponse jobResponse = getNyplJobResponsePollingProcessor().pollNyplRequestItemJobResponse(itemHoldResponse.getJobId());
+                    JobResponse jobResponse = getRestProtocolJobResponsePollingProcessor().pollRestApiRequestItemJobResponse(itemHoldResponse.getJobId(), institutionCode);
                     String statusMessage = jobResponse.getStatusMessage();
                     itemHoldResponse.setScreenMessage(statusMessage);
                     JobData jobData = jobResponse.getData();
@@ -451,7 +461,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 itemHoldResponse.setJobId(jobId);
                 log.info("Initiated cancel hold request on NYPL");
                 log.info("Nypl cancel hold request job id -> {}" , jobId);
-                JobResponse jobResponse = getNyplJobResponsePollingProcessor().pollNyplRequestItemJobResponse(itemHoldResponse.getJobId());
+                JobResponse jobResponse = getRestProtocolJobResponsePollingProcessor().pollRestApiRequestItemJobResponse(itemHoldResponse.getJobId(), institutionCode);
                 String statusMessage = jobResponse.getStatusMessage();
                 itemHoldResponse.setScreenMessage(statusMessage);
                 JobData jobData = jobResponse.getData();
@@ -515,7 +525,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      * @throws Exception
      */
     private HttpHeaders getHttpHeaders() throws Exception {
-        String authorization = "Bearer " + getNyplOauthTokenApiService().generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword());
+        String authorization = "Bearer " + getRestOauthTokenApiService().generateAccessTokenForRestApi(getOauthTokenApiUrl(), getOperatorUserId(), getOperatorPassword());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -637,7 +647,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 itemRecallResponse.setJobId(jobId);
                 log.info("Initiated recall request on NYPL");
                 log.info("Nypl recall request job id -> {}" , jobId);
-                JobResponse jobResponse = getNyplJobResponsePollingProcessor().pollNyplRequestItemJobResponse(itemRecallResponse.getJobId());
+                JobResponse jobResponse = getRestProtocolJobResponsePollingProcessor().pollNyplRequestItemJobResponse(itemRecallResponse.getJobId());
                 String statusMessage = jobResponse.getStatusMessage();
                 itemRecallResponse.setScreenMessage(statusMessage);
                 JobData jobData = jobResponse.getData();
@@ -694,7 +704,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 itemRefileResponse.setJobId(jobId);
                 log.info("Initiated refile request on NYPL");
                 log.info("Nypl refile request job id -> {}" , jobId);
-                JobResponse jobResponse = getNyplJobResponsePollingProcessor().pollNyplRequestItemJobResponse(itemRefileResponse.getJobId());
+                JobResponse jobResponse = getRestProtocolJobResponsePollingProcessor().pollRestApiRequestItemJobResponse(itemRefileResponse.getJobId(), institutionCode);
                 String statusMessage = jobResponse.getStatusMessage();
                 itemRefileResponse.setScreenMessage(statusMessage);
                 JobData jobData = jobResponse.getData();

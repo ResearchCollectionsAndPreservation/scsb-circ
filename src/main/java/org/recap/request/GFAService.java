@@ -521,8 +521,12 @@ public class GFAService {
                 }
 
                 logger.info("Item status check before executing {} Order. Status received : {}", itemRequestInfo.getRequestType(), gfaOnlyStatus);
-                // Call Retrival Order
-                if (RecapConstants.getGFAStatusAvailableList().contains(gfaOnlyStatus)) {
+                // Call Retrieval Order
+                if (StringUtils.isBlank(itemRequestInfo.getImsLocationCode())) {
+                    itemResponseInformation.setSuccess(false);
+                    itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_SCSB_EXCEPTION + RecapConstants.IMS_LOCATION_CODE_BLANK_ERROR);
+                }
+                else if (RecapConstants.getGFAStatusAvailableList().contains(gfaOnlyStatus)) {
                     if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
                         itemResponseInformation = callItemEDDRetrievable(itemRequestInfo, itemResponseInformation);
                     } else if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {

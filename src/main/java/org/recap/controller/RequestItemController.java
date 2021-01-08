@@ -291,7 +291,7 @@ public class RequestItemController {
 
     @PostMapping("/patronValidationBulkRequest")
     public Boolean patronValidationBulkRequest(@RequestBody BulkRequestInformation bulkRequestInformation) {
-        return jsipConectorFactory.getJSIPConnector(bulkRequestInformation.getRequestingInstitution()).patronValidation(bulkRequestInformation.getRequestingInstitution(), bulkRequestInformation.getPatronBarcode());
+        return ilsProtocolConnectorFactory.getIlsProtocolConnector(bulkRequestInformation.getRequestingInstitution()).patronValidation(bulkRequestInformation.getRequestingInstitution(), bulkRequestInformation.getPatronBarcode());
     }
 
     /**

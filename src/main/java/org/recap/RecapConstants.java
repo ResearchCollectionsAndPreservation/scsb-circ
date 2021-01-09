@@ -236,6 +236,7 @@ public final class RecapConstants {
     public static final String SCSB_REQUEST_EXCEPTION = "SCSB Exception : Error occurred at SCSB - ";
     public static final String REQUEST_CANCELLED_NO_REFILED = "canceled";
     public static final String REQUEST_CANCELLED_SUBJECT = "Cancel Request - ";
+    public static final String IMS_LOCATION_CODE_BLANK_ERROR = "IMS Location Code is Blank";
 
     public static final String REQUEST_RECALL_TO_BORRWER = "recalled";
     public static final String REQUEST_RECALL_SUBJECT = "Recall - ";

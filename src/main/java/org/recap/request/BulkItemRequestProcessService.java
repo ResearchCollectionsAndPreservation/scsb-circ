@@ -119,6 +119,7 @@ public class BulkItemRequestProcessService {
             itemRequestInformation.setRequestId(requestId);
             itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
             itemRequestInformation.setCustomerCode(itemEntity.getCustomerCode());
+            itemRequestInformation.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
             ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
             itemCheckoutResponse.setSuccess(true);
             if (itemCheckoutResponse.isSuccess()) {

@@ -241,7 +241,7 @@ public class ItemValidatorService {
      */
     public int checkDeliveryLocation(String customerCode, ItemRequestInformation itemRequestInformation) {
         int bSuccess = 0;
-        CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution());
+        CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(itemRequestInformation.getDeliveryLocation());
         if (customerCodeEntity != null && customerCodeEntity.getCustomerCode().equalsIgnoreCase(itemRequestInformation.getDeliveryLocation())) {
             if (itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())) {
                 customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(customerCode);

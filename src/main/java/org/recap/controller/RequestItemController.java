@@ -70,6 +70,15 @@ public class RequestItemController {
     }
 
     /**
+     * Gets JSIPConectorFactory object.
+     *
+     * @return the jsip conector factory
+     */
+    public ILSProtocolConnectorFactory getIlsProtocolConnectorFactory() {
+        return ilsProtocolConnectorFactory;
+    }
+
+    /**
      * Checkout item method is for processing SIP2 protocol function check out, This function converts SIP data to JSON format.
      *
      * @param itemRequestInformation the item request information
@@ -291,7 +300,7 @@ public class RequestItemController {
 
     @PostMapping("/patronValidationBulkRequest")
     public Boolean patronValidationBulkRequest(@RequestBody BulkRequestInformation bulkRequestInformation) {
-        return jsipConectorFactory.getJSIPConnector(bulkRequestInformation.getRequestingInstitution()).patronValidation(bulkRequestInformation.getRequestingInstitution(), bulkRequestInformation.getPatronBarcode());
+        return ilsProtocolConnectorFactory.getIlsProtocolConnector(bulkRequestInformation.getRequestingInstitution()).patronValidation(bulkRequestInformation.getRequestingInstitution(), bulkRequestInformation.getPatronBarcode());
     }
 
     /**

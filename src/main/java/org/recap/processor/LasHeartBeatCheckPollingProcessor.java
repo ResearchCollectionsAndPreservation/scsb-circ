@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.callable.LasHeartBeatCheckPollingCallable;
@@ -43,29 +44,34 @@ public class LasHeartBeatCheckPollingProcessor {
 
     public void pollLasHeartBeatResponse(Exchange exchange) {
         ItemRequestInformation itemRequestInformation = (ItemRequestInformation) exchange.getIn().getBody();
-        GFALasStatusCheckResponse gfaLasStatusCheckResponse = null;
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        try {
-            Future<GFALasStatusCheckResponse> future = executor.submit(new LasHeartBeatCheckPollingCallable(pollingTimeInterval, gfaService, itemRequestInformation.getImsLocationCode()));
-            gfaLasStatusCheckResponse = future.get();
-            log.info("Process -1 -> {}", gfaLasStatusCheckResponse);
-            if (null != gfaLasStatusCheckResponse
-                    && null != gfaLasStatusCheckResponse.getDsitem()
-                    && null != gfaLasStatusCheckResponse.getDsitem().getTtitem()
-                    && !gfaLasStatusCheckResponse.getDsitem().getTtitem().isEmpty()
-                    && BooleanUtils.toBoolean(gfaLasStatusCheckResponse.getDsitem().getTtitem().get(0).getSuccess())) {
-                log.info("Sending to Outgoing Queue");
-                producerTemplate.sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+        if (StringUtils.isNotBlank(itemRequestInformation.getImsLocationCode())) {
+            GFALasStatusCheckResponse gfaLasStatusCheckResponse = null;
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            try {
+                Future<GFALasStatusCheckResponse> future = executor.submit(new LasHeartBeatCheckPollingCallable(pollingTimeInterval, gfaService, itemRequestInformation.getImsLocationCode()));
+                gfaLasStatusCheckResponse = future.get();
+                log.info("GFA Las Status Poll Response: {}", gfaLasStatusCheckResponse);
+                if (null != gfaLasStatusCheckResponse
+                        && null != gfaLasStatusCheckResponse.getDsitem()
+                        && null != gfaLasStatusCheckResponse.getDsitem().getTtitem()
+                        && !gfaLasStatusCheckResponse.getDsitem().getTtitem().isEmpty()
+                        && BooleanUtils.toBoolean(gfaLasStatusCheckResponse.getDsitem().getTtitem().get(0).getSuccess())) {
+                    log.info("Sending to Outgoing Queue");
+                    producerTemplate.sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+                }
+                executor.shutdown();
+            } catch (InterruptedException e) {
+                log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                Thread.currentThread().interrupt();
+                executor.shutdown();
+            } catch (ExecutionException e) {
+                log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            } catch (Exception e) {
+                log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             }
-            executor.shutdown();
-        } catch (InterruptedException e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
-            Thread.currentThread().interrupt();
-            executor.shutdown();
-        } catch (ExecutionException e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
-        } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+        } else {
+            log.info("");
+            producerTemplate.sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
         }
     }
 }

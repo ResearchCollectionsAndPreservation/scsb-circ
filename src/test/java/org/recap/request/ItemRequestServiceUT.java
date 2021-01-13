@@ -14,7 +14,9 @@ import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
+import org.recap.ils.AbstractProtocolConnector;
 import org.recap.ils.IJSIPConnector;
+import org.recap.ils.ILSProtocolConnectorFactory;
 import org.recap.ils.JSIPConnectorFactory;
 import org.recap.ils.model.response.ItemCreateBibResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
@@ -69,9 +71,13 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
     @Mock
     IJSIPConnector ijsipConnector;
     @Mock
+    AbstractProtocolConnector abstractProtocolConnector;
+    @Mock
     GenericPatronDetailsRepository genericPatronDetailsRepository;
     @Mock
     RestHeaderService restHeaderService;
+    @Mock
+    private ILSProtocolConnectorFactory ilsProtocolConnectorFactory;
     @Mock
     Exchange exchange;
     @Mock
@@ -163,6 +169,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
                 .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
                 .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(),HttpMethod.GET,requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {})).thenReturn(responseEntity);
+        Mockito.when(mockedRequestItemController.holdItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(mockedCustomerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(customerCodeEntity);
         Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
@@ -256,6 +263,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
                 .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
                 .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        Mockito.when(mockedRequestItemController.holdItem(any(),any())).thenReturn(itemHoldResponse);
         Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(),HttpMethod.GET,requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {})).thenReturn(responseEntity);
@@ -354,16 +362,15 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemRequestInfo.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
 
         List<String> requestItemStatusList = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
-        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled")).thenReturn("TRUE");
-        Mockito.when(mockedRequestItemController.getJsipConectorFactory()).thenReturn(jsipConnectorFactory);
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(),any())).thenReturn(Boolean.TRUE.toString());
+        Mockito.when(mockedRequestItemController.getIlsProtocolConnectorFactory()).thenReturn(ilsProtocolConnectorFactory);
+        Mockito.when(mockedRequestItemController.getIlsProtocolConnectorFactory().getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes())).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(mockedRequestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution())).thenReturn(ijsipConnector);
         Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Mockito.when(mockedGfaService.callGfaItemStatus(itemEntity.getBarcode())).thenReturn("REFILED SUCCESSFULLY");
         Mockito.when(genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(any(), any())).thenReturn(genericPatronEntity);
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(null);
-        Mockito.when(mockedRequestItemController.getJsipConectorFactory().getJSIPConnector(itemRequestInfo.getRequestingInstitution()).refileItem(itemBarcode)).thenReturn("");
         Mockito.doNothing().when(mockedIitemRequestServiceUtil).updateSolrIndex(itemEntity);
         mockedItemRequestService.reFileItem(itemRefileRequest, itemRefileResponse);
     }
@@ -764,7 +771,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(mockedGfaService.isUseQueueLasCall()).thenReturn(true);
         Mockito.when(mockedRequestItemController.holdItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(mockedRequestItemController.itemInformation(any(), any())).thenReturn(itemInformationResponse);
-        Mockito.when(mockedRequestItemController.recallItem(any(), any())).thenReturn(itemRecallResponse);
+        //Mockito.when(mockedRequestItemController.recallItem(any(), any())).thenReturn(itemRecallResponse);
         ItemInformationResponse response = mockedItemRequestService.recallItem(itemRequestInformation, exchange);
         assertNotNull(response);
         itemCreateBibResponse.setSuccess(false);

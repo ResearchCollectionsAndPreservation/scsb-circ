@@ -83,7 +83,7 @@ public class CallGFAServicesUT extends BaseTestCase {
         }
     }
 
-    @Test
+   /* @Test
     public void wtestretrieveItem() {
         GFARetrieveItemRequest gfaRetrieveItemRequest = new GFARetrieveItemRequest();
         try {
@@ -107,7 +107,7 @@ public class CallGFAServicesUT extends BaseTestCase {
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-    }
+    }*/
 
     @Test
     public void testPermanentlyRetrieveItem() {

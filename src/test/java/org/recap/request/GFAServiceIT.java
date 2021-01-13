@@ -69,10 +69,12 @@ public class GFAServiceIT {
             log.info("GFA Item Status Response: {}", response);
 
             assertNotNull(response);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
-    @Test
+
+   /* @Test
     public void testLasStatusCheck() throws Exception {
         log.info("GFA LAS Status API Url: {}", gfaLasStatusUrl);
         GFALasStatusCheckRequest lasStatusCheckRequest = new GFALasStatusCheckRequest();
@@ -95,9 +97,9 @@ public class GFAServiceIT {
 
             assertNotNull(response);
         }catch (Exception e){}
-    }
+    }*/
 
-    @Test
+   /* @Test
     public void testRetrieveItem() throws Exception {
         log.info("GFA Retrieve Item API Url: {}", gfaRetrieveItemUrl);
         GFARetrieveItemRequest gfaRetrieveItemRequest = new GFARetrieveItemRequest();
@@ -169,5 +171,5 @@ public class GFAServiceIT {
 
             assertNotNull(response);
         }catch (Exception e){}
-    }
+    }*/
 }

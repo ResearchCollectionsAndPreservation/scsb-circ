@@ -75,6 +75,9 @@ public class GFAService {
     private ProducerTemplate producer;
 
     @Autowired
+    RestTemplate restTemplate;
+
+    @Autowired
     private ItemDetailsRepository itemDetailsRepository;
 
     @Autowired
@@ -270,7 +273,7 @@ public class GFAService {
             filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
             logger.info(filterParamValue);
 
-            RestTemplate restTemplate = getRestTemplate();
+            //RestTemplate restTemplate = getRestTemplate();
             HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getGfaItemStatus()).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(getGfaServerResponseTimeOutMilliseconds());
@@ -305,7 +308,7 @@ public class GFAService {
             filterParamValue = objectMapper.writeValueAsString(gfaLasStatusCheckRequest);
             logger.info("Heart Beat Request: {}", filterParamValue);
 
-            RestTemplate restTemplate = getRestTemplate();
+           // RestTemplate restTemplate = getRestTemplate();
             HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getGfaHeartBeat()).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(getGfaServerResponseTimeOutMilliseconds());
@@ -365,7 +368,7 @@ public class GFAService {
         ResponseEntity<GFARetrieveItemResponse> responseEntity = null;
         try {
             HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
-            responseEntity = getRestTemplate().exchange(getGfaItemRetrival(), HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class);
+            responseEntity = restTemplate.exchange(getGfaItemRetrival(), HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class);
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 gfaRetrieveItemResponse = responseEntity.getBody();
                 gfaRetrieveItemResponse = getLASRetrieveResponse(gfaRetrieveItemResponse);
@@ -450,7 +453,7 @@ public class GFAService {
                     && gfaItemStatusCheckResponse.getDsitem() != null
                     && gfaItemStatusCheckResponse.getDsitem().getTtitem() != null && !gfaItemStatusCheckResponse.getDsitem().getTtitem().isEmpty()) {
 
-                RestTemplate restTemplate = new RestTemplate();
+                //RestTemplate restTemplate = new RestTemplate();
                 HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
                 logger.info("{}" , convertJsontoString(requestEntity.getBody()));
                 ResponseEntity<GFAEddItemResponse> responseEntity = restTemplate.exchange(getGfaItemEDDRetrival(), HttpMethod.POST, requestEntity, GFAEddItemResponse.class);
@@ -777,7 +780,7 @@ public class GFAService {
         try {
             HttpEntity<GFAPwdRequest> requestEntity = new HttpEntity<>(gfaPwdRequest, getHttpHeaders());
             logger.info("GFA PWD Request : {}", convertJsontoString(requestEntity.getBody()));
-            RestTemplate restTemplate = getRestTemplate();
+           // RestTemplate restTemplate = getRestTemplate();
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(getGfaServerResponseTimeOutMilliseconds());
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(getGfaServerResponseTimeOutMilliseconds());
             ResponseEntity<GFAPwdResponse> responseEntity = restTemplate.exchange(getGfaItemPermanentWithdrawlDirect(), HttpMethod.POST, requestEntity, GFAPwdResponse.class);
@@ -802,7 +805,7 @@ public class GFAService {
         try {
             HttpEntity<GFAPwiRequest> requestEntity = new HttpEntity<>(gfaPwiRequest, getHttpHeaders());
             logger.info("GFA PWI Request : {}", convertJsontoString(requestEntity.getBody()));
-            RestTemplate restTemplate = getRestTemplate();
+            //RestTemplate restTemplate = getRestTemplate();
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(getGfaServerResponseTimeOutMilliseconds());
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(getGfaServerResponseTimeOutMilliseconds());
             ResponseEntity<GFAPwiResponse> responseEntity = restTemplate.exchange(getGfaItemPermanentWithdrawlInDirect(), HttpMethod.POST, requestEntity, GFAPwiResponse.class);

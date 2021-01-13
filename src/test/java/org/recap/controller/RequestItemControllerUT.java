@@ -375,10 +375,10 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         BulkRequestInformation bulkRequestInformation = new BulkRequestInformation();
         bulkRequestInformation.setPatronBarcode("123456");
         bulkRequestInformation.setRequestingInstitution("PUL");
-        Mockito.when(jsipConectorFactory.getJSIPConnector(any())).thenReturn(ijsipConnector);
-        Mockito.when(jsipConectorFactory.getJSIPConnector(bulkRequestInformation.getRequestingInstitution()).patronValidation(bulkRequestInformation.getRequestingInstitution(), bulkRequestInformation.getPatronBarcode())).thenReturn(true);
-            boolean result = mockedRequestItemController.patronValidationBulkRequest(bulkRequestInformation);
-            assertNotNull(result);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(bulkRequestInformation.getRequestingInstitution()).patronValidation(bulkRequestInformation.getRequestingInstitution(), bulkRequestInformation.getPatronBarcode())).thenReturn(true);
+        boolean result = mockedRequestItemController.patronValidationBulkRequest(bulkRequestInformation);
+        assertNotNull(result);
     }
 
     @Test

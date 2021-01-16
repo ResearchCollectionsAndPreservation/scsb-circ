@@ -534,7 +534,7 @@ public class DeAccessionService {
                     deliveryLocation = barcodeAndStopCodeMap.get(barcode);
                     List<HoldingsEntity> holdingsEntities = itemEntity.getHoldingsEntities();
                     List<BibliographicEntity> bibliographicEntities = itemEntity.getBibliographicEntities();
-                    Integer itemId = itemEntity.getItemId();
+                    Integer itemId = itemEntity.getId();
                     List<Integer> holdingsIds = processHoldings(holdingsEntities, username);
                     List<Integer> bibliographicIds = processBibs(bibliographicEntities, username);
                     itemDetailsRepository.markItemAsDeleted(itemId, username, currentDate);
@@ -682,7 +682,7 @@ public class DeAccessionService {
             deAccessionDBResponseEntity.setCollectionGroupCode(collectionGroupEntity.getCollectionGroupCode());
         }
         deAccessionDBResponseEntity.setCustomerCode(itemEntity.getCustomerCode());
-        deAccessionDBResponseEntity.setItemId(itemEntity.getItemId());
+        deAccessionDBResponseEntity.setItemId(itemEntity.getId());
         List<BibliographicEntity> bibliographicEntities = itemEntity.getBibliographicEntities();
         List<String> owningInstitutionBibIds = new ArrayList<>();
         for (BibliographicEntity bibliographicEntity : bibliographicEntities) {
@@ -699,7 +699,7 @@ public class DeAccessionService {
             String owningInstitutionBibId = bibliographicEntity.getOwningInstitutionBibId();
             Long nonDeletedItemsCount = bibliographicDetailsRepository.getNonDeletedItemsCount(owningInstitutionId, owningInstitutionBibId);
             if (nonDeletedItemsCount == 1) {
-                bibliographicIds.add(bibliographicEntity.getBibliographicId());
+                bibliographicIds.add(bibliographicEntity.getId());
             }
         }
         if (CollectionUtils.isNotEmpty(bibliographicIds)) {
@@ -715,7 +715,7 @@ public class DeAccessionService {
             String owningInstitutionHoldingsId = holdingsEntity.getOwningInstitutionHoldingsId();
             Long nonDeletedItemsCount = holdingsDetailsRepository.getNonDeletedItemsCount(owningInstitutionId, owningInstitutionHoldingsId);
             if (nonDeletedItemsCount == 1) {
-                holdingIds.add(holdingsEntity.getHoldingsId());
+                holdingIds.add(holdingsEntity.getId());
             }
         }
         if (CollectionUtils.isNotEmpty(holdingIds)) {

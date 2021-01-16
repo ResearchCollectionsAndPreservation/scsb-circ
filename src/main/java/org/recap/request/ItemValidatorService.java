@@ -134,7 +134,7 @@ public class ItemValidatorService {
             for (ItemEntity itemEntity : itemEntityList) {
                 List<BibliographicEntity> bibliographicList = itemEntity.getBibliographicEntities();
                 for (BibliographicEntity bibliographicEntityDetails : bibliographicList) {
-                    bibliographicIds.add(bibliographicEntityDetails.getBibliographicId());
+                    bibliographicIds.add(bibliographicEntityDetails.getId());
                 }
             }
             return multipleRequestItemValidation(itemEntityList, bibliographicIds, itemRequestInformation);
@@ -210,7 +210,7 @@ public class ItemValidatorService {
                     if (itemEntity.getBibliographicEntities().size() == bibliographicIds.size()) {
                         bibliographicList = itemEntity.getBibliographicEntities();
                         for (BibliographicEntity bibliographicEntity : bibliographicList) {
-                            Integer bibliographicId = bibliographicEntity.getBibliographicId();
+                            Integer bibliographicId = bibliographicEntity.getId();
                             if (!bibliographicIds.contains(bibliographicId)) {
                                 return new ResponseEntity(RecapConstants.ITEMBARCODE_WITH_DIFFERENT_BIB, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                             } else {

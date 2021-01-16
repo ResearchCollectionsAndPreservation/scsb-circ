@@ -297,7 +297,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
 
         ItemEntity itemEntity1 = new ItemEntity();
-        itemEntity1.setItemId(1);
+        itemEntity1.setId(1);
         itemEntity1.setCreatedDate(new Date());
         itemEntity1.setCreatedBy("etl");
         itemEntity1.setLastUpdatedDate(new Date());
@@ -314,7 +314,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         itemEntity1.setCatalogingStatus("Complete");
 
         ItemEntity itemEntity2 = new ItemEntity();
-        itemEntity2.setItemId(1);
+        itemEntity2.setId(1);
         itemEntity2.setCreatedDate(new Date());
         itemEntity2.setCreatedBy("etl");
         itemEntity2.setLastUpdatedDate(new Date());
@@ -337,10 +337,10 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity1, itemEntity2));
 
         assertNotNull(bibliographicEntity);
-        assertNotNull(bibliographicEntity.getBibliographicId());
-        assertNotNull(bibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
-        assertNotNull(bibliographicEntity.getItemEntities().get(0).getItemId());
-        assertNotNull(bibliographicEntity.getItemEntities().get(1).getItemId());
+        assertNotNull(bibliographicEntity.getId());
+        assertNotNull(bibliographicEntity.getHoldingsEntities().get(0).getId());
+        assertNotNull(bibliographicEntity.getItemEntities().get(0).getId());
+        assertNotNull(bibliographicEntity.getItemEntities().get(1).getId());
 
 
     }
@@ -378,7 +378,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         HoldingsEntity holdingsEntity = getHoldingsEntity(random, 1);
 
         ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setItemId(1);
+        itemEntity.setId(1);
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity.setOwningInstitutionId(1);
@@ -401,14 +401,14 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         BibliographicEntity savedBibliographicEntity = bibliographicEntity;
 
         assertNotNull(savedBibliographicEntity);
-        assertNotNull(savedBibliographicEntity.getBibliographicId());
-        assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0).getHoldingsId());
-        assertNotNull(savedBibliographicEntity.getItemEntities().get(0).getItemId());
+        assertNotNull(savedBibliographicEntity.getId());
+        assertNotNull(savedBibliographicEntity.getHoldingsEntities().get(0).getId());
+        assertNotNull(savedBibliographicEntity.getItemEntities().get(0).getId());
     }
 
     private HoldingsEntity getHoldingsEntity(Random random, Integer institutionId) {
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setHoldingsId(1);
+        holdingsEntity.setId(1);
         holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setCreatedBy("etl");
@@ -421,7 +421,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
 
     private BibliographicEntity getBibliographicEntity(Integer institutionId, String owningInstitutionBibId1) {
         BibliographicEntity bibliographicEntity1 = new BibliographicEntity();
-        bibliographicEntity1.setBibliographicId(1);
+        bibliographicEntity1.setId(1);
         bibliographicEntity1.setContent("mock Content".getBytes());
         bibliographicEntity1.setCreatedDate(new Date());
         bibliographicEntity1.setCreatedBy("etl");

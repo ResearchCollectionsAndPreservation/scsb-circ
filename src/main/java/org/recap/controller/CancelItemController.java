@@ -139,7 +139,7 @@ public class CancelItemController {
 
     private void makeItemAvailableForFirstScanCancelRequest(RequestItemEntity requestItemEntity) {
         if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.LAS_REFILE_REQUEST_PLACED)) {
-            commonUtil.rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
+            commonUtil.rollbackUpdateItemAvailabilityStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
             itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
         }
     }

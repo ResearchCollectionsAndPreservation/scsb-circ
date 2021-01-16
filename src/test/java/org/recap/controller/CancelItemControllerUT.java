@@ -74,7 +74,7 @@ public class CancelItemControllerUT{
         Mockito.when(requestItemDetailsRepository.save(any())).thenReturn(requestItemEntity);
         Mockito.when(requestItemController.cancelHoldItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(requestItemEntity.getRequestStatusEntity());
-        Mockito.doNothing().when(commonUtil).rollbackUpdateItemAvailabilutyStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
+        Mockito.doNothing().when(commonUtil).rollbackUpdateItemAvailabilityStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
         Mockito.doNothing().when(itemRequestServiceUtil).updateSolrIndex(requestItemEntity.getItemEntity());
         cancelRequestResponse = cancelItemController.cancelRequest(requestItemEntity.getId());
         assertNotNull(cancelRequestResponse);
@@ -152,7 +152,7 @@ public class CancelItemControllerUT{
         requestStatusEntity.setRequestStatusCode("LAS_REFILE_REQUEST_PLACED");
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setId(16);
-        requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
+        requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getId());
         requestItemEntity.setRequestTypeId(3);
 
         requestItemEntity.setRequestingInstitutionId(2);
@@ -177,7 +177,7 @@ public class CancelItemControllerUT{
     public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setBibliographicId(1);
+        bibliographicEntity.setId(1);
         bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
@@ -187,7 +187,7 @@ public class CancelItemControllerUT{
         bibliographicEntity.setOwningInstitutionBibId(String.valueOf(random.nextInt()));
 
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setHoldingsId(1);
+        holdingsEntity.setId(1);
         holdingsEntity.setContent("mock holdings".getBytes());
         holdingsEntity.setCreatedDate(new Date());
         holdingsEntity.setLastUpdatedDate(new Date());
@@ -201,7 +201,7 @@ public class CancelItemControllerUT{
         institutionEntity.setInstitutionName("PUL");
 
         ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setItemId(1);
+        itemEntity.setId(1);
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity.setOwningInstitutionId(1);

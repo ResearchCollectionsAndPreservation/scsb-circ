@@ -79,7 +79,7 @@ public class NyplApiResponseUtilUT {
     @Test
     public void getNormalizedItemIdForNypl() throws Exception {
         ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setItemId(123456);
+        itemEntity.setId(123456);
         itemEntity.setOwningInstitutionItemId("124567");
         itemEntity.setInstitutionEntity(getInstitutionEntity());
         Mockito.when(itemDetailsRepository.findByBarcode("123456")).thenReturn(Arrays.asList(itemEntity));

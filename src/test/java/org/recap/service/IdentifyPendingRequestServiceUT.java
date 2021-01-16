@@ -116,7 +116,7 @@ public class IdentifyPendingRequestServiceUT{
         institutionEntity.setInstitutionCode("PUL");
         institutionEntity.setInstitutionName("PUL");
         ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setItemId(1);
+        itemEntity.setId(1);
         itemEntity.setBarcode("123456");
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemStatusEntity(itemStatusEntity);

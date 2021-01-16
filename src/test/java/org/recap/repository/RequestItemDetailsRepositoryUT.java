@@ -76,7 +76,7 @@ public class RequestItemDetailsRepositoryUT extends BaseTestCase {
         assertNotNull(savedRequestStatusEntity);
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
-        requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getItemId());
+        requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getId());
         requestItemEntity.setRequestTypeId(savedRequestStatusEntity.getId());
         requestItemEntity.setRequestingInstitutionId(1);
         requestItemEntity.setRequestStatusId(1);

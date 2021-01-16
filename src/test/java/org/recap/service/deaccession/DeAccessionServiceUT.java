@@ -427,11 +427,11 @@ public class DeAccessionServiceUT{
         institutionEntity.setInstitutionCode("PUL");
         institutionEntity.setInstitutionName("PUL");
         HoldingsEntity holdingsEntity = new HoldingsEntity();
-        holdingsEntity.setHoldingsId(123456);
+        holdingsEntity.setId(123456);
         holdingsEntity.setOwningInstitutionHoldingsId("1");
         holdingsEntity.setOwningInstitutionId(1);
         ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setItemId(1);
+        itemEntity.setId(1);
         itemEntity.setBarcode("123456");
         itemEntity.setCustomerCode("PA");
         itemEntity.setItemStatusEntity(itemStatusEntity);
@@ -446,7 +446,7 @@ public class DeAccessionServiceUT{
 
     private BibliographicEntity getBibliographicEntity() {
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setBibliographicId(1);
+        bibliographicEntity.setId(1);
         bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
@@ -638,7 +638,7 @@ public class DeAccessionServiceUT{
         requestStatusEntity2.setRequestStatusDescription("RECALL_ORDER_PLACED");
 
         ItemEntity itemEntity1 = new ItemEntity();
-        itemEntity1.setItemId(1);
+        itemEntity1.setId(1);
         itemEntity1.setBarcode("123");
         itemEntity1.setOwningInstitutionId(1);
         itemEntity1.setInstitutionEntity(institutionEntity1);

@@ -108,11 +108,11 @@ public class CommonUtilUT extends BaseTestCaseUT {
         commonUtil.addItemAndReportEntities(itemEntities,reportEntities,processHoldings,holdingsEntity,itemMap);
     }
     @Test
-    public void rollbackUpdateItemAvailabilutyStatus(){
+    public void rollbackUpdateItemAvailabilityStatus(){
         ItemEntity itemEntity = getBibliographicEntity().getItemEntities().get(0);
         String userName = "Test";
         Mockito.when(itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.AVAILABLE)).thenReturn(getItemStatusEntity());
-        commonUtil.rollbackUpdateItemAvailabilutyStatus(itemEntity,userName);
+        commonUtil.rollbackUpdateItemAvailabilityStatus(itemEntity,userName);
     }
     @Test
     public void getFTPPropertiesMap(){
@@ -201,7 +201,7 @@ public class CommonUtilUT extends BaseTestCaseUT {
     private BibliographicEntity getBibliographicEntity(){
 
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setBibliographicId(123456);
+        bibliographicEntity.setId(123456);
         bibliographicEntity.setContent("Test".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());
@@ -221,7 +221,7 @@ public class CommonUtilUT extends BaseTestCaseUT {
         holdingsEntity.setDeleted(false);
 
         ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setItemId(1);
+        itemEntity.setId(1);
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId("843617540");
         itemEntity.setOwningInstitutionId(1);

@@ -104,7 +104,7 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
         Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
-        Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilutyStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
+        Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilityStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
         Mockito.when(gfaService.executeRetrieveOrder(any(), any())).thenReturn(itemInformationResponse);
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
         itemInformationResponse.setRequestTypeForScheduledOnWO(false);
@@ -128,7 +128,7 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
         Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
-        Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilutyStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
+        Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilityStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
         Mockito.when(requestItemController.checkoutItem(any(), any())).thenReturn(itemCheckoutResponse);
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
 

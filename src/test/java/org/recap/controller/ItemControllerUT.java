@@ -64,7 +64,7 @@ public class ItemControllerUT extends BaseTestCaseUT {
     }
     private BibliographicEntity getBibliographicEntity() {
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
-        bibliographicEntity.setBibliographicId(1);
+        bibliographicEntity.setId(1);
         bibliographicEntity.setContent("mock Content".getBytes());
         bibliographicEntity.setCreatedDate(new Date());
         bibliographicEntity.setLastUpdatedDate(new Date());

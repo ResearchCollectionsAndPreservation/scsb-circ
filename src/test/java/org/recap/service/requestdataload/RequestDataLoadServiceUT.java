@@ -109,7 +109,7 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         holdingsEntity.setOwningInstitutionHoldingsId(String.valueOf(random.nextInt()));
 
         ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setItemId(1);
+        itemEntity.setId(1);
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId(String.valueOf(random.nextInt()));
         itemEntity.setOwningInstitutionId(1);

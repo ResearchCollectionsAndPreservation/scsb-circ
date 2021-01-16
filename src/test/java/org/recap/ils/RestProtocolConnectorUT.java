@@ -1,11 +1,16 @@
 package org.recap.ils;
 
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapConstants;
 import org.recap.ils.model.nypl.*;
-import org.recap.ils.model.nypl.request.*;
+import org.recap.ils.model.nypl.request.CancelHoldRequest;
+import org.recap.ils.model.nypl.request.CheckinRequest;
+import org.recap.ils.model.nypl.request.CheckoutRequest;
+import org.recap.ils.model.nypl.request.CreateHoldRequest;
 import org.recap.ils.model.nypl.response.*;
 import org.recap.ils.model.response.ItemCheckinResponse;
 import org.recap.ils.model.response.ItemCheckoutResponse;
@@ -13,10 +18,12 @@ import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.ils.service.NyplApiResponseUtil;
 import org.recap.ils.service.NyplOauthTokenApiService;
+import org.recap.ils.service.RestOauthTokenApiService;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.jpa.ItemRefileResponse;
 import org.recap.processor.NyplJobResponsePollingProcessor;
+import org.recap.processor.RestProtocolJobResponsePollingProcessor;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -49,6 +56,12 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
 
     @Mock
     RestTemplate restTemplate;
+
+    @Mock
+    RestOauthTokenApiService restOauthTokenApiService;
+
+    @Mock
+    RestProtocolJobResponsePollingProcessor restProtocolJobResponsePollingProcessor;
 
     @Test
     public void supports(){
@@ -125,10 +138,10 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         when(nyplApiResponseUtil.getNyplSource(institutionId)).thenReturn("rest");
         when(nyplApiResponseUtil.getNormalizedItemIdForNypl(itemId)).thenReturn("holdItem");
         when(restProtocolConnector.getApiUrl(source,itemIdentifier)).thenReturn("localhost:9090/holdItem");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
 
-        when(restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class)).thenReturn(responseEntity);
-        when(nyplApiResponseUtil.buildItemInformationResponse(any())).thenReturn(itemInformationResponse);
+//        when(restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class)).thenReturn(responseEntity);
+//        when(nyplApiResponseUtil.buildItemInformationResponse(any())).thenReturn(itemInformationResponse);
         ItemInformationResponse informationResponse = restProtocolConnector.lookupItem(itemId);
         assertNotNull(informationResponse);
     }
@@ -154,9 +167,9 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         when(nyplApiResponseUtil.getNyplSource(institutionId)).thenReturn("rest");
         when(nyplApiResponseUtil.getNormalizedItemIdForNypl(itemId)).thenReturn("holdItem");
         when(restProtocolConnector.getApiUrl(source,itemIdentifier)).thenReturn("localhost:9090/holdItem");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
 
-        when(restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+//        when(restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
         ItemInformationResponse informationResponse = restProtocolConnector.lookupItem(itemId);
         assertNotNull(informationResponse);
     }
@@ -183,14 +196,15 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         ResponseEntity<CheckoutResponse> responseEntity = new ResponseEntity<CheckoutResponse>(checkoutResponse,HttpStatus.OK);
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
         when(nyplApiResponseUtil.getExpirationDateForNypl()).thenReturn(new Date().toString());
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         doReturn(responseEntity).when(restTemplate).exchange(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CheckoutResponse>>any());
         when(nyplApiResponseUtil.buildItemCheckoutResponse(checkoutResponse)).thenReturn(new ItemCheckoutResponse());
-        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(getJobResponse());
+        when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(getJobResponse());
+//        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(getJobResponse());
         ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier,patronIdentifier);
         assertNotNull(response);
     }
@@ -206,14 +220,15 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         ResponseEntity<CheckoutResponse> responseEntity = new ResponseEntity<CheckoutResponse>(checkoutResponse,HttpStatus.OK);
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
         when(nyplApiResponseUtil.getExpirationDateForNypl()).thenReturn(new Date().toString());
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         doReturn(responseEntity).when(restTemplate).exchange(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CheckoutResponse>>any());
         when(nyplApiResponseUtil.buildItemCheckoutResponse(checkoutResponse)).thenReturn(new ItemCheckoutResponse());
-        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(new JobResponse());
+        when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
+//        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(new JobResponse());
         ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier,patronIdentifier);
         assertNotNull(response);
     }
@@ -227,7 +242,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         checkoutRequest.setDesiredDateDue(new Date().toString());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
         when(nyplApiResponseUtil.getExpirationDateForNypl()).thenReturn(new Date().toString());
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST)).when(restTemplate).exchange(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(HttpMethod.class),
@@ -257,9 +272,10 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CheckinResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         when(nyplApiResponseUtil.buildItemCheckinResponse(checkinResponse)).thenReturn(new ItemCheckinResponse());
-        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(getJobResponse());
+        when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(getJobResponse());
+//        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(getJobResponse());
         ItemCheckinResponse response = restProtocolConnector.checkInItem(itemIdentifier,patronIdentifier);
         assertNotNull(response);
     }
@@ -277,9 +293,10 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CheckinResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         when(nyplApiResponseUtil.buildItemCheckinResponse(checkinResponse)).thenReturn(new ItemCheckinResponse());
-        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(new JobResponse());
+        when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
+//        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(new JobResponse());
         ItemCheckinResponse response = restProtocolConnector.checkInItem(itemIdentifier,patronIdentifier);
         assertNotNull(response);
     }
@@ -295,7 +312,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CheckinResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         ItemCheckinResponse response = restProtocolConnector.checkInItem(itemIdentifier,patronIdentifier);
         assertNotNull(response);
     }
@@ -331,7 +348,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                     ArgumentMatchers.any(),
                     ArgumentMatchers.<Class<CreateHoldResponse>>any());
             when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-            when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//            when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
 //            when(nyplApiResponseUtil.buildItemCheckinResponse(any())).thenReturn(new ItemCheckinResponse());
 //            when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(getJobResponse());
             AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
@@ -388,7 +405,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CheckinResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         AbstractResponseItem responseItem =restProtocolConnector.placeHold(itemIdentifier,patronIdentifier,callInstitutionId,itemInstitutionId,expirationDate,bibId,deliveryLocation,trackingId,title,author,callNumber);
         assertNotNull(responseItem);
     }
@@ -471,9 +488,10 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CancelHoldResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         when(nyplApiResponseUtil.buildItemCancelHoldResponse(any())).thenReturn(new ItemHoldResponse());
-        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(getJobResponse());
+        when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(getJobResponse());
+        //when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(getJobResponse());
         when(nyplApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenReturn("2");
         AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier,patronIdentifier,institutionId,expirationDate,bibId,pickupLocation,trackingId);
         assertNotNull(responseItem);
@@ -495,9 +513,10 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CancelHoldResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         when(nyplApiResponseUtil.buildItemCancelHoldResponse(any())).thenReturn(new ItemHoldResponse());
-        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(new JobResponse());
+        when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
+//        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(new JobResponse());
         when(nyplApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenReturn("2");
         AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier,patronIdentifier,institutionId,expirationDate,bibId,pickupLocation,trackingId);
         assertNotNull(responseItem);
@@ -519,7 +538,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CancelHoldResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         when(nyplApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenReturn("2");
         AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier,patronIdentifier,institutionId,expirationDate,bibId,pickupLocation,trackingId);
         assertNotNull(responseItem);
@@ -562,15 +581,19 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<RefileResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         when(nyplApiResponseUtil.buildItemRefileResponse(any())).thenReturn(new ItemRefileResponse());
-        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(getJobResponse());
+        when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(getJobResponse());
+//        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(getJobResponse());
         ItemRefileResponse response = restProtocolConnector.refileItem(itemIdentifier);
         assertNotNull(response);
     }
     @Test
     public void refileItemWithoutJobId() throws Exception {
         String itemIdentifier = "2345343";
+        ilsConfigProperties.setOperatorPassword("recap");
+        ilsConfigProperties.setOperatorUserId("recap");
+        ilsConfigProperties.setOperatorLocation("location");
         RefileResponse refileResponse = new RefileResponse();
         refileResponse.setCount(1);
         refileResponse.setData(new RefileData());
@@ -581,10 +604,11 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<RefileResponse>>any());
+        when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         when(nyplApiResponseUtil.buildItemRefileResponse(any())).thenReturn(new ItemRefileResponse());
-        when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(new JobResponse());
+   //     when(nyplJobResponsePollingProcessor.pollNyplRequestItemJobResponse(any())).thenReturn(new JobResponse());
         ItemRefileResponse response = restProtocolConnector.refileItem(itemIdentifier);
         assertNotNull(response);
     }
@@ -597,7 +621,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<RefileResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(nyplOauthTokenApiService.generateAccessTokenForNyplApi(getOperatorUserId(), getOperatorPassword())).thenReturn("Recap");
+//        when(restOauthTokenApiService.generateAccessTokenForRestApi(any(),any(),anyString())).thenReturn("Recap");
         ItemRefileResponse response = restProtocolConnector.refileItem(itemIdentifier);
         assertNotNull(response);
     }

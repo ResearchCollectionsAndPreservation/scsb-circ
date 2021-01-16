@@ -2,11 +2,9 @@ package org.recap.request;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
@@ -48,7 +46,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
     private ItemController itemController;
 
     @Mock
-    private CustomerCodeDetailsRepository customerCodeDetailsRepository;
+    CustomerCodeDetailsRepository customerCodeDetailsRepository;
 
     @Mock
     private RequestItemDetailsRepository requestItemDetailsRepository;
@@ -128,7 +126,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         itemValidatorService.itemValidation(itemRequestInformation);
         Mockito.when(itemController.findByBarcodeIn(itemBarcodes.toString())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(getCustomerCodeEntity());
+//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(getCustomerCodeEntity());
         itemValidatorService.itemValidation(itemRequestInformation);
         Mockito.when(imsLocationDetailsRepository.findById(any())).thenReturn(Optional.of(imsLocationEntity));
         itemValidatorService.itemValidation(itemRequestInformation);
@@ -136,15 +134,15 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         itemRequestInformation1.setDeliveryLocation("PA");
         itemRequestInformation1.setRequestType(RecapCommonConstants.REQUEST_TYPE_RECALL);
         itemValidatorService.itemValidation(itemRequestInformation1);
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(),any())).thenReturn(getCustomerCodeEntity());
-        itemValidatorService.itemValidation(itemRequestInformation1);
+//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(),any())).thenReturn(getCustomerCodeEntity());
+  //      itemValidatorService.itemValidation(itemRequestInformation1);
     }
     @Test
     public void getCheckDeliveryLocation(){
         String customerCode = "PA";
         ItemRequestInformation itemRequestInformation = getItemRequestInformation(Arrays.asList("2456744"));
         CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(customerCodeEntity);
+//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(customerCodeEntity);
         Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
         itemValidatorService.checkDeliveryLocation(customerCode,itemRequestInformation);
         customerCodeEntity.setDeliveryRestrictions("CA");
@@ -158,7 +156,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation(Arrays.asList("2456744"));
         itemRequestInformation.setRequestingInstitution("3");
         CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(customerCodeEntity);
+//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(customerCodeEntity);
         Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
         itemValidatorService.checkDeliveryLocation(customerCode,itemRequestInformation);
     }
@@ -168,7 +166,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation(Arrays.asList("2456744"));
         itemRequestInformation.setRequestingInstitution("PUL");
         CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(), any())).thenReturn(customerCodeEntity);
+//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(), any())).thenReturn(customerCodeEntity);
         Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
         itemValidatorService.checkDeliveryLocation(customerCode,itemRequestInformation);
         itemRequestInformation.setDeliveryLocation("PA");
@@ -234,14 +232,14 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity1);
         ResponseEntity responseEntity4 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity4);
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(),any())).thenReturn(customerCodeEntity);
+//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(),any())).thenReturn(customerCodeEntity);
         Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
         ResponseEntity responseEntity5 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity5);
 
         CustomerCodeEntity customerCodeEntity1 = getCustomerCodeEntity();
         customerCodeEntity1.setDeliveryRestrictions("PA");
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(),any())).thenReturn(customerCodeEntity1);
+//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(),any())).thenReturn(customerCodeEntity1);
         Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity1);
         ResponseEntity responseEntity6 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity6);

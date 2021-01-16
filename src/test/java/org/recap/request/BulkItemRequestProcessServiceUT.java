@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
 
@@ -159,7 +158,20 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setBarcode("123456");
         itemEntity.setCustomerCode("PA");
+        itemEntity.setImsLocationEntity(getImsLocationEntity());
         return itemEntity;
+    }
+    private ImsLocationEntity getImsLocationEntity() {
+        ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
+        imsLocationEntity.setImsLocationCode("1");
+        imsLocationEntity.setImsLocationName("test");
+        imsLocationEntity.setCreatedBy("test");
+        imsLocationEntity.setCreatedDate(new Date());
+        imsLocationEntity.setActive(true);
+        imsLocationEntity.setDescription("test");
+        imsLocationEntity.setUpdatedBy("test");
+        imsLocationEntity.setUpdatedDate(new Date());
+        return imsLocationEntity;
     }
 
     private BulkRequestItemEntity getBulkRequestItemEntity() {

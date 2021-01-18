@@ -73,10 +73,11 @@ public class IdentifyPendingRequestService {
 
     private PendingRequestEntity getPendingRequestEntityFromRequestEntity(RequestItemEntity requestItemEntity){
         PendingRequestEntity pendingRequestEntity = new PendingRequestEntity();
-        pendingRequestEntity.setId(requestItemEntity.getId());
+       // pendingRequestEntity.setId(requestItemEntity.getId());
         pendingRequestEntity.setItemId(requestItemEntity.getItemId());
-        pendingRequestEntity.setRequestItemEntity(requestItemEntity);
+        pendingRequestEntity.setRequestId(requestItemEntity.getId());
         pendingRequestEntity.setRequestCreatedDate(new Date());
+        pendingRequestEntity.setRequestItemEntity(requestItemEntity);
         pendingRequestEntity.setItemEntity(requestItemEntity.getItemEntity());
         return pendingRequestEntity;
     }

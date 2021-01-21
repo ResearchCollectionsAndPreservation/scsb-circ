@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
@@ -47,6 +48,7 @@ import static org.mockito.ArgumentMatchers.any;
 public class GFAServiceUT extends BaseTestCaseUT {
 
     @InjectMocks
+    @Spy
     GFAService gfaService;
 
     private String gfaItemStatus = "http://recapgfa-dev.princeton.edu:9092/lasapi/rest/lasapiSvc/itemStatus";
@@ -110,7 +112,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
     CommonUtil commonUtil;
 
     @Mock
-    RestTemplate restTemplate;
+    RestTemplate restTemplate = new RestTemplate();
 
     @Mock
     SimpleClientHttpRequestFactory simpleClientHttpRequestFactory;
@@ -136,6 +138,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -158,6 +161,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         String filterParamValue = objectMapper.writeValueAsString(gfaLasStatusCheckRequest);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaLasStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -197,6 +201,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
         HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
         ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.OK);
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
         GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
         assertNotNull(response);
@@ -209,6 +214,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         gfaRetrieveItemResponse.getDsitem().getTtitem().get(0).setErrorCode("Error code");
         HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
         ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.OK);
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
         GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
         assertNotNull(response);
@@ -219,6 +225,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         GFARetrieveItemRequest gfaRetrieveItemRequest = getGfaRetrieveItemRequest();
         HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
         ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(HttpStatus.OK);
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
         GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
         assertNotNull(response);
@@ -230,6 +237,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
         HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
         ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.FORBIDDEN);
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
         GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
         assertNotNull(response);
@@ -240,6 +248,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         GFARetrieveItemRequest gfaRetrieveItemRequest = getGfaRetrieveItemRequest();
         GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
         HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
         GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
         assertNotNull(response);
@@ -248,6 +257,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
     @Test
     public void itemRetrievalException() {
         GFARetrieveItemRequest gfaRetrieveItemRequest = getGfaRetrieveItemRequest();
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
         assertNotNull(response);
     }
@@ -255,6 +265,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
     @Test
     public void itemEDDRetrievalWithoutGfaItemStatusCheckResponse() {
         GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = getGFARetrieveEDDItemRequest();
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         GFAEddItemResponse response = gfaService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
         assertNotNull(response);
     }
@@ -277,6 +288,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
         HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -304,6 +316,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
         HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -331,6 +344,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
         HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -358,6 +372,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
         HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -385,6 +400,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
         HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -410,6 +426,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
         HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -436,6 +453,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -474,6 +492,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -499,6 +518,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -523,6 +543,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -534,9 +555,9 @@ public class GFAServiceUT extends BaseTestCaseUT {
     @Test
     public void executeRetrieveOrderGFAItemStatusINForEDDWithUseQueueLasCall() throws Exception {
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
+        itemRequestInfo.setImsLocationCode("PA");
         itemRequestInfo.setRequestType("EDD");
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
-        RequestStatusEntity requestStatusEntity = getRequestItemEntity().getRequestStatusEntity();
         ObjectMapper objectMapper = new ObjectMapper();
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
         GFAItemStatus gfaItemStatus001 = new GFAItemStatus();
@@ -550,6 +571,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -578,6 +600,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
         ReflectionTestUtils.setField(gfaService, "useQueueLasCall", useQueueLasCall);
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -615,6 +638,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
         ReflectionTestUtils.setField(gfaService, "useQueueLasCall", false);
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -664,6 +688,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
         HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
         ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.OK);
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
         ItemInformationResponse response = gfaService.gfaItemRequestProcessor(ex);
         assertNotNull(response);
@@ -674,6 +699,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         CamelContext ctx = new DefaultCamelContext();
         Exchange ex = new DefaultExchange(ctx);
         ex.getIn().setBody(itemRequestInfo);
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         ItemInformationResponse response = gfaService.gfaItemRequestProcessor(ex);
         assertNotNull(response);
     }
@@ -738,6 +764,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
         HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
         HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -763,6 +790,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         CamelContext ctx = new DefaultCamelContext();
         Exchange ex = new DefaultExchange(ctx);
         ex.getIn().setBody(itemRequestInfo);
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         ItemInformationResponse response = gfaService.gfaItemRequestProcessor(ex);
         assertNotNull(response);
     }
@@ -780,6 +808,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         GFAPwdResponse gfaPwdResponse = getGfaPwdResponse();
         ResponseEntity<GFAPwdResponse> responseEntity = new ResponseEntity<>(gfaPwdResponse, HttpStatus.OK);
         HttpEntity<GFAPwdRequest> requestEntity = new HttpEntity<>(gfaPwdRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -798,6 +827,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         GFAPwiResponse gfaPwiResponse = getGfaPwiResponse();
         ResponseEntity<GFAPwiResponse> responseEntity = new ResponseEntity<>(gfaPwiResponse, HttpStatus.OK);
         HttpEntity<GFAPwiRequest> requestEntity = new HttpEntity<>(gfaPwiRequest, getHttpHeaders());
+        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
         Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
         Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
@@ -1001,6 +1031,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         gfaEddItemResponse.setSuccess(true);
         RetrieveItemEDDRequest retrieveItemEDDRequest = new RetrieveItemEDDRequest();
         TtitemEDDResponse ttitemEDDResponse = new TtitemEDDResponse();
+        ttitemEDDResponse.setRequestId(1);
         ttitemEDDResponse.setCustomerCode("123456");
         ttitemEDDResponse.setRequestId(1);
         retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitemEDDResponse));
@@ -1057,6 +1088,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         GFARetrieveItemResponse gfaRetrieveItemResponse = new GFARetrieveItemResponse();
         RetrieveItem retrieveItem = new RetrieveItem();
         Ttitem ttitem = new Ttitem();
+        ttitem.setRequestId(1);
         ttitem.setItemStatus("Success");
         ttitem.setItemBarcode("123456");
         retrieveItem.setTtitem(Arrays.asList(ttitem));
@@ -1165,7 +1197,7 @@ public class GFAServiceUT extends BaseTestCaseUT {
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         itemRequestInformation.setStartPage("10");
         itemRequestInformation.setEndPage("100");
-
+        itemRequestInformation.setImsLocationCode("PA");
         return itemRequestInformation;
     }
 

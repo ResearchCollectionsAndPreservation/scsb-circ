@@ -45,8 +45,11 @@ public class RequestInitialDataLoadProcessorUT {
     CamelContext camelContext;
 
     private Set<String> barcodeSet = new HashSet<>();
+
+    private static String key = "test/test/test";
+
     @Before
-    public  void setup(){
+    public void setup() {
         MockitoAnnotations.initMocks(this);
     }
 
@@ -80,7 +83,7 @@ public class RequestInitialDataLoadProcessorUT {
         Exchange ex = new DefaultExchange(ctx);
         ex.getIn().setHeader("directoryName", "CUL");
         ex.getIn().setBody(requestDataLoadCSVRecordList);
-        ex.setProperty("CamelSplitComplete",true);
+        ex.setProperty("CamelSplitComplete", true);
         try {
             Set<String> data = new HashSet<>();
             data.add("332456456456745");
@@ -113,16 +116,17 @@ public class RequestInitialDataLoadProcessorUT {
         exchange.getIn().setBody(requestDataLoadCSVRecordList);
         exchange.getIn().setHeader("John", "CUL");
         exchange.getIn().setHeader("CamelAwsS3Key", "GEJGNSIKHIL");
-        exchange.getIn().setHeader("CamelAwsS3BucketName", "AWSS3Bucket/Htsvmlfkgdr/fksifdg");
-        exchange.setProperty("CamelSplitIndex",0);
-        exchange.setProperty("CamelSplitComplete",true);
+        exchange.getIn().setHeader("CamelAwsS3BucketName", key);
+        exchange.setProperty("CamelSplitIndex", 0);
+        exchange.setProperty("CamelSplitComplete", true);
         Set<String> stringSet = new HashSet<>();
         stringSet.add("test");
         //Mockito.when(awsS3Client.doesObjectExist(any(), any())).thenReturn(true);
         requestInitialDataLoadProcessor.processInput(exchange);
 
     }
-    private RequestDataLoadCSVRecord getRequestDataLoadCSVRecord(){
+
+    private RequestDataLoadCSVRecord getRequestDataLoadCSVRecord() {
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = new RequestDataLoadCSVRecord();
         requestDataLoadCSVRecord.setBarcode("332456456456745");
         requestDataLoadCSVRecord.setCustomerCode("PB");

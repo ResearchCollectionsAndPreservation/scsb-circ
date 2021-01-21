@@ -450,7 +450,7 @@ public class GFAService {
                     && gfaItemStatusCheckResponse.getDsitem() != null
                     && gfaItemStatusCheckResponse.getDsitem().getTtitem() != null && !gfaItemStatusCheckResponse.getDsitem().getTtitem().isEmpty()) {
 
-                RestTemplate restTemplate = new RestTemplate();
+                RestTemplate restTemplate = getRestTemplate();
                 HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
                 logger.info("{}" , convertJsontoString(requestEntity.getBody()));
                 ResponseEntity<GFAEddItemResponse> responseEntity = restTemplate.exchange(getGfaItemEDDRetrival(), HttpMethod.POST, requestEntity, GFAEddItemResponse.class);

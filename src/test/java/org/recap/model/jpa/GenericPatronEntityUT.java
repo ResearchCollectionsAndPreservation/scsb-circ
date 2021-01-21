@@ -11,6 +11,7 @@ public class GenericPatronEntityUT {
     @Test
     public void getGenericPatronEntity(){
         GenericPatronEntity genericPatronEntity = new GenericPatronEntity();
+        genericPatronEntity.setGenericPatronId(1);
         genericPatronEntity.setRetrievalGenericPatron("173623e34");
         genericPatronEntity.setEddGenericPatron("233455");
         genericPatronEntity.setGenericPatronId(123456);

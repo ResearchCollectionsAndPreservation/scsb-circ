@@ -19,6 +19,7 @@ public class ItemRequestInformationUT extends BaseTestCaseUT {
         itemRequestInformation.setItemOwningInstitution("PUL");
         itemRequestInformation.setCallNumber("X");
         itemRequestInformation.setAuthor("John");
+        itemRequestInformation.setItemVolume("2145");
         itemRequestInformation.setTitleIdentifier("test");
         itemRequestInformation.setTrackingId("235");
         itemRequestInformation.setRequestingInstitution("PUL");

@@ -14,18 +14,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    @Value("${recap-las.email.request.cancel.email.recap.to}")
-    private String recapMailTo;
-
-    @Value("${email.deleted.records.to}")
-    private String deletedRecordsMailTo;
-
-    @Value("${recap-las.email.request.recall.cc}")
-    private String recapMailCC;
-
-    @Value("${recap-las.email.request.refile.to}")
-    private String refileRecapMailTo;
-
     @Value("${email.bulk.request.to}")
     private String bulkRequestEmailTo;
 
@@ -44,41 +32,16 @@ public class EmailService {
      * @param patronBarcode  the patron barcode
      * @param toInstitution  the to institution
      */
-    public void sendEmail(String customerCode, String itemBarcode, String messageDisplay, String patronBarcode, String toInstitution, String subject) {
+    public void sendEmail(String customerCode, String itemBarcode, String imsLocationCode, String messageDisplay, String patronBarcode, String toInstitution, String subject) {
         EmailPayLoad emailPayLoad = new EmailPayLoad();
-        emailPayLoad.setTo(emailIdTo(toInstitution));
-        emailPayLoad.setCc(emailIdCC(toInstitution));
+        emailPayLoad.setTo(emailIdTo(toInstitution, imsLocationCode));
+        emailPayLoad.setCc(emailIdCC(toInstitution, imsLocationCode));
         emailPayLoad.setCustomerCode(customerCode);
         emailPayLoad.setItemBarcode(itemBarcode);
         emailPayLoad.setMessageDisplay(messageDisplay);
         emailPayLoad.setPatronBarcode(patronBarcode);
         emailPayLoad.setSubject(subject + itemBarcode);
         producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.REQUEST_RECALL_MAIL_QUEUE);
-    }
-
-    /**
-     *  Send email method for deleted records reporting.
-     *
-     * @param messageDisplay
-     * @param patronBarcode
-     * @param toInstitution
-     * @param subject
-     */
-    public void sendEmail(String messageDisplay, String patronBarcode, String toInstitution, String subject) {
-        EmailPayLoad emailPayLoad = new EmailPayLoad();
-        emailPayLoad.setTo(emailIdTo(toInstitution));
-        emailPayLoad.setMessageDisplay(messageDisplay);
-        emailPayLoad.setPatronBarcode(patronBarcode);
-        emailPayLoad.setSubject(subject);
-        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.DELETED_MAIL_QUEUE);
-    }
-
-    public void sendEmail(String itemBarcode, String toInstitution, String subject) {
-        EmailPayLoad emailPayLoad = new EmailPayLoad();
-        emailPayLoad.setTo(refileEmailIdTo(toInstitution));
-        emailPayLoad.setItemBarcode(itemBarcode);
-        emailPayLoad.setSubject(subject);
-        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.REQUEST_LAS_STATUS_MAIL_QUEUE);
     }
 
     /**
@@ -102,31 +65,21 @@ public class EmailService {
         producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.BULK_REQUEST_EMAIL_QUEUE);
     }
 
-    private String refileEmailIdTo(String institution) {
-        if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
-            return refileRecapMailTo;
-        } else {
-            return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.request.refile.to");
-        }
-    }
-
     /**
      * @param institution
      * @return
      */
-    private String emailIdTo(String institution) {
+    private String emailIdTo(String institution, String imsLocationCode) {
         if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
-            return recapMailTo;
-        } else if (institution.equalsIgnoreCase(RecapConstants.DELETED_MAIL_TO)) {
-            return deletedRecordsMailTo;
+            return propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.email.request.cancel.to");
         } else {
             return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.recall.request.to");
         }
     }
 
-    private String emailIdCC(String institution) {
+    private String emailIdCC(String institution, String imsLocationCode) {
         if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
-            return recapMailCC;
+            return propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.email.request.recall.cc");
         } else {
             return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.request.recall.cc");
         }

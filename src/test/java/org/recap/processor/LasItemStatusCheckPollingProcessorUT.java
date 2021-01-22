@@ -14,7 +14,7 @@ import org.recap.model.gfa.GFAItemStatusCheckResponse;
 import org.recap.model.gfa.Ttitem;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.recap.request.GFAService;
+import org.recap.las.GFALasService;
 import org.recap.util.ItemRequestServiceUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -28,7 +28,7 @@ public class LasItemStatusCheckPollingProcessorUT extends BaseTestCaseUT {
     LasItemStatusCheckPollingProcessor lasItemStatusCheckPollingProcessor;
 
     @Mock
-    private GFAService gfaService;
+    private GFALasService gfaLasService;
 
     @Mock
     RequestItemDetailsRepository requestItemDetailsRepository;
@@ -56,7 +56,7 @@ public class LasItemStatusCheckPollingProcessorUT extends BaseTestCaseUT {
         CamelContext ctx = new DefaultCamelContext();
         ctx.setRouteController(routeController);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGFAItemStatusCheckResponse();
-        Mockito.when(gfaService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
+        Mockito.when(gfaLasService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
         lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode,ctx);
     }
     @Test
@@ -65,7 +65,7 @@ public class LasItemStatusCheckPollingProcessorUT extends BaseTestCaseUT {
         CamelContext ctx = new DefaultCamelContext();
         ctx.setRouteController(routeController);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGFAItemStatusCheckResponse();
-        Mockito.when(gfaService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
+        Mockito.when(gfaLasService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
         Mockito.doThrow(new NullPointerException()).when(routeController).startRoute(any());
         lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode,ctx);
     }
@@ -75,7 +75,7 @@ public class LasItemStatusCheckPollingProcessorUT extends BaseTestCaseUT {
         CamelContext ctx = new DefaultCamelContext();
         ctx.setRouteController(routeController);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGFAItemStatusCheckResponse();
-        Mockito.when(gfaService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
+        Mockito.when(gfaLasService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
         Mockito.doThrow(new InterruptedException()).when(routeController).startRoute(any());
         lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode,ctx);
     }

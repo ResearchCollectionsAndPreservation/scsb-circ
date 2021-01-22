@@ -6,36 +6,26 @@ import org.codehaus.jettison.json.JSONException;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.controller.RequestItemController;
-import org.recap.gfa.model.GFAPwdDsItemRequest;
-import org.recap.gfa.model.GFAPwdDsItemResponse;
-import org.recap.gfa.model.GFAPwdRequest;
-import org.recap.gfa.model.GFAPwdResponse;
-import org.recap.gfa.model.GFAPwdTtItemRequest;
-import org.recap.gfa.model.GFAPwdTtItemResponse;
-import org.recap.gfa.model.GFAPwiDsItemRequest;
-import org.recap.gfa.model.GFAPwiDsItemResponse;
-import org.recap.gfa.model.GFAPwiRequest;
-import org.recap.gfa.model.GFAPwiResponse;
-import org.recap.gfa.model.GFAPwiTtItemRequest;
-import org.recap.gfa.model.GFAPwiTtItemResponse;
+import org.recap.las.LASImsLocationConnectorFactory;
+import org.recap.las.model.GFAPwdDsItemRequest;
+import org.recap.las.model.GFAPwdDsItemResponse;
+import org.recap.las.model.GFAPwdRequest;
+import org.recap.las.model.GFAPwdResponse;
+import org.recap.las.model.GFAPwdTtItemRequest;
+import org.recap.las.model.GFAPwdTtItemResponse;
+import org.recap.las.model.GFAPwiDsItemRequest;
+import org.recap.las.model.GFAPwiDsItemResponse;
+import org.recap.las.model.GFAPwiRequest;
+import org.recap.las.model.GFAPwiResponse;
+import org.recap.las.model.GFAPwiTtItemRequest;
+import org.recap.las.model.GFAPwiTtItemResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.model.deaccession.DeAccessionSolrRequest;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.CollectionGroupEntity;
-import org.recap.model.jpa.DeaccessionItemChangeLog;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.ReportDataEntity;
-import org.recap.model.jpa.ReportEntity;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.DeaccesionItemChangeLogDetailsRepository;
 import org.recap.repository.jpa.HoldingsDetailsRepository;
@@ -44,9 +34,10 @@ import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ReportDetailRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.recap.request.GFAService;
+import org.recap.las.GFALasService;
 import org.recap.service.RestHeaderService;
 import org.recap.util.ItemRequestServiceUtil;
+import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,18 +117,28 @@ public class DeAccessionService {
     RequestItemController requestItemController;
 
     /**
-     * The Gfa service.
+     * The LAS Ims Location Connector Factory
      */
     @Autowired
-    GFAService gfaService;
+    LASImsLocationConnectorFactory lasImsLocationConnectorFactory;
+
     /**
      * The Item Request Service.
      */
     @Autowired
     ItemRequestServiceUtil itemRequestServiceUtil;
 
+    /**
+     * The GFA Las  Service
+     */
+    @Autowired
+    GFALasService gfaLasService;
+
     @Autowired
     RestHeaderService restHeaderService;
+
+    @Autowired
+    PropertyUtil propertyUtil;
 
     @Autowired
     private DeaccesionItemChangeLogDetailsRepository deaccesionItemChangeLogDetailsRepository;
@@ -152,14 +153,10 @@ public class DeAccessionService {
     @Value("${scsb.solr.doc.url}")
     String scsbSolrClientUrl;
 
-    @Value("${gfa.item.permanent.withdrawl.direct}")
-    private String gfaItemPermanentWithdrawlDirect;
 
-    @Value("${gfa.item.permanent.withdrawl.indirect}")
-    private String gfaItemPermanentWithdrawlInDirect;
-
-    @Value("${recap-las.email.recap.assist.email.to}")
-    private String recapAssistanceEmailTo;
+    private String getRecapAssistanceEmailTo(String imsLocationCode) {
+        return this.propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.email.assist.to");
+    }
 
 
     /**
@@ -235,8 +232,9 @@ public class DeAccessionService {
                             deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), RecapCommonConstants.ITEM_BARCDE_DOESNOT_EXIST, itemEntity));
                         } else {
                             String scsbItemStatus = itemEntity.getItemStatusEntity().getStatusCode();
+                            String recapAssistanceEmailTo = getRecapAssistanceEmailTo(itemEntity.getImsLocationEntity().getImsLocationCode());
                             logger.info("SCSB Item Status : {}", scsbItemStatus);
-                            String gfaItemStatus = gfaService.callGfaItemStatus(itemBarcode);
+                            String gfaItemStatus = gfaLasService.callGfaItemStatus(itemBarcode);
                             logger.info("GFA Item Status : {}", gfaItemStatus);
                             if (StringUtils.isNotBlank(gfaItemStatus)) {
                                 gfaItemStatus = gfaItemStatus.toUpperCase();
@@ -272,6 +270,7 @@ public class DeAccessionService {
     private void callGfaDeaccessionService(List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities, String username) {
         if (CollectionUtils.isNotEmpty(deAccessionDBResponseEntities)) {
             for (DeAccessionDBResponseEntity deAccessionDBResponseEntity : deAccessionDBResponseEntities) {
+                String recapAssistanceEmailTo = getRecapAssistanceEmailTo(deAccessionDBResponseEntity.getImsLocationCode());
                 if (RecapCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && RecapCommonConstants.AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
                     GFAPwdRequest gfaPwdRequest = new GFAPwdRequest();
                     GFAPwdDsItemRequest gfaPwdDsItemRequest = new GFAPwdDsItemRequest();
@@ -282,7 +281,7 @@ public class DeAccessionService {
                     gfaPwdTtItemRequest.setRequestor(username);
                     gfaPwdDsItemRequest.setTtitem(Collections.singletonList(gfaPwdTtItemRequest));
                     gfaPwdRequest.setDsitem(gfaPwdDsItemRequest);
-                    GFAPwdResponse gfaPwdResponse = gfaService.gfaPermanentWithdrawlDirect(gfaPwdRequest);
+                    GFAPwdResponse gfaPwdResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(deAccessionDBResponseEntity.getImsLocationCode()).gfaPermanentWithdrawalDirect(gfaPwdRequest);
                     if (null != gfaPwdResponse) {
                         GFAPwdDsItemResponse gfaPwdDsItemResponse = gfaPwdResponse.getDsitem();
                         if (null != gfaPwdDsItemResponse) {
@@ -309,7 +308,7 @@ public class DeAccessionService {
                     gfaPwiTtItemRequest.setItemBarcode(deAccessionDBResponseEntity.getBarcode());
                     gfaPwiDsItemRequest.setTtitem(Collections.singletonList(gfaPwiTtItemRequest));
                     gfaPwiRequest.setDsitem(gfaPwiDsItemRequest);
-                    GFAPwiResponse gfaPwiResponse = gfaService.gfaPermanentWithdrawlInDirect(gfaPwiRequest);
+                    GFAPwiResponse gfaPwiResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(deAccessionDBResponseEntity.getImsLocationCode()).gfaPermanentWithdrawalInDirect(gfaPwiRequest);
                     if (null != gfaPwiResponse) {
                         GFAPwiDsItemResponse gfaPwiDsItemResponse = gfaPwiResponse.getDsitem();
                         if (null != gfaPwiDsItemResponse) {
@@ -676,6 +675,10 @@ public class DeAccessionService {
         InstitutionEntity institutionEntity = itemEntity.getInstitutionEntity();
         if (institutionEntity != null) {
             deAccessionDBResponseEntity.setInstitutionCode(institutionEntity.getInstitutionCode());
+        }
+        ImsLocationEntity imsLocationEntity = itemEntity.getImsLocationEntity();
+        if (imsLocationEntity != null) {
+            deAccessionDBResponseEntity.setImsLocationCode(imsLocationEntity.getImsLocationCode());
         }
         CollectionGroupEntity collectionGroupEntity = itemEntity.getCollectionGroupEntity();
         if (collectionGroupEntity != null) {

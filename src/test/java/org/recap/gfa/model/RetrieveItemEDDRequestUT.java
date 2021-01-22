@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.RetrieveItemEDDRequest;
+import org.recap.las.model.TtitemEDDResponse;
 
 import java.util.Arrays;
 

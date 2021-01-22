@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAPwiDsItemRequest;
+import org.recap.las.model.GFAPwiTtItemRequest;
 
 import java.util.Arrays;
 

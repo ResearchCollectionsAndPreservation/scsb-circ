@@ -3,6 +3,7 @@ package org.recap.mqconsumer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
+import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -28,6 +29,7 @@ public class RequestItemQueueConsumer {
     private ItemEDDRequestService itemEDDRequestService;
     private BulkItemRequestService bulkItemRequestService;
     private BulkItemRequestProcessService bulkItemRequestProcessService;
+    private String institutionCode;
 
     /**
      * Gets item request service.
@@ -63,6 +65,15 @@ public class RequestItemQueueConsumer {
      */
     public BulkItemRequestProcessService getBulkItemRequestProcessService() {
         return bulkItemRequestProcessService;
+    }
+
+    /**
+     * Gets institution code
+     *
+     * @return institutionCode
+     */
+    public String getInstitutionCode() {
+        return institutionCode;
     }
 
     /**
@@ -106,6 +117,19 @@ public class RequestItemQueueConsumer {
     /**
      * Instantiates a new Request item queue consumer.
      *
+     * @param institutionCode    the institution code
+     * @param itemRequestService    the item request service
+     * @param itemEDDRequestService the item edd request service
+     */
+    public RequestItemQueueConsumer(String institutionCode, ItemRequestService itemRequestService, ItemEDDRequestService itemEDDRequestService) {
+        this.institutionCode = institutionCode;
+        this.itemRequestService = itemRequestService;
+        this.itemEDDRequestService = itemEDDRequestService;
+    }
+
+    /**
+     * Instantiates a new Request item queue consumer.
+     *
      * @param itemEDDRequestService the item edd request service
      */
     public RequestItemQueueConsumer(ItemEDDRequestService itemEDDRequestService) {
@@ -141,7 +165,7 @@ public class RequestItemQueueConsumer {
     public void requestItemOnMessage(@Body String body, Exchange exchange) throws IOException {
         ObjectMapper om = getObjectMapper();
         ItemRequestInformation itemRequestInformation = om.readValue(body, ItemRequestInformation.class);
-        getLogger().info("Item Barcode Recevied for Processing Request -> " + itemRequestInformation.getItemBarcodes().get(0));
+        getLogger().info("Item Barcode Received for Processing Request -> {}", itemRequestInformation.getItemBarcodes().get(0));
         getItemRequestService().requestItem(itemRequestInformation, exchange);
     }
 
@@ -155,7 +179,7 @@ public class RequestItemQueueConsumer {
     public void requestItemEDDOnMessage(@Body String body, Exchange exchange) throws IOException {
         ObjectMapper om = getObjectMapper();
         ItemRequestInformation itemRequestInformation = om.readValue(body, ItemRequestInformation.class);
-        getLogger().info("Item Barcode Recevied for Processing EDD -> " + itemRequestInformation.getItemBarcodes().get(0));
+        getLogger().info("Item Barcode Received for Processing EDD -> {}", itemRequestInformation.getItemBarcodes().get(0));
         getItemEDDRequestService().eddRequestItem(itemRequestInformation, exchange);
     }
 
@@ -187,7 +211,6 @@ public class RequestItemQueueConsumer {
 
     public void requestItemLasStatusCheckOnMessage(@Body String body, Exchange exchange) throws IOException {
         ObjectMapper om = new ObjectMapper();
-
         RequestInformation requestInformation = null;
         try {
             logger.info(body);
@@ -211,7 +234,7 @@ public class RequestItemQueueConsumer {
     public void requestItemBorrowDirectOnMessage(@Body String body, Exchange exchange) throws IOException {
         ObjectMapper om = getObjectMapper();
         ItemRequestInformation itemRequestInformation = om.readValue(body, ItemRequestInformation.class);
-        getLogger().info("Item Barcode Recevied for Processing Borrow Direct -> " + itemRequestInformation.getItemBarcodes().get(0));
+        getLogger().info("Item Barcode Received for Processing Borrow Direct -> {}", itemRequestInformation.getItemBarcodes().get(0));
         getItemRequestService().requestItem(itemRequestInformation, exchange);
     }
 
@@ -225,128 +248,38 @@ public class RequestItemQueueConsumer {
     public void requestItemRecallOnMessage(@Body String body, Exchange exchange) throws IOException {
         ObjectMapper om = getObjectMapper();
         ItemRequestInformation itemRequestInformation = om.readValue(body, ItemRequestInformation.class);
-        getLogger().info("Item Barcode Recevied for Processing Recall -> " + itemRequestInformation.getItemBarcodes().get(0));
+        getLogger().info("Item Barcode Received for Processing Recall -> {}", itemRequestInformation.getItemBarcodes().get(0));
         getItemRequestService().recallItem(itemRequestInformation, exchange);
     }
 
     /**
-     * Pul request topic on message.
+     * Institution request topic on message.
      *
      * @param body the body
      */
-    public void pulRequestTopicOnMessage(@Body String body) {
-        getLogger().info("PUL Request Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_PUL_REQUEST_TOPIC);
+    public void requestTopicOnMessage(@Body String body) {
+        getLogger().info("{} {}", RecapConstants.REQUEST_TOPIC_LISTENING_MESSAGES, getInstitutionCode());
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_TOPIC_PREFIX + getInstitutionCode() + "RequestTopic");
     }
 
     /**
-     * Pul edd topic on message.
+     * Institution edd topic on message.
      *
      * @param body the body
      */
-    public void pulEDDTopicOnMessage(@Body String body) {
-        getLogger().info("PUL EDD Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_PUL_EDD_TOPIC);
+    public void eddTopicOnMessage(@Body String body) {
+        getLogger().info("{} {}", RecapConstants.REQUEST_TOPIC_LISTENING_MESSAGES, getInstitutionCode());
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_TOPIC_PREFIX + getInstitutionCode() + "EDDTopic");
     }
 
     /**
-     * Pul recal topic on message.
+     * Institution recall topic on message.
      *
      * @param body the body
      */
-    public void pulRecalTopicOnMessage(@Body String body) {
-        getLogger().info("PUL Recall Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_PUL_RECALL_TOPIC);
-    }
-
-    /**
-     * Pul borrow direct topic on message.
-     *
-     * @param body the body
-     */
-    public void pulBorrowDirectTopicOnMessage(@Body String body) {
-        getLogger().info("PUL BorrowDirect Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_PUL_BORROW_DIRECT_TOPIC);
-    }
-
-    /**
-     * Cul request topic on message.
-     *
-     * @param body the body
-     */
-    public void culRequestTopicOnMessage(@Body String body) {
-        getLogger().info("CUL Request Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_CUL_REQUEST_TOPIC);
-    }
-
-    /**
-     * Cul edd topic on message.
-     *
-     * @param body the body
-     */
-    public void culEDDTopicOnMessage(@Body String body) {
-        getLogger().info("CUL EDD Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_CUL_EDD_TOPIC);
-    }
-
-    /**
-     * Cul recal topic on message.
-     *
-     * @param body the body
-     */
-    public void culRecalTopicOnMessage(@Body String body) {
-        getLogger().info("CUL Recall Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_CUL_RECALL_TOPIC);
-    }
-
-    /**
-     * Cul borrow direct topic on message.
-     *
-     * @param body the body
-     */
-    public void culBorrowDirectTopicOnMessage(@Body String body) {
-        getLogger().info("CUL Borrow Direct Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_CUL_BORROW_DIRECT_TOPIC);
-    }
-
-    /**
-     * Nypl request topic on message.
-     *
-     * @param body the body
-     */
-    public void nyplRequestTopicOnMessage(@Body String body) {
-        getLogger().info("NYPL Request Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_NYPL_REQUEST_TOPIC);
-    }
-
-    /**
-     * Nypl edd topic on message.
-     *
-     * @param body the body
-     */
-    public void nyplEDDTopicOnMessage(@Body String body) {
-        getLogger().info("NYPL EDD Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_NYPL_EDD_TOPIC);
-    }
-
-    /**
-     * Nypl recal topic on message.
-     *
-     * @param body the body
-     */
-    public void nyplRecalTopicOnMessage(@Body String body) {
-        getLogger().info("NYPL Recall Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_NYPL_RECALL_TOPIC);
-    }
-
-    /**
-     * Nypl borrow direct topic on message.
-     *
-     * @param body the body
-     */
-    public void nyplBorrowDirectTopicOnMessage(@Body String body) {
-        getLogger().info("NYPL Borrow Direct Topic - Lisinting to messages");
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_NYPL_BORROW_DIRECT_TOPIC);
+    public void recallTopicOnMessage(@Body String body) {
+        getLogger().info("{} {}", RecapConstants.REQUEST_TOPIC_LISTENING_MESSAGES, getInstitutionCode());
+        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_TOPIC_PREFIX + getInstitutionCode() + "RecallTopic");
     }
 
     public void scsbOutgoingQOnCompletion(@Body String body) {
@@ -372,11 +305,11 @@ public class RequestItemQueueConsumer {
     }
 
     /**
-     * Las response retrival on message.
+     * Las response retrieval on message.
      *
      * @param body the body
      */
-    public void lasResponseRetrivalOnMessage(@Body String body) {
+    public void lasResponseRetrievalOnMessage(@Body String body) {
         getLogger().info(body);
         getItemRequestService().processLASRetrieveResponse(body);
     }
@@ -410,12 +343,14 @@ public class RequestItemQueueConsumer {
     }
 
     private void setTopicMessageToDb(String body, String operationType) {
-        if (!getItemRequestService().isUseQueueLasCall()) {
+        if (StringUtils.isNotBlank(body)) {
             ObjectMapper om = new ObjectMapper();
             ItemInformationResponse itemInformationResponse = null;
             try {
                 itemInformationResponse = om.readValue(body, ItemInformationResponse.class);
-                getItemRequestService().updateChangesToDb(itemInformationResponse, operationType);
+                if (!getItemRequestService().isUseQueueLasCall(itemInformationResponse.getImsLocationCode())) {
+                    getItemRequestService().updateChangesToDb(itemInformationResponse, operationType);
+                }
             } catch (Exception e) {
                 logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
             }

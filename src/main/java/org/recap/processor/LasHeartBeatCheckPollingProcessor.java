@@ -8,15 +8,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.callable.LasHeartBeatCheckPollingCallable;
-import org.recap.gfa.model.GFALasStatusCheckResponse;
+import org.recap.las.LASImsLocationConnectorFactory;
+import org.recap.las.model.GFALasStatusCheckResponse;
 import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.request.GFAService;
-import org.recap.util.ItemRequestServiceUtil;
+import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,34 +28,32 @@ import java.util.concurrent.Future;
 @Slf4j
 public class LasHeartBeatCheckPollingProcessor {
 
-    @Value("${las.polling.time.interval}")
-    private Integer pollingTimeInterval;
-
     @Autowired
-    private GFAService gfaService;
-
-    @Autowired
-    ItemRequestServiceUtil itemRequestServiceUtil;
+    private LASImsLocationConnectorFactory lasImsLocationConnectorFactory;
 
     @Autowired
     ProducerTemplate producerTemplate;
+
+    @Autowired
+    PropertyUtil propertyUtil;
 
     public void pollLasHeartBeatResponse(Exchange exchange) {
         ItemRequestInformation itemRequestInformation = (ItemRequestInformation) exchange.getIn().getBody();
         if (StringUtils.isNotBlank(itemRequestInformation.getImsLocationCode())) {
             GFALasStatusCheckResponse gfaLasStatusCheckResponse = null;
             ExecutorService executor = Executors.newSingleThreadExecutor();
+            Integer pollingTimeInterval = Integer.parseInt(propertyUtil.getPropertyByImsLocationAndKey(itemRequestInformation.getImsLocationCode(), "las.polling.time.interval"));
             try {
-                Future<GFALasStatusCheckResponse> future = executor.submit(new LasHeartBeatCheckPollingCallable(pollingTimeInterval, gfaService, itemRequestInformation.getImsLocationCode()));
+                Future<GFALasStatusCheckResponse> future = executor.submit(new LasHeartBeatCheckPollingCallable(pollingTimeInterval, lasImsLocationConnectorFactory, itemRequestInformation.getImsLocationCode()));
                 gfaLasStatusCheckResponse = future.get();
-                log.info("GFA Las Status Poll Response: {}", gfaLasStatusCheckResponse);
+                log.info("GFA Las Status Poll Response for IMS Location {} : {}", itemRequestInformation.getImsLocationCode(), gfaLasStatusCheckResponse);
                 if (null != gfaLasStatusCheckResponse
                         && null != gfaLasStatusCheckResponse.getDsitem()
                         && null != gfaLasStatusCheckResponse.getDsitem().getTtitem()
                         && !gfaLasStatusCheckResponse.getDsitem().getTtitem().isEmpty()
                         && BooleanUtils.toBoolean(gfaLasStatusCheckResponse.getDsitem().getTtitem().get(0).getSuccess())) {
-                    log.info("Sending to Outgoing Queue");
-                    producerTemplate.sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+                    log.info("Sending to Outgoing Queue at {}", itemRequestInformation.getImsLocationCode());
+                    producerTemplate.sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE_PREFIX + itemRequestInformation.getImsLocationCode() + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
                 }
                 executor.shutdown();
             } catch (InterruptedException e) {
@@ -71,7 +67,7 @@ public class LasHeartBeatCheckPollingProcessor {
             }
         } else {
             log.info("");
-            producerTemplate.sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+            producerTemplate.sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE_PREFIX + itemRequestInformation.getImsLocationCode() + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
         }
     }
 }

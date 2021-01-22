@@ -2,6 +2,7 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAItemStatus;
 
 public class GFAItemStatusUT extends BaseTestCaseUT {
     @Test

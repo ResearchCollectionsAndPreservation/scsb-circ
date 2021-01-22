@@ -1,5 +1,6 @@
 package org.recap.util;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
@@ -47,7 +48,10 @@ public class CommonUtil {
     private ItemDetailsRepository itemDetailsRepository;
 
     @Autowired
-    ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+    private ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+
+    @Autowired
+    private ImsLocationDetailsRepository imsLocationDetailsRepository;
 
     /**
      * This method builds Holdings Entity from holdings content
@@ -249,5 +253,39 @@ public class CommonUtil {
             ftpPropertiesMap.put("privateKey",ftpPrivateKey);
         }
         return ftpPropertiesMap;
+    }
+
+    /**
+     * Gets IMS Location by item barcode.
+     *
+     * @param itemBarcode the item barcode
+     * @return the IMS Location by item barcode
+     */
+    public String getImsLocationCodeByItemBarcode(String itemBarcode) {
+        String imsLocationCode = null;
+        List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
+        if (CollectionUtils.isNotEmpty(itemEntities)) {
+            ItemEntity itemEntity = itemEntities.get(0);
+            if (null != itemEntity.getImsLocationEntity()) {
+                imsLocationCode = itemEntity.getImsLocationEntity().getImsLocationCode();
+            }
+        }
+        return imsLocationCode;
+    }
+
+    /**
+     * Get All Institution Codes Except HTC
+     * @return institutionCodes
+     */
+    public List<String> findAllInstitutionCodesExceptHTC(){
+        return institutionDetailsRepository.findAllInstitutionCodeExceptHTC();
+    }
+
+    /**
+     * Get All Ims Location Codes Except UN
+     * @return imsLocationCodes
+     */
+    public List<String> findAllImsLocationCodeExceptUN(){
+        return imsLocationDetailsRepository.findAllImsLocationCodeExceptUN();
     }
 }

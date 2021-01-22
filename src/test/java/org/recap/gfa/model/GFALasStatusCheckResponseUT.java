@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFALasStatusCheckResponse;
+import org.recap.las.model.GFALasStatusDsItem;
 
 public class GFALasStatusCheckResponseUT extends BaseTestCaseUT {
 

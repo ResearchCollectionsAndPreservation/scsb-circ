@@ -163,7 +163,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
         } catch (Exception e) {
             log.error(RecapCommonConstants.LOG_ERROR, e);
             itemInformationResponse.setSuccess(false);
-            itemInformationResponse.setScreenMessage("SCSB Exception: ILS connection failed");
+            itemInformationResponse.setScreenMessage("SCSB Exception: {}" + RecapConstants.ILS_CONNECTION_FAILED);
         } finally {
             connection.close();
         }
@@ -385,12 +385,17 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                     } else {
                         itemHoldResponse.setSuccess(false);
                         itemHoldResponse.setScreenMessage(RecapConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
+                        log.error(itemHoldResponse.getScreenMessage());
                     }
                 } else {
                     itemHoldResponse.setSuccess(false);
                     itemHoldResponse.setScreenMessage(RecapConstants.ILS_LOGIN_FAILED);
-                    log.info(itemHoldResponse.getScreenMessage());
+                    log.error(itemHoldResponse.getScreenMessage());
                 }
+            } else {
+                itemHoldResponse.setSuccess(false);
+                itemHoldResponse.setScreenMessage(RecapConstants.ILS_CONNECTION_FAILED);
+                log.error(itemHoldResponse.getScreenMessage());
             }
         } catch (InvalidSIP2ResponseException e) {
             log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
@@ -435,12 +440,17 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                     } else {
                         itemCreateBibResponse.setSuccess(false);
                         itemCreateBibResponse.setScreenMessage(RecapConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
+                        log.error(itemCreateBibResponse.getScreenMessage());
                     }
                 } else {
-                    log.info(RecapConstants.ILS_LOGIN_FAILED);
                     itemCreateBibResponse.setSuccess(false);
                     itemCreateBibResponse.setScreenMessage(RecapConstants.ILS_LOGIN_FAILED);
+                    log.error(itemCreateBibResponse.getScreenMessage());
                 }
+            } else {
+                itemCreateBibResponse.setSuccess(false);
+                itemCreateBibResponse.setScreenMessage(RecapConstants.ILS_CONNECTION_FAILED);
+                log.error(itemCreateBibResponse.getScreenMessage());
             }
         } catch (InvalidSIP2ResponseException e) {
             log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
@@ -576,14 +586,19 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                         itemRecallResponse.setPickupLocation(sip2RecallResponse.getPickupLocation());
                         itemRecallResponse.setPatronIdentifier(sip2RecallResponse.getPatronIdentifier());
                     } else {
-                        itemRecallResponse.setScreenMessage(RecapConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
                         itemRecallResponse.setSuccess(false);
+                        itemRecallResponse.setScreenMessage(RecapConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
+                        log.error(itemRecallResponse.getScreenMessage());
                     }
                 } else {
-                    log.info(RecapConstants.ILS_LOGIN_FAILED);
+                    itemRecallResponse.setSuccess(false);
                     itemRecallResponse.setScreenMessage(RecapConstants.ILS_LOGIN_FAILED);
-                    itemRecallResponse.setSuccess(true);
+                    log.error(itemRecallResponse.getScreenMessage());
                 }
+            } else {
+                itemRecallResponse.setSuccess(false);
+                itemRecallResponse.setScreenMessage(RecapConstants.ILS_CONNECTION_FAILED);
+                log.error(itemRecallResponse.getScreenMessage());
             }
         } catch (InvalidSIP2ResponseException e) {
             log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);

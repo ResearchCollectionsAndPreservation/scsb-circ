@@ -2,8 +2,11 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.las.model.GFAEddItemResponse;
+import org.recap.las.model.GFARetrieveEDDItemRequest;
+import org.recap.las.model.RetrieveItemEDDRequest;
+import org.recap.las.model.TtitemEDDResponse;
 
-import java.sql.Time;
 import java.util.Arrays;
 import java.util.Date;
 

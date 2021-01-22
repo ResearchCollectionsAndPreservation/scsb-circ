@@ -5,11 +5,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.gfa.model.*;
+import org.recap.las.model.GFAItemStatus;
+import org.recap.las.model.GFAItemStatusCheckRequest;
 import org.recap.model.gfa.Dsitem;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
 import org.recap.model.gfa.Ttitem;
-import org.recap.request.GFAService;
+import org.recap.las.GFALasService;
 
 import java.util.Arrays;
 
@@ -20,11 +21,11 @@ import static org.mockito.ArgumentMatchers.any;
 public class LasItemStatusCheckPollingCallableUT {
 
     @Mock
-    private GFAService gfaService;
+    private GFALasService gfaLasService;
 
     @Test
     public void call() throws Exception{
-        LasItemStatusCheckPollingCallable lasItemStatusCheckPollingCallable = new LasItemStatusCheckPollingCallable(2,gfaService,"12345");
+        LasItemStatusCheckPollingCallable lasItemStatusCheckPollingCallable = new LasItemStatusCheckPollingCallable(2, gfaLasService,"12345");
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
         GFAItemStatus gfaItemStatus = new GFAItemStatus();
         gfaItemStatus.setItemBarCode("12345");
@@ -32,7 +33,7 @@ public class LasItemStatusCheckPollingCallableUT {
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         lasItemStatusCheckPollingCallable.setBarcode("12346");
         assertNotNull(lasItemStatusCheckPollingCallable.getBarcode());
-        Mockito.when(gfaService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
+        Mockito.when(gfaLasService.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse1 = lasItemStatusCheckPollingCallable.call();
         assertNotNull(gfaItemStatusCheckResponse1);
     }

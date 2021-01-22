@@ -13,11 +13,11 @@ import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
-import org.recap.gfa.model.GFALasStatusCheckResponse;
-import org.recap.gfa.model.GFALasStatusDsItem;
-import org.recap.gfa.model.GFALasStatusTtItem;
+import org.recap.las.model.GFALasStatusCheckResponse;
+import org.recap.las.model.GFALasStatusDsItem;
+import org.recap.las.model.GFALasStatusTtItem;
 import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.request.GFAService;
+import org.recap.las.GFALasService;
 import org.recap.util.ItemRequestServiceUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -31,7 +31,7 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
     LasHeartBeatCheckPollingProcessor lasHeartBeatCheckPollingProcessor;
 
     @Mock
-    private GFAService gfaService;
+    private GFALasService gfaLasService;
 
     @Mock
     ItemRequestServiceUtil itemRequestServiceUtil;
@@ -51,7 +51,7 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
         exchange.getIn().setHeader("John", "PUL");
         exchange.getIn().setBody(itemRequestInformation);
         GFALasStatusCheckResponse gfaLasStatusCheckResponse = getGFALasStatusCheckResponse();
-        Mockito.when(gfaService.heartBeatCheck(any())).thenReturn(gfaLasStatusCheckResponse);
+        Mockito.when(gfaLasService.heartBeatCheck(any())).thenReturn(gfaLasStatusCheckResponse);
         lasHeartBeatCheckPollingProcessor.pollLasHeartBeatResponse(exchange);
     }
     @Test
@@ -72,7 +72,7 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
         exchange.getIn().setHeader("John", "PUL");
         exchange.getIn().setBody(itemRequestInformation);
         GFALasStatusCheckResponse gfaLasStatusCheckResponse = getGFALasStatusCheckResponse();
-        Mockito.when(gfaService.heartBeatCheck(any())).thenReturn(gfaLasStatusCheckResponse);
+        Mockito.when(gfaLasService.heartBeatCheck(any())).thenReturn(gfaLasStatusCheckResponse);
         Mockito.doThrow(new NullPointerException()).when(producerTemplate).sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
         lasHeartBeatCheckPollingProcessor.pollLasHeartBeatResponse(exchange);
     }
@@ -85,7 +85,7 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
         exchange.getIn().setHeader("John", "PUL");
         exchange.getIn().setBody(itemRequestInformation);
         GFALasStatusCheckResponse gfaLasStatusCheckResponse = getGFALasStatusCheckResponse();
-        Mockito.when(gfaService.heartBeatCheck(any())).thenReturn(null);
+        Mockito.when(gfaLasService.heartBeatCheck(any())).thenReturn(null);
         lasHeartBeatCheckPollingProcessor.pollLasHeartBeatResponse(exchange);
     }
     private ItemRequestInformation getItemRequestInformation() {

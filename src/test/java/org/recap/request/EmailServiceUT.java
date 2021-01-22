@@ -29,19 +29,12 @@ public class EmailServiceUT {
 
     @Test
     public void testRecalEmail() {
-        emailService.sendEmail(RecapCommonConstants.NYPL, "NYPLTST67891", "A history of the Burmah Oil Company", "NoPatron", RecapCommonConstants.NYPL,"");
-        emailService.sendEmail(RecapCommonConstants.COLUMBIA, "CULTST42345", "Changing contours of Asian agriculture", "RECAPTST01", RecapCommonConstants.COLUMBIA,"");
-        emailService.sendEmail(RecapCommonConstants.PRINCETON, "PULTST54323", "1863 laws of war", "45678912", RecapCommonConstants.PRINCETON,"");
-        emailService.sendEmail(RecapCommonConstants.PRINCETON, "PULTST54323", "Message", "45678912", RecapConstants.GFA,"");
-        emailService.sendEmail("", "PULTST54323", "Message", "45678912", RecapConstants.DELETED_MAIL_TO,"");
-        emailService.sendEmail("", "PULTST54323", "Message", "45678912", "","");
-
-        emailService.sendEmail("A history of the Burmah Oil Company","RECAPTST01",RecapCommonConstants.NYPL,"");
-        emailService.sendEmail("NYPLTST67891",RecapCommonConstants.NYPL,"");
-        emailService.sendEmail("NYPLTST67891",RecapCommonConstants.COLUMBIA,"");
-        emailService.sendEmail("NYPLTST67891",RecapCommonConstants.PRINCETON,"");
-        emailService.sendEmail("NYPLTST67891","GFA","");
-        emailService.sendEmail("NYPLTST67891","DELETED_MAIL_TO","");
+        emailService.sendEmail(RecapCommonConstants.NYPL, "NYPLTST67891", "RECAP", "A history of the Burmah Oil Company", "NoPatron", RecapCommonConstants.NYPL,"");
+        emailService.sendEmail(RecapCommonConstants.COLUMBIA, "CULTST42345", "RECAP", "Changing contours of Asian agriculture", "RECAPTST01", RecapCommonConstants.COLUMBIA,"");
+        emailService.sendEmail(RecapCommonConstants.PRINCETON, "PULTST54323", "RECAP","1863 laws of war", "45678912", RecapCommonConstants.PRINCETON,"");
+        emailService.sendEmail(RecapCommonConstants.PRINCETON, "PULTST54323", "RECAP","Message", "45678912", RecapConstants.GFA,"");
+        emailService.sendEmail("", "PULTST54323", "RECAP","Message", "45678912", RecapConstants.DELETED_MAIL_TO,"");
+        emailService.sendEmail("", "PULTST54323", "RECAP","Message", "45678912", "","");
         emailService.sendBulkRequestEmail("12","TestFirstBulkRequest","TestFirstBulkRequest","PROCESSED","Test","");
     }
 }

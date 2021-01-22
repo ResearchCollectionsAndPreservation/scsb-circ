@@ -2,12 +2,18 @@ package org.recap.routebuilder;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.route.StartRouteProcessor;
+import org.recap.las.GFALasService;
 import org.recap.mqconsumer.RequestItemQueueConsumer;
 import org.recap.processor.LasHeartBeatCheckPollingProcessor;
-import org.recap.request.*;
+import org.recap.request.BulkItemRequestProcessService;
+import org.recap.request.BulkItemRequestService;
+import org.recap.request.ItemEDDRequestService;
+import org.recap.request.ItemRequestService;
+import org.recap.util.CommonUtil;
+import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +37,7 @@ public class RequestItemRouteBuilder {
      * @param itemEDDRequestService the item edd request service
      */
     @Autowired
-    public RequestItemRouteBuilder(@Value("${bulk.request.concurrent.consumer.count}") Integer bulkRequestConsumerCount, CamelContext camelContext, ApplicationContext applicationContext, ItemRequestService itemRequestService, ItemEDDRequestService itemEDDRequestService, BulkItemRequestService bulkItemRequestService, BulkItemRequestProcessService bulkItemRequestProcessService) {
+    public RequestItemRouteBuilder(@Value("${bulk.request.concurrent.consumer.count}") Integer bulkRequestConsumerCount, CamelContext camelContext, ApplicationContext applicationContext, ItemRequestService itemRequestService, ItemEDDRequestService itemEDDRequestService, BulkItemRequestService bulkItemRequestService, BulkItemRequestProcessService bulkItemRequestProcessService, PropertyUtil propertyUtil, CommonUtil commonUtil) {
         try {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
@@ -44,33 +50,33 @@ public class RequestItemRouteBuilder {
                                 .bean(new RequestItemQueueConsumer(itemRequestService), "requestItemOnMessage")
                             .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_EDD))
                                 .bean(new RequestItemQueueConsumer(itemEDDRequestService), "requestItemEDDOnMessage")
-                            .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT))
-                                .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "requestItemBorrowDirectOnMessage")
                             .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_RECALL))
                                 .bean(new RequestItemQueueConsumer(itemRequestService), "requestItemRecallOnMessage");
                 }
             });
 
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.SCSB_OUTGOING_QUEUE)
-                        .routeId(RecapConstants.SCSB_OUTGOING_ROUTE_ID)
-                            .log("Message Received in SCSB OUTGOING QUEUE")
-                            .bean(applicationContext.getBean(LasHeartBeatCheckPollingProcessor.class), "pollLasHeartBeatResponse");
-                }
-            });
+            for (String imsLocationCode : commonUtil.findAllImsLocationCodeExceptUN()) {
+                camelContext.addRoutes(new RouteBuilder() {
+                    @Override
+                    public void configure() throws Exception {
+                        from(RecapConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX)
+                                .routeId(imsLocationCode + RecapConstants.SCSB_OUTGOING_ROUTE_ID)
+                                .log("Message Received in SCSB OUTGOING QUEUE for " + imsLocationCode)
+                                .bean(applicationContext.getBean(LasHeartBeatCheckPollingProcessor.class), "pollLasHeartBeatResponse");
+                    }
+                });
 
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.LAS_OUTGOING_QUEUE)
-                            .routeId(RecapConstants.LAS_OUTGOING_ROUTE_ID)
-                            .log("Message Received in LAS OUTGOING QUEUE")
-                            .bean(applicationContext.getBean(GFAService.class), "gfaItemRequestProcessor");
+                camelContext.addRoutes(new RouteBuilder() {
+                    @Override
+                    public void configure() throws Exception {
+                        from(RecapConstants.LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX)
+                                .routeId(imsLocationCode + RecapConstants.LAS_OUTGOING_ROUTE_ID)
+                                .log("Message Received in LAS OUTGOING QUEUE for " + imsLocationCode)
+                                .bean(applicationContext.getBean(GFALasService.class), "gfaItemRequestProcessor");
 
-                }
-            });
+                    }
+                });
+            }
 
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
@@ -79,7 +85,7 @@ public class RequestItemRouteBuilder {
                         .routeId(RecapConstants.LAS_INCOMING_ROUTE_ID)
                         .choice()
                         .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL))
-                        .bean(new RequestItemQueueConsumer(itemRequestService), "lasResponseRetrivalOnMessage")
+                        .bean(new RequestItemQueueConsumer(itemRequestService), "lasResponseRetrievalOnMessage")
                         .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_EDD))
                         .bean(new RequestItemQueueConsumer(itemRequestService), "lasResponseEDDOnMessage")
                         .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapConstants.REQUEST_TYPE_PW_INDIRECT))
@@ -123,120 +129,38 @@ public class RequestItemRouteBuilder {
                             .endChoice();
                 }
             });
-            /* PUL Topics*/
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.PUL_REQUEST_TOPIC)
-                            .routeId(RecapConstants.PUL_REQUEST_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "pulRequestTopicOnMessage");
-                }
-            });
 
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.PUL_EDD_TOPIC)
-                            .routeId(RecapConstants.PUL_EDD_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "pulEDDTopicOnMessage");
-                }
-            });
+            for (String institutionCode : commonUtil.findAllInstitutionCodesExceptHTC()) {
+                String retrievalInstitutionTopic = propertyUtil.getPropertyByInstitutionAndKey(institutionCode, "ils.topic.retrieval.request");
+                String eddInstitutionTopic = propertyUtil.getPropertyByInstitutionAndKey(institutionCode, "ils.topic.edd.request");
+                String recallInstitutionTopic = propertyUtil.getPropertyByInstitutionAndKey(institutionCode, "ils.topic.recall.request");
+                camelContext.addRoutes(new RouteBuilder() {
+                    @Override
+                    public void configure() throws Exception {
+                        from(retrievalInstitutionTopic)
+                                .routeId(institutionCode + "RequestTopicRouteId")
+                                .bean(new RequestItemQueueConsumer(institutionCode, itemRequestService, itemEDDRequestService), "requestTopicOnMessage");
+                    }
+                });
 
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.PUL_RECALL_TOPIC)
-                            .routeId(RecapConstants.PUL_RECALL_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "pulRecalTopicOnMessage");
-                }
-            });
+                camelContext.addRoutes(new RouteBuilder() {
+                    @Override
+                    public void configure() throws Exception {
+                        from(eddInstitutionTopic)
+                                .routeId(institutionCode + "EDDTopicRouteId")
+                                .bean(new RequestItemQueueConsumer(institutionCode, itemRequestService, itemEDDRequestService), "eddTopicOnMessage");
+                    }
+                });
 
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.PUL_BORROW_DIRECT_TOPIC)
-                            .routeId(RecapConstants.PUL_BORROW_DIRECT_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "pulBorrowDirectTopicOnMessage");
-                }
-            });
-            /* PUL Topics*/
-
-            /* CUL Topics*/
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.CUL_REQUEST_TOPIC)
-                            .routeId(RecapConstants.CUL_REQUEST_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "culRequestTopicOnMessage");
-                }
-            });
-
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.CUL_EDD_TOPIC)
-                            .routeId(RecapConstants.CUL_EDD_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "culEDDTopicOnMessage");
-                }
-            });
-
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.CUL_RECALL_TOPIC)
-                            .routeId(RecapConstants.CUL_RECALL_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "culRecalTopicOnMessage");
-                }
-            });
-
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.CUL_BORROW_DIRECT_TOPIC)
-                            .routeId(RecapConstants.CUL_BORROW_DIRECT_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "culBorrowDirectTopicOnMessage");
-                }
-            });
-            /* CUL Topics*/
-
-            /* NYPL Topics */
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.NYPL_REQUEST_TOPIC)
-                            .routeId(RecapConstants.NYPL_REQUEST_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "nyplRequestTopicOnMessage");
-                }
-            });
-
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.NYPL_EDD_TOPIC)
-                            .routeId(RecapConstants.NYPL_EDD_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "nyplEDDTopicOnMessage");
-                }
-            });
-
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.NYPL_RECALL_TOPIC)
-                            .routeId(RecapConstants.NYPL_RECALL_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "nyplRecalTopicOnMessage");
-                }
-            });
-
-            camelContext.addRoutes(new RouteBuilder() {
-                @Override
-                public void configure() throws Exception {
-                    from(RecapConstants.NYPL_BORROW_DIRECT_TOPIC)
-                            .routeId(RecapConstants.NYPL_BORROW_DIRECT_TOPIC_ROUTEID)
-                            .bean(new RequestItemQueueConsumer(itemRequestService, itemEDDRequestService), "nyplBorrowDirectTopicOnMessage");
-                }
-            });
-            /* NYPL Topics */
-
+                camelContext.addRoutes(new RouteBuilder() {
+                    @Override
+                    public void configure() throws Exception {
+                        from(recallInstitutionTopic)
+                                .routeId(institutionCode + "RecallTopicRouteId")
+                                .bean(new RequestItemQueueConsumer(institutionCode, itemRequestService, itemEDDRequestService), "recallTopicOnMessage");
+                    }
+                });
+            }
 
         } catch (Exception e) {
             logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);

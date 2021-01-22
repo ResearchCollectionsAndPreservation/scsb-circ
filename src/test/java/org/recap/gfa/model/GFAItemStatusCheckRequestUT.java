@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAItemStatus;
+import org.recap.las.model.GFAItemStatusCheckRequest;
 
 import java.util.Arrays;
 

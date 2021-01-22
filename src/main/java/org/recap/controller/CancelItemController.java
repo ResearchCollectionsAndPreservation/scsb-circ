@@ -168,7 +168,7 @@ public class CancelItemController {
         saveRequestAndChangeLog(requestItemEntity);
         itemCanceHoldResponse.setSuccess(true);
         itemCanceHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_EDD_SUCCCESS);
-        sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), requestItemEntity.getItemEntity().getBarcode(), requestItemEntity.getPatronId());
+        sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), requestItemEntity.getItemEntity().getBarcode(), requestItemEntity.getItemEntity().getImsLocationEntity().getImsLocationCode(), requestItemEntity.getPatronId());
         makeItemAvailableForFirstScanCancelRequest(requestItemEntity);
         return itemCanceHoldResponse;
     }
@@ -190,8 +190,8 @@ public class CancelItemController {
         return iholdQueue;
     }
 
-    private void sendEmail(String customerCode, String itemBarcode, String patronBarcode) {
-        itemRequestService.getEmailService().sendEmail(customerCode, itemBarcode, RecapConstants.REQUEST_CANCELLED_NO_REFILED, patronBarcode, RecapConstants.GFA, RecapConstants.REQUEST_CANCELLED_SUBJECT);
+    private void sendEmail(String customerCode, String itemBarcode, String imsLocationCode, String patronBarcode) {
+        itemRequestService.getEmailService().sendEmail(customerCode, itemBarcode, imsLocationCode, RecapConstants.REQUEST_CANCELLED_NO_REFILED, patronBarcode, RecapConstants.GFA, RecapConstants.REQUEST_CANCELLED_SUBJECT);
     }
 
     private void changeRetrievalToCancelStatus(RequestItemEntity requestItemEntity, ItemHoldResponse itemCanceHoldResponse) {
@@ -199,7 +199,7 @@ public class CancelItemController {
         itemCanceHoldResponse.setSuccess(true);
         itemCanceHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_SUCCCESS);
         logger.info("Send Mail");
-        sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), requestItemEntity.getItemEntity().getBarcode(), requestItemEntity.getPatronId());
+        sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), requestItemEntity.getItemEntity().getBarcode(), requestItemEntity.getItemEntity().getImsLocationEntity().getImsLocationCode(), requestItemEntity.getPatronId());
         logger.info("Send Mail Done");
     }
 

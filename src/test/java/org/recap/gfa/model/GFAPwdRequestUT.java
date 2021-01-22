@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAPwdDsItemRequest;
+import org.recap.las.model.GFAPwdRequest;
 
 public class GFAPwdRequestUT extends BaseTestCaseUT {
 

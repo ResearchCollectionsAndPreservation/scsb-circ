@@ -19,7 +19,6 @@ import org.recap.model.BulkRequestInformation;
 import org.recap.model.ItemRefileRequest;
 import org.recap.model.jpa.ItemRefileResponse;
 import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemResponseInformation;
 import org.recap.model.jpa.ReplaceRequest;
 import org.recap.request.ItemRequestService;
 import org.slf4j.Logger;

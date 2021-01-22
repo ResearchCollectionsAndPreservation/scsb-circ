@@ -2,6 +2,7 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.RetrieveItem;
 import org.recap.model.gfa.Ttitem;
 
 import java.util.Arrays;

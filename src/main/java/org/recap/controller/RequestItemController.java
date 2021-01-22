@@ -20,6 +20,7 @@ import org.recap.model.jpa.ItemRefileResponse;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.ReplaceRequest;
 import org.recap.request.ItemRequestService;
+import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class RequestItemController {
 
     @Autowired
     private ILSProtocolConnectorFactory ilsProtocolConnectorFactory;
+
+    @Autowired
+    private PropertyUtil propertyUtil;
 
     /**
      * Gets JSIPConectorFactory object.
@@ -90,7 +94,7 @@ public class RequestItemController {
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         String itemBarcode;
         try {
-            String callInst = callingInsttution(callInstitition, itemRequestInformation);
+            String callInst = callingInstitution(callInstitition, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
                 itemCheckoutResponse = (ItemCheckoutResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkOutItem(itemBarcode, itemRequestInformation.getPatronBarcode());
@@ -118,7 +122,7 @@ public class RequestItemController {
         ItemCheckinResponse itemCheckinResponse;
         String itemBarcode;
         try {
-            String callInst = callingInsttution(callInstitition, itemRequestInformation);
+            String callInst = callingInstitution(callInstitition, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
                 logger.info("Patron barcode and Institution info before CheckIn call : patron - {} , institution - {} ",itemRequestInformation.getPatronBarcode(),callInstitition);
@@ -149,7 +153,7 @@ public class RequestItemController {
     public AbstractResponseItem holdItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         try {
-            String callInst = callingInsttution(callInstitition, itemRequestInformation);
+            String callInst = callingInstitution(callInstitition, itemRequestInformation);
             String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
             itemHoldResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).placeHold(itembarcode, itemRequestInformation.getPatronBarcode(),
                     itemRequestInformation.getRequestingInstitution(),
@@ -180,7 +184,7 @@ public class RequestItemController {
     @PostMapping(value = "/cancelHoldItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem cancelHoldItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemHoldResponse itemHoldCancelResponse = null;
-        String callInst = callingInsttution(callInstitition, itemRequestInformation);
+        String callInst = callingInstitution(callInstitition, itemRequestInformation);
         if (CollectionUtils.isNotEmpty(itemRequestInformation.getItemBarcodes())) {
             String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
             itemHoldCancelResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).cancelHold(itembarcode, itemRequestInformation.getPatronBarcode(),
@@ -204,7 +208,7 @@ public class RequestItemController {
         ItemCreateBibResponse itemCreateBibResponse;
         String itemBarcode;
         logger.info("ESIP CALL FOR CREATE BIB -> {}" , callInstitition);
-        String callInst = callingInsttution(callInstitition, itemRequestInformation);
+        String callInst = callingInstitution(callInstitition, itemRequestInformation);
         if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
             itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
             ItemInformationResponse itemInformation = (ItemInformationResponse) itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
@@ -233,7 +237,7 @@ public class RequestItemController {
     @PostMapping(value = "/itemInformation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem itemInformation(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         AbstractResponseItem itemInformationResponse;
-        String callInst = callingInsttution(callInstitition, itemRequestInformation);
+        String callInst = callingInstitution(callInstitition, itemRequestInformation);
         String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
         itemInformationResponse = ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).lookupItem(itembarcode);
         return itemInformationResponse;
@@ -250,7 +254,7 @@ public class RequestItemController {
     public AbstractResponseItem recallItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         ItemRecallResponse itemRecallResponse;
         logger.info("ESIP CALL FOR RECALL ITEM -> {}" , callInstitition);
-        String callInst = callingInsttution(callInstitition, itemRequestInformation);
+        String callInst = callingInstitution(callInstitition, itemRequestInformation);
         String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
         itemRecallResponse = (ItemRecallResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).recallItem(itembarcode, itemRequestInformation.getPatronBarcode(),
                 itemRequestInformation.getRequestingInstitution(),
@@ -270,7 +274,7 @@ public class RequestItemController {
     @PostMapping(value = "/patronInformation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem patronInformation(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
         PatronInformationResponse patronInformationResponse;
-        String callInst = callingInsttution(callInstitition, itemRequestInformation);
+        String callInst = callingInstitution(callInstitition, itemRequestInformation);
         patronInformationResponse = (PatronInformationResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).lookupPatron(itemRequestInformation.getPatronBarcode());
         return patronInformationResponse;
     }
@@ -315,7 +319,7 @@ public class RequestItemController {
         ItemRefileResponse itemRefileResponse;
         String itemBarcode;
         try {
-            String callInst = callingInsttution(callInstitition, itemRequestInformation);
+            String callInst = callingInstitution(callInstitition, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
                 itemRefileResponse = (ItemRefileResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).refileItem(itemBarcode);
@@ -351,15 +355,7 @@ public class RequestItemController {
      * @return the pickup location
      */
     public String getPickupLocation(String institution) {
-        String pickUpLocation = "";
-        if (institution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-            pickUpLocation = RecapConstants.DEFAULT_PICK_UP_LOCATION_PUL;
-        } else if (institution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-            pickUpLocation = RecapConstants.DEFAULT_PICK_UP_LOCATION_CUL;
-        } else if (institution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-            pickUpLocation = RecapConstants.DEFAULT_PICK_UP_LOCATION_NYPL;
-        }
-        return pickUpLocation;
+        return propertyUtil.getPropertyByInstitutionAndKey(institution, "ils.default.pickup.location");
     }
 
     /**
@@ -383,7 +379,7 @@ public class RequestItemController {
         }
     }
 
-    private String callingInsttution(String callingInst, ItemRequestInformation itemRequestInformation) {
+    private String callingInstitution(String callingInst, ItemRequestInformation itemRequestInformation) {
         String inst;
         if (callingInst == null) {
             inst = itemRequestInformation.getItemOwningInstitution();
@@ -394,7 +390,8 @@ public class RequestItemController {
     }
 
     private String getPickupLocationDB(ItemRequestInformation itemRequestInformation, String callInstitution) {
-        if (RecapCommonConstants.NYPL.equalsIgnoreCase(callInstitution)) {
+        String useDeliveryLocationAsPickupLocation = propertyUtil.getPropertyByInstitutionAndKey(callInstitution, "ils.use.delivery.location.as.pickup.location");
+        if (Boolean.TRUE.toString().equalsIgnoreCase(useDeliveryLocationAsPickupLocation)) {
             return itemRequestInformation.getDeliveryLocation();
         }
         return (StringUtils.isBlank(itemRequestInformation.getPickupLocation())) ? getPickupLocation(callInstitution) : itemRequestInformation.getPickupLocation();

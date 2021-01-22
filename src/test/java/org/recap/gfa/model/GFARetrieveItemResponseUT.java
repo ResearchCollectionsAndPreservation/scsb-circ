@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFARetrieveItemResponse;
+import org.recap.las.model.RetrieveItem;
 
 import static org.junit.Assert.assertNotNull;
 

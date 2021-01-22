@@ -1,7 +1,6 @@
 package org.recap.service.deaccession;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -11,9 +10,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
-import org.recap.gfa.model.GFAPwdDsItemResponse;
-import org.recap.gfa.model.GFAPwdResponse;
-import org.recap.gfa.model.GFAPwdTtItemResponse;
+import org.recap.las.model.GFAPwdDsItemResponse;
+import org.recap.las.model.GFAPwdResponse;
+import org.recap.las.model.GFAPwdTtItemResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
@@ -21,7 +20,7 @@ import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
-import org.recap.request.GFAService;
+import org.recap.las.GFALasService;
 import org.recap.service.RestHeaderService;
 import org.recap.util.ItemRequestServiceUtil;
 
@@ -71,7 +70,7 @@ public class DeAccessionServiceUT{
     ItemHoldResponse itemHoldResponse;
 
     @Mock
-    GFAService gfaService;
+    GFALasService gfaLasService;
 
     @Mock
     ItemRequestServiceUtil itemRequestServiceUtil;
@@ -103,11 +102,11 @@ public class DeAccessionServiceUT{
         DeaccessionItemChangeLog deaccessionItemChangeLog = getDeaccessionItemChangeLog(itemIdAndMessageMap);
         itemChangeLogEntities.add(deaccessionItemChangeLog);
         GFAPwdResponse gfaPwdResponse = getGFAPwdResponse();
-        when(gfaService.callGfaItemStatus(itemBarcode)).thenReturn("INC ON WO:");
+        when(gfaLasService.callGfaItemStatus(itemBarcode)).thenReturn("INC ON WO:");
         when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
         when(itemDetailsRepository.findByBarcodeIn(new ArrayList<>(itemBarcodeList))).thenReturn(Arrays.asList(itemEntity));
         when(requestItemDetailsRepository.findByItemBarcode(itemBarcode)).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(gfaService.gfaPermanentWithdrawlDirect(any())).thenReturn(gfaPwdResponse);
+        Mockito.when(gfaLasService.gfaPermanentWithdrawlDirect(any())).thenReturn(gfaPwdResponse);
         Mockito.when(deaccesionItemChangeLogDetailsRepository.saveAll(itemChangeLogEntities)).thenReturn(Arrays.asList(deaccessionItemChangeLog));
         //Mockito.when(bibliographicDetailsRepository.markBibsAsNotDeleted(any(), any(), any())).thenReturn(1);
         //Mockito.when(holdingsDetailsRepository.markHoldingsAsNotDeleted(any(), any(), any())).thenReturn(1);

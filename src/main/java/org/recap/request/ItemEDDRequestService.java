@@ -144,7 +144,7 @@ public class ItemEDDRequestService {
                 } else {
                     // Process
                     String requestInfoPatronBarcode = itemRequestInfo.getPatronBarcode();
-                    if (getItemRequestService().getGfaService().isUseQueueLasCall()) {
+                    if (getItemRequestService().getGfaLasService().isUseQueueLasCall(itemRequestInfo.getImsLocationCode())) {
                         getItemRequestService().updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING);
                     }
                     itemResponseInformation.setItemId(itemEntity.getId());
@@ -207,6 +207,7 @@ public class ItemEDDRequestService {
             itemResponseInformation.setEmailAddress(itemRequestInfo.getEmailAddress());
             itemResponseInformation.setDeliveryLocation(itemRequestInfo.getDeliveryLocation());
             itemResponseInformation.setUsername(itemRequestInfo.getUsername());
+            itemResponseInformation.setImsLocationCode(itemRequestInfo.getImsLocationCode());
             if (!itemResponseInformation.isSuccess()) {
                 itemResponseInformation.setRequestNotes(itemRequestInfo.getRequestNotes() + "\n" + RecapConstants.REQUEST_SCSB_EXCEPTION + itemResponseInformation.getScreenMessage());
                 getItemRequestService().updateChangesToDb(itemResponseInformation, RecapCommonConstants.REQUEST_TYPE_EDD + "-" + itemResponseInformation.getRequestingInstitution());

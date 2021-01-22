@@ -2,6 +2,9 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAPwdDsItemResponse;
+import org.recap.las.model.GFAPwdTtItemResponse;
+import org.recap.las.model.ProdsBefore;
 
 import java.util.Arrays;
 

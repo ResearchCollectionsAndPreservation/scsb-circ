@@ -52,13 +52,11 @@ public class EmailRouteBuilder {
      * @param passwordDirectory the password directory
      * @param from              the from
      * @param subject           the subject
-     * @param requestPendingTo  the request pending to
      * @param smtpServer        the smtp server
      */
     @Autowired
     public EmailRouteBuilder(CamelContext context, @Value("${email.smtp.server.username}") String username, @Value("${email.smtp.server.password.file}") String passwordDirectory,
-                             @Value("${email.smtp.server.address.from}") String from, @Value("${email.request.recall.subject}") String subject,
-                             @Value("${recap-las.email.recap.assist.email.to}") String requestPendingTo, @Value("${email.smtp.server}") String smtpServer) {
+                             @Value("${email.smtp.server.address.from}") String from, @Value("${email.request.recall.subject}") String subject, @Value("${email.smtp.server}") String smtpServer) {
         try {
             context.addRoutes(new RouteBuilder() {
                 @Override
@@ -157,7 +155,7 @@ public class EmailRouteBuilder {
                                     .setHeader(subjectHeader, simple("LAS Pending Request Queue"))
                                     .setBody(simple(emailBodyForRequestPending))
                                     .setHeader("from", simple(from))
-                                    .setHeader("to", simple(requestPendingTo))
+                                    .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email for request pending")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.EMAIL_HEADER_REQUEST_STATUS_PENDING))

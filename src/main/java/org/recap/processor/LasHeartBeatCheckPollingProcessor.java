@@ -44,9 +44,10 @@ public class LasHeartBeatCheckPollingProcessor {
             ExecutorService executor = Executors.newSingleThreadExecutor();
             Integer pollingTimeInterval = Integer.parseInt(propertyUtil.getPropertyByImsLocationAndKey(itemRequestInformation.getImsLocationCode(), "las.polling.time.interval"));
             try {
+                log.info("Polling Started on LAS Heart Beat Check for IMS Location : {}", itemRequestInformation.getImsLocationCode());
                 Future<GFALasStatusCheckResponse> future = executor.submit(new LasHeartBeatCheckPollingCallable(pollingTimeInterval, lasImsLocationConnectorFactory, itemRequestInformation.getImsLocationCode()));
                 gfaLasStatusCheckResponse = future.get();
-                log.info("GFA Las Status Poll Response for IMS Location {} : {}", itemRequestInformation.getImsLocationCode(), gfaLasStatusCheckResponse);
+                log.info("Polling Ended on LAS Heart Beat Check for IMS Location : {}", itemRequestInformation.getImsLocationCode());
                 if (null != gfaLasStatusCheckResponse
                         && null != gfaLasStatusCheckResponse.getDsitem()
                         && null != gfaLasStatusCheckResponse.getDsitem().getTtitem()

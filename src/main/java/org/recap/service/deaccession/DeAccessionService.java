@@ -239,7 +239,7 @@ public class DeAccessionService {
                             if (StringUtils.isNotBlank(gfaItemStatus)) {
                                 gfaItemStatus = gfaItemStatus.toUpperCase();
                                 gfaItemStatus = gfaItemStatus.contains(":") ? gfaItemStatus.substring(0, gfaItemStatus.indexOf(':') + 1) : gfaItemStatus;
-                                logger.info("GFA Item Status    after trimming : {}", gfaItemStatus);
+                                logger.info("GFA Item Status after trimming : {}", gfaItemStatus);
                                 if((StringUtils.isNotBlank(gfaItemStatus) && RecapConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.equals(gfaItemStatus))){
                                     deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), "Cannot Deaccession as Item is awaiting for Refile.Please try again later or contact ReCAP staff for further assistance.", itemEntity));
                                 }

@@ -40,10 +40,10 @@ public class IdentifyPendingRequestService {
     @Autowired
     ProducerTemplate producerTemplate;
 
-    @Value("${pending.request.email.to}")
+    @Value("${email.pending.request.to}")
     private String pendingRequestEmailTo;
 
-    @Value("${pending.request.email.cc}")
+    @Value("${email.pending.request.cc}")
     private String pendingRequestEmailCc;
 
     public boolean identifyPendingRequest(){

@@ -243,18 +243,14 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         try {
             String apiUrl = getRestDataApiUrl() + RecapConstants.NYPL_CHECKOUT_REQUEST_URL;
-            log.error("API URL = {}" , apiUrl);
             CheckoutRequest checkoutRequest = getCheckOutRequest();
             checkoutRequest.setPatronBarcode(patronIdentifier);
             checkoutRequest.setItemBarcode(itemIdentifier);
             checkoutRequest.setDesiredDateDue(getNyplApiResponseUtil().getExpirationDateForNypl());
 
-            log.error("CHECKOUT REQUEST {}", checkoutRequest);
             HttpEntity<CheckoutRequest> requestEntity = new HttpEntity<>(checkoutRequest, getHttpHeaders());
-            log.error("CHECKOUT REQUEST ENTITY = {}" , requestEntity);
             ResponseEntity<CheckoutResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, CheckoutResponse.class);
             CheckoutResponse checkoutResponse = responseEntity.getBody();
-            log.error("CHECKOUT RESPONSE {}" , checkoutResponse);
             itemCheckoutResponse = getNyplApiResponseUtil().buildItemCheckoutResponse(checkoutResponse);
             CheckoutData checkoutData = checkoutResponse.getData();
             if (null != checkoutData) {

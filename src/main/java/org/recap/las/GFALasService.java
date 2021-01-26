@@ -202,8 +202,7 @@ public class GFALasService {
     public ItemInformationResponse gfaItemRequestProcessor(Exchange exchange) {
         ItemInformationResponse itemInformationResponse = null;
         ItemRequestInformation itemRequestInfo = (ItemRequestInformation) exchange.getIn().getBody();
-        log.info("Message Processing from LAS OUTGOING QUEUE: {}", itemRequestInfo.toString());
-
+        log.info("Message Processing from LAS OUTGOING QUEUE at {} : {}", itemRequestInfo.getImsLocationCode(), itemRequestInfo.toString());
         if (RecapCommonConstants.REQUEST_TYPE_RETRIEVAL.equalsIgnoreCase(itemRequestInfo.getRequestType())) {
             itemInformationResponse = callItemRetrieveApi(itemRequestInfo);
         } else if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(itemRequestInfo.getRequestType())) {

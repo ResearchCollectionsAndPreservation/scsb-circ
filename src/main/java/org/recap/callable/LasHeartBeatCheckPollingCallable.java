@@ -6,7 +6,6 @@ import org.recap.las.LASImsLocationConnectorFactory;
 import org.recap.las.model.GFALasStatus;
 import org.recap.las.model.GFALasStatusCheckRequest;
 import org.recap.las.model.GFALasStatusCheckResponse;
-import org.recap.las.GFALasService;
 import java.util.Collections;
 import java.util.concurrent.Callable;
 
@@ -39,7 +38,6 @@ public class LasHeartBeatCheckPollingCallable implements Callable {
         gfaLasStatusCheckRequest.setLasStatus(Collections.singletonList(lasStatus));
         try {
             gfaLasStatusCheckResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(imsLocationCode).heartBeatCheck(gfaLasStatusCheckRequest);
-            log.info("LAS Server Heart Beat Check Polling for IMS Location {} -> {}", imsLocationCode, gfaLasStatusCheckResponse);
             if (null == gfaLasStatusCheckResponse
                     || null == gfaLasStatusCheckResponse.getDsitem()
                     || null == gfaLasStatusCheckResponse.getDsitem().getTtitem()

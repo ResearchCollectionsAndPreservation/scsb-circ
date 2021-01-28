@@ -59,11 +59,15 @@ public final class RecapConstants {
     public static final String BULK_REQUEST_ITEM_PROCESSING_QUEUE = "scsbactivemq:queue:BulkRequestItemProcessingQ";
     public static final String ASYNC_CONCURRENT_CONSUMERS = "?asyncConsumer=true&concurrentConsumers=";
     public static final String EMAIL_Q = "scsbactivemq:queue:CircEmailQ";
+    public static final String SCSB_LAS_OUTGOING_QUEUE_PREFIX = "scsbactivemq:queue:scsb";
+    public static final String LAS_OUTGOING_QUEUE_PREFIX = "scsbactivemq:queue:las";
+    public static final String OUTGOING_QUEUE_SUFFIX = "OutgoingQ";
     public static final String SCSB_OUTGOING_QUEUE = "scsbactivemq:queue:scsbOutgoingQ";
     public static final String LAS_OUTGOING_QUEUE = "scsbactivemq:queue:lasOutgoingQ";
     public static final String LAS_INCOMING_QUEUE = "scsbactivemq:queue:lasIncomingQ";
     public static final String REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE = "scsbactivemq:queue:RequestItemLasStatusCheckQ?asyncConsumer=true";
 
+    public static final String REQUEST_TOPIC_PREFIX = "scsbactivemq:topic:";
     public static final String PUL_REQUEST_TOPIC = "scsbactivemq:topic:PUL.RequestT";
     public static final String PUL_EDD_TOPIC = "scsbactivemq:topic:PUL.EDDT";
     public static final String PUL_RECALL_TOPIC = "scsbactivemq:topic:PUL.RecallT";
@@ -79,12 +83,14 @@ public final class RecapConstants {
     public static final String NYPL_RECALL_TOPIC = "scsbactivemq:topic:NYPL.RecallT";
     public static final String NYPL_BORROW_DIRECT_TOPIC = "scsbactivemq:topic:NYPL.BorrowDirectT";
 
+    public static final String REQUEST_TOPIC_LISTENING_MESSAGES = "Request Topic - Listening to messages";
+
     //RoutId
     public static final String REQUEST_ITEM_QUEUE_ROUTEID = "RequestItemRouteId";
     public static final String BULK_REQUEST_ITEM_QUEUE_ROUTEID = "BulkRequestItemRouteId";
     public static final String BULK_REQUEST_ITEM_PROCESSING_QUEUE_ROUTEID = "BulkRequestItemProcessingRouteId";
     public static final String EMAIL_ROUTE_ID = "RequestRecallEmailRouteId";
-    public static final String SCSB_OUTGOING_ROUTE_ID = "LasOutgoingRouteId";
+    public static final String SCSB_OUTGOING_ROUTE_ID = "ScsbLasOutgoingRouteId";
     public static final String LAS_OUTGOING_ROUTE_ID = "LasOutgoingQueueRouteId";
     public static final String LAS_INCOMING_ROUTE_ID = "LasIncomingQueueRouteId";
     public static final String REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID = "RequestItemLasStatusCheckRouteId";
@@ -104,6 +110,7 @@ public final class RecapConstants {
     public static final String NYPL_RECALL_TOPIC_ROUTEID = "NYPLRecallTopicRouteId";
     public static final String NYPL_BORROW_DIRECT_TOPIC_ROUTEID = "NYPLBorrowDirectTopicRouteId";
 
+    public static final String REQUEST_ITEM_TOPIC_PREFIX = "RequestItem-";
     public static final String REQUEST_ITEM_PUL_REQUEST_TOPIC = "RequestItem-pulRequestTopic";
     public static final String REQUEST_ITEM_PUL_EDD_TOPIC = "RequestItem-pulEDDTopic";
     public static final String REQUEST_ITEM_PUL_RECALL_TOPIC = "RequestItem-pulRecallTopic";

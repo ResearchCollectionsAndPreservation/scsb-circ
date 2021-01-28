@@ -5,10 +5,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.gfa.model.GFALasStatusCheckResponse;
-import org.recap.gfa.model.GFALasStatusDsItem;
-import org.recap.gfa.model.GFALasStatusTtItem;
-import org.recap.request.GFAService;
+import org.recap.las.AbstractLASImsLocationConnector;
+import org.recap.las.LASImsLocationConnectorFactory;
+import org.recap.las.model.GFALasStatusCheckRequest;
+import org.recap.las.model.GFALasStatusCheckResponse;
+import org.recap.las.model.GFALasStatusDsItem;
+import org.recap.las.model.GFALasStatusTtItem;
+import org.recap.las.GFALasService;
 
 import java.util.Arrays;
 
@@ -19,15 +22,23 @@ public class LasHeartBeatCheckPollingCallableUT extends BaseTestCaseUT {
 
     @InjectMocks
     LasHeartBeatCheckPollingCallable lasHeartBeatCheckPollingCallable;
+
     @Mock
-    GFAService gfaService;
+    private LASImsLocationConnectorFactory lasImsLocationConnectorFactory;
+
+    @Mock
+    AbstractLASImsLocationConnector abstractLASImsLocationConnector;
+
+    @Mock
+    GFALasService gfaLasService;
     @Test
     public void call() throws Exception {
         Integer pollingTimeInterval = 10000;
         String imsLocationCode = "1";
         GFALasStatusCheckResponse gfaLasStatusCheckResponse = getGFALasStatusCheckResponse();
-        LasHeartBeatCheckPollingCallable lasHeartBeatCheckPollingCallable = new LasHeartBeatCheckPollingCallable(pollingTimeInterval,gfaService,imsLocationCode);
-        Mockito.when(gfaService.heartBeatCheck(any())).thenReturn(gfaLasStatusCheckResponse);
+        LasHeartBeatCheckPollingCallable lasHeartBeatCheckPollingCallable = new LasHeartBeatCheckPollingCallable(pollingTimeInterval, lasImsLocationConnectorFactory,imsLocationCode);
+        Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
+        Mockito.when(abstractLASImsLocationConnector.heartBeatCheck(any(GFALasStatusCheckRequest.class))).thenReturn(gfaLasStatusCheckResponse);
         GFALasStatusCheckResponse response = lasHeartBeatCheckPollingCallable.call();
         assertNotNull(response);
     }

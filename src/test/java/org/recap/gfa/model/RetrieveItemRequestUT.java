@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.RetrieveItemRequest;
+import org.recap.las.model.TtitemRequest;
 
 import java.util.Arrays;
 
@@ -16,8 +18,6 @@ public class RetrieveItemRequestUT extends BaseTestCaseUT {
         retrieveItemRequest.equals(retrieveItemRequest1);
         retrieveItemRequest.hashCode();
         retrieveItemRequest1.hashCode();
-        retrieveItemRequest.canEqual(retrieveItemRequest);
-        retrieveItemRequest.canEqual(retrieveItemRequest1);
         retrieveItemRequest.toString();
     }
 

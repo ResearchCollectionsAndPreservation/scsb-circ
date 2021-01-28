@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.RetrieveItemEDDRequest;
+import org.recap.las.model.TtitemEDDResponse;
 
 import java.util.Arrays;
 
@@ -14,8 +16,6 @@ public class RetrieveItemEDDRequestUT extends BaseTestCaseUT {
         retrieveItemEDDRequest.equals(retrieveItemEDDRequest);
         retrieveItemEDDRequest.equals(retrieveItemEDDRequest1);
         retrieveItemEDDRequest1.equals(retrieveItemEDDRequest);
-        retrieveItemEDDRequest.canEqual(retrieveItemEDDRequest);
-        retrieveItemEDDRequest.canEqual(retrieveItemEDDRequest1);
         retrieveItemEDDRequest.hashCode();
         retrieveItemEDDRequest1.hashCode();
         retrieveItemEDDRequest.toString();

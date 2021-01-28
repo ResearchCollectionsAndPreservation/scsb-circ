@@ -13,6 +13,7 @@ import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.*;
 import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.repository.jpa.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 
@@ -138,11 +139,46 @@ public class CommonUtilUT extends BaseTestCaseUT {
         assertNotNull(map);
     }
     @Test
+    public void getInstitutionEntityMapException(){
+        Mockito.when(institutionDetailsRepository.findAll()).thenThrow(new NullPointerException());
+        Map map = commonUtil.getInstitutionEntityMap();
+        assertNotNull(map);
+    }
+    @Test
     public void getCollectionGroupMap(){
         CollectionGroupEntity collectionGroupEntity = getCollectionGroupEntity();
         Mockito.when(collectionGroupDetailsRepository.findAll()).thenReturn(Arrays.asList(collectionGroupEntity));
         Map map = commonUtil.getCollectionGroupMap();
         assertNotNull(map);
+    }
+    @Test
+    public void getCollectionGroupMapException(){
+        Mockito.when(collectionGroupDetailsRepository.findAll()).thenThrow(new NullPointerException());
+        Map map = commonUtil.getCollectionGroupMap();
+        assertNotNull(map);
+    }
+
+    @Test
+    public void getImsLocationCodeByItemBarcode(){
+        String itemBarcode = "32959";
+        Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(getBibliographicEntity().getItemEntities());
+        String imsLocationCode = commonUtil.getImsLocationCodeByItemBarcode(itemBarcode);
+        assertNotNull(imsLocationCode);
+    }
+
+    @Test
+    public void getExistingItemEntityOwningInstItemId(){
+        BibliographicEntity fetchedBibliographicEntity = getBibliographicEntity();
+        ItemEntity incomingItemEntity = getBibliographicEntity().getItemEntities().get(0);
+        incomingItemEntity.setOwningInstitutionItemId("55555");
+        ReflectionTestUtils.invokeMethod(commonUtil,"getExistingItemEntityOwningInstItemId",fetchedBibliographicEntity,incomingItemEntity);
+    }
+
+    @Test
+    public  void getBarcodesList(){
+        List<ItemEntity> itemEntities = getBibliographicEntity().getItemEntities();
+        List<String> itemBarcodes = commonUtil.getBarcodesList(itemEntities);
+        assertNotNull(itemBarcodes);
     }
 
     private CollectionGroupEntity getCollectionGroupEntity() {
@@ -236,6 +272,7 @@ public class CommonUtilUT extends BaseTestCaseUT {
         itemEntity.setCatalogingStatus("Complete");
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setDeleted(false);
+        itemEntity.setImsLocationEntity(getImsLocationEntity());
         itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
@@ -244,5 +281,17 @@ public class CommonUtilUT extends BaseTestCaseUT {
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
 
         return bibliographicEntity;
+    }
+    private ImsLocationEntity getImsLocationEntity() {
+        ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
+        imsLocationEntity.setImsLocationCode("1");
+        imsLocationEntity.setImsLocationName("test");
+        imsLocationEntity.setCreatedBy("test");
+        imsLocationEntity.setCreatedDate(new Date());
+        imsLocationEntity.setActive(true);
+        imsLocationEntity.setDescription("test");
+        imsLocationEntity.setUpdatedBy("test");
+        imsLocationEntity.setUpdatedDate(new Date());
+        return imsLocationEntity;
     }
 }

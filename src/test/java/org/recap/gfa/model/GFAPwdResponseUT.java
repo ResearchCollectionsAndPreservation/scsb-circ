@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAPwdDsItemResponse;
+import org.recap.las.model.GFAPwdResponse;
 
 public class GFAPwdResponseUT extends BaseTestCaseUT {
 
@@ -15,8 +17,6 @@ public class GFAPwdResponseUT extends BaseTestCaseUT {
         gfaPwdResponse1.equals(gfaPwdResponse);
         gfaPwdResponse.hashCode();
         gfaPwdResponse1.hashCode();
-        gfaPwdResponse.canEqual(gfaPwdResponse);
-        gfaPwdResponse.canEqual(gfaPwdResponse1);
         gfaPwdResponse.toString();
     }
 }

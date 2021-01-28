@@ -2,8 +2,13 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAPwdDsItemResponse;
+import org.recap.las.model.GFAPwdTtItemResponse;
+import org.recap.las.model.ProdsBefore;
 
 import java.util.Arrays;
+
+import static org.junit.Assert.assertNotNull;
 
 public class GFAPwdDsItemResponseUT extends BaseTestCaseUT {
 
@@ -14,6 +19,8 @@ public class GFAPwdDsItemResponseUT extends BaseTestCaseUT {
         gfaPwdDsItemResponse.setTtitem(Arrays.asList(new GFAPwdTtItemResponse()));
         gfaPwdDsItemResponse.setProdsBefore(new ProdsBefore());
         gfaPwdDsItemResponse.setProdsHasChanges(true);
+        assertNotNull(gfaPwdDsItemResponse.getProdsBefore());
+        assertNotNull(gfaPwdDsItemResponse.getProdsHasChanges());
         gfaPwdDsItemResponse.equals(gfaPwdDsItemResponse);
         gfaPwdDsItemResponse.equals(gfaPwdDsItemResponse1);
         gfaPwdDsItemResponse1.equals(gfaPwdDsItemResponse);

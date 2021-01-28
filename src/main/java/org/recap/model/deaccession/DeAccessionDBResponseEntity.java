@@ -26,6 +26,8 @@ public class DeAccessionDBResponseEntity {
 
     private String institutionCode;
 
+    private String imsLocationCode;
+
     private String collectionGroupCode;
 
     private List<String> owningInstitutionBibIds;

@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAPwiDsItemRequest;
+import org.recap.las.model.GFAPwiRequest;
 
 public class GFAPwiRequestUT extends BaseTestCaseUT {
 
@@ -15,8 +17,6 @@ public class GFAPwiRequestUT extends BaseTestCaseUT {
         gfaPwiRequest1.equals(gfaPwiRequest);
         gfaPwiRequest.hashCode();
         gfaPwiRequest1.hashCode();
-        gfaPwiRequest.canEqual(gfaPwiRequest);
-        gfaPwiRequest.canEqual(gfaPwiRequest1);
         gfaPwiRequest.toString();
     }
 }

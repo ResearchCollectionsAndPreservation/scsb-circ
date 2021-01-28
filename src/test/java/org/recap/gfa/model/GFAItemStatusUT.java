@@ -2,6 +2,7 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAItemStatus;
 
 public class GFAItemStatusUT extends BaseTestCaseUT {
     @Test
@@ -15,7 +16,5 @@ public class GFAItemStatusUT extends BaseTestCaseUT {
         gfaItemStatus.hashCode();
         gfaItemStatus1.hashCode();
         gfaItemStatus.toString();
-        gfaItemStatus.canEqual(gfaItemStatus);
-        gfaItemStatus.canEqual(gfaItemStatus1);
     }
 }

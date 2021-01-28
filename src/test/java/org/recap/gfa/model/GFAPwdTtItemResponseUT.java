@@ -2,6 +2,7 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAPwdTtItemResponse;
 
 import java.sql.Time;
 import java.util.Date;
@@ -30,8 +31,6 @@ public class GFAPwdTtItemResponseUT extends BaseTestCaseUT {
         gfaPwdTtItemResponse.setRequestTime(new Time(new Long(10)));
         gfaPwdTtItemResponse.setErrorCode("test");
         gfaPwdTtItemResponse.setErrorNote("test");
-        gfaPwdTtItemResponse.canEqual(gfaPwdTtItemResponse);
-        gfaPwdTtItemResponse.canEqual(gfaPwdTtItemResponse1);
         gfaPwdTtItemResponse.equals(gfaPwdTtItemResponse);
         gfaPwdTtItemResponse.equals(gfaPwdTtItemResponse1);
         gfaPwdTtItemResponse1.equals(gfaPwdTtItemResponse);

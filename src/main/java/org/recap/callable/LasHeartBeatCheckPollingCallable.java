@@ -2,10 +2,11 @@ package org.recap.callable;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
-import org.recap.gfa.model.GFALasStatus;
-import org.recap.gfa.model.GFALasStatusCheckRequest;
-import org.recap.gfa.model.GFALasStatusCheckResponse;
-import org.recap.request.GFAService;
+import org.recap.las.LASImsLocationConnectorFactory;
+import org.recap.las.model.GFALasStatus;
+import org.recap.las.model.GFALasStatusCheckRequest;
+import org.recap.las.model.GFALasStatusCheckResponse;
+import org.recap.las.GFALasService;
 import java.util.Collections;
 import java.util.concurrent.Callable;
 
@@ -16,12 +17,12 @@ import java.util.concurrent.Callable;
 public class LasHeartBeatCheckPollingCallable implements Callable {
 
     private String imsLocationCode;
-    private GFAService gfaService;
+    private LASImsLocationConnectorFactory lasImsLocationConnectorFactory;
     private Integer pollingTimeInterval;
 
-    public LasHeartBeatCheckPollingCallable(Integer pollingTimeInterval, GFAService gfaService, String imsLocationCode) {
+    public LasHeartBeatCheckPollingCallable(Integer pollingTimeInterval, LASImsLocationConnectorFactory lasImsLocationConnectorFactory, String imsLocationCode) {
         this.imsLocationCode = imsLocationCode;
-        this.gfaService = gfaService;
+        this.lasImsLocationConnectorFactory = lasImsLocationConnectorFactory;
         this.pollingTimeInterval = pollingTimeInterval;
     }
 
@@ -36,17 +37,15 @@ public class LasHeartBeatCheckPollingCallable implements Callable {
         GFALasStatus lasStatus = new GFALasStatus();
         lasStatus.setImsLocationCode(imsLocationCode);
         gfaLasStatusCheckRequest.setLasStatus(Collections.singletonList(lasStatus));
-        //Pol HeartBeat Rest Service
         try {
-            gfaLasStatusCheckResponse = gfaService.heartBeatCheck(gfaLasStatusCheckRequest);
-            log.info("LAS Heart Beat Check Polling -> {}", gfaLasStatusCheckResponse);
+            gfaLasStatusCheckResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(imsLocationCode).heartBeatCheck(gfaLasStatusCheckRequest);
+            log.info("LAS Server Heart Beat Check Polling for IMS Location {} -> {}", imsLocationCode, gfaLasStatusCheckResponse);
             if (null == gfaLasStatusCheckResponse
                     || null == gfaLasStatusCheckResponse.getDsitem()
                     || null == gfaLasStatusCheckResponse.getDsitem().getTtitem()
                     || gfaLasStatusCheckResponse.getDsitem().getTtitem().isEmpty()
                     || !BooleanUtils.toBoolean(gfaLasStatusCheckResponse.getDsitem().getTtitem().get(0).getSuccess())) {
                 Thread.sleep(pollingTimeInterval);
-                log.debug("LAS Heart Beat Check Polling");
                 gfaLasStatusCheckResponse = poll();
             }
         } catch (Exception e) {

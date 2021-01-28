@@ -2,6 +2,7 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFALasStatusTtItem;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -19,8 +20,6 @@ public class GFALasStatusTtItemUT extends BaseTestCaseUT {
         gfaLasStatusTtItem1.equals(gfaLasStatusTtItem);
         gfaLasStatusTtItem.hashCode();
         gfaLasStatusTtItem1.hashCode();
-        gfaLasStatusTtItem.canEqual(gfaLasStatusTtItem);
-        gfaLasStatusTtItem.canEqual(gfaLasStatusTtItem1);
         gfaLasStatusTtItem.toString();
 
         assertNotNull(gfaLasStatusTtItem.getScreenMessage());

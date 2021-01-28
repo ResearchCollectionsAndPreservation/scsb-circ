@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFALasStatusCheckResponse;
+import org.recap.las.model.GFALasStatusDsItem;
 
 public class GFALasStatusCheckResponseUT extends BaseTestCaseUT {
 
@@ -13,8 +15,6 @@ public class GFALasStatusCheckResponseUT extends BaseTestCaseUT {
         gfaLasStatusCheckResponse.equals(gfaLasStatusCheckResponse1);
         gfaLasStatusCheckResponse.equals(gfaLasStatusCheckResponse);
         gfaLasStatusCheckResponse1.equals(gfaLasStatusCheckResponse);
-        gfaLasStatusCheckResponse.canEqual(gfaLasStatusCheckResponse1);
-        gfaLasStatusCheckResponse.canEqual(gfaLasStatusCheckResponse);
         gfaLasStatusCheckResponse.toString();
         gfaLasStatusCheckResponse.hashCode();
         gfaLasStatusCheckResponse1.hashCode();

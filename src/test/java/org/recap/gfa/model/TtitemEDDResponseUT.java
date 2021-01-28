@@ -2,8 +2,11 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.las.model.GFAEddItemResponse;
+import org.recap.las.model.GFARetrieveEDDItemRequest;
+import org.recap.las.model.RetrieveItemEDDRequest;
+import org.recap.las.model.TtitemEDDResponse;
 
-import java.sql.Time;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -53,8 +56,7 @@ public class TtitemEDDResponseUT extends BaseTestCase{
         ttitemEDDResponse.equals(ttitemEDDResponse1);
         ttitemEDDResponse.hashCode();
         ttitemEDDResponse1.hashCode();
-        ttitemEDDResponse.canEqual(ttitemEDDResponse);
-        ttitemEDDResponse.canEqual(ttitemEDDResponse1);
+
 
         RetrieveItemEDDRequest retrieveItemEDDRequest = new RetrieveItemEDDRequest();
         retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitemEDDResponse));
@@ -66,7 +68,6 @@ public class TtitemEDDResponseUT extends BaseTestCase{
         gfaEddItemResponse.setDsitem(retrieveItemEDDRequest);
         gfaEddItemResponse.setScreenMessage("Success");
         gfaEddItemResponse.setSuccess(true);
-        gfaEddItemResponse.canEqual(gfaEddItemResponse);
         gfaEddItemResponse.equals(gfaEddItemResponse);
         gfaEddItemResponse.hashCode();
 

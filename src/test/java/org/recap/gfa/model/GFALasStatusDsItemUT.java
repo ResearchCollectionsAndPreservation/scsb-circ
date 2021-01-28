@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFALasStatusDsItem;
+import org.recap.las.model.GFALasStatusTtItem;
 
 import java.util.Arrays;
 
@@ -13,8 +15,6 @@ public class GFALasStatusDsItemUT extends BaseTestCaseUT {
         GFALasStatusDsItem gfaLasStatusDsItem1 = new GFALasStatusDsItem();
         gfaLasStatusDsItem.setTtitem(Arrays.asList(new GFALasStatusTtItem()));
         gfaLasStatusDsItem.toString();
-        gfaLasStatusDsItem.canEqual(gfaLasStatusDsItem1);
-        gfaLasStatusDsItem.canEqual(gfaLasStatusDsItem);
         gfaLasStatusDsItem.equals(gfaLasStatusDsItem1);
         gfaLasStatusDsItem.equals(gfaLasStatusDsItem);
         gfaLasStatusDsItem1.equals(gfaLasStatusDsItem);

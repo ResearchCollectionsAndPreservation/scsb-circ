@@ -1,10 +1,10 @@
 package org.recap.callable;
 
 import org.recap.RecapConstants;
-import org.recap.gfa.model.GFAItemStatus;
-import org.recap.gfa.model.GFAItemStatusCheckRequest;
+import org.recap.las.LASImsLocationConnectorFactory;
+import org.recap.las.model.GFAItemStatus;
+import org.recap.las.model.GFAItemStatusCheckRequest;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
-import org.recap.request.GFAService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,14 +18,16 @@ public class LasItemStatusCheckPollingCallable implements Callable {
     private static final Logger logger = LoggerFactory.getLogger(LasItemStatusCheckPollingCallable.class);
 
     private static String barcode;
-    private GFAService gfaService;
+    private String imsLocationCode;
+    private LASImsLocationConnectorFactory lasImsLocationConnectorFactory;
     private Integer pollingTimeInterval;
 
 
-    public LasItemStatusCheckPollingCallable(Integer pollingTimeInterval, GFAService gfaService, String barcode) {
-        this.gfaService = gfaService;
+    public LasItemStatusCheckPollingCallable(Integer pollingTimeInterval, LASImsLocationConnectorFactory lasImsLocationConnectorFactory, String barcode, String imsLocationCode) {
+        this.lasImsLocationConnectorFactory = lasImsLocationConnectorFactory;
         this.pollingTimeInterval = pollingTimeInterval;
         this.barcode = barcode;
+        this.imsLocationCode = imsLocationCode;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class LasItemStatusCheckPollingCallable implements Callable {
         gfaItemStatuses.add(gfaItemStatus001);
         gfaItemStatusCheckRequest.setItemStatus(gfaItemStatuses);
         try {
-            gfaItemStatusCheckResponse = gfaService.itemStatusCheck(gfaItemStatusCheckRequest);
+            gfaItemStatusCheckResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(imsLocationCode).itemStatusCheck(gfaItemStatusCheckRequest);
             logger.info("Item Status Check Polling -> {}", gfaItemStatusCheckResponse);
             if (gfaItemStatusCheckResponse == null) {
                 Thread.sleep(pollingTimeInterval);

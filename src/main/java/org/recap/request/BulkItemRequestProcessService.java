@@ -7,6 +7,7 @@ import org.recap.RecapCommonConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
+import org.recap.las.GFALasService;
 import org.recap.model.jpa.BulkRequestItem;
 import org.recap.model.jpa.BulkRequestItemEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -51,7 +52,7 @@ public class BulkItemRequestProcessService {
     private ItemRequestServiceUtil itemRequestServiceUtil;
 
     @Autowired
-    private GFAService gfaService;
+    private GFALasService gfaLasService;
 
     @Autowired
     private CommonUtil commonUtil;
@@ -123,19 +124,19 @@ public class BulkItemRequestProcessService {
             ItemCheckoutResponse itemCheckoutResponse = (ItemCheckoutResponse) requestItemController.checkoutItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
             itemCheckoutResponse.setSuccess(true);
             if (itemCheckoutResponse.isSuccess()) {
-                if (gfaService.isUseQueueLasCall()) {
+                if (gfaLasService.isUseQueueLasCall(itemRequestInformation.getImsLocationCode())) {
                     itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_PENDING, bulkRequestItemEntity);
                 }
                 ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                 itemInformationResponse.setRequestId(requestId);
-                itemInformationResponse = gfaService.executeRetrieveOrder(itemRequestInformation, itemInformationResponse);
+                itemInformationResponse = gfaLasService.executeRetrieveOrder(itemRequestInformation, itemInformationResponse);
                 if (itemInformationResponse.isRequestTypeForScheduledOnWO()) {
                     logger.info("Bulk Request : Request received on first scan");
                     itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.LAS_REFILE_REQUEST_PLACED, bulkRequestItemEntity);
                 } else if (itemInformationResponse.isSuccess()) {
                     itemInformationResponse.setScreenMessage(RecapConstants.SUCCESSFULLY_PROCESSED_REQUEST_ITEM);
                     itemRequestInformation.setRequestNotes(itemRequestInformation.getRequestNotes() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
-                    if (!gfaService.isUseQueueLasCall()) {
+                    if (!gfaLasService.isUseQueueLasCall(itemRequestInformation.getImsLocationCode())) {
                         itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, bulkRequestItemEntity);
                     }
                 } else {

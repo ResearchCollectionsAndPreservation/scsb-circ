@@ -2,6 +2,9 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAPwiDsItemResponse;
+import org.recap.las.model.GFAPwiTtItemResponse;
+import org.recap.las.model.ProdsBefore;
 
 import java.util.Arrays;
 
@@ -20,7 +23,5 @@ public class GFAPwiDsItemResponseUT extends BaseTestCaseUT {
         gfaPwiDsItemResponse.hashCode();
         gfaPwiDsItemResponse1.hashCode();
         gfaPwiDsItemResponse.toString();
-        gfaPwiDsItemResponse.canEqual(gfaPwiDsItemResponse);
-        gfaPwiDsItemResponse.canEqual(gfaPwiDsItemResponse1);
     }
 }

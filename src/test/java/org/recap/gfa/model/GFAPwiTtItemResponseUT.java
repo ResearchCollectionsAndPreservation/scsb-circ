@@ -2,6 +2,7 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFAPwiTtItemResponse;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -20,8 +21,6 @@ public class GFAPwiTtItemResponseUT extends BaseTestCaseUT {
         gfaPwiTtItemResponse1.equals(gfaPwiTtItemResponse);
         gfaPwiTtItemResponse.hashCode();
         gfaPwiTtItemResponse1.hashCode();
-        gfaPwiTtItemResponse.canEqual(gfaPwiTtItemResponse);
-        gfaPwiTtItemResponse.canEqual(gfaPwiTtItemResponse1);
         gfaPwiTtItemResponse.toString();
 
         assertNotNull(gfaPwiTtItemResponse.getItemBarcode());

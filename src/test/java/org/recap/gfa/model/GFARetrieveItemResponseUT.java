@@ -2,6 +2,8 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.GFARetrieveItemResponse;
+import org.recap.las.model.RetrieveItem;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -19,8 +21,6 @@ public class GFARetrieveItemResponseUT extends BaseTestCaseUT {
         gfaRetrieveItemResponse1.equals(gfaRetrieveItemResponse);
         gfaRetrieveItemResponse.hashCode();
         gfaRetrieveItemResponse1.hashCode();
-        gfaRetrieveItemResponse.canEqual(gfaRetrieveItemResponse);
-        gfaRetrieveItemResponse.canEqual(gfaRetrieveItemResponse1);
         gfaRetrieveItemResponse.toString();
 
         assertNotNull(gfaRetrieveItemResponse.getScreenMessage());

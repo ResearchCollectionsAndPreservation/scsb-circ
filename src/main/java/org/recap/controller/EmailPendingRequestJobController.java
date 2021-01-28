@@ -1,16 +1,18 @@
 package org.recap.controller;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
+import org.recap.RecapConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.service.ActiveMqQueuesInfo;
+import org.recap.util.CommonUtil;
+import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -37,6 +39,12 @@ public class EmailPendingRequestJobController {
     @Autowired
     private ActiveMqQueuesInfo activemqQueuesInfo;
 
+    @Autowired
+    private CommonUtil commonUtil;
+
+    @Autowired
+    private PropertyUtil propertyUtil;
+
     /**
      * Send email for pending request string.
      *
@@ -44,13 +52,16 @@ public class EmailPendingRequestJobController {
      * @throws Exception the exception
      */
     @PostMapping(value = "/sendEmailForPendingRequest")
-    public String sendEmailForPendingRequest() throws Exception{
-        Integer pendingRequests = activemqQueuesInfo.getActivemqQueuesInfo("lasOutgoingQ");
-        if(pendingRequests >= pendingRequestLimit) {
-            logger.info("Pending Request : {}", pendingRequests);
-            EmailPayLoad emailPayLoad = new EmailPayLoad();
-            emailPayLoad.setPendingRequestLimit(String.valueOf(pendingRequestLimit));
-            producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.EMAIL_HEADER_REQUEST_PENDING);
+    public String sendEmailForPendingRequest() throws Exception {
+        for (String imsLocationCode : commonUtil.findAllImsLocationCodeExceptUN()) {
+            Integer pendingRequests = activemqQueuesInfo.getActivemqQueuesInfo("las" + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX);
+            if (pendingRequests >= pendingRequestLimit) {
+                logger.info("Pending Request at {} : {}", imsLocationCode, pendingRequests);
+                EmailPayLoad emailPayLoad = new EmailPayLoad();
+                emailPayLoad.setPendingRequestLimit(String.valueOf(pendingRequestLimit));
+                emailPayLoad.setTo(propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.email.assist.to"));
+                producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.EMAIL_HEADER_REQUEST_PENDING);
+            }
         }
         return RecapCommonConstants.SUCCESS;
     }

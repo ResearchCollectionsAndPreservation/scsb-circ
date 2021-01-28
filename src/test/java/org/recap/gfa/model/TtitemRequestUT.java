@@ -2,6 +2,7 @@ package org.recap.gfa.model;
 
 import org.junit.Test;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.model.TtitemRequest;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -23,8 +24,7 @@ public class TtitemRequestUT extends BaseTestCaseUT {
         ititemRequest1.equals(ititemRequest);
         ititemRequest.hashCode();
         ititemRequest1.hashCode();
-        ititemRequest.canEqual(ititemRequest);
-        ititemRequest.canEqual(ititemRequest1);
+
 
         assertNotNull(ititemRequest.getRequestId());
         assertNotNull(ititemRequest.getRequestor());

@@ -1,7 +1,6 @@
 package org.recap.request;
 
 import org.apache.camel.Exchange;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,6 +14,7 @@ import org.recap.controller.RequestItemController;
 import org.recap.controller.RequestItemValidatorController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
+import org.recap.las.GFALasService;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.GenericPatronDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
@@ -74,7 +74,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     private ItemRequestService itemRequestService;
 
     @Mock
-    private GFAService gfaService;
+    private GFALasService gfaLasService;
 
 
 
@@ -103,8 +103,8 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.updateRecapRequestItem(any(), any(),any())).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
-        Mockito.when(itemRequestService.getGfaService()).thenReturn(gfaService);
-        Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
+        Mockito.when(itemRequestService.getGfaLasService()).thenReturn(gfaLasService);
+        Mockito.when(gfaLasService.isUseQueueLasCall(any())).thenReturn(true);
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
         Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(1);
         Mockito.when(requestItemController.getItemRequestService()).thenReturn(itemRequestService);
@@ -148,8 +148,8 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.updateRecapRequestItem(any(), any(), any())).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
-        Mockito.when(itemRequestService.getGfaService()).thenReturn(gfaService);
-        Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
+        Mockito.when(itemRequestService.getGfaLasService()).thenReturn(gfaLasService);
+        Mockito.when(gfaLasService.isUseQueueLasCall(any())).thenReturn(true);
         Mockito.when(itemRequestService.updateGFA(any(), any())).thenReturn(itemResponseInformation);
         Mockito.doNothing().when(itemRequestService).sendMessageToTopic(any(), any(), any(), any());
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
@@ -180,8 +180,8 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING)).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
-        Mockito.when(itemRequestService.getGfaService()).thenReturn(gfaService);
-        Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
+        Mockito.when(itemRequestService.getGfaLasService()).thenReturn(gfaLasService);
+        Mockito.when(gfaLasService.isUseQueueLasCall()).thenReturn(true);
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
         Mockito.when(itemRequestService.updateGFA(any(), any())).thenReturn(itemResponseInformation);
         Mockito.doNothing().when(itemRequestService).sendMessageToTopic(any(), any(), any(), any());
@@ -210,8 +210,8 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING)).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
-        Mockito.when(itemRequestService.getGfaService()).thenReturn(gfaService);
-        Mockito.when(gfaService.isUseQueueLasCall()).thenReturn(true);
+        Mockito.when(itemRequestService.getGfaLasService()).thenReturn(gfaLasService);
+        Mockito.when(gfaLasService.isUseQueueLasCall(any())).thenReturn(true);
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
         Mockito.when(itemRequestServiceUtil.getPatronIdBorrowingInstitution(any(), any(), any())).thenThrow(new NullPointerException());
         Mockito.when(itemRequestService.updateGFA(any(), any())).thenReturn(itemResponseInformation);

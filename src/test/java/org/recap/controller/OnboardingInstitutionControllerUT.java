@@ -1,6 +1,7 @@
 package org.recap.controller;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spi.RouteController;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class OnboardingInstitutionControllerUT extends BaseTestCaseUT {
     private ItemEDDRequestService itemEDDRequestService;
 
     @Mock
-    RouteController routeController;
+    RouteBuilder routeBuilder;
 
     @Before
     public void setup(){

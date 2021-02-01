@@ -16,8 +16,6 @@ public class RetrieveItemEDDRequestUT extends BaseTestCaseUT {
         retrieveItemEDDRequest.equals(retrieveItemEDDRequest);
         retrieveItemEDDRequest.equals(retrieveItemEDDRequest1);
         retrieveItemEDDRequest1.equals(retrieveItemEDDRequest);
-        retrieveItemEDDRequest.canEqual(retrieveItemEDDRequest);
-        retrieveItemEDDRequest.canEqual(retrieveItemEDDRequest1);
         retrieveItemEDDRequest.hashCode();
         retrieveItemEDDRequest1.hashCode();
         retrieveItemEDDRequest.toString();

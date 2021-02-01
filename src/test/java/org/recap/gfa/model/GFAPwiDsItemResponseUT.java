@@ -23,7 +23,5 @@ public class GFAPwiDsItemResponseUT extends BaseTestCaseUT {
         gfaPwiDsItemResponse.hashCode();
         gfaPwiDsItemResponse1.hashCode();
         gfaPwiDsItemResponse.toString();
-        gfaPwiDsItemResponse.canEqual(gfaPwiDsItemResponse);
-        gfaPwiDsItemResponse.canEqual(gfaPwiDsItemResponse1);
     }
 }

@@ -24,8 +24,7 @@ public class TtitemRequestUT extends BaseTestCaseUT {
         ititemRequest1.equals(ititemRequest);
         ititemRequest.hashCode();
         ititemRequest1.hashCode();
-        ititemRequest.canEqual(ititemRequest);
-        ititemRequest.canEqual(ititemRequest1);
+
 
         assertNotNull(ititemRequest.getRequestId());
         assertNotNull(ititemRequest.getRequestor());

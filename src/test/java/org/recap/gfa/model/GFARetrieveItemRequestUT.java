@@ -15,8 +15,6 @@ public class GFARetrieveItemRequestUT extends BaseTestCaseUT {
         gfaRetrieveItemRequest.equals(gfaRetrieveItemRequest);
         gfaRetrieveItemRequest1.equals(gfaRetrieveItemRequest);
         gfaRetrieveItemRequest.equals(gfaRetrieveItemRequest1);
-        gfaRetrieveItemRequest.canEqual(gfaRetrieveItemRequest);
-        gfaRetrieveItemRequest.canEqual(gfaRetrieveItemRequest1);
         gfaRetrieveItemRequest.hashCode();
         gfaRetrieveItemRequest1.hashCode();
         gfaRetrieveItemRequest.toString();

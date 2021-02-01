@@ -18,8 +18,6 @@ public class RetrieveItemRequestUT extends BaseTestCaseUT {
         retrieveItemRequest.equals(retrieveItemRequest1);
         retrieveItemRequest.hashCode();
         retrieveItemRequest1.hashCode();
-        retrieveItemRequest.canEqual(retrieveItemRequest);
-        retrieveItemRequest.canEqual(retrieveItemRequest1);
         retrieveItemRequest.toString();
     }
 

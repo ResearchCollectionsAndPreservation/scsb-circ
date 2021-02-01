@@ -21,8 +21,6 @@ public class GFAEddItemResponseUT extends BaseTestCaseUT {
         gfaEddItemResponse.equals(gfaEddItemResponse);
         gfaEddItemResponse.equals(gfaEddItemResponse1);
         gfaEddItemResponse1.equals(gfaEddItemResponse);
-        gfaEddItemResponse.canEqual(gfaEddItemResponse1);
-        gfaEddItemResponse.canEqual(gfaEddItemResponse);
         gfaEddItemResponse.toString();
         assertNotNull(gfaEddItemResponse.getScreenMessage());
         assertNotNull(gfaEddItemResponse.getDsitem());

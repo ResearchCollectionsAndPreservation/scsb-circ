@@ -21,7 +21,5 @@ public class GFAPwiDsItemRequestUT extends BaseTestCaseUT {
         gfaPwiDsItemRequest.hashCode();
         gfaPwiDsItemRequest1.hashCode();
         gfaPwiDsItemRequest.toString();
-        gfaPwiDsItemRequest.canEqual(gfaPwiDsItemRequest);
-        gfaPwiDsItemRequest.canEqual(gfaPwiDsItemRequest1);
     }
 }

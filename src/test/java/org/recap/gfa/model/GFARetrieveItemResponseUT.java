@@ -21,8 +21,6 @@ public class GFARetrieveItemResponseUT extends BaseTestCaseUT {
         gfaRetrieveItemResponse1.equals(gfaRetrieveItemResponse);
         gfaRetrieveItemResponse.hashCode();
         gfaRetrieveItemResponse1.hashCode();
-        gfaRetrieveItemResponse.canEqual(gfaRetrieveItemResponse);
-        gfaRetrieveItemResponse.canEqual(gfaRetrieveItemResponse1);
         gfaRetrieveItemResponse.toString();
 
         assertNotNull(gfaRetrieveItemResponse.getScreenMessage());

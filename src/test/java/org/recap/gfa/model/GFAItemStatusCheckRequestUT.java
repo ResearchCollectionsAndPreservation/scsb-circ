@@ -14,8 +14,6 @@ public class GFAItemStatusCheckRequestUT extends BaseTestCaseUT {
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest1 = new GFAItemStatusCheckRequest();
         gfaItemStatusCheckRequest.setItemStatus(Arrays.asList(new GFAItemStatus()));
-        gfaItemStatusCheckRequest.canEqual(gfaItemStatusCheckRequest);
-        gfaItemStatusCheckRequest.canEqual(gfaItemStatusCheckRequest1);
         gfaItemStatusCheckRequest.equals(gfaItemStatusCheckRequest);
         gfaItemStatusCheckRequest.equals(gfaItemStatusCheckRequest1);
         gfaItemStatusCheckRequest1.equals(gfaItemStatusCheckRequest);

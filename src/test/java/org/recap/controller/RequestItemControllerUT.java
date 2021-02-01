@@ -21,6 +21,7 @@ import org.recap.model.jpa.ItemRefileResponse;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.ReplaceRequest;
 import org.recap.request.ItemRequestService;
+import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,9 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     IJSIPConnector ijsipConnector;
 
     @Mock
+    PropertyUtil propertyUtil;
+
+    @Mock
     private JSIPConnectorFactory jsipConectorFactory;
 
     @Mock
@@ -58,6 +62,12 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     @Mock
     ItemRequestService itemRequestService;
 
+    @Test
+    public void checkGetters(){
+        mockedRequestItemController.getJsipConectorFactory();
+        mockedRequestItemController.getIlsProtocolConnectorFactory();
+        mockedRequestItemController.getItemRequestService();
+    }
     @Test
     public void testCheckoutItemRequest() {
         String callInstitition = "PUL";
@@ -180,12 +190,13 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         itemRequestInformation.setTrackingId("235");
         itemRequestInformation.setRequestingInstitution(callInstitition);
         ItemHoldResponse itemHoldResponse = getItemHoldResponse();
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(callInstitition, "ils.default.pickup.location")).thenReturn("PA");
         Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
         Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).cancelHold(itembarcode, itemRequestInformation.getPatronBarcode(),
                 itemRequestInformation.getRequestingInstitution(),
                 itemRequestInformation.getExpirationDate(),
                 itemRequestInformation.getBibId(),
-                getPickupLocationDB(itemRequestInformation, "PUL"), itemRequestInformation.getTrackingId())).thenReturn(itemHoldResponse);
+                "PA", itemRequestInformation.getTrackingId())).thenReturn(itemHoldResponse);
         AbstractResponseItem abstractResponseItem = mockedRequestItemController.cancelHoldItem(itemRequestInformation, callInstitition);
         assertNotNull(abstractResponseItem);
         assertTrue(abstractResponseItem.isSuccess());
@@ -200,22 +211,23 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
 
     @Test
     public void testHoldItemRequest() {
-        String callInstitition = "PUL";
+        String callInstitution = "PUL";
         String itembarcode = "PULTST54325";
-        ItemRequestInformation itemRequestInformation = getItemRequestInformation(callInstitition, itembarcode);
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation(callInstitution, itembarcode);
         ItemHoldResponse itemHoldResponse = getItemHoldResponse();
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(callInstitution, "ils.use.delivery.location.as.pickup.location")).thenReturn(Boolean.TRUE.toString());
         Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
-        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).placeHold(itembarcode, itemRequestInformation.getPatronBarcode(),
+        Mockito.when(abstractProtocolConnector.placeHold(itembarcode, itemRequestInformation.getPatronBarcode(),
                 itemRequestInformation.getRequestingInstitution(),
                 itemRequestInformation.getItemOwningInstitution(),
                 itemRequestInformation.getExpirationDate(),
                 itemRequestInformation.getBibId(),
-                getPickupLocationDB(itemRequestInformation, "PUL"),
+                itemRequestInformation.getDeliveryLocation(),
                 itemRequestInformation.getTrackingId(),
                 itemRequestInformation.getTitleIdentifier(),
                 itemRequestInformation.getAuthor(),
                 itemRequestInformation.getCallNumber())).thenReturn(itemHoldResponse);
-        AbstractResponseItem abstractResponseItem = mockedRequestItemController.holdItem(itemRequestInformation, callInstitition);
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.holdItem(itemRequestInformation, callInstitution);
         assertNotNull(abstractResponseItem);
     }
     @Test
@@ -283,6 +295,29 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         AbstractResponseItem abstractResponseItem = mockedRequestItemController.createBibliogrphicItem(itemRequestInformation, callInstitition);
         assertNotNull(abstractResponseItem);
     }
+    @Test
+    public void testBibCreationItemNotFound() {
+        String callInstitition = null;
+        String itemBarcode = "PULTST54325";
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Arrays.asList(itemBarcode));
+        itemRequestInformation.setPatronBarcode("198572368");
+        itemRequestInformation.setExpirationDate(new Date().toString());
+        itemRequestInformation.setBibId("12");
+        itemRequestInformation.setTrackingId("235");
+        itemRequestInformation.setRequestingInstitution(callInstitition);
+        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+        itemInformationResponse.setScreenMessage("ITEM BARCODE NOT FOUND.");
+        itemInformationResponse.setSuccess(true);
+        ItemCreateBibResponse itemCreateBibResponse =new ItemCreateBibResponse();
+        itemCreateBibResponse.setSuccess(true);
+        itemCreateBibResponse.setScreenMessage("Success");
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).lookupItem(itemBarcode)).thenReturn(itemInformationResponse);
+        Mockito.when(abstractProtocolConnector.createBib(itemBarcode, itemRequestInformation.getPatronBarcode(), itemRequestInformation.getRequestingInstitution(), itemRequestInformation.getTitleIdentifier())).thenReturn(itemCreateBibResponse);
+        AbstractResponseItem abstractResponseItem = mockedRequestItemController.createBibliogrphicItem(itemRequestInformation, callInstitition);
+        assertNotNull(abstractResponseItem);
+    }
 
     @Test
     public void testBibCreationWithoutItemBarcode() {
@@ -315,6 +350,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         itemRequestInformation.setRequestingInstitution(callInstitition);
         ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         itemRecallResponse.setSuccess(true);
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(callInstitition, "ils.use.delivery.location.as.pickup.location")).thenReturn(Boolean.TRUE.toString());
         Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
         Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).recallItem(itembarcode, itemRequestInformation.getPatronBarcode(),
                 itemRequestInformation.getRequestingInstitution(),
@@ -343,15 +379,6 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         AbstractResponseItem abstractResponseItem = mockedRequestItemController.patronInformation(itemRequestInformation, callInstitition);
         assertNotNull(abstractResponseItem);
 
-    }
-
-
-    @Test
-    public void testJsonResponseParse() throws Exception {
-        String strJson = "{\"patronBarcode\":null,\"itemBarcode\":\"32101095533293\",\"requestType\":null,\"deliveryLocation\":null,\"requestingInstitution\":null,\"bibliographicId\":null,\"expirationDate\":null,\"screenMessage\":\"Checkout Successful.\",\"success\":true,\"emailAddress\":null,\"startPage\":null,\"endPage\":null,\"titleIdentifier\":\"Accommodating Muslims under common law : a comparative analysis / Salim Farrar and Ghena Krayem.\",\"dueDate\":\"20170301    234500\"}";
-        ObjectMapper om = new ObjectMapper();
-        ItemResponseInformation itemResponseInformation = om.readValue(strJson, ItemResponseInformation.class);
-        logger.info(itemResponseInformation.getScreenMessage());
     }
 
     @Test
@@ -412,6 +439,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     @Test
     public void getPickupLocationCUL() {
         String institution = "CUL";
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, "ils.default.pickup.location")).thenReturn("CIRCrecap");
         String pickUpLocation = mockedRequestItemController.getPickupLocation(institution);
         assertNotNull(pickUpLocation);
         assertEquals("CIRCrecap", pickUpLocation);
@@ -420,6 +448,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     @Test
     public void getPickupLocationNYPL() {
         String institution = "NYPL";
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(),any())).thenReturn("lb");
         String pickUpLocation = mockedRequestItemController.getPickupLocation(institution);
         assertNotNull(pickUpLocation);
         assertEquals("lb", pickUpLocation);
@@ -428,6 +457,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     @Test
     public void getPickupLocationPUL() {
         String institution = "PUL";
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, "ils.default.pickup.location")).thenReturn("rcpcirc");
         String pickUpLocation = mockedRequestItemController.getPickupLocation(institution);
         assertNotNull(pickUpLocation);
         assertEquals("rcpcirc", pickUpLocation);

@@ -5,6 +5,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
+import org.recap.las.AbstractLASImsLocationConnector;
+import org.recap.las.LASImsLocationConnectorFactory;
+import org.recap.las.model.GFALasStatusCheckRequest;
 import org.recap.las.model.GFALasStatusCheckResponse;
 import org.recap.las.model.GFALasStatusDsItem;
 import org.recap.las.model.GFALasStatusTtItem;
@@ -19,6 +22,13 @@ public class LasHeartBeatCheckPollingCallableUT extends BaseTestCaseUT {
 
     @InjectMocks
     LasHeartBeatCheckPollingCallable lasHeartBeatCheckPollingCallable;
+
+    @Mock
+    private LASImsLocationConnectorFactory lasImsLocationConnectorFactory;
+
+    @Mock
+    AbstractLASImsLocationConnector abstractLASImsLocationConnector;
+
     @Mock
     GFALasService gfaLasService;
     @Test
@@ -26,8 +36,9 @@ public class LasHeartBeatCheckPollingCallableUT extends BaseTestCaseUT {
         Integer pollingTimeInterval = 10000;
         String imsLocationCode = "1";
         GFALasStatusCheckResponse gfaLasStatusCheckResponse = getGFALasStatusCheckResponse();
-        LasHeartBeatCheckPollingCallable lasHeartBeatCheckPollingCallable = new LasHeartBeatCheckPollingCallable(pollingTimeInterval, gfaLasService,imsLocationCode);
-        Mockito.when(gfaLasService.heartBeatCheck(any())).thenReturn(gfaLasStatusCheckResponse);
+        LasHeartBeatCheckPollingCallable lasHeartBeatCheckPollingCallable = new LasHeartBeatCheckPollingCallable(pollingTimeInterval, lasImsLocationConnectorFactory,imsLocationCode);
+        Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
+        Mockito.when(abstractLASImsLocationConnector.heartBeatCheck(any(GFALasStatusCheckRequest.class))).thenReturn(gfaLasStatusCheckResponse);
         GFALasStatusCheckResponse response = lasHeartBeatCheckPollingCallable.call();
         assertNotNull(response);
     }

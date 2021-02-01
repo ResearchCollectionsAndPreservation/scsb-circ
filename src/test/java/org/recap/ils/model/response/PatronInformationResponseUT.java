@@ -2,6 +2,7 @@ package org.recap.ils.model.response;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -11,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 3/4/17.
  */
-public class PatronInformationResponseUT extends BaseTestCase {
+public class PatronInformationResponseUT extends BaseTestCaseUT {
 
     @Test
     public void testPatronInformationResponse(){

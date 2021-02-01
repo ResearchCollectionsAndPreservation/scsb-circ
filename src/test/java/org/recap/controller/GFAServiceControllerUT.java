@@ -22,6 +22,14 @@ public class GFAServiceControllerUT extends BaseTestCaseUT {
     private GFALasService gfaLasService;
 
     @Test
+    public void itemStatusCheck(){
+        String itemBarcode = "3455632";
+        Mockito.when(gfaLasService.callGfaItemStatus(itemBarcode)).thenReturn("IN");
+        String gfaItemStatusValue = gfaServiceController.itemStatusCheck(itemBarcode);
+        assertNotNull(gfaItemStatusValue);
+    }
+
+    @Test
     public void multipleItemsStatusCheck(){
         List<ScsbLasItemStatusCheckModel> itemsStatusCheckModel = new ArrayList<>();
         ScsbLasItemStatusCheckModel scsbLasItemStatusCheckModel = new ScsbLasItemStatusCheckModel();

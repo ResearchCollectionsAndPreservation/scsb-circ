@@ -48,7 +48,7 @@ public class RequestDataLoadController {
     String requestInitialAccessionErrorFileS3Dir;
 
     @PostMapping(value = "/startRequestInitialLoad")
-    public String startAccessionReconcilation() throws Exception{
+    public String startAccessionReconciliation() throws Exception{
         logger.info("Request Initial DataLoad Starting.....");
         List<String> allInstitutionCodeExceptHTC = institutionDetailsRepository.findAllInstitutionCodeExceptHTC();
         for (String institution : allInstitutionCodeExceptHTC) {

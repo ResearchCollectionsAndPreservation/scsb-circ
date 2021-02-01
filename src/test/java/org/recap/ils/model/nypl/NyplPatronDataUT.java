@@ -30,8 +30,6 @@ public class NyplPatronDataUT extends BaseTestCase{
         nyplPatronData.setBarCodes(Arrays.asList("3545874547253814556"));
         nyplPatronData.setHomeLibraryCode("test");
         nyplPatronData.setEmails(Arrays.asList("test@gmail.com"));
-        nyplPatronData.setFixedFields(new FixedFields());
-        nyplPatronData.setVarFields(Arrays.asList(new VarField()));
 
         assertNotNull(nyplPatronData.getId());
         assertNotNull(nyplPatronData.getUpdatedDate());
@@ -45,9 +43,6 @@ public class NyplPatronDataUT extends BaseTestCase{
         assertNotNull(nyplPatronData.getHomeLibraryCode());
         assertNotNull(nyplPatronData.getBirthDate());
         assertNotNull(nyplPatronData.getEmails());
-        assertNotNull(nyplPatronData.getFixedFields());
-        assertNotNull(nyplPatronData.getVarFields());
-
     }
 
 }

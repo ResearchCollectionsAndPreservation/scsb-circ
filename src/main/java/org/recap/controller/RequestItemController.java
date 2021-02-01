@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.ils.ILSProtocolConnectorFactory;
-import org.recap.ils.JSIPConnectorFactory;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.BulkRequestInformation;
 import org.recap.model.ItemRefileRequest;
@@ -44,9 +43,6 @@ public class RequestItemController {
     private static final Logger logger = LoggerFactory.getLogger(RequestItemController.class);
 
     @Autowired
-    private JSIPConnectorFactory jsipConectorFactory;
-
-    @Autowired
     private ItemRequestService itemRequestService;
 
     @Autowired
@@ -54,15 +50,6 @@ public class RequestItemController {
 
     @Autowired
     private PropertyUtil propertyUtil;
-
-    /**
-     * Gets JSIPConectorFactory object.
-     *
-     * @return the jsip conector factory
-     */
-    public JSIPConnectorFactory getJsipConectorFactory() {
-        return jsipConectorFactory;
-    }
 
     /**
      * Gets ItemRequestService object.
@@ -86,15 +73,15 @@ public class RequestItemController {
      * Checkout item method is for processing SIP2 protocol function check out, This function converts SIP data to JSON format.
      *
      * @param itemRequestInformation the item request information
-     * @param callInstitition        the call institition
+     * @param callInstitution        the call institution
      * @return the abstract response item
      */
     @PostMapping(value = "/checkoutItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AbstractResponseItem checkoutItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
+    public AbstractResponseItem checkoutItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         String itemBarcode;
         try {
-            String callInst = callingInstitution(callInstitition, itemRequestInformation);
+            String callInst = callingInstitution(callInstitution, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
                 itemCheckoutResponse = (ItemCheckoutResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkOutItem(itemBarcode, itemRequestInformation.getPatronBarcode());
@@ -114,18 +101,18 @@ public class RequestItemController {
      * This method checkinItem is for processing SIP2 protocol function check in. This function converts SIP data to JSON format.
      *
      * @param itemRequestInformation the item request information
-     * @param callInstitition        the call institition
+     * @param callInstitution        the call institution
      * @return the abstract response item
      */
     @PostMapping(value = "/checkinItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AbstractResponseItem checkinItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
+    public AbstractResponseItem checkinItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         ItemCheckinResponse itemCheckinResponse;
         String itemBarcode;
         try {
-            String callInst = callingInstitution(callInstitition, itemRequestInformation);
+            String callInst = callingInstitution(callInstitution, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
-                logger.info("Patron barcode and Institution info before CheckIn call : patron - {} , institution - {} ",itemRequestInformation.getPatronBarcode(),callInstitition);
+                logger.info("Patron barcode and Institution info before CheckIn call : patron - {} , institution - {} ",itemRequestInformation.getPatronBarcode(),callInstitution);
                 itemCheckinResponse = (ItemCheckinResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkInItem(itemBarcode, itemRequestInformation.getPatronBarcode());
                 logger.info("CheckIn Response Message : {}",itemCheckinResponse.getScreenMessage());
             } else {
@@ -146,14 +133,14 @@ public class RequestItemController {
      * Hold item abstract response item.
      *
      * @param itemRequestInformation the item request information
-     * @param callInstitition        the call institition
+     * @param callInstitution        the call institution
      * @return the abstract response item
      */
     @PostMapping(value = "/holdItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AbstractResponseItem holdItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
+    public AbstractResponseItem holdItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         try {
-            String callInst = callingInstitution(callInstitition, itemRequestInformation);
+            String callInst = callingInstitution(callInstitution, itemRequestInformation);
             String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
             itemHoldResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).placeHold(itembarcode, itemRequestInformation.getPatronBarcode(),
                     itemRequestInformation.getRequestingInstitution(),
@@ -178,13 +165,13 @@ public class RequestItemController {
      * Cancel hold item abstract response item.
      *
      * @param itemRequestInformation the item request information
-     * @param callInstitition        the call institition
+     * @param callInstitution        the call institution
      * @return the abstract response item
      */
     @PostMapping(value = "/cancelHoldItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AbstractResponseItem cancelHoldItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
+    public AbstractResponseItem cancelHoldItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         ItemHoldResponse itemHoldCancelResponse = null;
-        String callInst = callingInstitution(callInstitition, itemRequestInformation);
+        String callInst = callingInstitution(callInstitution, itemRequestInformation);
         if (CollectionUtils.isNotEmpty(itemRequestInformation.getItemBarcodes())) {
             String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
             itemHoldCancelResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).cancelHold(itembarcode, itemRequestInformation.getPatronBarcode(),
@@ -200,15 +187,15 @@ public class RequestItemController {
      * Create bibliogrphic item abstract response item.
      *
      * @param itemRequestInformation the item request information
-     * @param callInstitition        the call institition
+     * @param callInstitution        the call institution
      * @return the abstract response item
      */
     @PostMapping(value = "/createBib", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AbstractResponseItem createBibliogrphicItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
+    public AbstractResponseItem createBibliogrphicItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         ItemCreateBibResponse itemCreateBibResponse;
         String itemBarcode;
-        logger.info("ESIP CALL FOR CREATE BIB -> {}" , callInstitition);
-        String callInst = callingInstitution(callInstitition, itemRequestInformation);
+        logger.info("ESIP CALL FOR CREATE BIB -> {}" , callInstitution);
+        String callInst = callingInstitution(callInstitution, itemRequestInformation);
         if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
             itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
             ItemInformationResponse itemInformation = (ItemInformationResponse) itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
@@ -231,15 +218,15 @@ public class RequestItemController {
      * Item information abstract response item.
      *
      * @param itemRequestInformation the item request information
-     * @param callInstitition        the call institition
+     * @param callInstitution        the call institution
      * @return the abstract response item
      */
     @PostMapping(value = "/itemInformation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AbstractResponseItem itemInformation(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
+    public AbstractResponseItem itemInformation(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         AbstractResponseItem itemInformationResponse;
-        String callInst = callingInstitution(callInstitition, itemRequestInformation);
-        String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
-        itemInformationResponse = ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).lookupItem(itembarcode);
+        String callInst = callingInstitution(callInstitution, itemRequestInformation);
+        String itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
+        itemInformationResponse = ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).lookupItem(itemBarcode);
         return itemInformationResponse;
     }
 
@@ -247,14 +234,14 @@ public class RequestItemController {
      * Recall item abstract response item.
      *
      * @param itemRequestInformation the item request information
-     * @param callInstitition        the call institition
+     * @param callInstitution        the call institution
      * @return the abstract response item
      */
     @PostMapping(value = "/recallItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AbstractResponseItem recallItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
+    public AbstractResponseItem recallItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         ItemRecallResponse itemRecallResponse;
-        logger.info("ESIP CALL FOR RECALL ITEM -> {}" , callInstitition);
-        String callInst = callingInstitution(callInstitition, itemRequestInformation);
+        logger.info("ESIP CALL FOR RECALL ITEM -> {}" , callInstitution);
+        String callInst = callingInstitution(callInstitution, itemRequestInformation);
         String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
         itemRecallResponse = (ItemRecallResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).recallItem(itembarcode, itemRequestInformation.getPatronBarcode(),
                 itemRequestInformation.getRequestingInstitution(),
@@ -268,13 +255,13 @@ public class RequestItemController {
      * Patron information abstract response item.
      *
      * @param itemRequestInformation the item request information
-     * @param callInstitition        the call institition
+     * @param callInstitution        the call institution
      * @return the abstract response item
      */
     @PostMapping(value = "/patronInformation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AbstractResponseItem patronInformation(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
+    public AbstractResponseItem patronInformation(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         PatronInformationResponse patronInformationResponse;
-        String callInst = callingInstitution(callInstitition, itemRequestInformation);
+        String callInst = callingInstitution(callInstitution, itemRequestInformation);
         patronInformationResponse = (PatronInformationResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).lookupPatron(itemRequestInformation.getPatronBarcode());
         return patronInformationResponse;
     }
@@ -311,15 +298,15 @@ public class RequestItemController {
      * This method refiles the item in ILS. Currently only NYPL has the refile endpoint.
      *
      * @param itemRequestInformation the item request information
-     * @param callInstitition        the call institition
+     * @param callInstitution        the call institution
      * @return the abstract response item
      */
     @PostMapping(value = "/refileItemInILS", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AbstractResponseItem refileItemInILS(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitition) {
+    public AbstractResponseItem refileItemInILS(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         ItemRefileResponse itemRefileResponse;
         String itemBarcode;
         try {
-            String callInst = callingInstitution(callInstitition, itemRequestInformation);
+            String callInst = callingInstitution(callInstitution, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
                 itemRefileResponse = (ItemRefileResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).refileItem(itemBarcode);

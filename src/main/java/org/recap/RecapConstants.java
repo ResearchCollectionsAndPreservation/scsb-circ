@@ -10,7 +10,7 @@ public final class RecapConstants {
 
     public static final String GFA = "GFA";
 
-    public static final String INVALID_REQUEST_INSTITUTION = "Please enter valid Institution PUL/CUL/NYPL for requestingInstitution";
+    public static final String INVALID_REQUEST_INSTITUTION = "Please enter valid Institution {0} for requestingInstitution";
     public static final String INVALID_EMAIL_ADDRESS = "Please enter valid emailAddress";
     public static final String START_PAGE_AND_END_PAGE_REQUIRED = "Start page and end page required.";
     public static final String DELIVERY_LOCATION_REQUIRED = "Delivery Location is required for request type Recall/hold/retrieval";
@@ -67,22 +67,6 @@ public final class RecapConstants {
     public static final String LAS_INCOMING_QUEUE = "scsbactivemq:queue:lasIncomingQ";
     public static final String REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE = "scsbactivemq:queue:RequestItemLasStatusCheckQ?asyncConsumer=true";
 
-    public static final String REQUEST_TOPIC_PREFIX = "scsbactivemq:topic:";
-    public static final String PUL_REQUEST_TOPIC = "scsbactivemq:topic:PUL.RequestT";
-    public static final String PUL_EDD_TOPIC = "scsbactivemq:topic:PUL.EDDT";
-    public static final String PUL_RECALL_TOPIC = "scsbactivemq:topic:PUL.RecallT";
-    public static final String PUL_BORROW_DIRECT_TOPIC = "scsbactivemq:topic:PUL.BorrowDirectT";
-
-    public static final String CUL_REQUEST_TOPIC = "scsbactivemq:topic:CUL.RequestT";
-    public static final String CUL_EDD_TOPIC = "scsbactivemq:topic:CUL.EDDT";
-    public static final String CUL_RECALL_TOPIC = "scsbactivemq:topic:CUL.RecallT";
-    public static final String CUL_BORROW_DIRECT_TOPIC = "scsbactivemq:topic:CUL.BorrowDirectT";
-
-    public static final String NYPL_REQUEST_TOPIC = "scsbactivemq:topic:NYPL.RequestT";
-    public static final String NYPL_EDD_TOPIC = "scsbactivemq:topic:NYPL.EDDT";
-    public static final String NYPL_RECALL_TOPIC = "scsbactivemq:topic:NYPL.RecallT";
-    public static final String NYPL_BORROW_DIRECT_TOPIC = "scsbactivemq:topic:NYPL.BorrowDirectT";
-
     public static final String REQUEST_TOPIC_LISTENING_MESSAGES = "Request Topic - Listening to messages";
 
     //RoutId
@@ -95,36 +79,7 @@ public final class RecapConstants {
     public static final String LAS_INCOMING_ROUTE_ID = "LasIncomingQueueRouteId";
     public static final String REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID = "RequestItemLasStatusCheckRouteId";
 
-    public static final String PUL_REQUEST_TOPIC_ROUTEID = "PULRequestTopicRouteId";
-    public static final String PUL_EDD_TOPIC_ROUTEID = "PULEDDTopicRouteId";
-    public static final String PUL_RECALL_TOPIC_ROUTEID = "PULRecallTopicRouteId";
-    public static final String PUL_BORROW_DIRECT_TOPIC_ROUTEID = "PULBorrowDirectTopicRouteId";
-
-    public static final String CUL_REQUEST_TOPIC_ROUTEID = "CULRequestTopicRouteId";
-    public static final String CUL_EDD_TOPIC_ROUTEID = "CULEDDTopicRouteId";
-    public static final String CUL_RECALL_TOPIC_ROUTEID = "CULRecallTopicRouteId";
-    public static final String CUL_BORROW_DIRECT_TOPIC_ROUTEID = "CULBorrowDirectTopicRouteId";
-
-    public static final String NYPL_REQUEST_TOPIC_ROUTEID = "NYPLRequestTopicRouteId";
-    public static final String NYPL_EDD_TOPIC_ROUTEID = "NYPLEDDTopicRouteId";
-    public static final String NYPL_RECALL_TOPIC_ROUTEID = "NYPLRecallTopicRouteId";
-    public static final String NYPL_BORROW_DIRECT_TOPIC_ROUTEID = "NYPLBorrowDirectTopicRouteId";
-
     public static final String REQUEST_ITEM_TOPIC_PREFIX = "RequestItem-";
-    public static final String REQUEST_ITEM_PUL_REQUEST_TOPIC = "RequestItem-pulRequestTopic";
-    public static final String REQUEST_ITEM_PUL_EDD_TOPIC = "RequestItem-pulEDDTopic";
-    public static final String REQUEST_ITEM_PUL_RECALL_TOPIC = "RequestItem-pulRecallTopic";
-    public static final String REQUEST_ITEM_PUL_BORROW_DIRECT_TOPIC = "RequestItem-pulBorrowDirectTopic";
-
-    public static final String REQUEST_ITEM_CUL_REQUEST_TOPIC = "RequestItem-culRequestTopic";
-    public static final String REQUEST_ITEM_CUL_EDD_TOPIC = "RequestItem-culEDDTopic";
-    public static final String REQUEST_ITEM_CUL_RECALL_TOPIC = "RequestItem-culRecallTopic";
-    public static final String REQUEST_ITEM_CUL_BORROW_DIRECT_TOPIC = "RequestItem-culBorrowDirectTopic";
-
-    public static final String REQUEST_ITEM_NYPL_REQUEST_TOPIC = "RequestItem-nyplRequestTopic";
-    public static final String REQUEST_ITEM_NYPL_EDD_TOPIC = "RequestItem-nyplEDDTopic";
-    public static final String REQUEST_ITEM_NYPL_RECALL_TOPIC = "RequestItem-nyplRecallTopic";
-    public static final String REQUEST_ITEM_NYPL_BORROW_DIRECT_TOPIC = "RequestItem-nyplBorrowDirectTopic";
 
     public static final String FORMAT_MARC = "marc";
     public static final String FORMAT_SCSB = "scsb";
@@ -154,7 +109,7 @@ public final class RecapConstants {
     public static final String REQUEST_ITEM_ITEM_CHANGE_LOG_EXCEPTION = "RequestItem - Exception";
     public static final String REQUEST_ITEM_CANCEL_ITEM_AVAILABILITY_STATUS = "RequestItemCancel";
     public static final String REQUEST_ITEM_INSERT = "Request Item Insert";
-    public static final String RETRIVAL_ORDER_NOT_REQUIRED_FOR_RECALL = "Retrival order not required for recall";
+    public static final String RETRIEVAL_ORDER_NOT_REQUIRED_FOR_RECALL = "Retrieval order not required for recall";
 
 
     public static final String REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE = "1 - 2";
@@ -164,11 +119,6 @@ public final class RecapConstants {
 
     public static final String UPDATE_ITEM_STATUS_SOLR = "/updateItem/updateItemAvailablityStatus";
     public static final String UPDATE_ITEM_STATUS_SOLR_PARAM_ITEM_ID = "itemBarcode";
-    public static final String CIRCULATION_STATUS_CHARGED = "CHARGED";
-    public static final String CIRCULATION_STATUS_OTHER = "OTHER";
-    public static final String CIRCULATION_STATUS_IN_TRANSIT = "IN_TRANSIT";
-    public static final String CIRCULATION_STATUS_IN_TRANSIT_NYPL = "IN TRANSIT";
-    public static final String CIRCULATION_STATUS_ON_HOLDSHELF = "ON HOLDSHELF";
 
     public static final String SEARCH_RECORDS_SOLR = "/searchService/searchByParam";
     public static final String SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE = "fieldValue";
@@ -184,12 +134,8 @@ public final class RecapConstants {
     public static final String REQUEST_STATUS_LAS_ITEM_STATUS_PENDING = "LAS_ITEM_STATUS_PENDING";
     public static final String LAS_REFILE_REQUEST_PLACED = "LAS_REFILE_REQUEST_PLACED";
 
-    public static final String NYPL_HOLD_DATE_FORMAT = "yyyy-MM-dd";
-    public static final String NYPL_RECORD_TYPE = "i";
-
-    public static final String DEFAULT_PICK_UP_LOCATION_NYPL = "lb";
-    public static final String DEFAULT_PICK_UP_LOCATION_PUL = "rcpcirc";
-    public static final String DEFAULT_PICK_UP_LOCATION_CUL = "CIRCrecap";
+    public static final String REST_HOLD_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String REST_RECORD_TYPE = "i";
 
     public static final String REQUEST_PARSE_EXCEPTION = "ParseException : ";
     public static final String REQUEST_INVALID_SIP2_RESPONSE = "InvalidSIP2Response ";
@@ -357,7 +303,7 @@ public final class RecapConstants {
     public static final String ACCESSION_RR_FTP_OPTIONS = "&sendEmptyMessageWhenIdle=true&move=.done&delay=2&localWorkDirectory=";
     public static final String ACCESSION_RECONCILATION_FILE_NAME = "AccessionReconcilation";
     public static final String ACCESSION_RECONCILATION_SOLR_CLIENT_URL = "accessionReconcilationService/startAccessionReconcilation";
-    public static final String STARTING = "Starting {} ";
+    public static final String STARTING = "Starting ";
     public static final String SUBMIT_COLLECTION_COMPLETED_ROUTE = "submitCollectionCompletedRoute";
     public static final String SUBMIT_COLLECTION_CAUGHT_EXCEPTION_METHOD = "caughtException";
     public static final String SUBMIT_COLLECTION_EXCEPTION_BODY_VM = "submit_collection_exception_body.vm";
@@ -377,15 +323,15 @@ public final class RecapConstants {
     public static final String EMAIL_HEADER_REQUEST_PENDING = "Request_Pending";
     public static final String REQUEST_PENDING_EMAIL_BODY_VM = "requestPendingEmailBody.vm";
 
-    // NYPL API URL
-    public static final String NYPL_CHECKOUT_REQUEST_URL = "/checkout-requests";
-    public static final String NYPL_CHECKIN_REQUEST_URL = "/checkin-requests";
-    public static final String NYPL_RECAP_HOLD_REQUEST_URL = "/recap/hold-requests";
-    public static final String NYPL_RECAP_CANCEL_HOLD_REQUEST_URL = "/recap/cancel-hold-requests";
-    public static final String NYPL_RECAP_RECALL_REQUEST_URL = "/recap/recall-requests";
-    public static final String NYPL_RECAP_REFILE_REQUEST_URL = "/recap/refile-requests";
-    public static final String NYPL_HOLD_REQUEST_URL = "/hold-requests";
-    public static final String NYPL_PATRON_BY_BARCODE_URL = "/patrons?barcode=";
+    // REST API URL
+    public static final String REST_CHECKOUT_REQUEST_URL = "/checkout-requests";
+    public static final String REST_CHECKIN_REQUEST_URL = "/checkin-requests";
+    public static final String REST_RECAP_HOLD_REQUEST_URL = "/recap/hold-requests";
+    public static final String REST_RECAP_CANCEL_HOLD_REQUEST_URL = "/recap/cancel-hold-requests";
+    public static final String REST_RECAP_RECALL_REQUEST_URL = "/recap/recall-requests";
+    public static final String REST_RECAP_REFILE_REQUEST_URL = "/recap/refile-requests";
+    public static final String REST_HOLD_REQUEST_URL = "/hold-requests";
+    public static final String REST_PATRON_BY_BARCODE_URL = "/patrons?barcode=";
 
     //Date Pattern
     public static final String FILE_DATE_FORMAT = "yyyyMMdd_HHmmss";
@@ -410,7 +356,7 @@ public final class RecapConstants {
     public static final String BULK_REQUEST_EMAIL_QUEUE = "BulkRequestEmailQueue";
     public static final String BULK_REQUEST_EMAIL_BODY_VM = "bulkRequestEmailBody.vm";
 
-    public static final String NYPL_NO_RESTRICTIONS = "Standard NYPL restrictions apply";
+    public static final String REST_NO_RESTRICTIONS = "Standard {0} restrictions apply";
 
     public static final String BARCODE_RECONCILIATION_FILE_DATE_FORMAT = "yyyyMMdd";
 

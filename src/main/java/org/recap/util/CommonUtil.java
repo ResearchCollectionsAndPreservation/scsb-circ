@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
-import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.repository.jpa.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,27 +74,6 @@ public class CommonUtil {
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
         holdingsEntity.setOwningInstitutionId(owningInstitutionId);
         return holdingsEntity;
-    }
-
-    public void buildSubmitCollectionReportInfoAndAddFailures(BibliographicEntity fetchedBibliographicEntity, List<SubmitCollectionReportInfo> failureSubmitCollectionReportInfoList, String owningInstitution, Map.Entry<String, Map<String, ItemEntity>> incomingHoldingItemMapEntry, ItemEntity incomingItemEntity) {
-        SubmitCollectionReportInfo submitCollectionReportInfo = new SubmitCollectionReportInfo();
-        submitCollectionReportInfo.setItemBarcode(incomingItemEntity.getBarcode());
-        submitCollectionReportInfo.setCustomerCode(incomingItemEntity.getCustomerCode());
-        submitCollectionReportInfo.setOwningInstitution(owningInstitution);
-        String existingOwningInstitutionHoldingsId = getExistingItemEntityOwningInstItemId(fetchedBibliographicEntity,incomingItemEntity);
-        submitCollectionReportInfo.setMessage(RecapConstants.SUBMIT_COLLECTION_FAILED_RECORD+" - Owning institution holdings id mismatch - incoming owning institution holdings id " +incomingHoldingItemMapEntry.getKey()+ ", existing owning institution item id "+incomingItemEntity.getOwningInstitutionItemId()
-                +", existing owning institution holdings id "+existingOwningInstitutionHoldingsId+", existing owning institution bib id "+fetchedBibliographicEntity.getOwningInstitutionBibId());
-        failureSubmitCollectionReportInfoList.add(submitCollectionReportInfo);
-    }
-
-    public void buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(BibliographicEntity incomingBibliographicEntity, List<SubmitCollectionReportInfo> failureSubmitCollectionReportInfoList, String owningInstitution, ItemEntity incomingItemEntity) {
-        SubmitCollectionReportInfo submitCollectionReportInfo = new SubmitCollectionReportInfo();
-        submitCollectionReportInfo.setItemBarcode(incomingItemEntity.getBarcode());
-        submitCollectionReportInfo.setCustomerCode(incomingItemEntity.getCustomerCode());
-        submitCollectionReportInfo.setOwningInstitution(owningInstitution);
-        submitCollectionReportInfo.setMessage(RecapConstants.SUBMIT_COLLECTION_FAILED_RECORD+" - "+"Unable to update dummy record, CGD is unavailable in the incoming xml record - incoming owning institution bib id - "+incomingBibliographicEntity.getOwningInstitutionBibId()
-                +", incoming owning institution item id - "+incomingItemEntity.getOwningInstitutionItemId());
-        failureSubmitCollectionReportInfoList.add(submitCollectionReportInfo);
     }
 
     private String getExistingItemEntityOwningInstItemId(BibliographicEntity fetchedBibliographicEntity,ItemEntity incomingItemEntity){

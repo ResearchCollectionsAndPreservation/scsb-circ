@@ -52,10 +52,6 @@ public class NyplPatronData {
     private String birthDate;
     @JsonProperty("emails")
     private List<String> emails = null;
-    @JsonProperty("fixedFields")
-    private FixedFields fixedFields;
-    @JsonProperty("varFields")
-    private List<VarField> varFields = null;
 
     /**
      * Gets id.
@@ -295,46 +291,6 @@ public class NyplPatronData {
     @JsonProperty("emails")
     public void setEmails(List<String> emails) {
         this.emails = emails;
-    }
-
-    /**
-     * Gets fixed fields.
-     *
-     * @return the fixed fields
-     */
-    @JsonProperty("fixedFields")
-    public FixedFields getFixedFields() {
-        return fixedFields;
-    }
-
-    /**
-     * Sets fixed fields.
-     *
-     * @param fixedFields the fixed fields
-     */
-    @JsonProperty("fixedFields")
-    public void setFixedFields(FixedFields fixedFields) {
-        this.fixedFields = fixedFields;
-    }
-
-    /**
-     * Gets var fields.
-     *
-     * @return the var fields
-     */
-    @JsonProperty("varFields")
-    public List<VarField> getVarFields() {
-        return varFields;
-    }
-
-    /**
-     * Sets var fields.
-     *
-     * @param varFields the var fields
-     */
-    @JsonProperty("varFields")
-    public void setVarFields(List<VarField> varFields) {
-        this.varFields = varFields;
     }
 
 }

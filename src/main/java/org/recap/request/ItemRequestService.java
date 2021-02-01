@@ -644,7 +644,7 @@ public class ItemRequestService {
                 itemResponseInformation = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemResponseInformation);
             } else {
                 itemResponseInformation.setSuccess(true);
-                itemResponseInformation.setScreenMessage(RecapConstants.RETRIVAL_ORDER_NOT_REQUIRED_FOR_RECALL);
+                itemResponseInformation.setScreenMessage(RecapConstants.RETRIEVAL_ORDER_NOT_REQUIRED_FOR_RECALL);
             }
         } catch (Exception e) {
             itemResponseInformation.setSuccess(false);
@@ -760,10 +760,10 @@ public class ItemRequestService {
         logger.info("Owning     Inst = {}" , requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
         logger.info("Borrowed   Inst = {}" , requestItemEntity.getInstitutionEntity().getInstitutionCode());
         logger.info("Requesting Inst = {}" , itemRequestInfo.getRequestingInstitution());
-        ItemInformationResponse itemInformation = (ItemInformationResponse) requestItemController.itemInformation(itemRequestInfo, requestItemEntity.getInstitutionEntity().getInstitutionCode());
-        if (itemInformation.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_CHARGED)
-                || itemInformation.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_ON_HOLDSHELF)
-                || itemInformation.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_IN_TRANSIT_NYPL)) {
+        String instToGetItemInfo = requestItemEntity.getInstitutionEntity().getInstitutionCode();
+        ItemInformationResponse itemInformation = (ItemInformationResponse) requestItemController.itemInformation(itemRequestInfo, instToGetItemInfo);
+        String checkedOutCirculationStatuses = propertyUtil.getPropertyByInstitutionAndKey(instToGetItemInfo, "ils.checkedout.circulation.status");
+        if (StringUtils.isNotBlank(checkedOutCirculationStatuses) && StringUtils.containsIgnoreCase(checkedOutCirculationStatuses, itemInformation.getCirculationStatus())) {
             if (requestItemEntity.getInstitutionEntity().getInstitutionCode().equalsIgnoreCase(itemRequestInfo.getRequestingInstitution())) {
                 ItemRecallResponse itemRecallResponse = (ItemRecallResponse) requestItemController.recallItem(itemRequestInfo, requestItemEntity.getInstitutionEntity().getInstitutionCode());
                 if (itemRecallResponse.isSuccess()) {

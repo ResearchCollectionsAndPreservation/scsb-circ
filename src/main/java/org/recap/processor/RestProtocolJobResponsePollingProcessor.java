@@ -5,13 +5,12 @@ import org.recap.callable.RestJobResponsePollingCallable;
 import org.recap.ils.RestProtocolConnector;
 import org.recap.ils.model.nypl.JobData;
 import org.recap.ils.model.nypl.response.JobResponse;
-import org.recap.ils.service.NyplApiResponseUtil;
+import org.recap.ils.service.RestApiResponseUtil;
 import org.recap.model.ILSConfigProperties;
 import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.*;
@@ -37,7 +36,7 @@ public class RestProtocolJobResponsePollingProcessor {
      * The Nypl api response util.
      */
     @Autowired
-    NyplApiResponseUtil nyplApiResponseUtil;
+    RestApiResponseUtil restApiResponseUtil;
 
     @Autowired
     PropertyUtil propertyUtil;
@@ -66,7 +65,7 @@ public class RestProtocolJobResponsePollingProcessor {
             jobResponse = future.get(pollingMaxTimeOut, TimeUnit.SECONDS);
             JobData jobData = jobResponse.getData();
             if (null != jobData) {
-                jobResponse.setStatusMessage(nyplApiResponseUtil.getJobStatusMessage(jobData));
+                jobResponse.setStatusMessage(restApiResponseUtil.getJobStatusMessage(jobData));
             }
             executor.shutdown();
             return jobResponse;

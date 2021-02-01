@@ -17,8 +17,6 @@ public class GFAPwdResponseUT extends BaseTestCaseUT {
         gfaPwdResponse1.equals(gfaPwdResponse);
         gfaPwdResponse.hashCode();
         gfaPwdResponse1.hashCode();
-        gfaPwdResponse.canEqual(gfaPwdResponse);
-        gfaPwdResponse.canEqual(gfaPwdResponse1);
         gfaPwdResponse.toString();
     }
 }

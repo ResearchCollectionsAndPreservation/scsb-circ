@@ -4,13 +4,14 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class GenericPatronEntityUT {
 
     @Test
     public void getGenericPatronEntity(){
         GenericPatronEntity genericPatronEntity = new GenericPatronEntity();
+        genericPatronEntity.setGenericPatronId(1);
         genericPatronEntity.setRetrievalGenericPatron("173623e34");
         genericPatronEntity.setEddGenericPatron("233455");
         genericPatronEntity.setGenericPatronId(123456);
@@ -29,6 +30,7 @@ public class GenericPatronEntityUT {
         genericPatronEntity.canEqual(genericPatronEntity);
         genericPatronEntity1.canEqual(genericPatronEntity);
         genericPatronEntity.hashCode();
+        assertNotEquals(genericPatronEntity, null);
         assertNotNull(genericPatronEntity.getCreatedBy());
         assertNotNull(genericPatronEntity.getCreatedDate());
         assertNotNull(genericPatronEntity.getEddGenericPatron());
@@ -40,5 +42,7 @@ public class GenericPatronEntityUT {
         assertNotNull(genericPatronEntity.getRetrievalGenericPatron());
         assertNotNull(genericPatronEntity.getUpdatedBy());
         assertNotNull(genericPatronEntity.getUpdatedDate());
+        assertEquals(genericPatronEntity1, genericPatronEntity1);
+        assertNotEquals(genericPatronEntity, genericPatronEntity1);
     }
 }

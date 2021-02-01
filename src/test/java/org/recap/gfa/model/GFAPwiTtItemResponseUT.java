@@ -21,8 +21,6 @@ public class GFAPwiTtItemResponseUT extends BaseTestCaseUT {
         gfaPwiTtItemResponse1.equals(gfaPwiTtItemResponse);
         gfaPwiTtItemResponse.hashCode();
         gfaPwiTtItemResponse1.hashCode();
-        gfaPwiTtItemResponse.canEqual(gfaPwiTtItemResponse);
-        gfaPwiTtItemResponse.canEqual(gfaPwiTtItemResponse1);
         gfaPwiTtItemResponse.toString();
 
         assertNotNull(gfaPwiTtItemResponse.getItemBarcode());

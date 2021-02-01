@@ -22,8 +22,6 @@ public class GFAPwdTtItemRequestUT extends BaseTestCaseUT {
         gfaPwdTtItemRequest.hashCode();
         gfaPwdTtItemRequest1.hashCode();
         gfaPwdTtItemRequest.toString();
-        gfaPwdTtItemRequest.canEqual(gfaPwdTtItemRequest);
-        gfaPwdTtItemRequest.canEqual(gfaPwdTtItemRequest1);
 
         assertNotNull(gfaPwdTtItemRequest.getItemBarcode());
         assertNotNull(gfaPwdTtItemRequest.getRequestor());

@@ -104,12 +104,11 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         Mockito.when(requestItemController.checkoutItem(any(), any())).thenReturn(itemCheckoutResponse);
         Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
         Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
-        Mockito.when(gfaLasService.isUseQueueLasCall()).thenReturn(true);
         Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilityStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
         Mockito.when(gfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemInformationResponse);
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
         itemInformationResponse.setRequestTypeForScheduledOnWO(false);
-        Mockito.when(gfaLasService.isUseQueueLasCall()).thenReturn(true);
+        Mockito.when(gfaLasService.isUseQueueLasCall(any())).thenReturn(true);
         Mockito.when(gfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemInformationResponse);
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
         itemInformationResponse.setSuccess(false);
@@ -128,7 +127,7 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         itemCheckoutResponse.setSuccess(false);
         Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
         Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
-        Mockito.when(gfaLasService.isUseQueueLasCall()).thenReturn(true);
+        Mockito.when(gfaLasService.isUseQueueLasCall(any())).thenReturn(true);
         Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilityStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
         Mockito.when(requestItemController.checkoutItem(any(), any())).thenReturn(itemCheckoutResponse);
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);

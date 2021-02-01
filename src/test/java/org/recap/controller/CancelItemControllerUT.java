@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.ils.model.response.ItemHoldResponse;
@@ -30,8 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 /**
  * Created by hemalathas on 17/2/17.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class CancelItemControllerUT{
+public class CancelItemControllerUT extends BaseTestCaseUT {
 
     @InjectMocks
     CancelItemController cancelItemController;
@@ -74,6 +74,7 @@ public class CancelItemControllerUT{
         Mockito.when(requestItemDetailsRepository.save(any())).thenReturn(requestItemEntity);
         Mockito.when(requestItemController.cancelHoldItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.doNothing().when(emailService).sendEmail(any(),any(),any(),any(),any(), any(),any());
         Mockito.doNothing().when(commonUtil).rollbackUpdateItemAvailabilityStatus(requestItemEntity.getItemEntity(), RecapConstants.GUEST_USER);
         Mockito.doNothing().when(itemRequestServiceUtil).updateSolrIndex(requestItemEntity.getItemEntity());
         cancelRequestResponse = cancelItemController.cancelRequest(requestItemEntity.getId());
@@ -214,6 +215,7 @@ public class CancelItemControllerUT{
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
+        itemEntity.setImsLocationEntity(getImsLocationEntity());
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         itemEntity.setInstitutionEntity(institutionEntity);
         itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
@@ -226,5 +228,16 @@ public class CancelItemControllerUT{
 
     }
 
-
+    private ImsLocationEntity getImsLocationEntity() {
+        ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
+        imsLocationEntity.setImsLocationCode("1");
+        imsLocationEntity.setImsLocationName("test");
+        imsLocationEntity.setCreatedBy("test");
+        imsLocationEntity.setCreatedDate(new Date());
+        imsLocationEntity.setActive(true);
+        imsLocationEntity.setDescription("test");
+        imsLocationEntity.setUpdatedBy("test");
+        imsLocationEntity.setUpdatedDate(new Date());
+        return imsLocationEntity;
+    }
 }

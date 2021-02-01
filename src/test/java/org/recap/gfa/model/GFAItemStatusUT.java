@@ -16,7 +16,5 @@ public class GFAItemStatusUT extends BaseTestCaseUT {
         gfaItemStatus.hashCode();
         gfaItemStatus1.hashCode();
         gfaItemStatus.toString();
-        gfaItemStatus.canEqual(gfaItemStatus);
-        gfaItemStatus.canEqual(gfaItemStatus1);
     }
 }

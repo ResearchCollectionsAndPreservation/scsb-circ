@@ -20,8 +20,6 @@ public class GFALasStatusTtItemUT extends BaseTestCaseUT {
         gfaLasStatusTtItem1.equals(gfaLasStatusTtItem);
         gfaLasStatusTtItem.hashCode();
         gfaLasStatusTtItem1.hashCode();
-        gfaLasStatusTtItem.canEqual(gfaLasStatusTtItem);
-        gfaLasStatusTtItem.canEqual(gfaLasStatusTtItem1);
         gfaLasStatusTtItem.toString();
 
         assertNotNull(gfaLasStatusTtItem.getScreenMessage());

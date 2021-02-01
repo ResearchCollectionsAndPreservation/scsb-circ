@@ -5,8 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.recap.ScsbCircApplication;
-import org.recap.las.model.GFAItemStatus;
-import org.recap.las.model.GFAItemStatusCheckRequest;
+import org.recap.las.model.*;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
@@ -74,7 +74,7 @@ public class GFALasServiceIT {
     }
 
 
-   /* @Test
+    @Test
     public void testLasStatusCheck() throws Exception {
         log.info("GFA LAS Status API Url: {}", gfaLasStatusUrl);
         GFALasStatusCheckRequest lasStatusCheckRequest = new GFALasStatusCheckRequest();
@@ -97,9 +97,9 @@ public class GFALasServiceIT {
 
             assertNotNull(response);
         }catch (Exception e){}
-    }*/
+    }
 
-   /* @Test
+    @Test
     public void testRetrieveItem() throws Exception {
         log.info("GFA Retrieve Item API Url: {}", gfaRetrieveItemUrl);
         GFARetrieveItemRequest gfaRetrieveItemRequest = new GFARetrieveItemRequest();
@@ -171,5 +171,5 @@ public class GFALasServiceIT {
 
             assertNotNull(response);
         }catch (Exception e){}
-    }*/
+    }
 }

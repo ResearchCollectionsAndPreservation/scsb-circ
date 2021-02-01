@@ -510,7 +510,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
         String apiUrl = getRestDataApiUrl() + "/hold-requests/" + trackingId;
         HttpHeaders headers = getHttpHeaders();
         HttpEntity requestEntity = getHttpEntity(headers);
-        ResponseEntity<NYPLHoldResponse> jobResponseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.GET, requestEntity, NYPLHoldResponse.class);
+        ResponseEntity<NYPLHoldResponse> jobResponseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, NYPLHoldResponse.class);
         return jobResponseEntity.getBody();
     }
 

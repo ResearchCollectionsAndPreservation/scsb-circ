@@ -15,9 +15,7 @@ import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.AbstractProtocolConnector;
-import org.recap.ils.IJSIPConnector;
 import org.recap.ils.ILSProtocolConnectorFactory;
-import org.recap.ils.JSIPConnectorFactory;
 import org.recap.ils.model.response.ItemCreateBibResponse;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -70,8 +68,6 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
     @InjectMocks
     ItemRequestService mockedItemRequestService;
     @Mock
-    IJSIPConnector ijsipConnector;
-    @Mock
     AbstractProtocolConnector abstractProtocolConnector;
     @Mock
     GenericPatronDetailsRepository genericPatronDetailsRepository;
@@ -81,8 +77,6 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
     private ILSProtocolConnectorFactory ilsProtocolConnectorFactory;
     @Mock
     Exchange exchange;
-    @Mock
-    JSIPConnectorFactory jsipConnectorFactory;
 
     @Mock
     PropertyUtil propertyUtil;

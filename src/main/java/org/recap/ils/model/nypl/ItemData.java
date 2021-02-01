@@ -55,10 +55,6 @@ public class ItemData {
     private Object callNumber;
     @JsonProperty("itemType")
     private Object itemType;
-    @JsonProperty("fixedFields")
-    private Object fixedFields;
-    @JsonProperty("varFields")
-    private List<VarField> varFields = null;
 
     /**
      * Gets nypl source.
@@ -318,45 +314,5 @@ public class ItemData {
     @JsonProperty("itemType")
     public void setItemType(Object itemType) {
         this.itemType = itemType;
-    }
-
-    /**
-     * Gets fixed fields.
-     *
-     * @return The fixedFields
-     */
-    @JsonProperty("fixedFields")
-    public Object getFixedFields() {
-        return fixedFields;
-    }
-
-    /**
-     * Sets fixed fields.
-     *
-     * @param fixedFields The fixedFields
-     */
-    @JsonProperty("fixedFields")
-    public void setFixedFields(Object fixedFields) {
-        this.fixedFields = fixedFields;
-    }
-
-    /**
-     * Gets var fields.
-     *
-     * @return The varFields
-     */
-    @JsonProperty("varFields")
-    public List<VarField> getVarFields() {
-        return varFields;
-    }
-
-    /**
-     * Sets var fields.
-     *
-     * @param varFields The varFields
-     */
-    @JsonProperty("varFields")
-    public void setVarFields(List<VarField> varFields) {
-        this.varFields = varFields;
     }
 }

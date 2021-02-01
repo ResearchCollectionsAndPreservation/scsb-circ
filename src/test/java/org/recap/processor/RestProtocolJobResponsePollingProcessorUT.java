@@ -9,7 +9,7 @@ import org.recap.BaseTestCaseUT;
 import org.recap.ils.RestProtocolConnector;
 import org.recap.ils.model.nypl.JobData;
 import org.recap.ils.model.nypl.response.JobResponse;
-import org.recap.ils.service.NyplApiResponseUtil;
+import org.recap.ils.service.RestApiResponseUtil;
 import org.recap.util.PropertyUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -27,7 +27,7 @@ public class RestProtocolJobResponsePollingProcessorUT extends BaseTestCaseUT {
     RestProtocolConnector restProtocolConnector;
 
     @Mock
-    NyplApiResponseUtil nyplApiResponseUtil;
+    RestApiResponseUtil restApiResponseUtil;
 
     @Mock
     PropertyUtil propertyUtil;
@@ -46,7 +46,7 @@ public class RestProtocolJobResponsePollingProcessorUT extends BaseTestCaseUT {
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, "ils.rest.polling.time.interval")).thenReturn("1000");
         JobResponse jobResponse = getJobResponse();
         Mockito.when(restProtocolConnector.queryForJob(any())).thenReturn(jobResponse);
-        Mockito.when(nyplApiResponseUtil.getJobStatusMessage(any())).thenReturn("Success");
+        Mockito.when(restApiResponseUtil.getJobStatusMessage(any())).thenReturn("Success");
         JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId,institution);
         assertNotNull(response);
     }
@@ -58,7 +58,7 @@ public class RestProtocolJobResponsePollingProcessorUT extends BaseTestCaseUT {
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, "ils.rest.polling.time.interval")).thenReturn("1000");
         JobResponse jobResponse = getJobResponse();
         Mockito.when(restProtocolConnector.queryForJob(any())).thenReturn(jobResponse);
-        Mockito.doThrow(new NullPointerException()).when(nyplApiResponseUtil).getJobStatusMessage(any());
+        Mockito.doThrow(new NullPointerException()).when(restApiResponseUtil).getJobStatusMessage(any());
         JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId,institution);
         assertNotNull(response);
     }
@@ -70,7 +70,7 @@ public class RestProtocolJobResponsePollingProcessorUT extends BaseTestCaseUT {
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, "ils.rest.polling.time.interval")).thenReturn("1000");
         JobResponse jobResponse = getJobResponse();
         Mockito.when(restProtocolConnector.queryForJob(any())).thenReturn(jobResponse);
-        Mockito.doThrow(new TimeoutException()).when(nyplApiResponseUtil).getJobStatusMessage(any());
+        Mockito.doThrow(new TimeoutException()).when(restApiResponseUtil).getJobStatusMessage(any());
         JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId,institution);
         assertNotNull(response);
     }
@@ -82,7 +82,7 @@ public class RestProtocolJobResponsePollingProcessorUT extends BaseTestCaseUT {
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, "ils.rest.polling.time.interval")).thenReturn("1000");
         JobResponse jobResponse = getJobResponse();
         Mockito.when(restProtocolConnector.queryForJob(any())).thenReturn(jobResponse);
-        Mockito.doThrow(new InterruptedException()).when(nyplApiResponseUtil).getJobStatusMessage(any());
+        Mockito.doThrow(new InterruptedException()).when(restApiResponseUtil).getJobStatusMessage(any());
         JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId,institution);
         assertNotNull(response);
     }

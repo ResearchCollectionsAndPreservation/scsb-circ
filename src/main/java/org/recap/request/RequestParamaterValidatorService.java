@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class RequestParamaterValidatorService {
             errorCount++;
         }
         if (StringUtils.isEmpty(itemRequestInformation.getRequestingInstitution()) || !institutionDetailsRepository.existsByInstitutionCode(itemRequestInformation.getRequestingInstitution())) {
-            errorMessageMap.put(errorCount, RecapConstants.INVALID_REQUEST_INSTITUTION);
+            errorMessageMap.put(errorCount, MessageFormat.format(RecapConstants.INVALID_REQUEST_INSTITUTION, String.join(",", institutionDetailsRepository.findAllInstitutionCodeExceptHTC())));
             errorCount++;
         }
         if (!validateEmailAddress(itemRequestInformation.getEmailAddress())) {

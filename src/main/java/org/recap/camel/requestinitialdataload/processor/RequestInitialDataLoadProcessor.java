@@ -113,7 +113,7 @@ public class RequestInitialDataLoadProcessor {
         if ((boolean)exchange.getProperty(RecapConstants.CAMEL_SPLIT_COMPLETE)){
             logger.info("split last index-->{}",index);
             try {
-                    logger.info("{}",RecapConstants.STARTING+ RecapConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institutionCode);
+                    logger.info("{}{}{}",RecapConstants.STARTING, RecapConstants.REQUEST_INITIAL_LOAD_FS_ROUTE, institutionCode);
                     camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institutionCode);
             } catch (Exception e) {
                 logger.error(RecapCommonConstants.LOG_ERROR, e);

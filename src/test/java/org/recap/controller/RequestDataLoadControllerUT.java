@@ -60,7 +60,7 @@ public class RequestDataLoadControllerUT extends BaseTestCaseUT {
            // Mockito.when(propertyUtil.getILSConfigProperties(institution)).thenReturn(ilsConfigProperties);
         }
         Mockito.when(camelContext.getRouteController()).thenReturn(routeController);
-        String result = requestDataLoadController.startAccessionReconcilation();
+        String result = requestDataLoadController.startAccessionReconciliation();
         assertNotNull(result);
         assertEquals("Success",result);
     }

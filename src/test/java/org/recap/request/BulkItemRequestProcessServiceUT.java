@@ -104,7 +104,6 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         Mockito.when(requestItemController.checkoutItem(any(), any())).thenReturn(itemCheckoutResponse);
         Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
         Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
-        //Mockito.when(gfaLasService.isUseQueueLasCall()).thenReturn(true);
         Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilityStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
         Mockito.when(gfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemInformationResponse);
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);

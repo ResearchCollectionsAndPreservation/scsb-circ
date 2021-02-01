@@ -381,15 +381,6 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
 
     }
 
-
-    @Test
-    public void testJsonResponseParse() throws Exception {
-        String strJson = "{\"patronBarcode\":null,\"itemBarcode\":\"32101095533293\",\"requestType\":null,\"deliveryLocation\":null,\"requestingInstitution\":null,\"bibliographicId\":null,\"expirationDate\":null,\"screenMessage\":\"Checkout Successful.\",\"success\":true,\"emailAddress\":null,\"startPage\":null,\"endPage\":null,\"titleIdentifier\":\"Accommodating Muslims under common law : a comparative analysis / Salim Farrar and Ghena Krayem.\",\"dueDate\":\"20170301    234500\"}";
-        ObjectMapper om = new ObjectMapper();
-        /*ItemResponseInformation itemResponseInformation = om.readValue(strJson, ItemResponseInformation.class);
-        logger.info(itemResponseInformation.getScreenMessage());*/
-    }
-
     @Test
     public void refileItem() {
         ItemRefileRequest itemRefileRequest = new ItemRefileRequest();

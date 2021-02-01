@@ -159,7 +159,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInfoResponse = itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange);
         assertNotNull(itemInfoResponse);
     }
-    /*@Test
+    @Test
     public void testEddRequestItemWithFailureResponse() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
@@ -181,14 +181,14 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
         Mockito.when(itemRequestService.getGfaLasService()).thenReturn(gfaLasService);
-        Mockito.when(gfaLasService.isUseQueueLasCall()).thenReturn(true);
+        Mockito.when(gfaLasService.isUseQueueLasCall(any())).thenReturn(true);
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
         Mockito.when(itemRequestService.updateGFA(any(), any())).thenReturn(itemResponseInformation);
         Mockito.doNothing().when(itemRequestService).sendMessageToTopic(any(), any(), any(), any());
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "use.generic.patron.edd.cross")).thenReturn(Boolean.TRUE.toString());
         ItemInformationResponse itemInfoResponse = itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange);
         assertNotNull(itemInfoResponse);
-    }*/
+    }
     @Test
     public void testEddRequestItemWithFailureResponseInnerException() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();

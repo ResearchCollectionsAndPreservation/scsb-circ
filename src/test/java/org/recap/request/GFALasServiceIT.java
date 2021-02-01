@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.recap.ScsbCircApplication;
-import org.recap.gfa.model.*;
+import org.recap.las.model.*;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ScsbCircApplication.class)
 @Slf4j
-public class GFAServiceIT {
+public class GFALasServiceIT {
 
     @Value("${gfa.item.status}")
     private String gfaItemStatusUrl;
@@ -74,7 +74,7 @@ public class GFAServiceIT {
     }
 
 
-   /* @Test
+    @Test
     public void testLasStatusCheck() throws Exception {
         log.info("GFA LAS Status API Url: {}", gfaLasStatusUrl);
         GFALasStatusCheckRequest lasStatusCheckRequest = new GFALasStatusCheckRequest();
@@ -97,9 +97,9 @@ public class GFAServiceIT {
 
             assertNotNull(response);
         }catch (Exception e){}
-    }*/
+    }
 
-   /* @Test
+    @Test
     public void testRetrieveItem() throws Exception {
         log.info("GFA Retrieve Item API Url: {}", gfaRetrieveItemUrl);
         GFARetrieveItemRequest gfaRetrieveItemRequest = new GFARetrieveItemRequest();
@@ -171,5 +171,5 @@ public class GFAServiceIT {
 
             assertNotNull(response);
         }catch (Exception e){}
-    }*/
+    }
 }

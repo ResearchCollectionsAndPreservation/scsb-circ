@@ -1,7 +1,7 @@
 package org.recap.camel.requestinitialdataload;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Date;
 
@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 13/7/17.
  */
-public class RequestDataLoadCSVRecordUT extends BaseTestCase {
+public class RequestDataLoadCSVRecordUT extends BaseTestCaseUT {
 
     @Test
     public void testRequestDataLoadCSVRecord() {

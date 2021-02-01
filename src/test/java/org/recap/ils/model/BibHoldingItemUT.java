@@ -1,7 +1,7 @@
 package org.recap.ils.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
 
@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 22/3/17.
  */
-public class BibHoldingItemUT extends BaseTestCase{
+public class BibHoldingItemUT extends BaseTestCaseUT {
 
     @Test
     public void testBib(){

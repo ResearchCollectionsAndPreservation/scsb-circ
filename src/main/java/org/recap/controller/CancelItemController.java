@@ -1,5 +1,6 @@
 package org.recap.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.ils.model.response.ItemHoldResponse;
@@ -14,6 +15,7 @@ import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.request.ItemRequestService;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
+import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,9 @@ public class CancelItemController {
     @Autowired
     private CommonUtil commonUtil;
 
+    @Autowired
+    private PropertyUtil propertyUtil;
+
     /**
      * This is rest service  method, for cancel requested item.
      *
@@ -67,7 +72,7 @@ public class CancelItemController {
     @PostMapping(value = "/cancel", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CancelRequestResponse cancelRequest(@RequestParam Integer requestId) {
         CancelRequestResponse cancelRequestResponse = new CancelRequestResponse();
-        ItemHoldResponse itemCanceHoldResponse = null;
+        ItemHoldResponse itemCancelHoldResponse = null;
         try {
             Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(requestId);
             if (requestItemEntity.isPresent()) {
@@ -87,54 +92,54 @@ public class CancelItemController {
                 boolean isRequestTypeRecallAndFirstScan = requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL) && requestItemEntity.get().getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.LAS_REFILE_REQUEST_PLACED);
                 boolean isRequestTypeEDDAndFirstScan = requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD) && requestItemEntity.get().getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.LAS_REFILE_REQUEST_PLACED);
                 if (requestStatus.equalsIgnoreCase(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED) || (isRequestTypeRetreivalAndFirstScan)) {
-                    itemCanceHoldResponse = processCancelRequest(itemRequestInformation, itemInformationResponse, requestItemEntity.get());
+                    itemCancelHoldResponse = processCancelRequest(itemRequestInformation, itemInformationResponse, requestItemEntity.get());
                 } else if (requestStatus.equalsIgnoreCase(RecapCommonConstants.REQUEST_STATUS_RECALLED) || (isRequestTypeRecallAndFirstScan)) {
-                    itemCanceHoldResponse = processRecall(itemRequestInformation, itemInformationResponse, requestItemEntity.get());
+                    itemCancelHoldResponse = processRecall(itemRequestInformation, itemInformationResponse, requestItemEntity.get());
                 } else if (requestStatus.equalsIgnoreCase(RecapCommonConstants.REQUEST_STATUS_EDD) || (isRequestTypeEDDAndFirstScan)) {
-                    itemCanceHoldResponse = processEDD(requestItemEntity.get());
+                    itemCancelHoldResponse = processEDD(requestItemEntity.get());
                 } else {
-                    itemCanceHoldResponse = new ItemHoldResponse();
-                    itemCanceHoldResponse.setSuccess(false);
-                    itemCanceHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_NOT_ACTIVE);
+                    itemCancelHoldResponse = new ItemHoldResponse();
+                    itemCancelHoldResponse.setSuccess(false);
+                    itemCancelHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_NOT_ACTIVE);
                 }
             } else {
-                itemCanceHoldResponse = new ItemHoldResponse();
-                itemCanceHoldResponse.setSuccess(false);
-                itemCanceHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_DOES_NOT_EXIST);
+                itemCancelHoldResponse = new ItemHoldResponse();
+                itemCancelHoldResponse.setSuccess(false);
+                itemCancelHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_DOES_NOT_EXIST);
             }
         } catch (Exception e) {
-            itemCanceHoldResponse = new ItemHoldResponse();
-            itemCanceHoldResponse.setSuccess(false);
-            itemCanceHoldResponse.setScreenMessage(e.getMessage());
+            itemCancelHoldResponse = new ItemHoldResponse();
+            itemCancelHoldResponse.setSuccess(false);
+            itemCancelHoldResponse.setScreenMessage(e.getMessage());
             logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
         } finally {
-            if (itemCanceHoldResponse == null) {
-                itemCanceHoldResponse = new ItemHoldResponse();
+            if (itemCancelHoldResponse == null) {
+                itemCancelHoldResponse = new ItemHoldResponse();
             }
-            cancelRequestResponse.setSuccess(itemCanceHoldResponse.isSuccess());
-            cancelRequestResponse.setScreenMessage(itemCanceHoldResponse.getScreenMessage());
+            cancelRequestResponse.setSuccess(itemCancelHoldResponse.isSuccess());
+            cancelRequestResponse.setScreenMessage(itemCancelHoldResponse.getScreenMessage());
         }
         return cancelRequestResponse;
     }
 
     private ItemHoldResponse processCancelRequest(ItemRequestInformation itemRequestInformation, ItemInformationResponse itemInformationResponse, RequestItemEntity requestItemEntity) {
-        ItemHoldResponse itemCanceHoldResponse;
-        if ((getHoldQueueLength(itemInformationResponse) > 0 && (itemInformationResponse.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_OTHER) || itemInformationResponse.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_IN_TRANSIT)))
-                || (itemInformationResponse.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_ON_HOLDSHELF) || itemInformationResponse.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_IN_TRANSIT_NYPL))) {
-            itemCanceHoldResponse = (ItemHoldResponse) requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
-            if (itemCanceHoldResponse.isSuccess()) {
+        ItemHoldResponse itemCancelHoldResponse;
+        String checkedOutCirculationStatuses = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkedout.circulation.status");
+        if (getHoldQueueLength(itemInformationResponse) > 0 || (StringUtils.isNotBlank(checkedOutCirculationStatuses) && StringUtils.containsIgnoreCase(checkedOutCirculationStatuses, itemInformationResponse.getCirculationStatus()))) {
+            itemCancelHoldResponse = (ItemHoldResponse) requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
+            if (itemCancelHoldResponse.isSuccess()) {
                 requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getItemOwningInstitution());
-                changeRetrievalToCancelStatus(requestItemEntity, itemCanceHoldResponse);
+                changeRetrievalToCancelStatus(requestItemEntity, itemCancelHoldResponse);
             } else {
-                itemCanceHoldResponse.setSuccess(false);
-                itemCanceHoldResponse.setScreenMessage(itemCanceHoldResponse.getScreenMessage());
+                itemCancelHoldResponse.setSuccess(false);
+                itemCancelHoldResponse.setScreenMessage(itemCancelHoldResponse.getScreenMessage());
             }
         } else {
-            itemCanceHoldResponse = new ItemHoldResponse();
-            changeRetrievalToCancelStatus(requestItemEntity,itemCanceHoldResponse);
+            itemCancelHoldResponse = new ItemHoldResponse();
+            changeRetrievalToCancelStatus(requestItemEntity,itemCancelHoldResponse);
         }
         makeItemAvailableForFirstScanCancelRequest(requestItemEntity);
-        return itemCanceHoldResponse;
+        return itemCancelHoldResponse;
     }
 
     private void makeItemAvailableForFirstScanCancelRequest(RequestItemEntity requestItemEntity) {
@@ -145,32 +150,33 @@ public class CancelItemController {
     }
 
     private ItemHoldResponse processRecall(ItemRequestInformation itemRequestInformation, ItemInformationResponse itemInformationResponse, RequestItemEntity requestItemEntity) {
-        ItemHoldResponse itemCanceHoldResponse;
-        if (getHoldQueueLength(itemInformationResponse) > 0 || (itemInformationResponse.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_ON_HOLDSHELF) || itemInformationResponse.getCirculationStatus().equalsIgnoreCase(RecapConstants.CIRCULATION_STATUS_IN_TRANSIT_NYPL))) {
+        ItemHoldResponse itemCancelHoldResponse;
+        String checkedOutCirculationStatuses = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkedout.circulation.status");
+        if (getHoldQueueLength(itemInformationResponse) > 0 || (StringUtils.isNotBlank(checkedOutCirculationStatuses) && StringUtils.containsIgnoreCase(checkedOutCirculationStatuses, itemInformationResponse.getCirculationStatus()))) {
             itemRequestInformation.setBibId(itemInformationResponse.getBibID());
-            itemCanceHoldResponse = (ItemHoldResponse) requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
-            if (itemCanceHoldResponse.isSuccess()) {
-                changeRecallToCancelStatus(requestItemEntity, itemCanceHoldResponse);
+            itemCancelHoldResponse = (ItemHoldResponse) requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
+            if (itemCancelHoldResponse.isSuccess()) {
+                changeRecallToCancelStatus(requestItemEntity, itemCancelHoldResponse);
             } else {
-                itemCanceHoldResponse.setSuccess(false);
-                itemCanceHoldResponse.setScreenMessage(itemCanceHoldResponse.getScreenMessage());
+                itemCancelHoldResponse.setSuccess(false);
+                itemCancelHoldResponse.setScreenMessage(itemCancelHoldResponse.getScreenMessage());
             }
         } else {
-            itemCanceHoldResponse = new ItemHoldResponse();
-            changeRecallToCancelStatus(requestItemEntity, itemCanceHoldResponse);
+            itemCancelHoldResponse = new ItemHoldResponse();
+            changeRecallToCancelStatus(requestItemEntity, itemCancelHoldResponse);
         }
         makeItemAvailableForFirstScanCancelRequest(requestItemEntity);
-        return itemCanceHoldResponse;
+        return itemCancelHoldResponse;
     }
 
     private ItemHoldResponse processEDD(RequestItemEntity requestItemEntity) {
-        ItemHoldResponse itemCanceHoldResponse = new ItemHoldResponse();
+        ItemHoldResponse itemCancelHoldResponse = new ItemHoldResponse();
         saveRequestAndChangeLog(requestItemEntity);
-        itemCanceHoldResponse.setSuccess(true);
-        itemCanceHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_EDD_SUCCCESS);
+        itemCancelHoldResponse.setSuccess(true);
+        itemCancelHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_EDD_SUCCCESS);
         sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), requestItemEntity.getItemEntity().getBarcode(), requestItemEntity.getItemEntity().getImsLocationEntity().getImsLocationCode(), requestItemEntity.getPatronId());
         makeItemAvailableForFirstScanCancelRequest(requestItemEntity);
-        return itemCanceHoldResponse;
+        return itemCancelHoldResponse;
     }
 
     private void saveRequestAndChangeLog(RequestItemEntity requestItemEntity) {
@@ -194,19 +200,19 @@ public class CancelItemController {
         itemRequestService.getEmailService().sendEmail(customerCode, itemBarcode, imsLocationCode, RecapConstants.REQUEST_CANCELLED_NO_REFILED, patronBarcode, RecapConstants.GFA, RecapConstants.REQUEST_CANCELLED_SUBJECT);
     }
 
-    private void changeRetrievalToCancelStatus(RequestItemEntity requestItemEntity, ItemHoldResponse itemCanceHoldResponse) {
+    private void changeRetrievalToCancelStatus(RequestItemEntity requestItemEntity, ItemHoldResponse itemCancelHoldResponse) {
         saveRequestAndChangeLog(requestItemEntity);
-        itemCanceHoldResponse.setSuccess(true);
-        itemCanceHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_SUCCCESS);
+        itemCancelHoldResponse.setSuccess(true);
+        itemCancelHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_SUCCCESS);
         logger.info("Send Mail");
         sendEmail(requestItemEntity.getItemEntity().getCustomerCode(), requestItemEntity.getItemEntity().getBarcode(), requestItemEntity.getItemEntity().getImsLocationEntity().getImsLocationCode(), requestItemEntity.getPatronId());
         logger.info("Send Mail Done");
     }
 
-    private void changeRecallToCancelStatus(RequestItemEntity requestItemEntity, ItemHoldResponse itemCanceHoldResponse) {
+    private void changeRecallToCancelStatus(RequestItemEntity requestItemEntity, ItemHoldResponse itemCancelHoldResponse) {
         saveRequestAndChangeLog(requestItemEntity);
-        itemCanceHoldResponse.setSuccess(true);
-        itemCanceHoldResponse.setScreenMessage(RecapConstants.RECALL_CANCELLATION_SUCCCESS);
+        itemCancelHoldResponse.setSuccess(true);
+        itemCancelHoldResponse.setScreenMessage(RecapConstants.RECALL_CANCELLATION_SUCCCESS);
     }
 
     private String appendCancelMessageToNotes(RequestItemEntity requestItemEntity) {

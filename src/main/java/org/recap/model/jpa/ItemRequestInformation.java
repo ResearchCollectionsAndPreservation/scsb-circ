@@ -16,10 +16,10 @@ public class ItemRequestInformation implements Serializable {
 
     private List<String> itemBarcodes;
     private String titleIdentifier;
-    private String itemOwningInstitution = ""; // PUL, CUL, NYPL
+    private String itemOwningInstitution = "";
     private String patronBarcode = "";
     private String emailAddress = "";
-    private String requestingInstitution = ""; // PUL, CUL, NYPL
+    private String requestingInstitution = "";
     private String requestType = ""; // Retrieval,EDD, Hold, Recall, Borrow Direct
     private String deliveryLocation = "";
     private String customerCode = "";

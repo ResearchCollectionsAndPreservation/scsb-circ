@@ -1,6 +1,5 @@
 package org.recap.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -10,9 +9,7 @@ import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.ils.AbstractProtocolConnector;
-import org.recap.ils.IJSIPConnector;
 import org.recap.ils.ILSProtocolConnectorFactory;
-import org.recap.ils.JSIPConnectorFactory;
 import org.recap.ils.model.response.*;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.BulkRequestInformation;
@@ -48,13 +45,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     AbstractProtocolConnector abstractProtocolConnector;
 
     @Mock
-    IJSIPConnector ijsipConnector;
-
-    @Mock
     PropertyUtil propertyUtil;
-
-    @Mock
-    private JSIPConnectorFactory jsipConectorFactory;
 
     @Mock
     private ILSProtocolConnectorFactory ilsProtocolConnectorFactory;
@@ -64,7 +55,6 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
 
     @Test
     public void checkGetters(){
-        mockedRequestItemController.getJsipConectorFactory();
         mockedRequestItemController.getIlsProtocolConnectorFactory();
         mockedRequestItemController.getItemRequestService();
     }
@@ -167,15 +157,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     }
 
     private String getPickupLocation(String institution) {
-        String pickUpLocation = "";
-        if (institution.equalsIgnoreCase(RecapCommonConstants.PRINCETON)) {
-            pickUpLocation = RecapConstants.DEFAULT_PICK_UP_LOCATION_PUL;
-        } else if (institution.equalsIgnoreCase(RecapCommonConstants.COLUMBIA)) {
-            pickUpLocation = RecapConstants.DEFAULT_PICK_UP_LOCATION_CUL;
-        } else if (institution.equalsIgnoreCase(RecapCommonConstants.NYPL)) {
-            pickUpLocation = RecapConstants.DEFAULT_PICK_UP_LOCATION_NYPL;
-        }
-        return pickUpLocation;
+        return "lb";
     }
 
     @Test

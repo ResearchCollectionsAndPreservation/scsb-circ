@@ -11,7 +11,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.model.jpa.*;
-import org.recap.model.report.SubmitCollectionReportInfo;
 import org.recap.repository.jpa.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -62,27 +61,6 @@ public class CommonUtilUT extends BaseTestCaseUT {
         String holdingsContent = null;
         HoldingsEntity holdingsEntity = commonUtil.buildHoldingsEntity(bibliographicEntity,currentDate,errorMessage,holdingsContent);
         assertNotNull(holdingsEntity);
-    }
-    @Test
-    public void buildSubmitCollectionReportInfoAndAddFailures(){
-        BibliographicEntity fetchedBibliographicEntity = getBibliographicEntity();
-        List<SubmitCollectionReportInfo > failureSubmitCollectionReportInfoList = new ArrayList<>();
-        failureSubmitCollectionReportInfoList.add(getSubmitCollectionReportInfo());
-        String owningInstitution = "PUL";
-        Map<String, ItemEntity > itemEntityMap = new HashMap<>();
-        itemEntityMap.put("1",getBibliographicEntity().getItemEntities().get(0));
-        Map.Entry<String, Map<String, ItemEntity >> incomingHoldingItemMapEntry = new AbstractMap.SimpleEntry<String, Map<String, ItemEntity>>("1", itemEntityMap);;
-        ItemEntity incomingItemEntity = getBibliographicEntity().getItemEntities().get(0);
-        commonUtil.buildSubmitCollectionReportInfoAndAddFailures(fetchedBibliographicEntity,failureSubmitCollectionReportInfoList,owningInstitution,incomingHoldingItemMapEntry,incomingItemEntity);
-    }
-    @Test
-    public void buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(){
-        BibliographicEntity incomingBibliographicEntity = getBibliographicEntity();
-        List<SubmitCollectionReportInfo> failureSubmitCollectionReportInfoList = new ArrayList<>();
-        failureSubmitCollectionReportInfoList.add(getSubmitCollectionReportInfo());
-        String owningInstitution = "PUL";
-        ItemEntity incomingItemEntity = getBibliographicEntity().getItemEntities().get(0);
-        commonUtil.buildSubmitCollectionReportInfoWhenNoGroupIdAndAddFailures(incomingBibliographicEntity,failureSubmitCollectionReportInfoList,owningInstitution,incomingItemEntity);
     }
     @Test
     public void addItemAndReportEntities(){
@@ -213,15 +191,6 @@ public class CommonUtilUT extends BaseTestCaseUT {
         itemStatusEntity.setStatusCode("SUCCESS");
         itemStatusEntity.setStatusDescription("AVAILABLE");
         return itemStatusEntity;
-    }
-
-    private SubmitCollectionReportInfo getSubmitCollectionReportInfo(){
-        SubmitCollectionReportInfo submitCollectionReportInfo = new SubmitCollectionReportInfo();
-        submitCollectionReportInfo.setOwningInstitution("PUL");
-        submitCollectionReportInfo.setItemBarcode("123456");
-        submitCollectionReportInfo.setCustomerCode("PA");
-        submitCollectionReportInfo.setMessage("SUCCESS");
-        return submitCollectionReportInfo;
     }
     private HoldingsEntity getHoldingsEntity() {
         HoldingsEntity holdingsEntity = new HoldingsEntity();

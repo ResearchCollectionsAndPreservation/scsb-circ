@@ -52,6 +52,9 @@ public class CommonUtil {
     @Autowired
     private ImsLocationDetailsRepository imsLocationDetailsRepository;
 
+    @Autowired
+    private PropertyUtil propertyUtil;
+
     /**
      * This method builds Holdings Entity from holdings content
      * @param bibliographicEntity
@@ -265,5 +268,29 @@ public class CommonUtil {
      */
     public List<String> findAllImsLocationCodeExceptUN(){
         return imsLocationDetailsRepository.findAllImsLocationCodeExceptUN();
+    }
+
+    /**
+     * Checks if the Gfa item status is available
+     * @param imsLocationCode IMS Location Code
+     * @param imsItemStatus IMS Item Status
+     * @return boolean
+     */
+    public boolean isImsItemStatusAvailable(String imsLocationCode, String imsItemStatus) {
+        String imsAvailableCodes = propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.available.item.status.codes");
+        List<String> imsAvailableCodesList = Arrays.asList(imsAvailableCodes.split(","));
+        return imsAvailableCodesList.contains(imsItemStatus);
+    }
+
+    /**
+     * Checks if the Gfa item status is not available
+     * @param imsLocationCode IMS Location Code
+     * @param imsItemStatus IMS Item Status
+     * @return boolean
+     */
+    public boolean isImsItemStatusNotAvailable(String imsLocationCode, String imsItemStatus) {
+        String imsNotAvailableCodes = propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.not.available.item.status.codes");
+        List<String> imsNotAvailableCodesList = Arrays.asList(imsNotAvailableCodes.split(","));
+        return imsNotAvailableCodesList.contains(imsItemStatus);
     }
 }

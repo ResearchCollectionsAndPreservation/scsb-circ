@@ -415,8 +415,9 @@ public class ItemRequestService {
                         gfaItemStatus = gfaItemStatus.toUpperCase();
                     }
                     logger.info("Gfa status After modifying : {}",gfaItemStatus);
-                    logger.info("Condition satified {}", RecapConstants.getGFAStatusAvailableList().contains(gfaItemStatus));
-                    if(RecapConstants.getGFAStatusAvailableList().contains(gfaItemStatus)) {
+                    boolean isImsItemStatusAvailable = commonUtil.isImsItemStatusAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus);
+                    logger.info("Condition satified {}", isImsItemStatusAvailable);
+                    if (isImsItemStatusAvailable) {
                         itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
                         itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
                         itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
@@ -1268,7 +1269,7 @@ public class ItemRequestService {
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(itemRequestInformation);
             String itemStatus = gfaLasService.callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
-            if (RecapConstants.getGFAStatusAvailableList().contains(itemStatus)) {
+            if (commonUtil.isImsItemStatusAvailable(requestItemEntity.getItemEntity().getImsLocationEntity().getImsLocationCode(), itemStatus)) {
                 producerTemplate.sendBodyAndHeader(RecapConstants.REQUEST_ITEM_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
             } else {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);

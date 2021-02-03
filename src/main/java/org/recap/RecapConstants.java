@@ -145,39 +145,19 @@ public final class RecapConstants {
     public static final String REQUEST_SCSB_EXCEPTION = "SCSB Exception : ";
 
     public static final String GFA_SERVICE_PARAM = "filter";
-    public static final String GFA_STATUS_INCOMING_ON_WORK_ORDER = "INC ON WO:";
-    public static final String GFA_STATUS_OUT_ON_EDD_WORK_ORDER = "OUT ON EDD WO:";
-    public static final String GFA_STATUS_REACC_ON_WORK_ORDER = "REACC ON WO:";
-    public static final String GFA_STATUS_REFILE_ON_WORK_ORDER = "REFILE ON WO:";
-    public static final String GFA_STATUS_SCH_ON_EDD_WORK_ORDER = "SCH ON EDD WO:";
-    public static final String GFA_STATUS_VER_ON_EDD_WORK_ORDER = "VER ON EDD WO:";
-    public static final String GFA_STATUS_IN = "IN";
 
     public static final String GFA_STATUS_NOT_ON_FILE = "NOT ON FILE";
-    public static final String GFA_STATUS_OUT_ON_RETRIVAL_WORK_ORDER = "OUT ON RET WO:";
-    public static final String GFA_STATUS_PW_INDIRECT_WORK_ORDER = "PWI ON WO:";
-    public static final String GFA_STATUS_PW_DIRECT_WORK_ORDER = "PWD ON WO:";
-    public static final String GFA_STATUS_SCH_ON_RET_WORK_ORDER = "SCH ON RET WO:";
     public static final String GFA_STATUS_SCH_ON_REFILE_WORK_ORDER = "SCH ON REFILE WO:";
-    public static final String GFA_STATUS_VER_ON_REFILE_WORK_ORDER = "VER ON REFILE WO:";
-    public static final String GFA_STATUS_VER_ON_PW_INDIRECT_WORK_ORDER = "VER ON PWI WO:";
-    public static final String GFA_STATUS_VER_ON_PW_DIRECT_WORK_ORDER = "VER ON PWD WO:";
-    public static final String GFA_STATUS_VER_ON_RET_WORK_ORDER = "VER ON RET WO:";
-    public static final String GFA_STATUS_VER_ON_WORK_ORDER = "VER ON WO:";
     public static final String CANNOT_REFILE_FIRST_SCAN_REQUEST ="Cannot place recall for requests placed on first scan LAS status";
     public static final String REQUESTS_STUCK_IN_PENDING = "Requests stuck in pending";
     public static final String NO_PENDING_REQUESTS_FOUND = "There are no pending requests or no new pending request";
-
-    protected static final List<String> GFA_STATUS_AVAILABLE_LIST = Arrays.asList(GFA_STATUS_INCOMING_ON_WORK_ORDER, GFA_STATUS_REACC_ON_WORK_ORDER, GFA_STATUS_VER_ON_REFILE_WORK_ORDER, GFA_STATUS_IN);
-    protected static final List<String> GFA_STATUS_NOT_AVAILABLE_LIST = Arrays.asList(GFA_STATUS_SCH_ON_REFILE_WORK_ORDER, GFA_STATUS_NOT_ON_FILE, GFA_STATUS_OUT_ON_RETRIVAL_WORK_ORDER, GFA_STATUS_PW_INDIRECT_WORK_ORDER, GFA_STATUS_PW_DIRECT_WORK_ORDER,
-            GFA_STATUS_SCH_ON_RET_WORK_ORDER, GFA_STATUS_VER_ON_PW_INDIRECT_WORK_ORDER, GFA_STATUS_VER_ON_PW_DIRECT_WORK_ORDER, GFA_STATUS_VER_ON_RET_WORK_ORDER, GFA_STATUS_VER_ON_WORK_ORDER, GFA_STATUS_REFILE_ON_WORK_ORDER, GFA_STATUS_OUT_ON_EDD_WORK_ORDER, GFA_STATUS_VER_ON_EDD_WORK_ORDER, GFA_STATUS_SCH_ON_EDD_WORK_ORDER);
 
     protected static final List<String> REQUEST_TYPE_LIST = Arrays.asList(RecapCommonConstants.RETRIEVAL, RecapCommonConstants.REQUEST_TYPE_EDD, RecapCommonConstants.BORROW_DIRECT, RecapCommonConstants.REQUEST_TYPE_RECALL);
 
     public static final String SUCCESSFULLY_PROCESSED_REQUEST_ITEM = "Successfully Processed Request Item";
     public static final String REQUEST_ITEM_BARCODE_NOT_FOUND = "ITEM BARCODE NOT FOUND.";
-    public static final String REQUEST_CANCELLATION_SUCCCESS = "Request cancellation succcessfully processed";
-    public static final String RECALL_CANCELLATION_SUCCCESS = "Recall request cancellation succcessfully processed";
+    public static final String REQUEST_CANCELLATION_SUCCCESS = "Request cancellation successfully processed";
+    public static final String RECALL_CANCELLATION_SUCCCESS = "Recall request cancellation successfully processed";
     public static final String REQUEST_CANCELLATION_EDD_SUCCCESS = "EDD request cancellation successfully processed.";
     public static final String REQUEST_CANCELLATION_NOT_ON_HOLD_IN_ILS = "This Request cannot be canceled, this item is not on hold in ILS";
     public static final String REQUEST_CANCELLATION_NOT_ACTIVE = "RequestId is not active status to be canceled";
@@ -396,14 +376,6 @@ public final class RecapConstants {
     public static final String ITEM_STATUS_NOT_AVAILABLE = "Not Available";
 
     private RecapConstants() {
-    }
-
-    public static List<String> getGFAStatusAvailableList() {
-        return GFA_STATUS_AVAILABLE_LIST;
-    }
-
-    public static List<String> getGFAStatusNotAvailableList() {
-        return GFA_STATUS_NOT_AVAILABLE_LIST;
     }
 
     public static List<String> getRequestTypeList() {

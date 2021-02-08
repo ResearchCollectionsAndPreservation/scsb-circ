@@ -1,11 +1,7 @@
 package org.recap.las.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
-import org.recap.las.model.GFAEddItemResponse;
-import org.recap.las.model.GFARetrieveEDDItemRequest;
-import org.recap.las.model.RetrieveItemEDDRequest;
-import org.recap.las.model.TtitemEDDResponse;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -15,10 +11,10 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 13/7/17.
  */
-public class TtitemEDDResponseUT extends BaseTestCase{
+public class TtitemEDDResponseUT extends BaseTestCaseUT {
 
     @Test
-    public void testTtitemEDDResponse(){
+    public void testTtitemEDDResponse() {
 
         TtitemEDDResponse ttitemEDDResponse = new TtitemEDDResponse();
         TtitemEDDResponse ttitemEDDResponse1 = new TtitemEDDResponse();

@@ -1,11 +1,9 @@
 package org.recap.controller;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
@@ -19,6 +17,7 @@ import org.recap.request.EmailService;
 import org.recap.request.ItemRequestService;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
+import org.recap.util.PropertyUtil;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -38,6 +37,9 @@ public class CancelItemControllerUT extends BaseTestCaseUT {
 
     @Mock
     EmailService emailService;
+
+    @Mock
+    PropertyUtil propertyUtil;
 
     @Mock
     private RequestItemController requestItemController;
@@ -72,6 +74,7 @@ public class CancelItemControllerUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.getEmailService()).thenReturn(emailService);
         Mockito.when(requestItemController.itemInformation(any(), any())).thenReturn(itemInformationResponse);
         Mockito.when(requestItemDetailsRepository.save(any())).thenReturn(requestItemEntity);
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn(itemInformationResponse.getCirculationStatus());
         Mockito.when(requestItemController.cancelHoldItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Mockito.doNothing().when(emailService).sendEmail(any(),any(),any(),any(),any(), any(),any());

@@ -1,8 +1,7 @@
 package org.recap.ils.model.nypl;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Date;
 
@@ -11,10 +10,10 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 3/4/17.
  */
-public class NYPLHoldDataUT extends BaseTestCase{
+public class NYPLHoldDataUT extends BaseTestCaseUT {
 
     @Test
-    public void testNYPLHoldData(){
+    public void testNYPLHoldData() {
         NYPLHoldData nyplHoldData = new NYPLHoldData();
         nyplHoldData.setId(1);
         nyplHoldData.setPatron("test");

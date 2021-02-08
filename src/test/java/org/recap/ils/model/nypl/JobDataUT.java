@@ -1,22 +1,19 @@
 package org.recap.ils.model.nypl;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.deser.Deserializers;
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 3/4/17.
  */
-public class JobDataUT extends BaseTestCase{
+public class JobDataUT extends BaseTestCaseUT {
 
     @Test
-    public void testJobData(){
+    public void testJobData() {
         JobData jobData = new JobData();
         jobData.setId("1");
         jobData.setStarted(true);

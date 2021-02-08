@@ -1,7 +1,7 @@
 package org.recap.ils.model.response;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Date;
 
@@ -10,10 +10,10 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 3/4/17.
  */
-public class ItemRecallResponseUT extends BaseTestCase{
+public class ItemRecallResponseUT extends BaseTestCaseUT {
 
     @Test
-    public void testItemRecallResponse(){
+    public void testItemRecallResponse() {
         ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         itemRecallResponse.setAvailable(true);
         itemRecallResponse.setTransactionDate(new Date().toString());

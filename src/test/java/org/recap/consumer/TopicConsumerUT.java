@@ -1,7 +1,7 @@
 package org.recap.consumer;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +16,13 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by sudhishk on 12/1/17.
  */
-public class TopicConsumerUT extends BaseTestCase {
+public class TopicConsumerUT extends BaseTestCaseUT {
 
     private final static Logger logger = LoggerFactory.getLogger(TopicConsumerUT.class);
 
     private final String topicName = "PUL.RequestT";
-    private final String initialContextFactory = "org.apache.activemq.jndi.ActiveMQInitialContextFactory";
-    private final String connectionString = "tcp://192.168.55.210:61616";
+    private final String initialContextFactory = "test.activemq";
+    private final String connectionString = "test://localhost:61616";
 
     private boolean messageReceived = false;
 
@@ -84,7 +84,7 @@ public class TopicConsumerUT extends BaseTestCase {
     }
 
     @Test
-    public void testStringEncoding() {
+    public void ztestStringEncoding() {
         String name = "procès Laval | gri︠a︡dushchee : poluvekovai︠a︡ paradigma poėtiki Serebri︠a︡nogo Kikhneĭ, I. Erokhinoĭ]. Mikhaĭlovskoe čeká kat. Vilém  Soi︠u︡za preobrazovanni︠k︡h";
         String encoded = "";
         logger.info(name);

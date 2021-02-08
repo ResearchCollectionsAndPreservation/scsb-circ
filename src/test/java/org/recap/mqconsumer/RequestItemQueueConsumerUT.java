@@ -6,13 +6,10 @@ import org.apache.camel.Message;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.BaseTestCase;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -36,9 +33,6 @@ public class RequestItemQueueConsumerUT extends BaseTestCaseUT {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestItemQueueConsumer.class);
 
-    @Mock
-    RequestItemQueueConsumer requestItemQueueConsumer;
-
     @InjectMocks
     RequestItemQueueConsumer mockedRequestItemQueueConsumer;
 
@@ -50,6 +44,9 @@ public class RequestItemQueueConsumerUT extends BaseTestCaseUT {
 
     @Mock
     Message message;
+
+    @Mock
+    RequestItemQueueConsumer requestItemQueueConsumer;
 
     @Mock
     BulkItemRequestService bulkItemRequestService;
@@ -64,7 +61,7 @@ public class RequestItemQueueConsumerUT extends BaseTestCaseUT {
     ObjectMapper om;
 
     @Before
-    public  void setup(){
+    public void setup() {
         MockitoAnnotations.initMocks(this);
         Mockito.when(requestItemQueueConsumer.getBulkItemRequestProcessService()).thenReturn(bulkItemRequestProcessService);
         Mockito.when(requestItemQueueConsumer.getBulkItemRequestService()).thenReturn(bulkItemRequestService);
@@ -73,6 +70,15 @@ public class RequestItemQueueConsumerUT extends BaseTestCaseUT {
         Mockito.when(requestItemQueueConsumer.getLogger()).thenReturn(logger);
         Mockito.when(requestItemQueueConsumer.getObjectMapper()).thenReturn(om);
     }
+
+    @Test
+    public void checkConstructors() {
+        RequestItemQueueConsumer requestItemQueueConsumer = new RequestItemQueueConsumer(bulkItemRequestService);
+        RequestItemQueueConsumer requestItemQueueConsumer1 = new RequestItemQueueConsumer(bulkItemRequestProcessService);
+        RequestItemQueueConsumer requestItemQueueConsumer2 = new RequestItemQueueConsumer(itemRequestService);
+        RequestItemQueueConsumer requestItemQueueConsumer3 = new RequestItemQueueConsumer(itemEDDRequestService);
+    }
+
     @Test
     public void testRequestItemOnMessage() throws IOException {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();

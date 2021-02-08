@@ -1,7 +1,7 @@
 package org.recap.ils.model.nypl;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Date;
 
@@ -10,11 +10,11 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 3/4/17.
  */
-public class NoticesDataUT extends BaseTestCase{
+public class NoticesDataUT extends BaseTestCaseUT {
 
 
     @Test
-    public void testNoticesData(){
+    public void testNoticesData() {
         Problem problem = new Problem();
         problem.setProblemType("test");
         problem.setProblemDetail("test");

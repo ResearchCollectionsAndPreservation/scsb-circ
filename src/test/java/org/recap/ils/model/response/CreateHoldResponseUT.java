@@ -1,20 +1,27 @@
 package org.recap.ils.model.response;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
+import org.recap.ils.model.nypl.DebugInfo;
 import org.recap.ils.model.nypl.response.CreateHoldResponse;
 
-import static org.junit.Assert.assertTrue;
+import java.util.Arrays;
 
-public class CreateHoldResponseUT extends BaseTestCase {
-    CreateHoldResponse createHoldResponse;
+import static org.junit.Assert.assertNotNull;
+
+public class CreateHoldResponseUT extends BaseTestCaseUT {
 
     @Test
     public void testCheckinResponse() {
-        createHoldResponse = new CreateHoldResponse();
+        CreateHoldResponse createHoldResponse = new CreateHoldResponse();
+        createHoldResponse.setCount(1);
+        createHoldResponse.setStatusCode(1);
+        createHoldResponse.setDebugInfo(Arrays.asList(new DebugInfo()));
         createHoldResponse.getCount();
         createHoldResponse.getStatusCode();
         createHoldResponse.getDebugInfo();
-        assertTrue(true);
+        assertNotNull(createHoldResponse.getCount());
+        assertNotNull(createHoldResponse.getStatusCode());
+        assertNotNull(createHoldResponse.getDebugInfo());
     }
 }

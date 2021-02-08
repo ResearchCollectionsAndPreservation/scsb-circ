@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
@@ -100,8 +101,45 @@ public class BulkItemRequestServiceUT {
         ReflectionTestUtils.setField(bulkItemRequestService, "bulkRequestItemCountLimit", 0);
         bulkItemRequestService.bulkRequestItems(bulkRequestId);
     }
+
     @Test
-    public void bulkRequestItemsForbulkRequestItemBarcodeExcessList(){
+    public void bulkRequestItemsForSameOwingInstId() {
+        int bulkRequestId = 1;
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setOwningInstitutionId(1);
+        ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
+        itemStatusEntity.setId(2);
+        itemStatusEntity.setStatusCode(RecapCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusDescription(RecapCommonConstants.AVAILABLE);
+        itemEntity.setItemStatusEntity(itemStatusEntity);
+        BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
+        ReflectionTestUtils.setField(bulkItemRequestService, "bulkRequestItemCountLimit", 0);
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
+    }
+
+    @Test
+    public void bulkRequestItemsWithoutItemEntites() {
+        int bulkRequestId = 1;
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setOwningInstitutionId(1);
+        ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
+        itemStatusEntity.setId(2);
+        itemStatusEntity.setStatusCode(RecapCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusDescription(RecapCommonConstants.AVAILABLE);
+        itemEntity.setItemStatusEntity(itemStatusEntity);
+        BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Collections.EMPTY_LIST);
+        Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
+        ReflectionTestUtils.setField(bulkItemRequestService, "bulkRequestItemCountLimit", 0);
+        bulkItemRequestService.bulkRequestItems(bulkRequestId);
+    }
+
+    @Test
+    public void bulkRequestItemsForbulkRequestItemBarcodeExcessList() {
         int bulkRequestId = 1;
         ItemEntity itemEntity = getItemEntity();
         BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();

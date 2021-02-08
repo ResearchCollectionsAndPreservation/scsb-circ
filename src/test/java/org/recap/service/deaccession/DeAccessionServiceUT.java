@@ -1,6 +1,7 @@
 package org.recap.service.deaccession;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -10,18 +11,19 @@ import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.RequestItemController;
-import org.recap.las.AbstractLASImsLocationConnector;
-import org.recap.las.LASImsLocationConnectorFactory;
-import org.recap.las.model.*;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
+import org.recap.las.AbstractLASImsLocationConnector;
+import org.recap.las.GFALasService;
+import org.recap.las.LASImsLocationConnectorFactory;
+import org.recap.las.model.*;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
-import org.recap.las.GFALasService;
 import org.recap.service.RestHeaderService;
+import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
 import org.recap.util.PropertyUtil;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -55,6 +57,9 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
 
     @Mock
     PropertyUtil propertyUtil;
+
+    @Mock
+    CommonUtil commonUtil;
 
     @Mock
     ReportDetailRepository reportDetailRepository;
@@ -92,9 +97,13 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
     @Mock
     DeaccesionItemChangeLogDetailsRepository deaccesionItemChangeLogDetailsRepository;
 
+    @Before
+    public void setup() {
+        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+    }
 
     @Test
-    public void deaccession(){
+    public void deaccession() {
         DeAccessionRequest deAccessionRequest = new DeAccessionRequest();
         DeAccessionItem deAccessionItem = getDeAccessionItem();
         deAccessionRequest.setDeAccessionItems(Arrays.asList(deAccessionItem));

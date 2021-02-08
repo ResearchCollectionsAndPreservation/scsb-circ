@@ -1,7 +1,8 @@
 package com.pkrete.jsip2.messages;
 
+import com.pkrete.jsip2.parser.SIP2ResponseParser;
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +13,9 @@ public class SIP2ResponseFactoryUT {
 
     SIP2ResponseFactory sip2ResponseFactory;
 
+    @Mock
+    SIP2ResponseParser parser;
+
     @Test
     public void testcreate() {
 
@@ -19,7 +23,7 @@ public class SIP2ResponseFactoryUT {
         try {
             sipResponseFactory.create("88Test");
         } catch (Exception e) {
-            logger.info("Exception"+e);
+            logger.info("Exception" + e);
         }
         try {
             sipResponseFactory.create("98Test2");

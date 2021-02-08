@@ -1,13 +1,9 @@
 package org.recap.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
 import org.recap.model.jpa.CustomerCodeEntity;
 import org.recap.model.jpa.DeliveryRestrictionEntity;
 import org.recap.model.jpa.InstitutionEntity;
-import org.recap.repository.jpa.CustomerCodeDetailsRepository;
-import org.recap.repository.jpa.InstitutionDetailsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 
@@ -39,6 +35,7 @@ public class CustomerCodeEntityUT{
         customerCodeEntity.setPickupLocation("Discovery");
         customerCodeEntity.setDeliveryRestrictionEntityList(Arrays.asList(new DeliveryRestrictionEntity()));
         customerCodeEntity.equals(customerCodeEntity);
+        customerCodeEntity.equals(null);
 
         assertNotNull(customerCodeEntity.getId());
         assertEquals("AB", customerCodeEntity.getCustomerCode());
@@ -53,17 +50,26 @@ public class CustomerCodeEntityUT{
 
         CustomerCodeEntity customerCodeEntity1 = new CustomerCodeEntity();
         customerCodeEntity1.setId(2);
-        customerCodeEntity1.setDescription("PA");
-        customerCodeEntity1.setCustomerCode("OP");
-        CustomerCodeEntity customerCodeEntity2 = new CustomerCodeEntity();
-        customerCodeEntity1.setId(2);
-        customerCodeEntity1.setDescription("PA");
-        customerCodeEntity1.setCustomerCode("OP");
-        customerCodeEntity1.compareTo(customerCodeEntity);
         customerCodeEntity1.equals(customerCodeEntity);
+        CustomerCodeEntity customerCodeEntity2 = new CustomerCodeEntity();
+        customerCodeEntity2.setId(1);
+        customerCodeEntity2.setDescription("RE");
+        customerCodeEntity2.equals(customerCodeEntity);
+        CustomerCodeEntity customerCodeEntity3 = new CustomerCodeEntity();
+        customerCodeEntity3.setId(1);
+        customerCodeEntity3.setDescription("test");
+        customerCodeEntity3.setCustomerCode("OP");
+        customerCodeEntity3.equals(customerCodeEntity);
+        CustomerCodeEntity customerCodeEntity4 = new CustomerCodeEntity();
+        customerCodeEntity4.setId(1);
+        customerCodeEntity4.setDescription("test");
+        customerCodeEntity4.setCustomerCode("AB");
+        customerCodeEntity4.setOwningInstitutionId(5);
+        customerCodeEntity4.equals(customerCodeEntity);
+
         customerCodeEntity.hashCode();
         customerCodeEntity1.compareTo(customerCodeEntity2);
-        customerCodeEntity1.equals(customerCodeEntity2);
+        //customerCodeEntity1.equals(customerCodeEntity2);
     }
 
 }

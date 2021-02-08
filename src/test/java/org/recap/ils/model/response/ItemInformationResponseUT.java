@@ -1,7 +1,7 @@
 package org.recap.ils.model.response;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -11,10 +11,10 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 3/4/17.
  */
-public class ItemInformationResponseUT extends BaseTestCase{
+public class ItemInformationResponseUT extends BaseTestCaseUT {
 
     @Test
-    public void testItemInformationResponse(){
+    public void testItemInformationResponse() {
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
         itemInformationResponse.setExpirationDate(new Date().toString());
         itemInformationResponse.setTitleIdentifier("test");

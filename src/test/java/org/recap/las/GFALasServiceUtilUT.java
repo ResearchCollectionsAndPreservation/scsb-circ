@@ -1,8 +1,10 @@
 package org.recap.las;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.recap.BaseTestCaseUT;
 import org.recap.las.model.*;
 import org.recap.model.gfa.Ttitem;
@@ -16,46 +18,55 @@ public class GFALasServiceUtilUT extends BaseTestCaseUT {
     @InjectMocks
     GFALasServiceUtil gfaLasServiceUtil;
 
+    @Mock
+    ObjectMapper objectMapper;
+
     @Test
-    public void getLASRetrieveResponse(){
+    public void getLASRetrieveResponse() {
         GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
         GFARetrieveItemResponse response = gfaLasServiceUtil.getLASRetrieveResponse(gfaRetrieveItemResponse);
         assertNotNull(response);
     }
+
     @Test
-    public void getLASRetrieveResponseWithoutErrorcode(){
+    public void getLASRetrieveResponseWithoutErrorcode() {
         GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
         gfaRetrieveItemResponse.getDsitem().getTtitem().get(0).setErrorCode("");
         GFARetrieveItemResponse response = gfaLasServiceUtil.getLASRetrieveResponse(gfaRetrieveItemResponse);
         assertNotNull(response);
     }
+
     @Test
-    public void getLASRetrieveResponseNullValue(){
+    public void getLASRetrieveResponseNullValue() {
         GFARetrieveItemResponse gfaRetrieveItemResponse = null;
         GFARetrieveItemResponse response = gfaLasServiceUtil.getLASRetrieveResponse(gfaRetrieveItemResponse);
         assertNotNull(response);
     }
+
     @Test
-    public void getLASEddResponse(){
+    public void getLASEddResponse() {
         GFAEddItemResponse gfaEddItemResponse = getGFAEddItemResponse();
         GFAEddItemResponse response = gfaLasServiceUtil.getLASEddResponse(gfaEddItemResponse);
         assertNotNull(response);
     }
+
     @Test
-    public void getLASEddResponseWithoutErrorcode(){
+    public void getLASEddResponseWithoutErrorcode() {
         GFAEddItemResponse gfaEddItemResponse = getGFAEddItemResponse();
         gfaEddItemResponse.getDsitem().getTtitem().get(0).setErrorCode("");
         GFAEddItemResponse response = gfaLasServiceUtil.getLASEddResponse(gfaEddItemResponse);
         assertNotNull(response);
     }
+
     @Test
-    public void getLASEddResponseNullValue(){
+    public void getLASEddResponseNullValue() {
         GFAEddItemResponse gfaEddItemResponse = null;
         GFAEddItemResponse response = gfaLasServiceUtil.getLASEddResponse(gfaEddItemResponse);
         assertNotNull(response);
     }
+
     @Test
-    public void convertJsonToString(){
+    public void convertJsonToString() {
         String jString = "{\"PUL\": \"PUL\"}";
         JSONObject jsonObject = new JSONObject(jString.toString());
         String response = gfaLasServiceUtil.convertJsonToString(jsonObject);
@@ -76,6 +87,7 @@ public class GFALasServiceUtilUT extends BaseTestCaseUT {
         gfaEddItemResponse.setDsitem(retrieveItemEDDRequest);
         return gfaEddItemResponse;
     }
+
     private GFARetrieveItemResponse getGfaRetrieveItemResponse() {
         GFARetrieveItemResponse gfaRetrieveItemResponse = new GFARetrieveItemResponse();
         RetrieveItem retrieveItem = new RetrieveItem();

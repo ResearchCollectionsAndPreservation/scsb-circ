@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClientException;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -276,6 +277,24 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         assertEquals(itemInfoResponse.getTitleIdentifier(), "Title Of the Book");
     }
 
+    @Test
+    public void testEddRequestRestClientException() {
+        ItemRequestInformation itemRequestInfo = getItemRequestInformation();
+        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
+        Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
+        Mockito.when(itemRequestService.searchRecords(any())).thenThrow(new RestClientException("Bad Request"));
+        ItemInformationResponse itemInfoResponse = itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange);
+        assertNotNull(itemInfoResponse);
+    }
+
+    @Test
+    public void testEddRequestException() {
+        ItemRequestInformation itemRequestInfo = getItemRequestInformation();
+        Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenThrow(new NullPointerException());
+        ItemInformationResponse itemInfoResponse = itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange);
+        assertNotNull(itemInfoResponse);
+    }
+
     private ItemRequestInformation getItemRequestInformation() {
         ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
         itemRequestInfo.setItemBarcodes(Arrays.asList("23"));
@@ -331,7 +350,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         return genericPatronEntity;
     }
 
-    public BibliographicEntity saveBibSingleHoldingsSingleItem() throws Exception {
+    public BibliographicEntity saveBibSingleHoldingsSingleItem() {
 
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);

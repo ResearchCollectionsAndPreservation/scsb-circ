@@ -4,25 +4,21 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.recap.BaseTestCase;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.model.jpa.*;
-import org.recap.repository.jpa.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.repository.jpa.RequestItemDetailsRepository;
+import org.recap.repository.jpa.RequestTypeDetailsRepository;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by hemalathas on 21/7/17.
@@ -49,27 +45,51 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         RequestTypeEntity requestTypeEntity = getRequestTypeEntity();
         Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(requestDataLoadCSVRecord.getBarcode(), RecapCommonConstants.NOT_AVAILABLE)).thenReturn(bibliographicEntity.getItemEntities());
         Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(RecapCommonConstants.RETRIEVAL)).thenReturn(requestTypeEntity);
-        Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord),barcodeSet);
+        Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertNotNull(response);
     }
+
     @Test
     public void testRequestDataServiceWithoutRequestIdItemId() throws Exception {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord(bibliographicEntity);
         Set<String> barcodeSet = new HashSet<>();
         Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(requestDataLoadCSVRecord.getBarcode(), RecapCommonConstants.NOT_AVAILABLE)).thenReturn(null);
-        Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord),barcodeSet);
+        Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertTrue(response.size() == 1);
     }
+
     @Test
     public void testRequestDataServiceWithDuplicateBarcodes() throws Exception {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord(bibliographicEntity);
         Set<String> barcodeSet = new HashSet<>();
         barcodeSet.add("41234213");
-        Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord),barcodeSet);
+        Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertNotNull(response);
     }
+
+    @Test
+    public void getDateFormat() {
+        String date = "";
+        ReflectionTestUtils.invokeMethod(requestDataLoadService, "getDateFormat", date);
+    }
+
+    @Test
+    public void getItemInfo() {
+        String barcode = "23465634";
+        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
+        ItemEntity itemEntity = bibliographicEntity.getItemEntities().get(0);
+        itemEntity.setOwningInstitutionId(5);
+        ItemEntity itemEntity2 = new ItemEntity();
+        itemEntity2.setOwningInstitutionId(4);
+        List<ItemEntity> itemEntityList = new ArrayList<>();
+        itemEntityList.add(itemEntity2);
+        itemEntityList.add(itemEntity);
+        Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(any(), any())).thenReturn(itemEntityList);
+        ReflectionTestUtils.invokeMethod(requestDataLoadService, "getItemInfo", barcode);
+    }
+
     private RequestDataLoadCSVRecord getRequestDataLoadCSVRecord(BibliographicEntity bibliographicEntity) {
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = new RequestDataLoadCSVRecord();
         requestDataLoadCSVRecord.setBarcode(bibliographicEntity.getItemEntities().get(0).getBarcode());
@@ -129,6 +149,7 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
 
         return bibliographicEntity;
     }
+
     private RequestTypeEntity getRequestTypeEntity() {
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
         requestTypeEntity.setId(1);

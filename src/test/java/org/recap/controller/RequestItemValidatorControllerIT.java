@@ -1,56 +1,42 @@
 package org.recap.controller;
 
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.recap.BaseTestCaseUT;
+import org.recap.BaseTestCase;
 import org.recap.RecapCommonConstants;
-import org.recap.ils.AbstractProtocolConnector;
-import org.recap.ils.ILSProtocolConnectorFactory;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.ImsLocationDetailsRepository;
 import org.recap.request.ItemValidatorService;
-import org.recap.request.RequestParamaterValidatorService;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 
-/**
- * Created by hemalathas on 11/11/16.
- */
-public class RequestItemValidatorControllerUT extends BaseTestCaseUT {
 
-    @InjectMocks
+public class RequestItemValidatorControllerIT extends BaseTestCase {
+    @Autowired
     RequestItemValidatorController requestItemValidatorController;
 
-    @Mock
-    RequestParamaterValidatorService requestParamaterValidatorService;
-
-    @Mock
-    ILSProtocolConnectorFactory ilsProtocolConnectorFactory;
-
-    @Mock
+    @Autowired
     ItemController itemController;
 
-    @Mock
-    AbstractProtocolConnector abstractProtocolConnector;
-
-    @Mock
+    @Autowired
     BibliographicDetailsRepository bibliographicDetailsRepository;
 
-    @Mock
+    @Autowired
     ItemValidatorService itemValidatorService;
 
-    @Mock
+    @Autowired
     ImsLocationDetailsRepository imsLocationDetailsRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     public void testValidRequest() throws Exception {
@@ -63,37 +49,13 @@ public class RequestItemValidatorControllerUT extends BaseTestCaseUT {
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         itemRequestInformation.setRequestingInstitution("PUL");
         itemRequestInformation.setItemBarcodes(Arrays.asList(bibliographicEntity.getItemEntities().get(0).getBarcode()));
-        ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-        Mockito.when(requestParamaterValidatorService.validateItemRequestParameters(any())).thenReturn(null);
-        Mockito.when(itemValidatorService.itemValidation(any())).thenReturn(responseEntity);
-        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
-        Mockito.when(abstractProtocolConnector.patronValidation(any(), any())).thenReturn(false);
-        ResponseEntity response = requestItemValidatorController.validateItemRequestInformations(itemRequestInformation);
-        assertNotNull(response);
+        ResponseEntity responseEntity = requestItemValidatorController.validateItemRequestInformations(itemRequestInformation);
+        assertNotNull(responseEntity);
     }
 
     @Test
-    public void testvalidateItemRequest() throws Exception {
+    public void testInValidRequest() throws Exception {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
-        ItemRequestInformation itemRequestInformation = getItemRequestInformation(bibliographicEntity);
-        ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-        Mockito.when(requestParamaterValidatorService.validateItemRequestParameters(any())).thenReturn(responseEntity);
-        ResponseEntity response = requestItemValidatorController.validateItemRequest(itemRequestInformation);
-        assertNotNull(response);
-    }
-
-    @Test
-    public void testvalidateItemRequestNullResponse() throws Exception {
-        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
-        ItemRequestInformation itemRequestInformation = getItemRequestInformation(bibliographicEntity);
-        ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
-        Mockito.when(requestParamaterValidatorService.validateItemRequestParameters(any())).thenReturn(null);
-        Mockito.when(itemValidatorService.itemValidation(any())).thenReturn(responseEntity);
-        ResponseEntity response = requestItemValidatorController.validateItemRequest(itemRequestInformation);
-        assertNotNull(response);
-    }
-
-    private ItemRequestInformation getItemRequestInformation(BibliographicEntity bibliographicEntity) {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("4567gfdr8915");
         itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
@@ -102,7 +64,23 @@ public class RequestItemValidatorControllerUT extends BaseTestCaseUT {
         itemRequestInformation.setItemOwningInstitution("PUL");
         itemRequestInformation.setRequestingInstitution("PUL");
         itemRequestInformation.setItemBarcodes(Arrays.asList(bibliographicEntity.getItemEntities().get(0).getBarcode()));
-        return itemRequestInformation;
+        ResponseEntity responseEntity = requestItemValidatorController.validateItemRequestInformations(itemRequestInformation);
+        assertNotNull(responseEntity);
+    }
+
+    @Test
+    public void testvalidateItemRequest() throws Exception {
+        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setPatronBarcode("4567gfdr8915");
+        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setDeliveryLocation("PB");
+        itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
+        itemRequestInformation.setItemOwningInstitution("PUL");
+        itemRequestInformation.setRequestingInstitution("PUL");
+        itemRequestInformation.setItemBarcodes(Arrays.asList(bibliographicEntity.getItemEntities().get(0).getBarcode()));
+        ResponseEntity responseEntity = requestItemValidatorController.validateItemRequest(itemRequestInformation);
+        assertNotNull(responseEntity);
     }
 
     private BibliographicEntity saveBibSingleHoldingsMultipleItem() throws Exception {
@@ -195,3 +173,6 @@ public class RequestItemValidatorControllerUT extends BaseTestCaseUT {
     }
 
 }
+
+
+

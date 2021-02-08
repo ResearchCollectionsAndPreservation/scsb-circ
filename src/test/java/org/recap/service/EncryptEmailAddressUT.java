@@ -6,8 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.BaseTestCase;
-import org.recap.controller.EncryptEmailAddress;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
@@ -16,8 +14,6 @@ import org.recap.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -106,15 +102,10 @@ public class EncryptEmailAddressUT {
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
         requestTypeEntity.setRequestTypeCode("Recall");
         requestTypeEntity.setRequestTypeDesc("Recall");
-        //RequestTypeEntity savedRequestTypeEntity = requestTypeDetailsRepository.save(requestTypeEntity);
-        //assertNotNull(savedRequestTypeEntity);
-
-        //RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findById(3).orElse(null);
 
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(bibliographicEntity.getItemEntities().get(0).getId());
         requestItemEntity.setRequestTypeId(requestTypeEntity.getId());
-       // requestItemEntity.setRequestStatusEntity(requestStatusEntity);
         requestItemEntity.setRequestingInstitutionId(2);
         requestItemEntity.setStopCode("test");
         requestItemEntity.setNotes("test");
@@ -128,8 +119,6 @@ public class EncryptEmailAddressUT {
         requestItemEntity.setCreatedBy("test");
         requestItemEntity.setEmailId("test@gmail.com");
         requestItemEntity.setLastUpdatedDate(new Date());
-        //RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
-       // entityManager.refresh(savedRequestItemEntity);
         return requestItemEntity;
     }
 
@@ -169,8 +158,6 @@ public class EncryptEmailAddressUT {
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
-        //BibliographicEntity savedBibliographicEntity = bibliographicDetailsRepository.saveAndFlush(bibliographicEntity);
-       // entityManager.refresh(savedBibliographicEntity);
         return bibliographicEntity;
 
     }

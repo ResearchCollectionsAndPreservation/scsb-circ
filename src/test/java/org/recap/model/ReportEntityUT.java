@@ -1,11 +1,9 @@
 package org.recap.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 import org.recap.model.jpa.ReportDataEntity;
 import org.recap.model.jpa.ReportEntity;
-import org.recap.repository.jpa.ReportDetailRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,19 +15,17 @@ import static org.junit.Assert.assertNull;
 /**
  * Created by hemalathas on 23/3/17.
  */
-public class ReportEntityUT extends BaseTestCase{
-
-    @Autowired
-    private ReportDetailRepository reportDetailRepository;
+public class ReportEntityUT extends BaseTestCaseUT {
 
     @Test
-    public void  saveDataDumpSuccessReport(){
+    public void saveDataDumpSuccessReport() {
         ReportEntity reportEntity = new ReportEntity();
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportDataEntity numberOfBibExportReportEntity = new ReportDataEntity();
         numberOfBibExportReportEntity.setHeaderName("NoOfBibsExported");
         numberOfBibExportReportEntity.setHeaderValue("1");
+        numberOfBibExportReportEntity.setId(1);
         reportDataEntities.add(numberOfBibExportReportEntity);
 
         ReportDataEntity requestingInstitutionReportDataEntity = new ReportDataEntity();
@@ -77,19 +73,19 @@ public class ReportEntityUT extends BaseTestCase{
         reportEntity.setType("BatchExportSuccess");
         reportEntity.setReportDataEntities(reportDataEntities);
         reportEntity.setInstitutionName("PUL");
+        reportEntity.setId(1);
 
-        ReportEntity savedReportEntity = reportDetailRepository.save(reportEntity);
-        assertNotNull(savedReportEntity);
-        assertNotNull(savedReportEntity.getId());
-        assertNotNull(savedReportEntity.getCreatedDate());
-        assertNotNull(savedReportEntity.getFileName());
-        assertNotNull(savedReportEntity.getInstitutionName());
-        assertNotNull(savedReportEntity.getType());
-        assertNotNull(savedReportEntity.getReportDataEntities());
-        assertNotNull(savedReportEntity.getReportDataEntities().get(0).getHeaderName());
-        assertNull(savedReportEntity.getReportDataEntities().get(0).getRecordNum());
-        assertNotNull(savedReportEntity.getReportDataEntities().get(0).getHeaderValue());
-        assertNotNull(savedReportEntity.getReportDataEntities().get(0).getId());
+        assertNotNull(reportEntity);
+        assertNotNull(reportEntity.getId());
+        assertNotNull(reportEntity.getCreatedDate());
+        assertNotNull(reportEntity.getFileName());
+        assertNotNull(reportEntity.getInstitutionName());
+        assertNotNull(reportEntity.getType());
+        assertNotNull(reportEntity.getReportDataEntities());
+        assertNotNull(reportEntity.getReportDataEntities().get(0).getHeaderName());
+        assertNull(reportEntity.getReportDataEntities().get(0).getRecordNum());
+        assertNotNull(reportEntity.getReportDataEntities().get(0).getHeaderValue());
+        assertNotNull(reportEntity.getReportDataEntities().get(0).getId());
     }
 
 }

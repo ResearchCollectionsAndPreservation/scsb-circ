@@ -1,7 +1,7 @@
 package org.recap.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 import org.recap.model.jpa.SearchItemResultRow;
 
 import static org.junit.Assert.assertNotNull;
@@ -9,10 +9,10 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 20/3/17.
  */
-public class SearchItemResultRowUT{
+public class SearchItemResultRowUT extends BaseTestCaseUT {
 
     @Test
-    public void testSearchItemResultRow(){
+    public void testSearchItemResultRow() {
 
         SearchItemResultRow searchItemResultRow = new SearchItemResultRow();
         searchItemResultRow.setCallNumber("X");
@@ -24,7 +24,9 @@ public class SearchItemResultRowUT{
         searchItemResultRow.setAvailability("Available");
         searchItemResultRow.setSelectedItem(false);
         searchItemResultRow.setItemId(1);
+        searchItemResultRow.compareTo(null);
         searchItemResultRow.compareTo(searchItemResultRow);
+        searchItemResultRow.equals(null);
         searchItemResultRow.equals(searchItemResultRow);
         searchItemResultRow.hashCode();
         SearchItemResultRow searchItemResultRow1 = new SearchItemResultRow();

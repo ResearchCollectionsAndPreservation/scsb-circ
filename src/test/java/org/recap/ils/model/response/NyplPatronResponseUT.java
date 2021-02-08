@@ -1,7 +1,7 @@
 package org.recap.ils.model.response;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 import org.recap.ils.model.nypl.DebugInfo;
 import org.recap.ils.model.nypl.NyplPatronData;
 import org.recap.ils.model.nypl.response.NyplPatronResponse;
@@ -9,13 +9,12 @@ import org.recap.ils.model.nypl.response.NyplPatronResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
-public class NyplPatronResponseUT extends BaseTestCase {
-    NyplPatronResponse nyplPatronResponse;
+public class NyplPatronResponseUT extends BaseTestCaseUT {
     @Test
-    public void testNyplPatronResponse(){
-        nyplPatronResponse = new NyplPatronResponse();
+    public void testNyplPatronResponse() {
+        NyplPatronResponse nyplPatronResponse = new NyplPatronResponse();
         DebugInfo debugInfo = new DebugInfo();
         List<DebugInfo> debugInfolist = new ArrayList<>();
         debugInfolist.add(debugInfo);
@@ -26,10 +25,10 @@ public class NyplPatronResponseUT extends BaseTestCase {
         nyplPatronDatalist.add(nyplPatronData);
         nyplPatronResponse.setDebugInfo(debugInfolist);
         nyplPatronResponse.setData(nyplPatronDatalist);
-        nyplPatronResponse.getCount();
-        nyplPatronResponse.getData();
-        nyplPatronResponse.getDebugInfo();
-        nyplPatronResponse.getStatusCode();
-        assertTrue(true);
+
+        assertNotNull(nyplPatronResponse.getCount());
+        assertNotNull(nyplPatronResponse.getStatusCode());
+        assertNotNull(nyplPatronResponse.getDebugInfo());
+        assertNotNull(nyplPatronResponse.getData());
     }
 }

@@ -1,29 +1,26 @@
 package org.recap.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 17/2/17.
  */
-public class RequestStatusEntityUT extends BaseTestCase{
-
-    @Autowired
-    RequestItemStatusDetailsRepository requestItemStatusDetailsRepository;
+public class RequestStatusEntityUT extends BaseTestCaseUT {
 
     @Test
-    public void testRequestStatus(){
+    public void testRequestStatus() {
         RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
+        requestStatusEntity.setId(1);
         requestStatusEntity.setRequestStatusCode("Refile");
         requestStatusEntity.setRequestStatusDescription("Refile");
-        RequestStatusEntity savedRequestStatusEntity = requestItemStatusDetailsRepository.save(requestStatusEntity);
-        assertNotNull(savedRequestStatusEntity);
-        assertNotNull(savedRequestStatusEntity.getId());
+        assertNotNull(requestStatusEntity);
+        assertNotNull(requestStatusEntity.getId());
+        assertNotNull(requestStatusEntity.getRequestStatusCode());
+        assertNotNull(requestStatusEntity.getRequestStatusDescription());
     }
 
 }

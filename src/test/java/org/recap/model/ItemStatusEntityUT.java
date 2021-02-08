@@ -1,10 +1,8 @@
 package org.recap.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -12,20 +10,16 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 14/3/17.
  */
-public class ItemStatusEntityUT extends BaseTestCase {
-
-    @Autowired
-    ItemStatusDetailsRepository itemStatusDetailsRepository;
+public class ItemStatusEntityUT extends BaseTestCaseUT {
 
     @Test
-    public void testItemStatus(){
+    public void testItemStatus() {
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setStatusCode("test");
         itemStatusEntity.setStatusDescription("test");
-        ItemStatusEntity savedItemStatusEntity = itemStatusDetailsRepository.save(itemStatusEntity);
-        assertNotNull(savedItemStatusEntity);
-        assertEquals("test", savedItemStatusEntity.getStatusCode());
-        assertEquals("test", savedItemStatusEntity.getStatusDescription());
+        assertNotNull(itemStatusEntity);
+        assertEquals("test", itemStatusEntity.getStatusCode());
+        assertEquals("test", itemStatusEntity.getStatusDescription());
     }
 
 }

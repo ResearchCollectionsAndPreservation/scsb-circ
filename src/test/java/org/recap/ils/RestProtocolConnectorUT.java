@@ -56,6 +56,13 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
     RestProtocolJobResponsePollingProcessor restProtocolJobResponsePollingProcessor;
 
     @Test
+    public void checkGetters() {
+        restProtocolConnector.getRestOauthTokenApiService();
+        restProtocolConnector.getRestTemplate();
+        restProtocolConnector.getCheckOutRequest();
+    }
+
+    @Test
     public void supports() {
         String protocol = RecapConstants.REST_PROTOCOL;
         boolean result = restProtocolConnector.supports(protocol);
@@ -131,7 +138,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
 
         HttpEntity requestEntity = getHttpEntity(headers);
         when(restApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemId)).thenReturn("1");
-        when(restApiResponseUtil.getRestApiSourceForInstitution("NYPL", institutionId)).thenReturn("rest");
+        when(restApiResponseUtil.getRestApiSourceForInstitution(any(), any())).thenReturn("rest");
         when(restApiResponseUtil.getNormalizedItemIdForRestProtocolApi(itemId)).thenReturn("holdItem");
         when(restProtocolConnector.getApiUrl(source, itemIdentifier)).thenReturn("localhost:9090/holdItem");
         when(restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class)).thenReturn(responseEntity);
@@ -159,7 +166,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
 
         HttpEntity requestEntity = getHttpEntity(headers);
         when(restApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemId)).thenReturn("1");
-        when(restApiResponseUtil.getRestApiSourceForInstitution("NYPL", institutionId)).thenReturn("rest");
+        when(restApiResponseUtil.getRestApiSourceForInstitution(any(), any())).thenReturn("rest");
         when(restApiResponseUtil.getNormalizedItemIdForRestProtocolApi(itemId)).thenReturn("holdItem");
         when(restProtocolConnector.getApiUrl(source, itemIdentifier)).thenReturn("localhost:9090/holdItem");
         when(restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
@@ -172,6 +179,18 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         String itemId = "25678";
         ItemInformationResponse informationResponse = restProtocolConnector.lookupItem(itemId);
         assertNotNull(informationResponse);
+    }
+
+    @Test
+    public void queryForJob() throws Exception {
+        String jobId = "1";
+        ResponseEntity<JobResponse> responseEntity = new ResponseEntity<JobResponse>(getJobResponse(), HttpStatus.OK);
+        doReturn(responseEntity).when(restTemplate).exchange(
+                ArgumentMatchers.anyString(),
+                ArgumentMatchers.any(HttpMethod.class),
+                ArgumentMatchers.any(),
+                ArgumentMatchers.<Class<CheckoutResponse>>any());
+        restProtocolConnector.queryForJob(jobId);
     }
 
     @Test
@@ -345,39 +364,40 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         assertNotNull(responseItem);
     }
 
-     @Test
-     public void placeHoldWithoutJobId() throws Exception {
-         String itemIdentifier = "236784";
-         String patronIdentifier = "234673";
-         String callInstitutionId = "1";
-         String itemInstitutionId = "1";
-         String expirationDate = new Date().toString();
-         String bibId = "2445566";
-         String deliveryLocation = "PA";
-         String trackingId ="543587";
-         String title = "test";
-         String author = "test";
-         String callNumber = "25578";
-         CreateHoldResponse createHoldResponse = getCreateHoldResponse();
-         NYPLHoldResponse nyplHoldResponse = getNyplHoldResponse();
-         ResponseEntity<CreateHoldResponse> responseEntity = new ResponseEntity<>(createHoldResponse,HttpStatus.OK);
-         ResponseEntity<NYPLHoldResponse> responseEntity1 = new ResponseEntity<>(nyplHoldResponse,HttpStatus.OK);
-         doReturn(responseEntity).when(restTemplate).exchange(
-                 ArgumentMatchers.anyString(),
-                 Mockito.eq(HttpMethod.POST),
-                 ArgumentMatchers.<HttpEntity<CreateHoldRequest>>any(),
-                 ArgumentMatchers.<Class<CreateHoldResponse>>any());
-         doReturn(responseEntity1).when(restTemplate).exchange(
-                 ArgumentMatchers.anyString(),
-                 Mockito.eq(HttpMethod.GET),
-                 ArgumentMatchers.<HttpEntity<NyplHoldRequest>>any(),
-                 ArgumentMatchers.<Class<NYPLHoldResponse>>any());
-         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-         when(restApiResponseUtil.buildItemHoldResponse(any())).thenReturn(new ItemHoldResponse());
-         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
-         AbstractResponseItem responseItem =restProtocolConnector.placeHold(itemIdentifier,patronIdentifier,callInstitutionId,itemInstitutionId,expirationDate,bibId,deliveryLocation,trackingId,title,author,callNumber);
-         assertNotNull(responseItem);
-     }
+    @Test
+    public void placeHoldWithoutJobId() throws Exception {
+        String itemIdentifier = "236784";
+        String patronIdentifier = "234673";
+        String callInstitutionId = "1";
+        String itemInstitutionId = "1";
+        String expirationDate = new Date().toString();
+        String bibId = "2445566";
+        String deliveryLocation = "PA";
+        String trackingId = "543587";
+        String title = "test";
+        String author = "test";
+        String callNumber = "25578";
+        CreateHoldResponse createHoldResponse = getCreateHoldResponse();
+        NYPLHoldResponse nyplHoldResponse = getNyplHoldResponse();
+        ResponseEntity<CreateHoldResponse> responseEntity = new ResponseEntity<>(createHoldResponse, HttpStatus.OK);
+        ResponseEntity<NYPLHoldResponse> responseEntity1 = new ResponseEntity<>(nyplHoldResponse, HttpStatus.OK);
+        doReturn(responseEntity).when(restTemplate).exchange(
+                ArgumentMatchers.anyString(),
+                Mockito.eq(HttpMethod.POST),
+                ArgumentMatchers.<HttpEntity<CreateHoldRequest>>any(),
+                ArgumentMatchers.<Class<CreateHoldResponse>>any());
+        doReturn(responseEntity1).when(restTemplate).exchange(
+                ArgumentMatchers.anyString(),
+                Mockito.eq(HttpMethod.GET),
+                ArgumentMatchers.<HttpEntity<NyplHoldRequest>>any(),
+                ArgumentMatchers.<Class<NYPLHoldResponse>>any());
+        when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
+        when(restApiResponseUtil.buildItemHoldResponse(any())).thenReturn(new ItemHoldResponse());
+        when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
+        AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
+        assertNotNull(responseItem);
+    }
+
     @Test
     public void placeHoldHttpClientErrorException() throws Exception {
         String itemIdentifier = "236784";
@@ -445,7 +465,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         ResponseEntity<NyplPatronResponse> jobResponseEntity = new ResponseEntity<>(nyplPatronResponse, HttpStatus.OK);
         ResponseEntity<NYPLHoldResponse> nyplHoldResponseEntity = new ResponseEntity<>(nyplHoldResponse, HttpStatus.OK);
         when(restProtocolConnector.getRestDataApiUrl()).thenReturn("localhost");
-        when(restApiResponseUtil.getRestApiSourceForInstitution("NYPL", itemInstitutionId)).thenReturn("initiateNyplHoldRequest");
+        when(restApiResponseUtil.getRestApiSourceForInstitution(any(), any())).thenReturn("initiateNyplHoldRequest");
         when(restApiResponseUtil.getNormalizedItemIdForRestProtocolApi(itemIdentifier)).thenReturn("records");
         doReturn(jobResponseEntity).when(restTemplate).exchange(
                 ArgumentMatchers.anyString(),
@@ -568,7 +588,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<RefileResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(restApiResponseUtil.buildItemRefileResponse(any(), "NYPL")).thenReturn(new ItemRefileResponse());
+        when(restApiResponseUtil.buildItemRefileResponse(any(), any())).thenReturn(new ItemRefileResponse());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(getJobResponse());
         ItemRefileResponse response = restProtocolConnector.refileItem(itemIdentifier);
         assertNotNull(response);
@@ -592,7 +612,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.<Class<RefileResponse>>any());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        when(restApiResponseUtil.buildItemRefileResponse(any(), "NYPL")).thenReturn(new ItemRefileResponse());
+        when(restApiResponseUtil.buildItemRefileResponse(any(), any())).thenReturn(new ItemRefileResponse());
         ItemRefileResponse response = restProtocolConnector.refileItem(itemIdentifier);
         assertNotNull(response);
     }
@@ -725,7 +745,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         return createHoldResponse;
     }
 
-    private NYPLHoldResponse getNyplHoldResponse(){
+    private NYPLHoldResponse getNyplHoldResponse() {
         NYPLHoldResponse nyplHoldResponse = new NYPLHoldResponse();
         NYPLHoldData nyplHoldData = new NYPLHoldData();
         nyplHoldData.setId(1);
@@ -747,7 +767,8 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         nyplHoldResponse.setData(nyplHoldData);
         return nyplHoldResponse;
     }
-    private CancelHoldResponse getCancelHoldResponse(){
+
+    private CancelHoldResponse getCancelHoldResponse() {
         CancelHoldResponse cancelHoldResponse = new CancelHoldResponse();
         CancelHoldData cancelHoldData = new CancelHoldData();
         cancelHoldData.setCreatedDate("2017-03-30");

@@ -33,6 +33,7 @@ public class HoldingsEntityUT {
         HoldingsEntity holdingsEntity1 = new HoldingsEntity();
         holdingsEntity1.setOwningInstitutionHoldingsId("235456");
         holdingsEntity1.equals(holdingsEntity);
+        holdingsEntity.equals(null);
 
         assertNotNull(holdingsEntity.getInstitutionEntity());
         assertNotNull(holdingsEntity.getBibliographicEntities());

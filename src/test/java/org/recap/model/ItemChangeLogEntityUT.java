@@ -1,10 +1,8 @@
 package org.recap.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 import org.recap.model.jpa.ItemChangeLogEntity;
-import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
@@ -13,13 +11,10 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by hemalathas on 17/2/17.
  */
-public class ItemChangeLogEntityUT extends BaseTestCase{
-
-    @Autowired
-    ItemChangeLogDetailsRepository itemChangeLogDetailsRepository;
+public class ItemChangeLogEntityUT extends BaseTestCaseUT {
 
     @Test
-    public void testItemChangeLogEntity(){
+    public void testItemChangeLogEntity() {
         ItemChangeLogEntity itemChangeLogEntity = new ItemChangeLogEntity();
         itemChangeLogEntity.setNotes("test");
         itemChangeLogEntity.setOperationType("test");
@@ -27,14 +22,12 @@ public class ItemChangeLogEntityUT extends BaseTestCase{
         itemChangeLogEntity.setRecordId(1);
         itemChangeLogEntity.setId(12);
         itemChangeLogEntity.setUpdatedDate(new Date());
-        ItemChangeLogEntity savedItemChangeLogEntity = itemChangeLogDetailsRepository.save(itemChangeLogEntity);
-        assertNotNull(savedItemChangeLogEntity);
-        assertNotNull(savedItemChangeLogEntity.getId());
-        assertNotNull(savedItemChangeLogEntity.getNotes());
-        assertNotNull(savedItemChangeLogEntity.getOperationType());
-        assertNotNull(savedItemChangeLogEntity.getUpdatedBy());
-        assertNotNull(savedItemChangeLogEntity.getUpdatedDate());
-        assertNotNull(savedItemChangeLogEntity.getId());
+        assertNotNull(itemChangeLogEntity);
+        assertNotNull(itemChangeLogEntity.getId());
+        assertNotNull(itemChangeLogEntity.getNotes());
+        assertNotNull(itemChangeLogEntity.getOperationType());
+        assertNotNull(itemChangeLogEntity.getUpdatedBy());
+        assertNotNull(itemChangeLogEntity.getUpdatedDate());
     }
 
 

@@ -83,6 +83,17 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
     }
 
     @Test
+    public void processBulkRequestItemINcomplete() {
+        String itemBarcode = "Complete";
+        int bulkRequestId = 1;
+        BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
+        bulkRequestItemEntity.getRequestItemEntities().get(0).getRequestStatusEntity().setRequestStatusCode("INCOMPLETE");
+        Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
+        Mockito.when(bulkRequestItemDetailsRepository.save(bulkRequestItemEntity)).thenReturn(bulkRequestItemEntity);
+        bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
+    }
+
+    @Test
     public void processBulkRequestItemForException() {
         String itemBarcode = "Complete";
         int bulkRequestId = 1;
@@ -113,7 +124,31 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
         itemInformationResponse.setSuccess(false);
         bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
+    }
 
+    @Test
+    public void processBulkRequestItemForBarcodeWithoutisUseQueue() {
+        String itemBarcode = "123456";
+        int bulkRequestId = 1;
+        BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
+        ItemEntity itemEntity = getItemEntity();
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation();
+        ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
+        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+        itemInformationResponse.setRequestTypeForScheduledOnWO(true);
+        itemInformationResponse.setSuccess(true);
+        Mockito.when(requestItemController.checkoutItem(any(), any())).thenReturn(itemCheckoutResponse);
+        Mockito.when(bulkRequestItemDetailsRepository.findById(bulkRequestId)).thenReturn(Optional.of(bulkRequestItemEntity));
+        Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
+        Mockito.doNothing().when(itemRequestDBService).updateItemAvailabilityStatus(Arrays.asList(itemEntity), bulkRequestItemEntity.getCreatedBy());
+        Mockito.when(gfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemInformationResponse);
+        bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
+        itemInformationResponse.setRequestTypeForScheduledOnWO(false);
+        Mockito.when(gfaLasService.isUseQueueLasCall(any())).thenReturn(false);
+        Mockito.when(gfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemInformationResponse);
+        bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
+        itemInformationResponse.setSuccess(false);
+        bulkItemRequestProcessService.processBulkRequestItem(itemBarcode, bulkRequestId);
     }
 
     @Test
@@ -161,6 +196,7 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         itemEntity.setImsLocationEntity(getImsLocationEntity());
         return itemEntity;
     }
+
     private ImsLocationEntity getImsLocationEntity() {
         ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
         imsLocationEntity.setImsLocationCode("1");
@@ -183,8 +219,8 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         requestTypeEntity.setRequestTypeDesc("EDD");
         ItemEntity itemEntity = getItemEntity();
         RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
-        requestStatusEntity.setRequestStatusCode("RETRIEVAL_ORDER_PLACED");
-        requestStatusEntity.setRequestStatusDescription("RETRIEVAL ORDER PLACED");
+        requestStatusEntity.setRequestStatusCode("PENDING");
+        requestStatusEntity.setRequestStatusDescription("PENDING");
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setId(1);
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);

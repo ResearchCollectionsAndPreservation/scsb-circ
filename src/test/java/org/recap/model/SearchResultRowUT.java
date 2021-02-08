@@ -1,7 +1,7 @@
 package org.recap.model;
 
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 import org.recap.model.jpa.SearchItemResultRow;
 import org.recap.model.jpa.SearchResultRow;
 
@@ -14,10 +14,10 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by hemalathas on 14/3/17.
  */
-public class SearchResultRowUT extends BaseTestCase{
+public class SearchResultRowUT extends BaseTestCaseUT {
 
     @Test
-    public void testSearchResultRow(){
+    public void testSearchResultRow() {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setBarcode("36598741256398");
         searchResultRow.setSearchItemResultRows(Arrays.asList(new SearchItemResultRow()));

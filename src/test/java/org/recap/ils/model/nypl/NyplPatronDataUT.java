@@ -1,22 +1,20 @@
 package org.recap.ils.model.nypl;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 3/4/17.
  */
-public class NyplPatronDataUT extends BaseTestCase{
+public class NyplPatronDataUT extends BaseTestCaseUT {
 
     @Test
-    public void testNyplPatronData(){
+    public void testNyplPatronData() {
         NyplPatronData nyplPatronData = new NyplPatronData();
         nyplPatronData.setId("1");
         nyplPatronData.setUpdatedDate(new Date().toString());

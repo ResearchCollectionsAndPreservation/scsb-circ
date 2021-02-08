@@ -8,13 +8,10 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spi.RouteController;
 import org.apache.camel.support.DefaultExchange;
-import org.apache.camel.util.json.JsonObject;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.*;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.api.mockito.PowerMockito;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
@@ -35,14 +32,12 @@ import org.recap.repository.jpa.*;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
 import org.recap.util.PropertyUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.sql.Time;
 import java.util.ArrayList;
@@ -59,25 +54,6 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     @Spy
     GFALasService gfaLasService;
 
-
-    /*private String gfaItemStatus = "http://recapgfa-dev.princeton.edu:9092/lasapi/rest/lasapiSvc/itemStatus";
-
-    private String gfaLasStatus = "http://recapgfa-dev.princeton.edu:9092/lasapi/rest/lasapiSvc/lasStatus";
-
-    private String gfaItemRetrival = "http://recapgfa-dev.princeton.edu:9092/lasapi/rest/lasapiSvc/retrieveItem";
-
-    private String gfaItemEDDRetrival = "http://recapgfa-dev.princeton.edu:9092/lasapi/rest/lasapiSvc/retrieveEDD";
-
-    private String gfaItemPermanentWithdrawlDirect = "http://recapgfa-dev.princeton.edu:9092/lasapi/rest/lasapiSvc/permanentlyRetrieveItem";
-
-    private String gfaItemPermanentWithdrawlInDirect = "http://recapgfa-dev.princeton.edu:9092/lasapi/rest/lasapiSvc/permanentlyRetrieveItemIndirect";
-
-    private boolean useQueueLasCall = true;
-
-    private Integer gfaServerResponseTimeOutMilliseconds = 1000;
-
-    private String recapAssistanceEmailTo = "test@gmail.com";*/
-
     @Mock
     private LASImsLocationConnectorFactory lasImsLocationConnectorFactory;
 
@@ -89,9 +65,6 @@ public class GFALasServiceUT extends BaseTestCaseUT{
 
     @Mock
     ObjectMapper objectMapper;
-
-    @Mock
-    GFALasService getGfaLasService;
 
     @Mock
     private ItemDetailsRepository itemDetailsRepository;
@@ -151,319 +124,6 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
         gfaLasService.isUseQueueLasCall(imsLocationCode);
     }
-    /*@Test
-    public void itemStatusCheck() throws JsonProcessingException {
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = getGfaItemStatusCheckRequest();
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        ResponseEntity<GFAItemStatusCheckResponse> responseEntity = new ResponseEntity<>(gfaItemStatusCheckResponse, HttpStatus.OK);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
-        HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
-        Mockito.when(gfaLasService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFAItemStatusCheckResponse.class)).thenReturn(responseEntity);
-      //  GFAItemStatusCheckResponse response = gfaLasService.itemStatusCheck(gfaItemStatusCheckRequest);
-        //assertNotNull(response);
-    }*/
-
-    /*@Test
-    public void itemStatusCheckException() {
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = getGfaItemStatusCheckRequest();
-        //GFAItemStatusCheckResponse response = gfaLasService.itemStatusCheck(gfaItemStatusCheckRequest);
-    }*/
-    /*@Test
-    public void heartBeatCheck() throws JsonProcessingException {
-        GFALasStatusCheckRequest gfaLasStatusCheckRequest = getGfaLasStatusCheckRequest();
-        GFALasStatusCheckResponse gfaLasStatusCheckResponse = getGfaLasStatusCheckResponse();
-        ResponseEntity<GFALasStatusCheckResponse> responseEntity = new ResponseEntity<>(gfaLasStatusCheckResponse, HttpStatus.OK);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String filterParamValue = objectMapper.writeValueAsString(gfaLasStatusCheckRequest);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaLasStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
-        HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
-        Mockito.when(gfaLasService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFALasStatusCheckResponse.class)).thenReturn(responseEntity);
-        //GFALasStatusCheckResponse response = gfaLasService.heartBeatCheck(gfaLasStatusCheckRequest);
-        assertNotNull(response);
-    }*/
-
-    @Test
-    public void heartBeatCheckException() {
-        GFALasStatusCheckRequest gfaLasStatusCheckRequest = getGfaLasStatusCheckRequest();
-      //  GFALasStatusCheckResponse response = gfaLasService.heartBeatCheck(gfaLasStatusCheckRequest);
-    }
-
-    @Test
-    public void getGFAItemStatusCheckResponse() {
-        List<String> itemBarcodes = new ArrayList<>();
-        itemBarcodes.add(getItemEntity().getBarcode());
-        List<ItemEntity> itemEntities = new ArrayList<>();
-        itemEntities.add(getItemEntity());
-        //Mockito.when(commonUtil.getBarcodesList(itemEntities)).thenReturn(itemBarcodes);
-        //GFAItemStatusCheckResponse response = gfaLasService.getGFAItemStatusCheckResponse(itemEntities);
-    }
-
-    @Test
-    public void getGFAItemStatusCheckResponseWithoutItemBarcodes() {
-        List<ItemEntity> itemEntities = new ArrayList<>();
-        itemEntities.add(getItemEntity());
-        //Mockito.when(commonUtil.getBarcodesList(itemEntities)).thenReturn(null);
-       // GFAItemStatusCheckResponse response = gfaLasService.getGFAItemStatusCheckResponse(itemEntities);
-       // assertNotNull(response);
-    }
-
-   /* @Test
-    public void itemRetrieval() {
-        GFARetrieveItemRequest gfaRetrieveItemRequest = getGfaRetrieveItemRequest();
-        GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
-        HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
-        ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.OK);
-        Mockito.when(gfaLasService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
-       // GFARetrieveItemResponse response = gfaLasService.itemRetrieval(gfaRetrieveItemRequest);
-        //assertNotNull(response);
-    }
-
-    @Test
-    public void itemRetrievalWithErrorCode() {
-        GFARetrieveItemRequest gfaRetrieveItemRequest = getGfaRetrieveItemRequest();
-        GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
-        gfaRetrieveItemResponse.getDsitem().getTtitem().get(0).setErrorCode("Error code");
-        HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
-        ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.OK);
-       // Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
-        //GFARetrieveItemResponse response = gfaLasService.itemRetrieval(gfaRetrieveItemRequest);
-        //assertNotNull(response);
-    }
-
-    @Test
-    public void itemRetrievalWithoutResponse() {
-        GFARetrieveItemRequest gfaRetrieveItemRequest = getGfaRetrieveItemRequest();
-        HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
-        ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(HttpStatus.OK);
-       // Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
-       // GFARetrieveItemResponse response = gfaLasService.itemRetrieval(gfaRetrieveItemRequest);
-        //assertNotNull(response);
-    }
-
-    @Test
-    public void itemRetrievalFailureResponse() {
-        GFARetrieveItemRequest gfaRetrieveItemRequest = getGfaRetrieveItemRequest();
-        GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
-        HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
-        ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity(gfaRetrieveItemResponse, HttpStatus.FORBIDDEN);
-        //Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenReturn(responseEntity);
-        //GFARetrieveItemResponse response = gfaLasService.itemRetrieval(gfaRetrieveItemRequest);
-       // assertNotNull(response);
-    }
-
-    @Test
-    public void itemRetrievalHttpClientErrorException() {
-        GFARetrieveItemRequest gfaRetrieveItemRequest = getGfaRetrieveItemRequest();
-        GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
-        HttpEntity requestEntity = new HttpEntity<>(gfaRetrieveItemRequest, getHttpHeaders());
-       // Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemRetrival, HttpMethod.POST, requestEntity, GFARetrieveItemResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
-        //GFARetrieveItemResponse response = gfaLasService.itemRetrieval(gfaRetrieveItemRequest);
-        //assertNotNull(response);
-    }
-
-    @Test
-    public void itemRetrievalException() {
-        GFARetrieveItemRequest gfaRetrieveItemRequest = getGfaRetrieveItemRequest();
-*//*<<<<<<< HEAD:src/test/java/org/recap/request/GFAServiceUT.java
-        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        GFARetrieveItemResponse response = gfaService.itemRetrieval(gfaRetrieveItemRequest);
-=======*//*
-       // GFARetrieveItemResponse response = gfaLasService.itemRetrieval(gfaRetrieveItemRequest);
-
-        //assertNotNull(response);
-    }
-
-    @Test
-    public void itemEDDRetrievalWithoutGfaItemStatusCheckResponse() {
-        GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = getGFARetrieveEDDItemRequest();
-*//*<<<<<<< HEAD:src/test/java/org/recap/request/GFAServiceUT.java
-        Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        GFAEddItemResponse response = gfaService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
-=======*//*
-      //  GFAEddItemResponse response = gfaLasService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
-      //  assertNotNull(response);
-    }
-
-    @Test
-    public void itemEDDRetrieval() throws JsonProcessingException {
-        GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = getGFARetrieveEDDItemRequest();
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        GFAEddItemResponse gfaEddItemResponse = getGFAEddItemResponse();
-        ResponseEntity<GFAItemStatusCheckResponse> responseEntity = new ResponseEntity<>(gfaItemStatusCheckResponse, HttpStatus.OK);
-        ObjectMapper objectMapper = new ObjectMapper();
-        ResponseEntity<GFAEddItemResponse> responseEntity1 = new ResponseEntity<>(gfaEddItemResponse, HttpStatus.OK);
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
-        GFAItemStatus gfaItemStatus001 = new GFAItemStatus();
-        gfaItemStatus001.setItemBarCode(gfaRetrieveEDDItemRequest.getDsitem().getTtitem().get(0).getItemBarcode());
-        List<GFAItemStatus> gfaItemStatuses = new ArrayList<>();
-        gfaItemStatuses.add(gfaItemStatus001);
-        gfaItemStatusCheckRequest.setItemStatus(gfaItemStatuses);
-        String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
-        HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
-        HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
-        Mockito.when(gfaLasService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
-        Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFAItemStatusCheckResponse.class)).thenReturn(responseEntity);
-       // GFAEddItemResponse response = gfaLasService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
-        //assertNotNull(response);
-    }
-    @Test
-    public void itemEDDRetrievalWithErrorCode() throws JsonProcessingException {
-        GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = getGFARetrieveEDDItemRequest();
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        GFAEddItemResponse gfaEddItemResponse = getGFAEddItemResponse();
-        gfaEddItemResponse.getDsitem().getTtitem().get(0).setErrorCode("001TE");
-        ResponseEntity<GFAItemStatusCheckResponse> responseEntity = new ResponseEntity<>(gfaItemStatusCheckResponse, HttpStatus.OK);
-        ObjectMapper objectMapper = new ObjectMapper();
-        ResponseEntity<GFAEddItemResponse> responseEntity1 = new ResponseEntity<>(gfaEddItemResponse, HttpStatus.OK);
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
-        GFAItemStatus gfaItemStatus001 = new GFAItemStatus();
-        gfaItemStatus001.setItemBarCode(gfaRetrieveEDDItemRequest.getDsitem().getTtitem().get(0).getItemBarcode());
-        List<GFAItemStatus> gfaItemStatuses = new ArrayList<>();
-        gfaItemStatuses.add(gfaItemStatus001);
-        gfaItemStatusCheckRequest.setItemStatus(gfaItemStatuses);
-        String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
-        HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
-        HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
-        Mockito.when(gfaLasService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
-        Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFAItemStatusCheckResponse.class)).thenReturn(responseEntity);
-       // GFAEddItemResponse response = gfaLasService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
-        //assertNotNull(response);
-    }
-    @Test
-    public void itemEDDRetrievalWithNewResponse() throws JsonProcessingException {
-        GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = getGFARetrieveEDDItemRequest();
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        GFAEddItemResponse gfaEddItemResponse = getGFAEddItemResponse();
-        gfaEddItemResponse.getDsitem().getTtitem().get(0).setErrorCode("001TE");
-        ResponseEntity<GFAItemStatusCheckResponse> responseEntity = new ResponseEntity<>(gfaItemStatusCheckResponse, HttpStatus.OK);
-        ObjectMapper objectMapper = new ObjectMapper();
-        ResponseEntity<GFAEddItemResponse> responseEntity1 = new ResponseEntity<>(HttpStatus.OK);
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
-        GFAItemStatus gfaItemStatus001 = new GFAItemStatus();
-        gfaItemStatus001.setItemBarCode(gfaRetrieveEDDItemRequest.getDsitem().getTtitem().get(0).getItemBarcode());
-        List<GFAItemStatus> gfaItemStatuses = new ArrayList<>();
-        gfaItemStatuses.add(gfaItemStatus001);
-        gfaItemStatusCheckRequest.setItemStatus(gfaItemStatuses);
-        String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
-        HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
-        HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
-        //Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
-        Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFAItemStatusCheckResponse.class)).thenReturn(responseEntity);
-        //GFAEddItemResponse response = gfaLasService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
-        //assertNotNull(response);
-    }
-    @Test
-    public void itemEDDRetrievalWithBadResponse() throws JsonProcessingException {
-        GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = getGFARetrieveEDDItemRequest();
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        GFAEddItemResponse gfaEddItemResponse = getGFAEddItemResponse();
-        gfaEddItemResponse.getDsitem().getTtitem().get(0).setErrorCode("001TE");
-        ResponseEntity<GFAItemStatusCheckResponse> responseEntity = new ResponseEntity<>(gfaItemStatusCheckResponse, HttpStatus.OK);
-        ObjectMapper objectMapper = new ObjectMapper();
-        ResponseEntity<GFAEddItemResponse> responseEntity1 = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
-        GFAItemStatus gfaItemStatus001 = new GFAItemStatus();
-        gfaItemStatus001.setItemBarCode(gfaRetrieveEDDItemRequest.getDsitem().getTtitem().get(0).getItemBarcode());
-        List<GFAItemStatus> gfaItemStatuses = new ArrayList<>();
-        gfaItemStatuses.add(gfaItemStatus001);
-        gfaItemStatusCheckRequest.setItemStatus(gfaItemStatuses);
-        String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
-        HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
-        HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
-        //Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
-        Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFAItemStatusCheckResponse.class)).thenReturn(responseEntity);
-        //GFAEddItemResponse response = gfaLasService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
-        //assertNotNull(response);
-    }
-
-    @Test
-    public void itemEDDRetrievalWithFailureResponse() throws JsonProcessingException {
-        GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = getGFARetrieveEDDItemRequest();
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        GFAEddItemResponse gfaEddItemResponse = getGFAEddItemResponse();
-        ResponseEntity<GFAItemStatusCheckResponse> responseEntity = new ResponseEntity<>(gfaItemStatusCheckResponse, HttpStatus.FORBIDDEN);
-        ObjectMapper objectMapper = new ObjectMapper();
-        ResponseEntity<GFAEddItemResponse> responseEntity1 = new ResponseEntity<>(gfaEddItemResponse, HttpStatus.OK);
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
-        GFAItemStatus gfaItemStatus001 = new GFAItemStatus();
-        gfaItemStatus001.setItemBarCode(gfaRetrieveEDDItemRequest.getDsitem().getTtitem().get(0).getItemBarcode());
-        List<GFAItemStatus> gfaItemStatuses = new ArrayList<>();
-        gfaItemStatuses.add(gfaItemStatus001);
-        gfaItemStatusCheckRequest.setItemStatus(gfaItemStatuses);
-        String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
-        HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
-        HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
-        //Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenReturn(responseEntity1);
-        Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFAItemStatusCheckResponse.class)).thenReturn(responseEntity);
-        //GFAEddItemResponse response = gfaLasService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
-        //assertNotNull(response);
-    }
-
-    @Test
-    public void itemEDDRetrievalHttpClientErrorException() throws JsonProcessingException {
-        GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = getGFARetrieveEDDItemRequest();
-        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        ResponseEntity<GFAItemStatusCheckResponse> responseEntity = new ResponseEntity<>(gfaItemStatusCheckResponse, HttpStatus.FORBIDDEN);
-        ObjectMapper objectMapper = new ObjectMapper();
-        GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
-        GFAItemStatus gfaItemStatus001 = new GFAItemStatus();
-        gfaItemStatus001.setItemBarCode(gfaRetrieveEDDItemRequest.getDsitem().getTtitem().get(0).getItemBarcode());
-        List<GFAItemStatus> gfaItemStatuses = new ArrayList<>();
-        gfaItemStatuses.add(gfaItemStatus001);
-        gfaItemStatusCheckRequest.setItemStatus(gfaItemStatuses);
-        String filterParamValue = objectMapper.writeValueAsString(gfaItemStatusCheckRequest);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gfaItemStatus).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
-        HttpEntity requestEntity = new HttpEntity<>(new HttpHeaders());
-        HttpEntity requestEntity1 = new HttpEntity<>(gfaRetrieveEDDItemRequest, getHttpHeaders());
-        //Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.exchange(gfaItemEDDRetrival, HttpMethod.POST, requestEntity1, GFAEddItemResponse.class)).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
-        Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFAItemStatusCheckResponse.class)).thenReturn(responseEntity);
-        //GFAEddItemResponse response = gfaLasService.itemEDDRetrieval(gfaRetrieveEDDItemRequest);
-        //assertNotNull(response);
-    }*/
 
     @Test
     public void executeRetrieveOrder() throws Exception {
@@ -471,6 +131,29 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         itemRequestInfo.setImsLocationCode("test");
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
+        Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
+        ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
+        assertNotNull(response);
+    }
+
+    @Test
+    public void executeRetrieveOrderWithoutImsLocationCode() throws Exception {
+        ItemRequestInformation itemRequestInfo = getItemRequestInformation();
+        itemRequestInfo.setImsLocationCode("");
+        ItemInformationResponse itemInformationResponse = getItemInformationResponse();
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
+        Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
+        ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
+        assertNotNull(response);
+    }
+
+    @Test
+    public void executeRetrieveOrderForSCHONREFILEWO() throws Exception {
+        ItemRequestInformation itemRequestInfo = getItemRequestInformation();
+        itemRequestInfo.setImsLocationCode("test");
+        ItemInformationResponse itemInformationResponse = getItemInformationResponse();
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
+        gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("SCH ON REFILE WO:");
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
         ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
         assertNotNull(response);
@@ -502,6 +185,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         gfaRetrieveItemResponse.setSuccess(false);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
+        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
         Mockito.when(abstractLASImsLocationConnector.itemRetrieval(any(GFARetrieveItemRequest.class))).thenReturn(getGfaRetrieveItemResponse());
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.FALSE.toString());
@@ -510,6 +194,21 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
         assertNotNull(response);
     }
+
+    @Test
+    public void executeRetrieveOrderGFAItemStatusSCHONREFILEWOWithUseQueueLasCall() throws Exception {
+        ItemRequestInformation itemRequestInfo = getItemRequestInformation();
+        ItemInformationResponse itemInformationResponse = getItemInformationResponse();
+        GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
+        gfaRetrieveItemResponse.setSuccess(false);
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
+        gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
+        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
+        ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
+        assertNotNull(response);
+    }
+
     @Test
     public void executeRetrieveOrderGFAItemStatusSCHONREFILEWOInnerException() throws Exception {
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
@@ -520,6 +219,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
         Mockito.when(abstractLASImsLocationConnector.itemRetrieval(any(GFARetrieveItemRequest.class))).thenThrow(new RestClientException("Bad Request"));
+        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.FALSE.toString());
         ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
         assertNotNull(response);
@@ -533,6 +233,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
+        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
         ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
         assertNotNull(response);
@@ -547,6 +248,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         gfaEddItemResponse.setSuccess(false);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
+        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.FALSE.toString());
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
         Mockito.when(abstractLASImsLocationConnector.itemEDDRetrieval(any(GFARetrieveEDDItemRequest.class))).thenReturn(gfaEddItemResponse);
@@ -660,75 +362,69 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemInformationResponse response= gfaLasService.callItemEDDRetrievable(itemRequestInformation,itemInformationResponse);
         assertNotNull(response);
     }
-    @Test
-    public void gfaPermanentWithdrawlDirect() {
-        GFAPwdRequest gfaPwdRequest = getGfaPwdRequest();
-        GFAPwdResponse gfaPwdResponse = getGfaPwdResponse();
-        ResponseEntity<GFAPwdResponse> responseEntity = new ResponseEntity<>(gfaPwdResponse, HttpStatus.OK);
-        HttpEntity<GFAPwdRequest> requestEntity = new HttpEntity<>(gfaPwdRequest, getHttpHeaders());
-        /*Mockito.when(gfaLasService.getRestTemplate()).thenReturn(restTemplate);
-        Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(gfaItemPermanentWithdrawlDirect, HttpMethod.POST, requestEntity, GFAPwdResponse.class)).thenReturn(responseEntity);*/
-        /*GFAPwdResponse response = gfaLasService.gfaPermanentWithdrawlDirect(gfaPwdRequest);
-        assertNotNull(response);*/
-    }
-    @Test
-    public void gfaPermanentWithdrawlDirectException() {
-        GFAPwdRequest gfaPwdRequest = getGfaPwdRequest();
-       // gfaLasService.gfaPermanentWithdrawlDirect(gfaPwdRequest);
-    }
-    @Test
-    public void gfaPermanentWithdrawlInDirect() {
-        GFAPwiRequest gfaPwiRequest = getGFAPwiRequest();
-        GFAPwiResponse gfaPwiResponse = getGfaPwiResponse();
-        ResponseEntity<GFAPwiResponse> responseEntity = new ResponseEntity<>(gfaPwiResponse, HttpStatus.OK);
-        HttpEntity<GFAPwiRequest> requestEntity = new HttpEntity<>(gfaPwiRequest, getHttpHeaders());
-        //Mockito.when(gfaService.getRestTemplate()).thenReturn(restTemplate);
-       /* Mockito.when(restTemplate.getRequestFactory()).thenReturn(simpleClientHttpRequestFactory);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setConnectTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.doNothing().when(simpleClientHttpRequestFactory).setReadTimeout(gfaServerResponseTimeOutMilliseconds);
-        Mockito.when(restTemplate.exchange(gfaItemPermanentWithdrawlInDirect, HttpMethod.POST, requestEntity, GFAPwiResponse.class)).thenReturn(responseEntity);*/
-        //GFAPwiResponse response = gfaLasService.gfaPermanentWithdrawlInDirect(gfaPwiRequest);
-        //assertNotNull(response);
-    }
-    @Test
-    public void gfaPermanentWithdrawlInDirectException() {
-        GFAPwiRequest gfaPwiRequest = getGFAPwiRequest();
-        //gfaLasService.gfaPermanentWithdrawlInDirect(gfaPwiRequest);
-    }
+
     @Test
     public void processLASRetrieveResponse() throws Exception {
         GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
-        ResponseEntity<GFARetrieveItemResponse> responseEntity = new ResponseEntity<>(gfaRetrieveItemResponse, HttpStatus.OK);
-        JsonObject object = new JsonObject();
+        JSONObject object = new JSONObject(gfaRetrieveItemResponse);
         String body = object.toString();
-        gfaLasService.processLASRetrieveResponse(body);
+        Mockito.when(ReflectionTestUtils.invokeMethod(gfaLasServiceUtil, "getLASRetrieveResponse", gfaRetrieveItemResponse)).thenReturn(gfaRetrieveItemResponse);
+        ItemInformationResponse itemInformationResponse = gfaLasService.processLASRetrieveResponse(body);
+        assertNotNull(itemInformationResponse);
     }
+
+    @Test
+    public void processLASRetrieveResponseFailure() throws Exception {
+        GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
+        gfaRetrieveItemResponse.setSuccess(false);
+        JSONObject object = new JSONObject(gfaRetrieveItemResponse);
+        String body = object.toString();
+        Mockito.when(ReflectionTestUtils.invokeMethod(gfaLasServiceUtil, "getLASRetrieveResponse", gfaRetrieveItemResponse)).thenReturn(gfaRetrieveItemResponse);
+        ItemInformationResponse itemInformationResponse = gfaLasService.processLASRetrieveResponse(body);
+        assertNotNull(itemInformationResponse);
+    }
+
+    @Test
+    public void processLASRetrieveResponseException() throws Exception {
+        GFARetrieveItemResponse gfaRetrieveItemResponse = getGfaRetrieveItemResponse();
+        JSONObject object = new JSONObject(gfaRetrieveItemResponse);
+        String body = object.toString();
+        ItemInformationResponse itemInformationResponse = gfaLasService.processLASRetrieveResponse(body);
+        assertNotNull(itemInformationResponse);
+    }
+
     @Test
     public void processLASEDDRetrieveResponse() throws JsonProcessingException {
-        RetrieveItemEDDRequest retrieveItemEDDRequest = new RetrieveItemEDDRequest();
-        JsonObject object = new JsonObject();
-        String body = object.toString() ;
-        GFAEddItemResponse gfaEddItemResponse = new GFAEddItemResponse();
-        gfaEddItemResponse.setScreenMessage("Success");
-        gfaEddItemResponse.setSuccess(true);
-        TtitemEDDResponse ttitemEDDResponse = new TtitemEDDResponse();
-        ttitemEDDResponse.setCustomerCode("123456");
-        ttitemEDDResponse.setRequestId(1);
-        retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitemEDDResponse));
-        gfaEddItemResponse.setDsitem(retrieveItemEDDRequest);
+        GFAEddItemResponse gfaEddItemResponse = getGfaEddItemResponse();
+        gfaEddItemResponse.getDsitem().getTtitem().get(0).setErrorCode("");
+        JSONObject object = new JSONObject(gfaEddItemResponse);
+        String body = object.toString();
         gfaLasService.processLASEDDRetrieveResponse(body);
     }
+
     @Test
-    public void startPolling(){
+    public void processLASEDDRetrieveResponseFailure() throws JsonProcessingException {
+        GFAEddItemResponse gfaEddItemResponse = getGfaEddItemResponse();
+        JSONObject object = new JSONObject(gfaEddItemResponse);
+        String body = object.toString();
+        gfaLasService.processLASEDDRetrieveResponse(body);
+    }
+
+    @Test
+    public void processLASEDDRetrieveResponseException() throws JsonProcessingException {
+        JSONObject object = new JSONObject();
+        String body = object.toString();
+        gfaLasService.processLASEDDRetrieveResponse(body);
+    }
+
+    @Test
+    public void startPolling() {
         String barcode = "135621";
         String imsLocationCode = "PUL";
         CamelContext ctx = new DefaultCamelContext();
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
-        Mockito.when(lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(any(),any(),any())).thenReturn(gfaItemStatusCheckResponse);
-        gfaLasService.startPolling(barcode,imsLocationCode);
+        Mockito.when(lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(any(), any(), any())).thenReturn(gfaItemStatusCheckResponse);
+        gfaLasService.startPolling(barcode, imsLocationCode);
     }
     @Test
     public void startPollingException(){
@@ -1110,6 +806,20 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         requestItemEntity.setItemEntity(itemEntity);
         requestItemEntity.setNotes("test");
         return requestItemEntity;
+    }
+
+    private GFAEddItemResponse getGfaEddItemResponse() {
+        GFAEddItemResponse gfaEddItemResponse = new GFAEddItemResponse();
+        gfaEddItemResponse.setScreenMessage("Success");
+        gfaEddItemResponse.setSuccess(true);
+        RetrieveItemEDDRequest retrieveItemEDDRequest = new RetrieveItemEDDRequest();
+        TtitemEDDResponse ttitemEDDResponse = new TtitemEDDResponse();
+        ttitemEDDResponse.setCustomerCode("123456");
+        ttitemEDDResponse.setRequestId(1);
+        ttitemEDDResponse.setErrorCode("errorCode");
+        retrieveItemEDDRequest.setTtitem(Arrays.asList(ttitemEDDResponse));
+        gfaEddItemResponse.setDsitem(retrieveItemEDDRequest);
+        return gfaEddItemResponse;
     }
 
 }

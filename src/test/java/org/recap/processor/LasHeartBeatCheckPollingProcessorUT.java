@@ -13,20 +13,18 @@ import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
-import org.recap.callable.LasHeartBeatCheckPollingCallable;
 import org.recap.las.AbstractLASImsLocationConnector;
-import org.recap.las.LASImsLocationConnectorFactory;
-import org.recap.las.model.*;
-import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.las.GFALasService;
+import org.recap.las.LASImsLocationConnectorFactory;
+import org.recap.las.model.GFALasStatusCheckRequest;
+import org.recap.las.model.GFALasStatusCheckResponse;
+import org.recap.las.model.GFALasStatusDsItem;
+import org.recap.las.model.GFALasStatusTtItem;
+import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.util.ItemRequestServiceUtil;
 import org.recap.util.PropertyUtil;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -54,12 +52,13 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
     AbstractLASImsLocationConnector abstractLASImsLocationConnector;
 
     @Before
-    public void setup(){
+    public void setup() {
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn("1000");
     }
+
     @Test
-    public void pollLasHeartBeatResponse(){
-        ItemRequestInformation itemRequestInformation =getItemRequestInformation();
+    public void pollLasHeartBeatResponse() {
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
         exchange.getIn().setHeader("John", "PUL");
@@ -69,9 +68,10 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
         Mockito.when(abstractLASImsLocationConnector.heartBeatCheck(any(GFALasStatusCheckRequest.class))).thenReturn(gfaLasStatusCheckResponse);
         lasHeartBeatCheckPollingProcessor.pollLasHeartBeatResponse(exchange);
     }
+
     @Test
-    public void pollLasHeartBeatResponseWithoutImsLocation(){
-        ItemRequestInformation itemRequestInformation =getItemRequestInformation();
+    public void pollLasHeartBeatResponseWithoutImsLocation() {
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         itemRequestInformation.setImsLocationCode(null);
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
@@ -79,9 +79,10 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
         exchange.getIn().setBody(itemRequestInformation);
         lasHeartBeatCheckPollingProcessor.pollLasHeartBeatResponse(exchange);
     }
+
     @Test
-    public void pollLasHeartBeatResponseException(){
-        ItemRequestInformation itemRequestInformation =getItemRequestInformation();
+    public void pollLasHeartBeatResponseException() {
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
         exchange.getIn().setHeader("John", "PUL");
@@ -92,6 +93,17 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
         Mockito.doThrow(new NullPointerException()).when(producerTemplate).sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE_PREFIX + itemRequestInformation.getImsLocationCode() + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
         lasHeartBeatCheckPollingProcessor.pollLasHeartBeatResponse(exchange);
     }
+
+    @Test
+    public void pollLasHeartBeatResponseInterruptedException() throws Exception {
+        ItemRequestInformation itemRequestInformation = getItemRequestInformation();
+        CamelContext ctx = new DefaultCamelContext();
+        Exchange exchange = new DefaultExchange(ctx);
+        exchange.getIn().setHeader("John", "PUL");
+        exchange.getIn().setBody(itemRequestInformation);
+        lasHeartBeatCheckPollingProcessor.pollLasHeartBeatResponse(exchange);
+    }
+
     private ItemRequestInformation getItemRequestInformation() {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Arrays.asList("123"));
@@ -112,6 +124,7 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
         itemRequestInformation.setImsLocationCode("PA");
         return itemRequestInformation;
     }
+
     private GFALasStatusCheckResponse getGFALasStatusCheckResponse() {
         GFALasStatusCheckResponse gfaLasStatusCheckResponse = new GFALasStatusCheckResponse();
         GFALasStatusDsItem gfaLasStatusDsItem = new GFALasStatusDsItem();
@@ -121,6 +134,6 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
         gfaLasStatusTtItem.setScreenMessage("SUCCESS");
         gfaLasStatusDsItem.setTtitem(Arrays.asList(gfaLasStatusTtItem));
         gfaLasStatusCheckResponse.setDsitem(gfaLasStatusDsItem);
-        return  gfaLasStatusCheckResponse;
+        return gfaLasStatusCheckResponse;
     }
 }

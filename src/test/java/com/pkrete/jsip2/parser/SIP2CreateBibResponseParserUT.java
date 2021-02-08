@@ -2,13 +2,13 @@ package com.pkrete.jsip2.parser;
 
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseException;
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
-import org.junit.Test;
-import org.recap.BaseTestCase;
 import com.pkrete.jsip2.messages.SIP2MessageResponse;
+import org.junit.Test;
+import org.recap.BaseTestCaseUT;
 
 import static org.junit.Assert.assertNotNull;
 
-public class SIP2CreateBibResponseParserUT extends BaseTestCase {
+public class SIP2CreateBibResponseParserUT extends BaseTestCaseUT {
     @Test
     public void testCreatebibParser() {
         SIP2MessageResponse sIP2MessageResponse = null;

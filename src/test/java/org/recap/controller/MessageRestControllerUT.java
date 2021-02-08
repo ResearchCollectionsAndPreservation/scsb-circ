@@ -17,7 +17,7 @@ public class MessageRestControllerUT extends BaseTestCaseUT {
     MessageRestController messageRestController;
 
     String institutionCode = "{institutionCode : PUL}";
-    String institutionCodeJson = "{\"PUL\":\"PUL\"}";
+    String institutionCodeJson = "{institutionCode:{\"1\":\"PUL\", \"2\":\"CUL\", \"3\":\"NYPL\"}}";
     String imslocation = "{imslocation : PU}";
     @Before
     public void setup(){
@@ -25,16 +25,24 @@ public class MessageRestControllerUT extends BaseTestCaseUT {
         ReflectionTestUtils.setField(messageRestController, "imsLocation", imslocation);
     }
 
-    /*@Test
+    @Test
     public void getValue(){
-        String jString = "{\"PUL\": \"PUL\"}";
-        JSONObject jsonObject = new JSONObject(jString.toString());
-        String institutionCode = "PUL";
+        MessageRestController messageRestController1 = new MessageRestController();
+        String institutionCode = "institutionCode";
         ReflectionTestUtils.setField(messageRestController, "institution", institutionCodeJson);
-        Mockito.when(messageRestController.getValue(jsonObject.toString())).thenCallRealMethod();
-        Map<String, Object> result = messageRestController.getValue("PUL");
+        Mockito.when(messageRestController.getValue(institutionCode)).thenCallRealMethod();
+        Map<String, Object> result = messageRestController.getValue(institutionCode);
         assertNotNull(result);
-    }*/
+    }
+    @Test
+    public void getValueInstitutionProperty(){
+        String institutionCode = "institutionCode";
+        String institutionProperty = "1";
+        ReflectionTestUtils.setField(messageRestController, "institution", institutionCodeJson);
+        Mockito.when(messageRestController.getValue(institutionCode,institutionProperty)).thenCallRealMethod();
+        String result = messageRestController.getValue(institutionCode,institutionProperty);
+        assertNotNull(result);
+    }
     @Test
     public void getInsData(){
         Mockito.when(messageRestController.getInsData()).thenCallRealMethod();

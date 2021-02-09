@@ -33,7 +33,7 @@ public class CheckoutItem extends RecapNCIP {
     }
 
 
-    public CheckOutItemInitiationData getCheckOutItemInitiationData(String itemIdentifier, String patronIdentifier, String ncipAgencyId, String ncipScheme) {
+    public CheckOutItemInitiationData getCheckOutItemInitiationData(String itemIdentifier, String requestId, String patronIdentifier, String ncipAgencyId, String ncipScheme) {
         try {
             CheckOutItemInitiationData checkoutItemInitiationData = new CheckOutItemInitiationData();
             InitiationHeader initiationHeader = new InitiationHeader();
@@ -52,8 +52,8 @@ public class CheckoutItem extends RecapNCIP {
             ItemId itemId = new ItemId();
             itemId.setItemIdentifierValue(itemIdentifier);
 
-            RequestId requestId = new RequestId();
-            requestId.setRequestIdentifierValue((Integer.valueOf(RandomUtils.nextInt(100000,100000000)).toString()));
+            RequestId requestIdentifier = new RequestId();
+            requestIdentifier.setRequestIdentifierValue(requestId);
 
             Calendar cal = new GregorianCalendar();
 
@@ -62,7 +62,7 @@ public class CheckoutItem extends RecapNCIP {
             checkoutItemInitiationData.setInitiationHeader(initiationHeader);
             checkoutItemInitiationData.setItemId(itemId);
             checkoutItemInitiationData.setUserId(userid);
-            checkoutItemInitiationData.setRequestId(requestId);
+            checkoutItemInitiationData.setRequestId(requestIdentifier);
             checkoutItemInitiationData.setDesiredDateDue((GregorianCalendar) cal);
             return checkoutItemInitiationData;
         } catch (Exception e) {

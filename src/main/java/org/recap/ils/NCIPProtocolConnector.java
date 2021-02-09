@@ -67,6 +67,9 @@ import java.util.HashMap;
 @Slf4j
 public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
+    private String ncipRequest = "NCIP2 request sent: ";
+    private String ncipResponse = "NCIP2 response received: ";
+
     @Autowired
     RestApiResponseUtil restApiResponseUtil;
 
@@ -149,8 +152,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
 
     public String getApiUrl(String itemIdentifier) {
-        String restApi = getRestDataApiUrl() + "/items?item_barcode=" + itemIdentifier;
-        return restApi;
+        return  getRestDataApiUrl() + "/items?item_barcode=" + itemIdentifier;
     }
 
     @Override
@@ -194,7 +196,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public ItemCheckoutResponse checkOutItem(String itemIdentifier, String patronIdentifier) {
+    public ItemCheckoutResponse checkOutItem(String itemIdentifier, String requestId, String patronIdentifier) {
         log.info("Item barcode {} received for a checkout in " + getInstitution() + "for patron {}", itemIdentifier, patronIdentifier);
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         String responseString = null;
@@ -202,7 +204,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         try {
             CheckoutItem checkoutItem = new CheckoutItem();
 
-            CheckOutItemInitiationData checkOutItemInitiationData = checkoutItem.getCheckOutItemInitiationData(itemIdentifier, patronIdentifier, getNcipAgencyId(), getNcipScheme());
+            CheckOutItemInitiationData checkOutItemInitiationData = checkoutItem.getCheckOutItemInitiationData(itemIdentifier, requestId, patronIdentifier, getNcipAgencyId(), getNcipScheme());
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, checkOutItemInitiationData);
             String requestBody = IOUtils.toString(requestMessageStream, StandardCharsets.UTF_8);
@@ -213,11 +215,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             HttpResponse response = client.execute(request);
 
             HttpEntity entity = response.getEntity();
-            responseString = EntityUtils.toString((org.apache.http.HttpEntity) entity, "UTF-8");
+            responseString = EntityUtils.toString( entity, StandardCharsets.UTF_8);
 
-            log.info("NCIP2 request sent: ");
+            log.info(ncipRequest);
             log.info(requestBody);
-            log.info("NCIP2 response received: ");
+            log.info(ncipResponse);
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
@@ -284,11 +286,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             HttpResponse response = client.execute(request);
 
             HttpEntity entity = response.getEntity();
-            responseString = EntityUtils.toString((org.apache.http.HttpEntity) entity, "UTF-8");
+            responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
 
-            log.info("NCIP2 request sent: ");
+            log.info(ncipRequest);
             log.info(requestBody);
-            log.info("NCIP2 response received: ");
+            log.info(ncipResponse);
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
@@ -329,7 +331,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public Object placeHold(String itemIdentifier, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
+    public Object placeHold(String itemIdentifier, String requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
         log.info("Item barcode {} received for hold request in " + itemInstitutionId + " for patron {}", itemIdentifier, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         String responseString = null;
@@ -337,7 +339,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
         try {
             AcceptItem acceptItem = new AcceptItem();
-            AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber, getNcipAgencyId(), getNcipScheme());
+            AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber, getNcipAgencyId(), getNcipScheme());
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             String requestBody = acceptItem.getRequestBody(ncipToolkitUtil, acceptItemInitiationData);
             log.info("AcceptItem Request Body >>> " + requestBody);
@@ -349,12 +351,12 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             HttpResponse response = client.execute(request);
 
             HttpEntity entity = response.getEntity();
-            responseString = EntityUtils.toString((org.apache.http.HttpEntity) entity, "UTF-8");
+            responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
 
 
-            log.info("NCIP2 request sent: ");
+            log.info(ncipRequest);
             log.info(requestBody);
-            log.info("NCIP2 response received: ");
+            log.info(ncipResponse);
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
@@ -402,14 +404,14 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public Object cancelHold(String itemIdentifier, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId) {
+    public Object cancelHold(String itemIdentifier, String patronIdentifier, String requestId, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId) {
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         String responseString = null;
         JSONObject responseObject = new JSONObject();
 
         try {
             CancelRequestItem cancelRequestItem = new CancelRequestItem();
-            CancelRequestItemInitiationData cancelRequestItemInitiationData = cancelRequestItem.getCancelRequestItemInitiationData(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId, getNcipAgencyId(), getNcipScheme());
+            CancelRequestItemInitiationData cancelRequestItemInitiationData = cancelRequestItem.getCancelRequestItemInitiationData(itemIdentifier, requestId, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId, getNcipAgencyId(), getNcipScheme());
 
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, cancelRequestItemInitiationData);
@@ -420,11 +422,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             HttpResponse response = client.execute(request);
 
             HttpEntity entity = response.getEntity();
-            responseString = EntityUtils.toString((org.apache.http.HttpEntity) entity, "UTF-8");
+            responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
 
-            log.info("NCIP2 request sent: ");
+            log.info(ncipRequest);
             log.info(requestBody);
-            log.info("NCIP2 response received: ");
+            log.info(ncipResponse);
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
@@ -492,11 +494,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             HttpResponse response = client.execute(request);
 
             HttpEntity entity = response.getEntity();
-            responseString = EntityUtils.toString((org.apache.http.HttpEntity) entity, "UTF-8");
+            responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
 
-            log.info("NCIP2 request sent: ");
+            log.info(ncipRequest);
             log.info(requestBody);
-            log.info("NCIP2 response received: ");
+            log.info(ncipResponse);
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
@@ -561,11 +563,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             HttpUriRequest request = getHttpRequest(requestBody);
             HttpResponse response = client.execute(request);
             HttpEntity entity = response.getEntity();
-            responseString = EntityUtils.toString((org.apache.http.HttpEntity) entity, "UTF-8");
+            responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
 
-            log.info("NCIP2 request sent: ");
+            log.info(ncipRequest);
             log.info(requestBody);
-            log.info("NCIP2 response received: ");
+            log.info(ncipResponse);
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
@@ -615,7 +617,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     public HttpUriRequest getHttpRequest(String requestBody) {
         return RequestBuilder.post()
                 .setUri(getEndPointUrl())
-                .setEntity(new StringEntity(requestBody, "UTF-8"))
+                .setEntity(new StringEntity(requestBody, StandardCharsets.UTF_8))
                 .setHeader("Content-Type", "application/xml")
                 .build();
     }

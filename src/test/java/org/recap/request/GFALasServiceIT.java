@@ -2,6 +2,7 @@ package org.recap.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.recap.ScsbCircApplication;
@@ -31,6 +32,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ScsbCircApplication.class)
 @Slf4j
+@Ignore
 public class GFALasServiceIT {
 
     @Value("${gfa.item.status}")

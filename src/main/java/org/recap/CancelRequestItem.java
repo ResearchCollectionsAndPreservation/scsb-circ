@@ -1,0 +1,142 @@
+package org.recap;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
+import org.extensiblecatalog.ncip.v2.service.*;
+import org.json.JSONObject;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+
+@Slf4j
+public class CancelRequestItem extends RecapNCIP {
+
+    private String requestIdString;
+    private String useridString;
+    private String itemIdString;
+    private String pickupLocationString;
+    protected String toAgency;
+    protected String fromAgency;
+    private String requestTypeString;
+    private String applicationProfileTypeString;
+    private HashMap<String, HashMap> itemOptionalFields = new HashMap<String, HashMap>();
+
+    public CancelRequestItem() {
+    }
+
+    public org.recap.CancelRequestItem setRequestType(String action) {
+        requestTypeString = action;
+        return this;
+    }
+
+    public org.recap.CancelRequestItem setApplicationProfileType(String profileType) {
+        applicationProfileTypeString = profileType;
+        return this;
+    }
+
+    public org.recap.CancelRequestItem setItemId(String itemId) {
+        itemIdString = itemId;
+        return this;
+    }
+
+    public org.recap.CancelRequestItem setRequestId(String requestId) {
+        requestIdString = requestId;
+        return this;
+    }
+
+    public org.recap.CancelRequestItem setUserId(String userId) {
+        useridString = userId;
+        return this;
+    }
+
+
+    public org.recap.CancelRequestItem setToAgency(String toAgency) {
+        this.toAgency = toAgency;
+        return this;
+    }
+
+    public org.recap.CancelRequestItem setFromAgency(String fromAgency) {
+        this.fromAgency = fromAgency;
+        return this;
+    }
+
+    public org.recap.CancelRequestItem setRequestTypeString(String actionType) {
+        this.requestTypeString = actionType;
+        return this;
+    }
+
+    // Convenience methods
+    public org.recap.CancelRequestItem setTitle(String title) {
+        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(RecapConstants.TITLE, title);
+        return this;
+    }
+
+    public String getFromAgency() {
+        return fromAgency;
+    }
+
+    public String getToAgency() {
+        return toAgency;
+    }
+
+    public String getRequestId() {
+        return requestIdString;
+    }
+
+    public String getItemId() {
+        return itemIdString;
+    }
+
+    public String getUserId() {
+        return useridString;
+    }
+
+    public String getRequestTypeString() {
+        return requestTypeString;
+    }
+
+    public CancelRequestItemInitiationData getCancelRequestItemInitiationData(String itemIdentifier, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String ncipAgencyId, String ncipScheme) {
+
+        CancelRequestItemInitiationData cancelRequestItemInitiationData = new CancelRequestItemInitiationData();
+        InitiationHeader initiationHeader = new InitiationHeader();
+        ApplicationProfileType applicationProfileType = getApplicationProfileType();
+        initiationHeader.setApplicationProfileType(applicationProfileType);
+        ToAgencyId toAgencyId = new ToAgencyId();
+        toAgencyId.setAgencyId(new AgencyId(ncipScheme, ncipAgencyId));
+        FromAgencyId fromAgencyId = new FromAgencyId();
+        fromAgencyId.setAgencyId(new AgencyId(ncipScheme, ncipAgencyId));
+        initiationHeader.setToAgencyId(toAgencyId);
+        initiationHeader.setFromAgencyId(fromAgencyId);
+        cancelRequestItemInitiationData.setInitiationHeader(initiationHeader);
+        RequestId requestId = new RequestId();
+        requestId.setRequestIdentifierValue("requestId2");
+        RequestType requestType = new RequestType(null, RecapConstants.HOLD);
+        UserId userid = new UserId();
+        userid.setUserIdentifierValue(patronIdentifier);
+        cancelRequestItemInitiationData.setUserId(userid);
+        cancelRequestItemInitiationData.setInitiationHeader(initiationHeader);
+        cancelRequestItemInitiationData.setRequestId(requestId);
+        cancelRequestItemInitiationData.setRequestType(requestType);
+
+        return cancelRequestItemInitiationData;
+
+    }
+
+    public JSONObject getCancelRequestItemResponse(CancelRequestItemResponseData cancelRequestItemResponseData) {
+
+        JSONObject returnJson = new JSONObject();
+
+        if (!cancelRequestItemResponseData.getProblems().isEmpty()) {
+            return generateNcipProblems(cancelRequestItemResponseData);
+        }
+
+        String itemId = cancelRequestItemResponseData.getItemId().getItemIdentifierValue();
+        String requestId = cancelRequestItemResponseData.getRequestId().getRequestIdentifierValue();
+        returnJson.put(RecapConstants.ITEM_ID, itemId);
+        returnJson.put(RecapConstants.REQUEST_ID, requestId);
+        return returnJson;
+    }
+}
+

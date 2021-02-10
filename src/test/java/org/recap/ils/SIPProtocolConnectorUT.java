@@ -56,7 +56,7 @@ public class SIPProtocolConnectorUT {
         SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
         loginResponse.setOk(true);
         //PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
-        PowerMockito.when(sipProtocolConnector,"getSocketConnection").thenReturn(sip2SocketConnection);
+        PowerMockito.when(sipProtocolConnector, "getSocketConnection").thenReturn(sip2SocketConnection);
         Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2ItemInformationRequest.class))).thenReturn(sip2ItemInformationResponse);
         sipProtocolConnector.lookupItem(itemIdentifier);
@@ -66,6 +66,7 @@ public class SIPProtocolConnectorUT {
     public void checkOutItem() throws Exception {
         String itemIdentifier = "1456883";
         String patronIdentifier = "123456";
+        Integer requestId = 2;
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
         sipProtocolConnector.setInstitution("PUL");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
@@ -74,12 +75,12 @@ public class SIPProtocolConnectorUT {
         SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
         loginResponse.setOk(true);
         PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
-        Mockito.doReturn(Boolean.TRUE).when(sipProtocolConnector).jSIPLogin(any(),any());
+        Mockito.doReturn(Boolean.TRUE).when(sipProtocolConnector).jSIPLogin(any(), any());
         Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
         Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2SCStatusRequest.class))).thenReturn(sip2ACSStatusResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2CheckoutRequest.class))).thenReturn(sip2CheckoutResponse);
-        sipProtocolConnector.checkOutItem(itemIdentifier,patronIdentifier);
+        sipProtocolConnector.checkOutItem(itemIdentifier, requestId, patronIdentifier);
     }
 
     @Test
@@ -98,7 +99,7 @@ public class SIPProtocolConnectorUT {
         Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2SCStatusRequest.class))).thenReturn(sip2ACSStatusResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2CheckinRequest.class))).thenReturn(sip2CheckinResponse);
-        sipProtocolConnector.checkInItem(itemIdentifier,patronIdentifier);
+        sipProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
     }
 
     @Test
@@ -114,6 +115,7 @@ public class SIPProtocolConnectorUT {
         String title = "Y90223";
         String author = "john";
         String callNumber = "54956";
+        Integer requestId = 2;
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
         sipProtocolConnector.setInstitution("PUL");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
@@ -128,8 +130,9 @@ public class SIPProtocolConnectorUT {
         Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2HoldRequest.class))).thenReturn(sip2HoldResponse);
-        sipProtocolConnector.placeHold(itemIdentifier, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
+        sipProtocolConnector.placeHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
     }
+
     @Test
     public void cancelHold() throws Exception {
         String itemIdentifier = "223467";
@@ -137,6 +140,7 @@ public class SIPProtocolConnectorUT {
         String institutionId = "2";
         String expirationDate = new Date().toString();
         String bibId = "357221";
+        Integer requestId = 2;
         String pickupLocation = "PA";
         String trackingId = "67878890";
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
@@ -153,8 +157,9 @@ public class SIPProtocolConnectorUT {
         Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2HoldRequest.class))).thenReturn(sip2HoldResponse);
-        sipProtocolConnector.cancelHold(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
+        sipProtocolConnector.cancelHold(itemIdentifier, requestId, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
     }
+
     @Test
     public void createBib() throws Exception {
         String itemIdentifier = "223467";
@@ -177,6 +182,7 @@ public class SIPProtocolConnectorUT {
         Mockito.when(sip2SocketConnection.send(any(SIP2CreateBibRequest.class))).thenReturn(sip2CreateBibResponse);
         sipProtocolConnector.createBib(itemIdentifier, patronIdentifier, institutionId, titleIdentifier);
     }
+
     @Test
     public void lookupPatron() throws Exception {
         String patronIdentifier = "132456";
@@ -192,6 +198,7 @@ public class SIPProtocolConnectorUT {
         Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
         sipProtocolConnector.lookupPatron(patronIdentifier);
     }
+
     @Test
     public void recallItem() throws Exception {
         String itemIdentifier = "223467";
@@ -223,7 +230,7 @@ public class SIPProtocolConnectorUT {
         sipProtocolConnector.refileItem(itemIdentifier);
     }
 
-    private SIP2RecallResponse getSIP2RecallResponse(){
+    private SIP2RecallResponse getSIP2RecallResponse() {
         SIP2RecallResponse sip2RecallResponse = new SIP2RecallResponse("940");
         sip2RecallResponse.setBibId("325465");
         sip2RecallResponse.setCode("code");
@@ -234,7 +241,8 @@ public class SIPProtocolConnectorUT {
         sip2RecallResponse.setPatronIdentifier("2345656");
         return sip2RecallResponse;
     }
-    private SIP2PatronInformationResponse getSIP2PatronInformationResponse(){
+
+    private SIP2PatronInformationResponse getSIP2PatronInformationResponse() {
         SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
         sip2PatronInformationResponse.setValidPatron(true);
         sip2PatronInformationResponse.setValidPatronPassword(true);
@@ -249,7 +257,8 @@ public class SIPProtocolConnectorUT {
         sip2PatronInformationResponse.setBibId("1");
         return sip2PatronInformationResponse;
     }
-    private SIP2CreateBibResponse getSIP2CreateBibResponse(){
+
+    private SIP2CreateBibResponse getSIP2CreateBibResponse() {
         SIP2CreateBibResponse sip2CreateBibResponse = new SIP2CreateBibResponse("940");
         sip2CreateBibResponse.setBibId("1");
         sip2CreateBibResponse.setCheckSum("checksum");
@@ -260,7 +269,8 @@ public class SIPProtocolConnectorUT {
         sip2CreateBibResponse.setScreenMessage(Arrays.asList("Success"));
         return sip2CreateBibResponse;
     }
-    private SIP2HoldResponse getSIP2HoldResponse(){
+
+    private SIP2HoldResponse getSIP2HoldResponse() {
         SIP2HoldResponse sip2HoldResponse = new SIP2HoldResponse("940");
         sip2HoldResponse.setCode("code");
         sip2HoldResponse.setAvailable(true);
@@ -272,7 +282,8 @@ public class SIPProtocolConnectorUT {
         sip2HoldResponse.setMediaType(MediaType.OTHER);
         return sip2HoldResponse;
     }
-    private SIP2CheckinResponse getSIP2CheckinResponse(){
+
+    private SIP2CheckinResponse getSIP2CheckinResponse() {
         SIP2CheckinResponse sip2CheckinResponse = new SIP2CheckinResponse("940");
         sip2CheckinResponse.setCheckSum("test");
         sip2CheckinResponse.setCode("code");
@@ -287,7 +298,8 @@ public class SIPProtocolConnectorUT {
         sip2CheckinResponse.setAlert(true);
         return sip2CheckinResponse;
     }
-    private SIP2CheckoutResponse getSIP2CheckoutResponse(){
+
+    private SIP2CheckoutResponse getSIP2CheckoutResponse() {
         SIP2CheckoutResponse sip2CheckoutResponse = new SIP2CheckoutResponse("940");
         sip2CheckoutResponse.setCheckSum("check");
         sip2CheckoutResponse.setCode("code");
@@ -306,7 +318,8 @@ public class SIPProtocolConnectorUT {
         sip2CheckoutResponse.setScreenMessage(Arrays.asList("Success"));
         return sip2CheckoutResponse;
     }
-    private SIP2ACSStatusResponse getSIP2ACSStatusResponse(){
+
+    private SIP2ACSStatusResponse getSIP2ACSStatusResponse() {
         SIP2ACSStatusResponse sip2ACSStatusResponse = new SIP2ACSStatusResponse("940");
         sip2ACSStatusResponse.setCheckoutOk(true);
         sip2ACSStatusResponse.setCheckinOk(true);
@@ -316,8 +329,9 @@ public class SIPProtocolConnectorUT {
         sip2ACSStatusResponse.setSupportedMessages(supportedMessages);
         return sip2ACSStatusResponse;
     }
-    private SIP2ItemInformationResponse getSIP2ItemInformationResponse(){
-        SIP2ItemInformationResponse sip2ItemInformationResponse =new SIP2ItemInformationResponse("940");
+
+    private SIP2ItemInformationResponse getSIP2ItemInformationResponse() {
+        SIP2ItemInformationResponse sip2ItemInformationResponse = new SIP2ItemInformationResponse("940");
         sip2ItemInformationResponse.setCirculationStatus(CirculationStatus.AVAILABLE);
         sip2ItemInformationResponse.setHoldPickupDate(new Date().toString());
         sip2ItemInformationResponse.setOwner("test");
@@ -342,6 +356,7 @@ public class SIPProtocolConnectorUT {
         sip2ItemInformationResponse.setTitleIdentifier("test");
         return sip2ItemInformationResponse;
     }
+
     private ILSConfigProperties getIlsConfigProperties() {
         ILSConfigProperties ilsConfigProperties = new ILSConfigProperties();
         ilsConfigProperties.setHost("libserv86.princeton.edu");

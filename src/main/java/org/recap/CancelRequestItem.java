@@ -34,6 +34,7 @@ public class CancelRequestItem extends RecapNCIP {
     private HashMap<String, HashMap> itemOptionalFields = new HashMap<String, HashMap>();
 
     public CancelRequestItem() {
+        itemOptionalFields.put(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION, new HashMap<String, String>());
     }
 
     public org.recap.CancelRequestItem setRequestType(String action) {

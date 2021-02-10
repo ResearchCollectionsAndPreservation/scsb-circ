@@ -197,6 +197,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
     public void checkOutItem() throws Exception {
         String itemIdentifier = "236784";
         String patronIdentifier = "234673";
+        Integer requestId = 2;
         CheckoutRequest checkoutRequest = new CheckoutRequest();
         checkoutRequest.setPatronBarcode(patronIdentifier);
         checkoutRequest.setItemBarcode(itemIdentifier);
@@ -212,7 +213,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.<Class<CheckoutResponse>>any());
         when(restApiResponseUtil.buildItemCheckoutResponse(checkoutResponse)).thenReturn(new ItemCheckoutResponse());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(getJobResponse());
-        ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier, patronIdentifier);
+        ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier, requestId, patronIdentifier);
         assertNotNull(response);
     }
 
@@ -220,6 +221,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
     public void checkOutItemWithoutJobData() throws Exception {
         String itemIdentifier = "236784";
         String patronIdentifier = "234673";
+        Integer requestId = 2;
         CheckoutRequest checkoutRequest = new CheckoutRequest();
         checkoutRequest.setPatronBarcode(patronIdentifier);
         checkoutRequest.setItemBarcode(itemIdentifier);
@@ -235,7 +237,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.<Class<CheckoutResponse>>any());
         when(restApiResponseUtil.buildItemCheckoutResponse(checkoutResponse)).thenReturn(new ItemCheckoutResponse());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
-        ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier, patronIdentifier);
+        ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier, requestId, patronIdentifier);
         assertNotNull(response);
     }
 
@@ -243,6 +245,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
     public void checkOutItemHttpClientErrorException() throws Exception {
         String itemIdentifier = "236784";
         String patronIdentifier = "234673";
+        Integer requestId = 2;
         CheckoutRequest checkoutRequest = new CheckoutRequest();
         checkoutRequest.setPatronBarcode(patronIdentifier);
         checkoutRequest.setItemBarcode(itemIdentifier);
@@ -254,7 +257,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CheckoutResponse>>any());
-        ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier, patronIdentifier);
+        ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier, requestId, patronIdentifier);
         assertNotNull(response);
     }
 
@@ -262,7 +265,8 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
     public void checkOutItemException() throws Exception {
         String itemIdentifier = "236784";
         String patronIdentifier = "234673";
-        ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier, patronIdentifier);
+        Integer requestId = 2;
+        ItemCheckoutResponse response = restProtocolConnector.checkOutItem(itemIdentifier, requestId, patronIdentifier);
         assertNotNull(response);
     }
 
@@ -336,6 +340,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         String patronIdentifier = "234673";
         String callInstitutionId = "1";
         String itemInstitutionId = "1";
+        Integer requestId = 2;
         String expirationDate = new Date().toString();
         String bibId = "2445566";
         String deliveryLocation = "PA";
@@ -360,7 +365,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
         when(restApiResponseUtil.buildItemHoldResponse(any())).thenReturn(new ItemHoldResponse());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(getJobResponse());
-        AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
+        AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
         assertNotNull(responseItem);
     }
 
@@ -377,6 +382,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         String title = "test";
         String author = "test";
         String callNumber = "25578";
+        Integer requestId = 2;
         CreateHoldResponse createHoldResponse = getCreateHoldResponse();
         NYPLHoldResponse nyplHoldResponse = getNyplHoldResponse();
         ResponseEntity<CreateHoldResponse> responseEntity = new ResponseEntity<>(createHoldResponse, HttpStatus.OK);
@@ -394,7 +400,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
         when(restApiResponseUtil.buildItemHoldResponse(any())).thenReturn(new ItemHoldResponse());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
-        AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
+        AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
         assertNotNull(responseItem);
     }
 
@@ -411,6 +417,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         String title = "test";
         String author = "test";
         String callNumber = "25578";
+        Integer requestId = 2;
         CreateHoldResponse createHoldResponse = getCreateHoldResponse();
         ResponseEntity<CreateHoldResponse> responseEntity = new ResponseEntity<>(createHoldResponse, HttpStatus.OK);
         doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST)).when(restTemplate).exchange(
@@ -419,7 +426,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CheckinResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
+        AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
         assertNotNull(responseItem);
     }
 
@@ -436,13 +443,15 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         String title = "test";
         String author = "test";
         String callNumber = "25578";
-        AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
+        Integer requestId = 2;
+        AbstractResponseItem responseItem = restProtocolConnector.placeHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, trackingId, title, author, callNumber);
         assertNotNull(responseItem);
     }
 
     @Test
     public void placeHoldWithoutTrackingId() throws Exception {
         String itemIdentifier = "236784";
+        Integer requestId = 2;
         String patronIdentifier = "234673";
         String callInstitutionId = "1";
         String itemInstitutionId = "1";
@@ -477,12 +486,13 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 Mockito.eq(HttpMethod.POST),
                 ArgumentMatchers.<HttpEntity<NyplHoldRequest>>any(),
                 ArgumentMatchers.<Class<NYPLHoldResponse>>any());
-        restProtocolConnector.placeHold(itemIdentifier, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, "", title, author, callNumber);
+        restProtocolConnector.placeHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, deliveryLocation, "", title, author, callNumber);
     }
 
     @Test
     public void cancelHold() throws Exception {
         String itemIdentifier = "236784";
+        Integer requestId = 2;
         String patronIdentifier = "234673";
         String institutionId = "1";
         String expirationDate = new Date().toString();
@@ -500,13 +510,14 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         when(restApiResponseUtil.buildItemCancelHoldResponse(any())).thenReturn(new ItemHoldResponse());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(getJobResponse());
         when(restApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenReturn("2");
-        AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
+        AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier, requestId, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
         assertNotNull(responseItem);
     }
 
     @Test
     public void cancelHoldWithoutJobId() throws Exception {
         String itemIdentifier = "236784";
+        Integer requestId = 2;
         String patronIdentifier = "234673";
         String institutionId = "1";
         String expirationDate = new Date().toString();
@@ -524,13 +535,14 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         when(restApiResponseUtil.buildItemCancelHoldResponse(any())).thenReturn(new ItemHoldResponse());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
         when(restApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenReturn("2");
-        AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
+        AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier, requestId, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
         assertNotNull(responseItem);
     }
 
     @Test
     public void cancelHoldHttpClientErrorException() throws Exception {
         String itemIdentifier = "236784";
+        Integer requestId = 2;
         String patronIdentifier = "234673";
         String institutionId = "1";
         String expirationDate = new Date().toString();
@@ -546,20 +558,21 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.<Class<CancelHoldResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
         when(restApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemIdentifier)).thenReturn("2");
-        AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
+        AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier, requestId, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
         assertNotNull(responseItem);
     }
 
     @Test
     public void cancelHoldException() throws Exception {
         String itemIdentifier = "236784";
+        Integer requestId = 2;
         String patronIdentifier = "234673";
         String institutionId = "1";
         String expirationDate = new Date().toString();
         String bibId = "2445566";
         String pickupLocation = "PA";
         String trackingId = "543587";
-        AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
+        AbstractResponseItem responseItem = restProtocolConnector.cancelHold(itemIdentifier, requestId, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId);
         assertNotNull(responseItem);
     }
 

@@ -49,7 +49,7 @@ public abstract class AbstractProtocolConnector {
      * @param patronIdentifier the patron identifier
      * @return the object
      */
-    public abstract Object checkOutItem(String itemIdentifier, String requestId, String patronIdentifier);
+    public abstract Object checkOutItem(String itemIdentifier, Integer requestId, String patronIdentifier);
 
     /**
      * Check in item object.
@@ -76,7 +76,7 @@ public abstract class AbstractProtocolConnector {
      * @param callNumber        the call number
      * @return the object
      */
-    public abstract Object placeHold(String itemIdentifier, String requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber);
+    public abstract Object placeHold(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber);
 
     /**
      * Cancel hold object.
@@ -90,7 +90,7 @@ public abstract class AbstractProtocolConnector {
      * @param trackingId       the tracking id
      * @return the object
      */
-    public abstract Object cancelHold(String itemIdentifier, String requestId, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId);
+    public abstract Object cancelHold(String itemIdentifier, Integer requestId, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId);
 
     /**
      * Create bib object.

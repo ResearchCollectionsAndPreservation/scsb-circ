@@ -196,7 +196,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public ItemCheckoutResponse checkOutItem(String itemIdentifier, String requestId, String patronIdentifier) {
+    public ItemCheckoutResponse checkOutItem(String itemIdentifier, Integer requestId, String patronIdentifier) {
         log.info("Item barcode {} received for a checkout in " + getInstitution() + "for patron {}", itemIdentifier, patronIdentifier);
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         String responseString = null;
@@ -331,7 +331,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public Object placeHold(String itemIdentifier, String requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
+    public Object placeHold(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
         log.info("Item barcode {} received for hold request in " + itemInstitutionId + " for patron {}", itemIdentifier, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         String responseString = null;
@@ -404,7 +404,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public Object cancelHold(String itemIdentifier, String patronIdentifier, String requestId, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId) {
+    public Object cancelHold(String itemIdentifier, Integer requestId, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId) {
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         String responseString = null;
         JSONObject responseObject = new JSONObject();

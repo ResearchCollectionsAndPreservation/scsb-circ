@@ -33,7 +33,7 @@ public class CheckoutItem extends RecapNCIP {
     }
 
 
-    public CheckOutItemInitiationData getCheckOutItemInitiationData(String itemIdentifier, String requestId, String patronIdentifier, String ncipAgencyId, String ncipScheme) {
+    public CheckOutItemInitiationData getCheckOutItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String ncipAgencyId, String ncipScheme) {
         try {
             CheckOutItemInitiationData checkoutItemInitiationData = new CheckOutItemInitiationData();
             InitiationHeader initiationHeader = new InitiationHeader();
@@ -53,7 +53,12 @@ public class CheckoutItem extends RecapNCIP {
             itemId.setItemIdentifierValue(itemIdentifier);
 
             RequestId requestIdentifier = new RequestId();
-            requestIdentifier.setRequestIdentifierValue(requestId);
+            if(requestId != null) {
+                requestIdentifier.setRequestIdentifierValue(requestId.toString());
+            }
+            else {
+                requestIdentifier.setRequestIdentifierValue((Integer.valueOf(RandomUtils.nextInt(100000,100000000)).toString()));
+            }
 
             Calendar cal = new GregorianCalendar();
 

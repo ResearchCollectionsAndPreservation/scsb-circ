@@ -150,7 +150,7 @@ public class AcceptItem extends RecapNCIP {
         return (String) this.itemOptionalFields.get(RecapConstants.ITEM_DESCRIPTION).get(RecapConstants.CALL_NUMBER);
     }
 
-    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, String requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String title, String author, String callNumber, String ncipAgencyId, String ncipScheme)  {
+    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String title, String author, String callNumber, String ncipAgencyId, String ncipScheme)  {
         AcceptItemInitiationData acceptItemInitationData = new AcceptItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
         ApplicationProfileType applicationProfileType = getApplicationProfileType();
@@ -163,7 +163,12 @@ public class AcceptItem extends RecapNCIP {
         initiationHeader.setFromAgencyId(fromAgencyId);
         acceptItemInitationData.setInitiationHeader(initiationHeader);
         RequestId requestIdentifier = new RequestId();
-        requestIdentifier.setRequestIdentifierValue(requestId);
+        if(requestId != null) {
+            requestIdentifier.setRequestIdentifierValue(requestIdentifier.toString());
+        }
+        else {
+            requestIdentifier.setRequestIdentifierValue((Integer.valueOf(RandomUtils.nextInt(100000,100000000)).toString()));
+        }
         RequestedActionType requestActionType = new RequestedActionType(null, "Hold For Pickup");
         UserId userid = new UserId();
         userid.setUserIdentifierValue(patronIdentifier);

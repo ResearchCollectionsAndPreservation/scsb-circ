@@ -207,7 +207,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public AbstractResponseItem checkOutItem(String itemIdentifier, String requestId, String patronIdentifier) {
+    public AbstractResponseItem checkOutItem(String itemIdentifier, Integer requestId, String patronIdentifier) {
         SIP2SocketConnection connection = getSocketConnection();
         SIP2CheckoutResponse checkoutResponse = null;
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
@@ -331,12 +331,12 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public Object placeHold(String itemIdentifier, String requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
+    public Object placeHold(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
         return hold(HoldMode.ADD, itemIdentifier, patronIdentifier, callInstitutionId, bibId, pickupLocation);
     }
 
     @Override
-    public Object cancelHold(String itemIdentifier, String requestId, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId) {
+    public Object cancelHold(String itemIdentifier, Integer requestId, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId) {
         return hold(HoldMode.DELETE, itemIdentifier, patronIdentifier, institutionId, bibId, pickupLocation);
     }
 

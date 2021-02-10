@@ -1,6 +1,7 @@
 package org.recap;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.ApplicationProfileType;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
@@ -106,7 +107,7 @@ public class CancelRequestItem extends RecapNCIP {
         return requestTypeString;
     }
 
-    public CancelRequestItemInitiationData getCancelRequestItemInitiationData(String itemIdentifier, String requestId, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String ncipAgencyId, String ncipScheme) {
+    public CancelRequestItemInitiationData getCancelRequestItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String ncipAgencyId, String ncipScheme) {
 
         CancelRequestItemInitiationData cancelRequestItemInitiationData = new CancelRequestItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
@@ -120,7 +121,12 @@ public class CancelRequestItem extends RecapNCIP {
         initiationHeader.setFromAgencyId(fromAgencyId);
         cancelRequestItemInitiationData.setInitiationHeader(initiationHeader);
         RequestId requestIdentifier = new RequestId();
-        requestIdentifier.setRequestIdentifierValue(requestId);
+        if(requestId != null) {
+            requestIdentifier.setRequestIdentifierValue(requestId.toString());
+        }
+        else {
+            requestIdentifier.setRequestIdentifierValue((Integer.valueOf(RandomUtils.nextInt(100000,100000000)).toString()));
+        }
         RequestType requestType = new RequestType(null, RecapConstants.HOLD);
         UserId userid = new UserId();
         userid.setUserIdentifierValue(patronIdentifier);

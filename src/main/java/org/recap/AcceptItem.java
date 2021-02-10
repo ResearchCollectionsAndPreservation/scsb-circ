@@ -164,7 +164,7 @@ public class AcceptItem extends RecapNCIP {
         acceptItemInitationData.setInitiationHeader(initiationHeader);
         RequestId requestIdentifier = new RequestId();
         if(requestId != null) {
-            requestIdentifier.setRequestIdentifierValue(requestIdentifier.toString());
+            requestIdentifier.setRequestIdentifierValue(requestId.toString());
         }
         else {
             requestIdentifier.setRequestIdentifierValue((Integer.valueOf(RandomUtils.nextInt(100000,100000000)).toString()));

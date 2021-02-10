@@ -84,7 +84,7 @@ public class RequestItemController {
             String callInst = callingInstitution(callInstitution, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
-                itemCheckoutResponse = (ItemCheckoutResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkOutItem(itemBarcode, itemRequestInformation.getPatronBarcode());
+                itemCheckoutResponse = (ItemCheckoutResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkOutItem(itemBarcode, itemRequestInformation.getRequestId(), itemRequestInformation.getPatronBarcode());
             } else {
                 itemCheckoutResponse.setSuccess(false);
                 itemCheckoutResponse.setScreenMessage("Item Id not found");
@@ -142,7 +142,8 @@ public class RequestItemController {
         try {
             String callInst = callingInstitution(callInstitution, itemRequestInformation);
             String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
-            itemHoldResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).placeHold(itembarcode, itemRequestInformation.getPatronBarcode(),
+            itemHoldResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).placeHold(itembarcode, itemRequestInformation.getRequestId(),
+                    itemRequestInformation.getPatronBarcode(),
                     itemRequestInformation.getRequestingInstitution(),
                     itemRequestInformation.getItemOwningInstitution(),
                     itemRequestInformation.getExpirationDate(),
@@ -174,7 +175,7 @@ public class RequestItemController {
         String callInst = callingInstitution(callInstitution, itemRequestInformation);
         if (CollectionUtils.isNotEmpty(itemRequestInformation.getItemBarcodes())) {
             String itembarcode = itemRequestInformation.getItemBarcodes().get(0);
-            itemHoldCancelResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).cancelHold(itembarcode, itemRequestInformation.getPatronBarcode(),
+            itemHoldCancelResponse = (ItemHoldResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).cancelHold(itembarcode, itemRequestInformation.getRequestId(), itemRequestInformation.getPatronBarcode(),
                     itemRequestInformation.getRequestingInstitution(),
                     itemRequestInformation.getExpirationDate(),
                     itemRequestInformation.getBibId(),

@@ -1,9 +1,19 @@
 package org.recap;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.apache.commons.lang3.RandomUtils;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.ApplicationProfileType;
+import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.CancelRequestItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
+import org.extensiblecatalog.ncip.v2.service.RequestType;
+import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
+import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.json.JSONObject;
+import org.recap.controller.RequestItemController;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -97,7 +107,7 @@ public class CancelRequestItem extends RecapNCIP {
         return requestTypeString;
     }
 
-    public CancelRequestItemInitiationData getCancelRequestItemInitiationData(String itemIdentifier, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String ncipAgencyId, String ncipScheme) {
+    public CancelRequestItemInitiationData getCancelRequestItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String ncipAgencyId, String ncipScheme) {
 
         CancelRequestItemInitiationData cancelRequestItemInitiationData = new CancelRequestItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
@@ -110,14 +120,19 @@ public class CancelRequestItem extends RecapNCIP {
         initiationHeader.setToAgencyId(toAgencyId);
         initiationHeader.setFromAgencyId(fromAgencyId);
         cancelRequestItemInitiationData.setInitiationHeader(initiationHeader);
-        RequestId requestId = new RequestId();
-        requestId.setRequestIdentifierValue("requestId2");
+        RequestId requestIdentifier = new RequestId();
+        if(requestId != null) {
+            requestIdentifier.setRequestIdentifierValue(requestId.toString());
+        }
+        else {
+            requestIdentifier.setRequestIdentifierValue((Integer.valueOf(RandomUtils.nextInt(100000,100000000)).toString()));
+        }
         RequestType requestType = new RequestType(null, RecapConstants.HOLD);
         UserId userid = new UserId();
         userid.setUserIdentifierValue(patronIdentifier);
         cancelRequestItemInitiationData.setUserId(userid);
         cancelRequestItemInitiationData.setInitiationHeader(initiationHeader);
-        cancelRequestItemInitiationData.setRequestId(requestId);
+        cancelRequestItemInitiationData.setRequestId(requestIdentifier);
         cancelRequestItemInitiationData.setRequestType(requestType);
 
         return cancelRequestItemInitiationData;

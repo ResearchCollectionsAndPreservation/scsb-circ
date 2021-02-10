@@ -150,7 +150,7 @@ public class AcceptItem extends RecapNCIP {
         return (String) this.itemOptionalFields.get(RecapConstants.ITEM_DESCRIPTION).get(RecapConstants.CALL_NUMBER);
     }
 
-    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String title, String author, String callNumber, String ncipAgencyId, String ncipScheme)  {
+    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String title, String author, String callNumber, String ncipAgencyId, String ncipScheme)  {
         AcceptItemInitiationData acceptItemInitationData = new AcceptItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
         ApplicationProfileType applicationProfileType = getApplicationProfileType();
@@ -162,24 +162,22 @@ public class AcceptItem extends RecapNCIP {
         initiationHeader.setToAgencyId(toAgencyId);
         initiationHeader.setFromAgencyId(fromAgencyId);
         acceptItemInitationData.setInitiationHeader(initiationHeader);
-        RequestId requestId = new RequestId();
-        RandomUtils.nextInt();
-        //  requestId.setAgencyId(new AgencyId(RecapConstants.AGENCY_ID_HVD));
-        //  requestId.setRequestIdentifierValue(requestIdString);
-        requestId.setRequestIdentifierValue((new Integer(RandomUtils.nextInt(100000,100000000)).toString()));
+        RequestId requestIdentifier = new RequestId();
+        if(requestId != null) {
+            requestIdentifier.setRequestIdentifierValue(requestId.toString());
+        }
+        else {
+            requestIdentifier.setRequestIdentifierValue((Integer.valueOf(RandomUtils.nextInt(100000,100000000)).toString()));
+        }
         RequestedActionType requestActionType = new RequestedActionType(null, "Hold For Pickup");
         UserId userid = new UserId();
-        //userid.setAgencyId(new AgencyId(callInstitutionId));
         userid.setUserIdentifierValue(patronIdentifier);
         ItemId itemId = new ItemId();
-        // itemId.setAgencyId(new AgencyId(itemInstitutionId));
         itemId.setItemIdentifierValue(itemIdentifier);
         ItemOptionalFields itemOptionalFields = new ItemOptionalFields();
         BibliographicDescription bibliographicDescription = new BibliographicDescription();
         bibliographicDescription.setAuthor(author);
         bibliographicDescription.setTitle(title);
-        bibliographicDescription.setPublisher("Penguin");
-        bibliographicDescription.setPublicationDate("2003");
 
         itemOptionalFields.setBibliographicDescription(bibliographicDescription);
         ItemDescription itemDescription = new ItemDescription();
@@ -191,12 +189,11 @@ public class AcceptItem extends RecapNCIP {
         Date dueDate = DateUtils.addYears(new Date(), 1);
         cal.setTime(dueDate);
 
-
         acceptItemInitationData.setItemId(itemId);
         acceptItemInitationData.setPickupLocation(pickupLocation);
         acceptItemInitationData.setUserId(userid);
         acceptItemInitationData.setInitiationHeader(initiationHeader);
-        acceptItemInitationData.setRequestId(requestId);
+        acceptItemInitationData.setRequestId(requestIdentifier);
         acceptItemInitationData.setRequestedActionType(requestActionType);
         acceptItemInitationData.setItemOptionalFields(itemOptionalFields);
         acceptItemInitationData.setDateForReturn((GregorianCalendar) cal);

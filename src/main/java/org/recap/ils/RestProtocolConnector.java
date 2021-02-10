@@ -223,11 +223,12 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      * Checks out item in REST protocol using Institution for the given patron.
      *
      * @param itemIdentifier   the item identifier
+     * @param requestId the request identifier
      * @param patronIdentifier the patron identifier
      * @return
      */
     @Override
-    public ItemCheckoutResponse checkOutItem(String itemIdentifier, String patronIdentifier) {
+    public ItemCheckoutResponse checkOutItem(String itemIdentifier, Integer requestId, String patronIdentifier) {
         log.info("Item barcode {} received for a checkout in {} for patron {}", itemIdentifier, this.institutionCode, patronIdentifier);
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         try {
@@ -347,7 +348,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      * @return
      */
     @Override
-    public AbstractResponseItem placeHold(String itemIdentifier, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String deliveryLocation, String trackingId, String title, String author, String callNumber) {
+    public AbstractResponseItem placeHold(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String deliveryLocation, String trackingId, String title, String author, String callNumber) {
         log.info("Item barcode {} received for hold request in {} for patron {}", itemIdentifier, this.institutionCode, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         try {
@@ -424,7 +425,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      * @return
      */
     @Override
-    public AbstractResponseItem cancelHold(String itemIdentifier, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId) {
+    public AbstractResponseItem cancelHold(String itemIdentifier, Integer requestId, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation, String trackingId) {
         log.info("Item barcode {} received for a canceling a hold in {} for patron {}", itemIdentifier, this.institutionCode, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         try {

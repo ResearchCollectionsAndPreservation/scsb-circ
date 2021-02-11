@@ -155,6 +155,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         return  getRestDataApiUrl() + "/items?item_barcode=" + itemIdentifier;
     }
 
+    public CloseableHttpClient buildCloseableHttpClient(){
+        CloseableHttpClient client = HttpClients.custom().build();
+        return client;
+    }
+
     @Override
     public AbstractResponseItem lookupItem(String itemIdentifier) {
         log.info("NCIP Connector Host: {}", getHost());
@@ -208,7 +213,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, checkOutItemInitiationData);
             String requestBody = IOUtils.toString(requestMessageStream, StandardCharsets.UTF_8);
-            CloseableHttpClient client = HttpClients.custom().build();
+            CloseableHttpClient client = buildCloseableHttpClient();
 
             HttpUriRequest request = getHttpRequest(requestBody);
 
@@ -280,7 +285,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
             String requestBody = checkInItem.getRequestBody(ncipToolkitUtil, checkInItemInitiationData);
 
-            CloseableHttpClient client = HttpClients.custom().build();
+            CloseableHttpClient client = buildCloseableHttpClient();
             HttpUriRequest request = getHttpRequest(requestBody);
 
             HttpResponse response = client.execute(request);
@@ -344,7 +349,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             String requestBody = acceptItem.getRequestBody(ncipToolkitUtil, acceptItemInitiationData);
             log.info("AcceptItem Request Body >>> " + requestBody);
 
-            CloseableHttpClient client = HttpClients.custom().build();
+            CloseableHttpClient client = buildCloseableHttpClient();
 
             HttpUriRequest request = getHttpRequest(requestBody);
 
@@ -417,7 +422,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, cancelRequestItemInitiationData);
             String requestBody = IOUtils.toString(requestMessageStream, StandardCharsets.UTF_8);
 
-            CloseableHttpClient client = HttpClients.custom().build();
+            CloseableHttpClient client = buildCloseableHttpClient();
             HttpUriRequest request = getHttpRequest(requestBody);
             HttpResponse response = client.execute(request);
 
@@ -488,7 +493,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, lookupUserInitiationData);
             String requestBody = IOUtils.toString(requestMessageStream, StandardCharsets.UTF_8);
-            CloseableHttpClient client = HttpClients.custom().build();
+            CloseableHttpClient client = buildCloseableHttpClient();
 
             HttpUriRequest request = getHttpRequest(requestBody);
             HttpResponse response = client.execute(request);
@@ -558,7 +563,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, recallItemInitiationData);
             String requestBody = IOUtils.toString(requestMessageStream, StandardCharsets.UTF_8);
-            CloseableHttpClient client = HttpClients.custom().build();
+            CloseableHttpClient client = buildCloseableHttpClient();
 
             HttpUriRequest request = getHttpRequest(requestBody);
             HttpResponse response = client.execute(request);

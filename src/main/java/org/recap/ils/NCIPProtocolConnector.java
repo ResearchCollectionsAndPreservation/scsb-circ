@@ -351,9 +351,9 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     public Object placeHold(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
         log.info("Item barcode {} received for hold request in " + itemInstitutionId + " for patron {}", itemIdentifier, patronIdentifier);
         ItemCheckoutResponse itemCheckoutResponse;
-        ItemHoldResponse itemHoldResponse;
+        ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
             if (callInstitutionId.equalsIgnoreCase(itemInstitutionId)) {
-                itemCheckoutResponse = checkOutItem(itemIdentifier, requestId, patronIdentifier);
+       /*         itemCheckoutResponse = checkOutItem(itemIdentifier, requestId, patronIdentifier);
                 if (!itemCheckoutResponse.isSuccess()) {
                     itemCheckoutResponse.setSuccess(Boolean.FALSE);
                     itemCheckoutResponse.setScreenMessage(itemCheckoutResponse.getScreenMessage());
@@ -361,6 +361,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                 } else {
                     itemHoldResponse = acceptItem(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
                 }
+       */
             }
             else {
                 itemHoldResponse = acceptItem(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);

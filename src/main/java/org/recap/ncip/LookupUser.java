@@ -1,20 +1,18 @@
-package org.recap;
+package org.recap.ncip;
 
 import lombok.extern.slf4j.Slf4j;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.ApplicationProfileType;
-import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
 import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
 import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
-import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserPrivilege;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.recap.RecapCommonConstants;
 
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -24,27 +22,16 @@ import java.util.regex.Pattern;
 public class LookupUser extends RecapNCIP {
 
     protected String fromAgency;
-
-    public LookupUser() {
-
-    }
+    private String stringValue = "value";
 
     public LookupUser setFromAgency(String fromAgency) {
         this.fromAgency = fromAgency;
         return this;
     }
-    public LookupUserInitiationData getLookupUserInitiationData(String useridString, String ncipAgencyId, String ncipScheme) {
+    public LookupUserInitiationData getLookupUserInitiationData(String useridString, String ncipAgencyId) {
         LookupUserInitiationData lookupUserInitationData = new LookupUserInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
-        ApplicationProfileType applicationProfileType = new ApplicationProfileType(null,RecapConstants.AGENCY_ID_SCSB);
-        initiationHeader.setApplicationProfileType(applicationProfileType);
-        ToAgencyId toAgencyId = new ToAgencyId();
-        toAgencyId.setAgencyId(new AgencyId(ncipAgencyId));
-        FromAgencyId fromAgencyId = new FromAgencyId();
-        fromAgencyId.setAgencyId(new AgencyId(ncipAgencyId));
-        initiationHeader.setToAgencyId(toAgencyId);
-        initiationHeader.setFromAgencyId(fromAgencyId);
-
+        initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, ncipAgencyId, ncipAgencyId);
         UserId userid = new UserId();
         userid.setAgencyId(new AgencyId(fromAgency));
         userid.setUserIdentifierValue(useridString);
@@ -69,9 +56,10 @@ public class LookupUser extends RecapNCIP {
         JSONObject returnJson = new JSONObject();
         JSONObject returnJsonName = new JSONObject();
 
-        returnJsonName = gatherName(lookupUserResponse,returnJsonName);
+        gatherName(lookupUserResponse,returnJsonName);
+        gatherPhysicalAddress(lookupUserResponse);
         returnJson.put("name",returnJsonName.get("firstName")+" "+returnJsonName.get("lastName"));
-        returnJson.put("userId", getUserIdString(lookupUserResponse,returnJson));
+        returnJson.put("userId", getUserIdString(lookupUserResponse));
         returnJson.put("privileges", getPrivileges(lookupUserResponse));
         returnJson.put("electronicAddresses", gatherElectronicAddress(lookupUserResponse));
 
@@ -102,7 +90,7 @@ public class LookupUser extends RecapNCIP {
         if (lookupUserResponse.getUserOptionalFields().getUserAddressInformations() == null) return jsonArray;
         Iterator<UserAddressInformation> iterator = lookupUserResponse.getUserOptionalFields().getUserAddressInformations().iterator();
         while (iterator.hasNext()) {
-            UserAddressInformation address = (UserAddressInformation) iterator.next();
+            UserAddressInformation address =  iterator.next();
             try {
                 JSONObject json = new JSONObject();
                 if (address.getPhysicalAddress() == null) continue;
@@ -115,7 +103,7 @@ public class LookupUser extends RecapNCIP {
                 addressAsJson.put("region", structuredAddress.getRegion());
                 addressAsJson.put("postalCode", structuredAddress.getPostalCode());
                 json.put("key",type);
-                json.put("value",addressAsJson);
+                json.put(stringValue,addressAsJson);
                 jsonArray.put(json);
             }
             catch(Exception e) {
@@ -133,7 +121,7 @@ public class LookupUser extends RecapNCIP {
         if (lookupUserResponse.getUserOptionalFields() == null || lookupUserResponse.getUserOptionalFields().getUserAddressInformations() == null) return jsonArray;
         Iterator<UserAddressInformation> iterator = lookupUserResponse.getUserOptionalFields().getUserAddressInformations().iterator();
         while (iterator.hasNext()) {
-            UserAddressInformation address = (UserAddressInformation) iterator.next();
+            UserAddressInformation address =  iterator.next();
             try {
                 JSONObject json = new JSONObject();
                 if (address.getElectronicAddress() == null) continue;
@@ -141,7 +129,7 @@ public class LookupUser extends RecapNCIP {
                 String value =  address.getElectronicAddress().getElectronicAddressData();
                 if (isEmailPattern(value)) type = "emailAddress";
                 json.put("key", type);
-                json.put("value", value);
+                json.put(stringValue, value);
                 jsonArray.put(json);
             }
             catch(Exception e) {
@@ -153,17 +141,14 @@ public class LookupUser extends RecapNCIP {
     }
 
     private boolean isEmailPattern(String email) {
-        String regex = "^([_a-zA-Z0-9-]+(\\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*(\\.[a-zA-Z]{1,6}))?$";
+        String regex = RecapCommonConstants.REGEX_FOR_EMAIL_ADDRESS;
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
-        if (matcher.matches()) {
-            return true;
-        }
-        return false;
+        return matcher.matches();
     }
 
 
-    private String getUserIdString(LookupUserResponseData lookupUserResponse,JSONObject returnJson) {
+    private String getUserIdString(LookupUserResponseData lookupUserResponse) {
         if (lookupUserResponse.getUserId() != null)
             return lookupUserResponse.getUserId().getUserIdentifierValue();
         return "";
@@ -174,14 +159,14 @@ public class LookupUser extends RecapNCIP {
         if (lookupUserResponse.getUserOptionalFields() == null || lookupUserResponse.getUserOptionalFields().getUserPrivileges() == null) return jsonArray;
         Iterator<UserPrivilege> iterator = lookupUserResponse.getUserOptionalFields().getUserPrivileges().iterator();
         while (iterator.hasNext()) {
-            UserPrivilege priv = (UserPrivilege) iterator.next();
+            UserPrivilege priv = iterator.next();
             try {
                 JSONObject json = new JSONObject();
                 String type = priv.getAgencyUserPrivilegeType().getValue();
                 String value = priv.getUserPrivilegeStatus().getUserPrivilegeStatusType().getValue();
                 if (type.equalsIgnoreCase("status") && value.equalsIgnoreCase("active")) value = "OK";
                 json.put("key", type);
-                json.put("value", value);
+                json.put(stringValue, value);
                 jsonArray.put(json);
             }
             catch(Exception e) {

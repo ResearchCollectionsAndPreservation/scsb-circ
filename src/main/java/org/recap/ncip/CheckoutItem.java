@@ -1,26 +1,17 @@
-package org.recap;
+package org.recap.ncip;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.ApplicationProfileType;
 import org.extensiblecatalog.ncip.v2.service.CheckOutItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.CheckOutItemResponseData;
-import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.recap.ils.NCIPToolKitUtil;
-import org.slf4j.Logger;
+import org.recap.RecapConstants;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,35 +20,21 @@ import java.util.GregorianCalendar;
 @Slf4j
 public class CheckoutItem extends RecapNCIP {
 
-    public CheckoutItem() {
-    }
-
-
-    public CheckOutItemInitiationData getCheckOutItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String ncipAgencyId, String ncipScheme) {
+    public CheckOutItemInitiationData getCheckOutItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String ncipAgencyId) {
         try {
             CheckOutItemInitiationData checkoutItemInitiationData = new CheckOutItemInitiationData();
             InitiationHeader initiationHeader = new InitiationHeader();
-            ApplicationProfileType applicationProfileType = getApplicationProfileType();
-            initiationHeader.setApplicationProfileType(applicationProfileType);
-            ToAgencyId toAgencyId = new ToAgencyId();
-            toAgencyId.setAgencyId(new AgencyId(ncipAgencyId));
-            FromAgencyId fromAgencyId = new FromAgencyId();
-            fromAgencyId.setAgencyId(new AgencyId(RecapConstants.AGENCY_ID_SCSB));
-            initiationHeader.setToAgencyId(toAgencyId);
-            initiationHeader.setFromAgencyId(fromAgencyId);
-
+            initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
             UserId userid = new UserId();
             userid.setUserIdentifierValue(patronIdentifier);
-
             ItemId itemId = new ItemId();
             itemId.setItemIdentifierValue(itemIdentifier);
-
             RequestId requestIdentifier = new RequestId();
             if(requestId != null) {
                 requestIdentifier.setRequestIdentifierValue(requestId.toString());
             }
             else {
-                requestIdentifier.setRequestIdentifierValue((Integer.valueOf(RandomUtils.nextInt(100000,100000000)).toString()));
+                requestIdentifier.setRequestIdentifierValue((Integer.toString(RandomUtils.nextInt(100000,100000000))));
             }
 
             Calendar cal = new GregorianCalendar();

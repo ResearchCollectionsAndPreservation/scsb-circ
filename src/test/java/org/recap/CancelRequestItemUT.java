@@ -1,8 +1,13 @@
 package org.recap;
 
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.CancelRequestItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.recap.ncip.CancelRequestItem;
 
 import java.util.Arrays;
 import java.util.Collections;

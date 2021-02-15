@@ -1,9 +1,14 @@
 package org.recap;
 
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.CheckInItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.recap.ncip.CheckinItem;
 
 import java.util.Arrays;
 import java.util.Collections;

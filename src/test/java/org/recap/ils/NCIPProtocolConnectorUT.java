@@ -382,7 +382,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         itemLookupData.setProcesstype(processTypeList);
         BibLookupData bibLookupData = new BibLookupData();
         bibLookupData.setBibId("24561");
-        bibLookupData.setTile("test");
+        bibLookupData.setTitle("test");
         itemLookupResponse.setItemLookupData(itemLookupData);
         itemLookupResponse.setBibLookupData(bibLookupData);
         return itemLookupResponse;

@@ -292,7 +292,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
         try {
             CheckinItem checkInItem = new CheckinItem();
-            CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemIdentifier, behalfAgency, getNcipAgencyId());
+            CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemIdentifier, behalfAgency, getNcipAgencyId(), getNcipScheme());
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
 
             String requestBody = checkInItem.getRequestBody(ncipToolkitUtil, checkInItemInitiationData);

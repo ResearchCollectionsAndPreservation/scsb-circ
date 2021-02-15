@@ -15,12 +15,12 @@ import java.text.SimpleDateFormat;
 @Slf4j
 public class CheckinItem extends RecapNCIP {
 
-    public CheckInItemInitiationData getCheckInItemInitiationData(String itemIdentifier, String behalfAgency, String ncipAgencyId) {
+    public CheckInItemInitiationData getCheckInItemInitiationData(String itemIdentifier, String behalfAgency, String ncipAgencyId, String ncipScheme) {
         CheckInItemInitiationData checkinItemInitiationData = new CheckInItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
-        initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
+        initiationHeader = getInitiationHeaderwithScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId, ncipScheme);
         OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
-        onBehalfOfAgency.setAgencyId(new AgencyId(null,behalfAgency));
+        onBehalfOfAgency.setAgencyId(new AgencyId(ncipScheme,behalfAgency));
         initiationHeader.setOnBehalfOfAgency(onBehalfOfAgency);
         ItemId itemId = new ItemId();
         itemId.setItemIdentifierValue(itemIdentifier);

@@ -352,7 +352,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         log.info("Item barcode {} received for hold request in " + itemInstitutionId + " for patron {}", itemIdentifier, patronIdentifier);
         ItemCheckoutResponse itemCheckoutResponse;
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
-            if (callInstitutionId.equalsIgnoreCase(itemInstitutionId)) {
+
+        if (callInstitutionId.equalsIgnoreCase(itemInstitutionId)) {
+                itemHoldResponse.setSuccess(Boolean.TRUE);
+           //     itemHoldResponse.
+
        /*         itemCheckoutResponse = checkOutItem(itemIdentifier, requestId, patronIdentifier);
                 if (!itemCheckoutResponse.isSuccess()) {
                     itemCheckoutResponse.setSuccess(Boolean.FALSE);

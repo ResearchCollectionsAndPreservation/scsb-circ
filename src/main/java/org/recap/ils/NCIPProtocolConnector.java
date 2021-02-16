@@ -350,7 +350,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     @Override
     public Object placeHold(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
         log.info("Item barcode {} received for hold request in " + itemInstitutionId + " for patron {}", itemIdentifier, patronIdentifier);
-        ItemCheckoutResponse itemCheckoutResponse;
+       // ItemCheckoutResponse itemCheckoutResponse;
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
 
         if (callInstitutionId.equalsIgnoreCase(itemInstitutionId)) {

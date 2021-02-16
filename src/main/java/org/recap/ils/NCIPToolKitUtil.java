@@ -16,7 +16,7 @@ import org.recap.RecapConstants;
 @Slf4j
 public class NCIPToolKitUtil {
 
-        private static volatile  NCIPToolKitUtil ncipToolkitUtilInstance;
+        private static NCIPToolKitUtil ncipToolkitUtilInstance;
         public Translator translator;
         public ServiceContext serviceContext;
 
@@ -24,30 +24,22 @@ public class NCIPToolKitUtil {
             if (ncipToolkitUtilInstance != null){
                 throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
             }
-
-        };
+   }
 
         public static NCIPToolKitUtil getInstance() throws IOException, ToolkitException {
             if (ncipToolkitUtilInstance == null) {
-
-                synchronized(NCIPToolKitUtil.class) {
-                    if (ncipToolkitUtilInstance == null) ncipToolkitUtilInstance = new NCIPToolKitUtil();
-
+                    ncipToolkitUtilInstance = new NCIPToolKitUtil();
                     InputStream inputStream = NCIPToolKitUtil.class.getClassLoader().getResourceAsStream(RecapConstants.TOOLKIT_PROP_FILE);
                     log.info("initializing the NCIP Toolkit Property File...");log.info("initializing the NCIP Toolkit Property File...");
                     Properties properties = new Properties();
                     properties.load(inputStream);
-
                     if (properties.isEmpty()) {
                         log.error("Unable to initialize the default toolkit properties.");
                         throw new RuntimeException("Unable to initialize the NCIP Toolkit property file.");
                     }
-
                     ncipToolkitUtilInstance.serviceContext = ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext();
                     ncipToolkitUtilInstance.translator = TranslatorFactory.buildTranslator(null,properties);
                     return ncipToolkitUtilInstance;
-                }
-
             }
             return ncipToolkitUtilInstance;
         }

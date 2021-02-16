@@ -86,7 +86,7 @@ public class RestApiResponseUtil {
         itemInformationResponse.setUpdatedDate(formatFromSipDate(itemData.getUpdatedDate()));
         itemInformationResponse.setCreatedDate(formatFromSipDate(itemData.getCreatedDate()));
         itemInformationResponse.setDeletedDate(formatFromSipDate((String) itemData.getDeletedDate()));
-        itemInformationResponse.setDeleted(itemData.getDeleted() != null ? (Boolean) itemData.getDeleted() : false);
+        itemInformationResponse.setDeleted(itemData.getDeleted() != null ? (Boolean) itemData.getDeleted() : Boolean.FALSE);
         if (null != itemData.getStatus()) {
             itemInformationResponse.setDueDate(formatDueDate((String) ((LinkedHashMap) itemData.getStatus()).get("dueDate")));
             itemInformationResponse.setCirculationStatus((String) ((LinkedHashMap) itemData.getStatus()).get("display"));
@@ -124,7 +124,7 @@ public class RestApiResponseUtil {
         itemCheckoutResponse.setCreatedDate(formatFromSipDate(checkoutData.getCreatedDate()));
         itemCheckoutResponse.setUpdatedDate(formatFromSipDate((String) checkoutData.getUpdatedDate()));
         itemCheckoutResponse.setDueDate(formatDueDate(checkoutData.getDesiredDateDue()));
-        itemCheckoutResponse.setProcessed(null != checkoutData.getProcessed() ? checkoutData.getProcessed() : false);
+        itemCheckoutResponse.setProcessed(null != checkoutData.getProcessed() ? checkoutData.getProcessed() : Boolean.FALSE);
         itemCheckoutResponse.setJobId(checkoutData.getJobId());
         itemCheckoutResponse.setSuccess(checkoutData.getSuccess());
         return itemCheckoutResponse;
@@ -142,7 +142,7 @@ public class RestApiResponseUtil {
         itemCheckinResponse.setItemBarcode(checkinData.getItemBarcode());
         itemCheckinResponse.setCreatedDate(formatFromSipDate(checkinData.getCreatedDate()));
         itemCheckinResponse.setUpdatedDate(formatFromSipDate((String) checkinData.getUpdatedDate()));
-        itemCheckinResponse.setProcessed(null != checkinData.getProcessed() ? checkinData.getProcessed() : false);
+        itemCheckinResponse.setProcessed(null != checkinData.getProcessed() ? checkinData.getProcessed() : Boolean.FALSE);
         itemCheckinResponse.setJobId(checkinData.getJobId());
         itemCheckinResponse.setSuccess(checkinData.getSuccess());
         return itemCheckinResponse;

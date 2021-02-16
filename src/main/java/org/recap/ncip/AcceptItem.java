@@ -101,36 +101,37 @@ public class AcceptItem extends RecapNCIP {
 
     // Convenience methods
     public AcceptItem setTitle(String title) {
-        return setInfo(title);
+        return setInfo(RecapConstants.TITLE, title);
     }
 
     public AcceptItem setAuthor(String author) {
-        return setInfo(author);
+        return setInfo(RecapConstants.AUTHOR, author);
     }
 
     public AcceptItem setPublisher(String publisher) {
-        return setInfo(publisher);
+        return setInfo(RecapConstants.PUBLISHER, publisher);
     }
 
     public AcceptItem setPublicationDate(String pubDate) {
-        return setInfo(pubDate);
+        return setInfo(RecapConstants.PUBLICATION_DATE, pubDate);
     }
 
-    private AcceptItem setInfo(String info) {
-        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(RecapConstants.PUBLICATION_DATE, info);
+    private AcceptItem setInfo(String var, String info) {
+        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(var, info);
         return this;
     }
 
     public AcceptItem setIsbn(String isbn) {
-        return setInfo(isbn);
+        return setInfo(RecapConstants.ISBN, isbn);
     }
 
     public AcceptItem setIssn(String issn) {
-        return setInfo(issn);
+        return setInfo(RecapConstants.ISSN, issn);
     }
 
     public AcceptItem setCallNumber(String callNumber) {
-        return setInfo(callNumber);
+        this.itemOptionalFields.get(RecapConstants.ITEM_DESCRIPTION).put(RecapConstants.CALL_NUMBER, callNumber);
+        return this;
     }
 
     public String getAuthor() {

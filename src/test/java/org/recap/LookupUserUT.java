@@ -79,7 +79,7 @@ public class LookupUserUT extends BaseTestCaseUT {
         LookupUserResponseData lookupUserResponseData = getLookupUserResponseData();
         lookupUserResponseData.setUserId(null);
         JSONObject returnJson = new JSONObject();
-        ReflectionTestUtils.invokeMethod(lookupUser, "getUserIdString", lookupUserResponseData, returnJson);
+        ReflectionTestUtils.invokeMethod(lookupUser, "getUserIdString", lookupUserResponseData);
     }
 
     @Test

@@ -18,7 +18,7 @@ public class CheckinItem extends RecapNCIP {
     public CheckInItemInitiationData getCheckInItemInitiationData(String itemIdentifier, String behalfAgency, String ncipAgencyId, String ncipScheme) {
         CheckInItemInitiationData checkinItemInitiationData = new CheckInItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
-        initiationHeader = getInitiationHeaderwithScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId, ncipScheme);
+        initiationHeader = getInitiationHeaderwithScheme(initiationHeader, ncipScheme, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
         OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
         onBehalfOfAgency.setAgencyId(new AgencyId(ncipScheme,behalfAgency));
         initiationHeader.setOnBehalfOfAgency(onBehalfOfAgency);

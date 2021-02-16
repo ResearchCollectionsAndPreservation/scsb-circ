@@ -1,4 +1,4 @@
-package org.recap;
+package org.recap.ncip;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,10 +7,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.extensiblecatalog.ncip.v2.service.AcceptItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.AcceptItemResponseData;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.ApplicationProfileType;
 import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
-import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
@@ -18,9 +15,9 @@ import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.PickupLocation;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestedActionType;
-import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.json.JSONObject;
+import org.recap.RecapConstants;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -40,11 +37,11 @@ public class AcceptItem extends RecapNCIP {
     protected String fromAgency;
     private String requestedActionTypeString;
     private String applicationProfileTypeString;
-    private HashMap<String, HashMap> itemOptionalFields = new HashMap<String, HashMap>();
+    private HashMap<String, HashMap<String, String>> itemOptionalFields = new HashMap<>();
 
     public AcceptItem() {
-        itemOptionalFields.put(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION, new HashMap<String, String>());
-        itemOptionalFields.put(RecapConstants.ITEM_DESCRIPTION, new HashMap<String, String>());
+        itemOptionalFields.put(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION, new HashMap<>());
+        itemOptionalFields.put(RecapConstants.ITEM_DESCRIPTION, new HashMap<>());
     }
 
     public AcceptItem setRequestActionType(String action) {
@@ -104,33 +101,32 @@ public class AcceptItem extends RecapNCIP {
 
     // Convenience methods
     public AcceptItem setTitle(String title) {
-        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(RecapConstants.TITLE, title);
-        return this;
+        return setInfo(RecapConstants.TITLE, title);
     }
 
     public AcceptItem setAuthor(String author) {
-        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(RecapConstants.AUTHOR, author);
-        return this;
+        return setInfo(RecapConstants.AUTHOR, author);
     }
 
     public AcceptItem setPublisher(String publisher) {
-        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(RecapConstants.PUBLISHER, publisher);
-        return this;
+        return setInfo(RecapConstants.PUBLISHER, publisher);
     }
 
     public AcceptItem setPublicationDate(String pubDate) {
-        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(RecapConstants.PUBLICATION_DATE, pubDate);
+        return setInfo(RecapConstants.PUBLICATION_DATE, pubDate);
+    }
+
+    private AcceptItem setInfo(String var, String info) {
+        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(var, info);
         return this;
     }
 
     public AcceptItem setIsbn(String isbn) {
-        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(RecapConstants.ISBN, isbn);
-        return this;
+        return setInfo(RecapConstants.ISBN, isbn);
     }
 
     public AcceptItem setIssn(String issn) {
-        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(RecapConstants.ISSN, issn);
-        return this;
+        return setInfo(RecapConstants.ISSN, issn);
     }
 
     public AcceptItem setCallNumber(String callNumber) {
@@ -139,50 +135,43 @@ public class AcceptItem extends RecapNCIP {
     }
 
     public String getAuthor() {
-        return (String) this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).get(RecapConstants.AUTHOR);
+        return this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).get(RecapConstants.AUTHOR);
     }
 
     public String getTitle() {
-        return (String) this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).get(RecapConstants.TITLE);
+        return this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).get(RecapConstants.TITLE);
     }
 
     public String getCallNo() {
-        return (String) this.itemOptionalFields.get(RecapConstants.ITEM_DESCRIPTION).get(RecapConstants.CALL_NUMBER);
+        return this.itemOptionalFields.get(RecapConstants.ITEM_DESCRIPTION).get(RecapConstants.CALL_NUMBER);
     }
 
-    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocationString, String trackingId, String title, String author, String callNumber, String ncipAgencyId, String ncipScheme)  {
+    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String title, String author, String callNumber, String ncipAgencyId, String ncipScheme)  {
         AcceptItemInitiationData acceptItemInitationData = new AcceptItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
-        ApplicationProfileType applicationProfileType = getApplicationProfileType();
-        initiationHeader.setApplicationProfileType(applicationProfileType);
-        ToAgencyId toAgencyId = new ToAgencyId();
-        toAgencyId.setAgencyId(new AgencyId(ncipScheme, ncipAgencyId));
-        FromAgencyId fromAgencyId = new FromAgencyId();
-        fromAgencyId.setAgencyId(new AgencyId(ncipScheme, RecapConstants.AGENCY_ID_SCSB));
-        initiationHeader.setToAgencyId(toAgencyId);
-        initiationHeader.setFromAgencyId(fromAgencyId);
+        initiationHeader = getInitiationHeaderwithScheme(initiationHeader, ncipScheme, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
         acceptItemInitationData.setInitiationHeader(initiationHeader);
         RequestId requestIdentifier = new RequestId();
         if(requestId != null) {
             requestIdentifier.setRequestIdentifierValue(requestId.toString());
         }
         else {
-            requestIdentifier.setRequestIdentifierValue((Integer.valueOf(RandomUtils.nextInt(100000,100000000)).toString()));
+            requestIdentifier.setRequestIdentifierValue(Integer.toString(RandomUtils.nextInt(100000,100000000)));
         }
         RequestedActionType requestActionType = new RequestedActionType(null, "Hold For Pickup");
         UserId userid = new UserId();
         userid.setUserIdentifierValue(patronIdentifier);
         ItemId itemId = new ItemId();
         itemId.setItemIdentifierValue(itemIdentifier);
-        ItemOptionalFields itemOptionalFields = new ItemOptionalFields();
+        ItemOptionalFields itemOptFields = new ItemOptionalFields();
         BibliographicDescription bibliographicDescription = new BibliographicDescription();
         bibliographicDescription.setAuthor(author);
         bibliographicDescription.setTitle(title);
 
-        itemOptionalFields.setBibliographicDescription(bibliographicDescription);
+        itemOptFields.setBibliographicDescription(bibliographicDescription);
         ItemDescription itemDescription = new ItemDescription();
         itemDescription.setCallNumber(callNumber);
-        itemOptionalFields.setItemDescription(itemDescription);
+        itemOptFields.setItemDescription(itemDescription);
         PickupLocation pickupLocation = new PickupLocation(pickupLocationString);
 
         Calendar cal = new GregorianCalendar();
@@ -195,7 +184,7 @@ public class AcceptItem extends RecapNCIP {
         acceptItemInitationData.setInitiationHeader(initiationHeader);
         acceptItemInitationData.setRequestId(requestIdentifier);
         acceptItemInitationData.setRequestedActionType(requestActionType);
-        acceptItemInitationData.setItemOptionalFields(itemOptionalFields);
+        acceptItemInitationData.setItemOptionalFields(itemOptFields);
         acceptItemInitationData.setDateForReturn((GregorianCalendar) cal);
 
         return acceptItemInitationData;

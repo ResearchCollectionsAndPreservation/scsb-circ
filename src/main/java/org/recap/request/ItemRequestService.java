@@ -778,7 +778,7 @@ public class ItemRequestService {
                     bsuccess = false;
                 }
             } else {
-                itemResponseInformation = createBibAndHold(itemRequestInfo, itemResponseInformation, itemEntity);
+                createBibAndHold(itemRequestInfo, itemResponseInformation, itemEntity);
                 if (itemResponseInformation.isSuccess()) { // IF Hold command is successfully
                     itemRequestInfo.setExpirationDate(itemRequestInfo.getExpirationDate());
                     String requestingPatron = itemRequestInfo.getPatronBarcode();

@@ -81,6 +81,7 @@ public class CancelItemController {
                 itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
                 itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
                 itemRequestInformation.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
+                itemRequestInformation.setRequestId(requestId);
                 itemRequestInformation.setRequestingInstitution(requestItemEntity.get().getInstitutionEntity().getInstitutionCode());
                 itemRequestInformation.setPatronBarcode(requestItemEntity.get().getPatronId());
                 itemRequestInformation.setDeliveryLocation(requestItemEntity.get().getStopCode());

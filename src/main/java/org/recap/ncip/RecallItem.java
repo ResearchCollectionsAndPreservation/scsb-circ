@@ -1,39 +1,23 @@
-package org.recap;
+package org.recap.ncip;
 
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.ApplicationProfileType;
-import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
 import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.RecallItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RecallItemResponseData;
-import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.json.JSONObject;
+import org.recap.RecapConstants;
 
 import java.text.SimpleDateFormat;
 
 public class RecallItem extends RecapNCIP {
-    public RecallItem() {
 
-    }
-
-    public RecallItemInitiationData getRecallItemInitiationData(String itemIdentifier, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation, String ncipAgencyId, String ncipScheme) {
+    public RecallItemInitiationData getRecallItemInitiationData(String itemIdentifier, String patronIdentifier, String ncipAgencyId) {
         RecallItemInitiationData recallItemInitiationData = new RecallItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
-        ApplicationProfileType applicationProfileType = getApplicationProfileType();
-        initiationHeader.setApplicationProfileType(applicationProfileType);
-        ToAgencyId toAgencyId = new ToAgencyId();
-        toAgencyId.setAgencyId(new AgencyId(ncipAgencyId));
-        FromAgencyId fromAgencyId = new FromAgencyId();
-        fromAgencyId.setAgencyId(new AgencyId(ncipAgencyId));
-        initiationHeader.setToAgencyId(toAgencyId);
-        initiationHeader.setFromAgencyId(fromAgencyId);
-
+        initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, ncipAgencyId, ncipAgencyId);
         UserId userid = new UserId();
         userid.setUserIdentifierValue(patronIdentifier);
-
-
         ItemId itemId = new ItemId();
         itemId.setItemIdentifierValue(itemIdentifier);
         recallItemInitiationData.setInitiationHeader(initiationHeader);

@@ -1,4 +1,4 @@
-package org.recap;
+package org.recap.ncip;
 
 import org.extensiblecatalog.ncip.v2.service.AgencyUserPrivilegeType;
 import org.extensiblecatalog.ncip.v2.service.ElectronicAddress;
@@ -22,8 +22,8 @@ import org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatusType;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.recap.BaseTestCaseUT;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.recap.ncip.LookupUser;
 
 import java.util.Arrays;
 import java.util.Collections;

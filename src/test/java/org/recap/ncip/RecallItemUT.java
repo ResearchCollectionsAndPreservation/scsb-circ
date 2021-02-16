@@ -1,4 +1,4 @@
-package org.recap;
+package org.recap.ncip;
 
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.Problem;
@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
-import org.recap.ncip.RecallItem;
+import org.recap.BaseTestCaseUT;
 
 import static org.junit.Assert.assertNotNull;
 

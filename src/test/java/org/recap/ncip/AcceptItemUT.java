@@ -1,4 +1,4 @@
-package org.recap;
+package org.recap.ncip;
 
 import org.extensiblecatalog.ncip.v2.service.AcceptItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
@@ -8,6 +8,7 @@ import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.recap.BaseTestCaseUT;
 import org.recap.ncip.AcceptItem;
 
 import java.util.Arrays;

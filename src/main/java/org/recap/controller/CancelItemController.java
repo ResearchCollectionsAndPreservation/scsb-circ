@@ -77,19 +77,20 @@ public class CancelItemController {
             Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(requestId);
             if (requestItemEntity.isPresent()) {
                 ItemEntity itemEntity = requestItemEntity.get().getItemEntity();
-                ItemRequestInformation itemRequestInformation = commonUtil.getItemRequestInformation(itemEntity);
+                ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+                itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
+                itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+                itemRequestInformation.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 itemRequestInformation.setRequestingInstitution(requestItemEntity.get().getInstitutionEntity().getInstitutionCode());
                 itemRequestInformation.setPatronBarcode(requestItemEntity.get().getPatronId());
                 itemRequestInformation.setDeliveryLocation(requestItemEntity.get().getStopCode());
-                itemRequestInformation.setRequestId(requestId);
 
                 String requestStatus = requestItemEntity.get().getRequestStatusEntity().getRequestStatusCode();
                 ItemInformationResponse itemInformationResponse = (ItemInformationResponse) requestItemController.itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
                 itemRequestInformation.setBibId(itemInformationResponse.getBibID());
-                boolean isRequestTypeRetreivalAndFirstScan = isRequestType(requestItemEntity, RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
-                boolean isRequestTypeRecallAndFirstScan = isRequestType(requestItemEntity, RecapCommonConstants.REQUEST_TYPE_RECALL);
-                boolean isRequestTypeEDDAndFirstScan =isRequestType(requestItemEntity, RecapCommonConstants.REQUEST_TYPE_EDD);
-
+                boolean isRequestTypeRetreivalAndFirstScan = requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL) && requestItemEntity.get().getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.LAS_REFILE_REQUEST_PLACED);
+                boolean isRequestTypeRecallAndFirstScan = requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL) && requestItemEntity.get().getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.LAS_REFILE_REQUEST_PLACED);
+                boolean isRequestTypeEDDAndFirstScan = requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD) && requestItemEntity.get().getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.LAS_REFILE_REQUEST_PLACED);
                 if (requestStatus.equalsIgnoreCase(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED) || (isRequestTypeRetreivalAndFirstScan)) {
                     itemCancelHoldResponse = processCancelRequest(itemRequestInformation, itemInformationResponse, requestItemEntity.get());
                 } else if (requestStatus.equalsIgnoreCase(RecapCommonConstants.REQUEST_STATUS_RECALLED) || (isRequestTypeRecallAndFirstScan)) {
@@ -119,13 +120,6 @@ public class CancelItemController {
             cancelRequestResponse.setScreenMessage(itemCancelHoldResponse.getScreenMessage());
         }
         return cancelRequestResponse;
-    }
-
-    boolean isRequestType(Optional<RequestItemEntity> requestItemEntity, String requestType) {
-        if(requestItemEntity.isPresent()) {
-            return requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(requestType) && requestItemEntity.get().getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.LAS_REFILE_REQUEST_PLACED);
-        }
-        else return false;
     }
 
     private ItemHoldResponse processCancelRequest(ItemRequestInformation itemRequestInformation, ItemInformationResponse itemInformationResponse, RequestItemEntity requestItemEntity) {

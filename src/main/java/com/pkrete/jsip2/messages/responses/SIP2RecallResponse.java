@@ -57,19 +57,19 @@ public class SIP2RecallResponse extends SIP2CirculationTransactionResponse {
             builder.append(this.bibId);
         }
 
-        Iterator i$ = this.screenMessage.iterator();
+        Iterator<String> iter = this.screenMessage.iterator();
 
         String msg;
-        while(i$.hasNext()) {
-            msg = (String)i$.next();
+        while(iter.hasNext()) {
+            msg = iter.next();
             builder.append("|AF");
             builder.append(msg);
         }
 
-        i$ = this.printLine.iterator();
+        iter = this.printLine.iterator();
 
-        while(i$.hasNext()) {
-            msg = (String)i$.next();
+        while(iter.hasNext()) {
+            msg = iter.next();
             builder.append("|AG");
             builder.append(msg);
         }

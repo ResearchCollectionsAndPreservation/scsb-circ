@@ -242,7 +242,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             ResponseEntity<CheckoutResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, CheckoutResponse.class);
             CheckoutResponse checkoutResponse = responseEntity.getBody();
             itemCheckoutResponse = getRestApiResponseUtil().buildItemCheckoutResponse(checkoutResponse);
-            CheckoutData checkoutData = checkoutResponse.getData();
+            CheckoutData checkoutData = checkoutResponse != null ? checkoutResponse.getData() : null;
             if (null != checkoutData) {
                 String jobId = checkoutData.getJobId();
                 itemCheckoutResponse.setJobId(jobId);
@@ -297,7 +297,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             ResponseEntity<CheckinResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, CheckinResponse.class);
             CheckinResponse checkinResponse = responseEntity.getBody();
             itemCheckinResponse = getRestApiResponseUtil().buildItemCheckinResponse(checkinResponse);
-            CheckinData checkinData = checkinResponse.getData();
+            CheckinData checkinData = checkinResponse != null ? checkinResponse.getData() : null;
             if (null != checkinData) {
                 String jobId = checkinData.getJobId();
                 itemCheckinResponse.setJobId(jobId);
@@ -373,11 +373,11 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             ResponseEntity<CreateHoldResponse> responseEntity = restTemplate.exchange(recapHoldApiUrl, HttpMethod.POST, requestEntity, CreateHoldResponse.class);
             CreateHoldResponse createHoldResponse = responseEntity.getBody();
             itemHoldResponse = getRestApiResponseUtil().buildItemHoldResponse(createHoldResponse);
-            CreateHoldData createHoldData = createHoldResponse.getData();
+            CreateHoldData createHoldData = createHoldResponse != null ? createHoldResponse.getData() : null;
             if (null != createHoldData) {
                 String responseTrackingId = createHoldData.getTrackingId();
                 NYPLHoldResponse nyplHoldResponse = queryHoldResponseByTrackingId(responseTrackingId);
-                NYPLHoldData nyplHoldData = nyplHoldResponse.getData();
+                NYPLHoldData nyplHoldData = nyplHoldResponse != null ? nyplHoldResponse.getData() : null;
                 if (null != nyplHoldData) {
                     String jobId = nyplHoldData.getJobId();
                     itemHoldResponse.setJobId(jobId);
@@ -441,7 +441,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             ResponseEntity<CancelHoldResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, CancelHoldResponse.class);
             CancelHoldResponse cancelHoldResponse = responseEntity.getBody();
             itemHoldResponse = getRestApiResponseUtil().buildItemCancelHoldResponse(cancelHoldResponse);
-            CancelHoldData cancelHoldData = cancelHoldResponse.getData();
+            CancelHoldData cancelHoldData = cancelHoldResponse!= null ? cancelHoldResponse.getData() : null;
             if (null != cancelHoldData) {
                 String jobId = cancelHoldData.getJobId();
                 itemHoldResponse.setJobId(jobId);
@@ -546,7 +546,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
         HttpEntity<NyplHoldRequest> requestEntity = new HttpEntity<>(nyplHoldRequest, getHttpHeaders());
         ResponseEntity<NYPLHoldResponse> responseEntity = restTemplate.exchange(nyplHoldApiUrl, HttpMethod.POST, requestEntity, NYPLHoldResponse.class);
         NYPLHoldResponse nyplHoldResponse = responseEntity.getBody();
-        NYPLHoldData nyplHoldData = nyplHoldResponse.getData();
+        NYPLHoldData nyplHoldData = nyplHoldResponse != null ? nyplHoldResponse.getData() : null;
         if (null != nyplHoldData) {
             trackingId = String.valueOf(nyplHoldData.getId());
         }
@@ -684,7 +684,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             ResponseEntity<RefileResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, RefileResponse.class);
             RefileResponse refileResponse = responseEntity.getBody();
             itemRefileResponse = getRestApiResponseUtil().buildItemRefileResponse(refileResponse, this.institutionCode);
-            RefileData refileData = refileResponse.getData();
+            RefileData refileData = refileResponse != null ? refileResponse.getData() : null;
             if (null != refileData) {
                 String jobId = refileData.getJobId();
                 itemRefileResponse.setJobId(jobId);

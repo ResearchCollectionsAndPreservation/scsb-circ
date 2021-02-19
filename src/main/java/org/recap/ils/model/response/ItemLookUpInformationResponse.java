@@ -7,7 +7,7 @@ import java.util.HashMap;
 public class ItemLookUpInformationResponse {
 
     private String barcode;
-    private HashMap processtype;
+    private HashMap<String, Object> processtype;
     private String circulationStatus;
     private String bibId;
     private String title;

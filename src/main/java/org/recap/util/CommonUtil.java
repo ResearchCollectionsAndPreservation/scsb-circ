@@ -5,7 +5,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.*;
-import org.recap.repository.jpa.*;
+import org.recap.repository.jpa.CollectionGroupDetailsRepository;
+import org.recap.repository.jpa.ImsLocationDetailsRepository;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
+import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,15 +82,6 @@ public class CommonUtil {
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
         holdingsEntity.setOwningInstitutionId(owningInstitutionId);
         return holdingsEntity;
-    }
-
-    private String getExistingItemEntityOwningInstItemId(BibliographicEntity fetchedBibliographicEntity,ItemEntity incomingItemEntity){
-        for(ItemEntity fetchedItemEntity:fetchedBibliographicEntity.getItemEntities()){
-            if(fetchedItemEntity.getOwningInstitutionItemId().equals(incomingItemEntity.getOwningInstitutionItemId())){
-                return fetchedItemEntity.getHoldingsEntities().get(0).getOwningInstitutionHoldingsId();
-            }
-        }
-        return "";
     }
 
     public void addItemAndReportEntities(List<ItemEntity> itemEntities, List<ReportEntity> reportEntities, boolean processHoldings, HoldingsEntity holdingsEntity, Map<String, Object> itemMap) {
@@ -292,5 +288,13 @@ public class CommonUtil {
         String imsNotAvailableCodes = propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.not.available.item.status.codes");
         List<String> imsNotAvailableCodesList = Arrays.asList(imsNotAvailableCodes.split(","));
         return imsNotAvailableCodesList.contains(imsItemStatus);
+    }
+    public ItemRequestInformation getItemRequestInformation(ItemEntity itemEntity)
+    {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
+        itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
+        return itemRequestInformation;
     }
 }

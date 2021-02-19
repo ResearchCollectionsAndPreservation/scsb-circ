@@ -26,12 +26,12 @@ import org.extensiblecatalog.ncip.v2.service.RecallItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RecallItemResponseData;
 import org.json.JSONObject;
 
-import org.recap.AcceptItem;
-import org.recap.CancelRequestItem;
-import org.recap.CheckinItem;
-import org.recap.CheckoutItem;
-import org.recap.LookupUser;
-import org.recap.RecallItem;
+import org.recap.ncip.AcceptItem;
+import org.recap.ncip.CancelRequestItem;
+import org.recap.ncip.CheckinItem;
+import org.recap.ncip.CheckoutItem;
+import org.recap.ncip.LookupUser;
+import org.recap.ncip.RecallItem;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.ils.model.nypl.BibLookupData;
@@ -48,8 +48,10 @@ import org.recap.ils.service.RestApiResponseUtil;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.AbstractResponseItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -69,6 +71,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
     private String ncipRequest = "NCIP2 request sent: ";
     private String ncipResponse = "NCIP2 response received: ";
+    private String httpCallTo = "Http call to ";
+    private String returnedResponseCode = " returned response code ";
+    private String responseBody = ".  Response body: ";
+    private String failureReason = "Failure due to ";
+    private String success = "Success";
 
     @Autowired
     RestApiResponseUtil restApiResponseUtil;
@@ -102,6 +109,9 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     public void setIlsConfigProperties(ILSConfigProperties ilsConfigProperties) {
         this.ilsConfigProperties = ilsConfigProperties;
     }
+
+    @Value("${ils.behalf.agency}")
+    private String behalfAgency;
 
     /**
      * Get rest template rest template.
@@ -137,7 +147,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
      * @param headers the headers
      * @return the http entity
      */
-    public org.springframework.http.HttpEntity getHttpEntity(HttpHeaders headers) {
+    public org.springframework.http.HttpEntity getHttpEntity(HttpHeaders headers){
         return new org.springframework.http.HttpEntity<>(headers);
     }
 
@@ -156,8 +166,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     public CloseableHttpClient buildCloseableHttpClient(){
-        CloseableHttpClient client = HttpClients.custom().build();
-        return client;
+        return HttpClients.custom().build();
     }
 
     @Override
@@ -168,7 +177,9 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
 
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
-        try {
+        itemInformationResponse.setCirculationStatus("CHARGED");
+        // Commeneted for testing
+       /* try {
             String owningInstitution = getRestApiResponseUtil().getItemOwningInstitutionByItemBarcode(itemIdentifier);
 
             String apiUrl = getApiUrl(itemIdentifier);
@@ -179,7 +190,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
             ResponseEntity<ItemLookupResponse> responseLookupEntity = restTemplate.exchange(apiUrl + "&apikey=" + ilsConfigProperties.getIlsApiKey(), HttpMethod.GET, requestEntity, ItemLookupResponse.class);
             ItemLookupResponse itemResponse = responseLookupEntity.getBody();
-            log.debug ("itemResponse {}" + itemResponse);
+            log.info ("itemResponse {}" + itemResponse);
 
             ItemLookUpInformationResponse itemLookupData = buildResponse(itemResponse);
             itemInformationResponse.setItemBarcode(itemLookupData.getBarcode());
@@ -197,6 +208,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             itemInformationResponse.setSuccess(false);
             itemInformationResponse.setScreenMessage(e.getMessage());
         }
+       */
         return itemInformationResponse;
     }
 
@@ -209,7 +221,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         try {
             CheckoutItem checkoutItem = new CheckoutItem();
 
-            CheckOutItemInitiationData checkOutItemInitiationData = checkoutItem.getCheckOutItemInitiationData(itemIdentifier, requestId, patronIdentifier, getNcipAgencyId(), getNcipScheme());
+            CheckOutItemInitiationData checkOutItemInitiationData = checkoutItem.getCheckOutItemInitiationData(itemIdentifier, requestId, patronIdentifier, getNcipAgencyId());
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, checkOutItemInitiationData);
             String requestBody = IOUtils.toString(requestMessageStream, StandardCharsets.UTF_8);
@@ -228,7 +240,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
-                throw new Exception("Http call to " + getEndPointUrl() + " returned response code " + responseCode + ".  Response body: " + responseString);
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST , httpCallTo + getEndPointUrl() + returnedResponseCode + responseCode + responseBody + responseString);
             }
             //transforms the NCIP xml response into NCIP Objects
 
@@ -242,7 +254,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
             if (!checkoutItemResponse.getProblems().isEmpty()) {
                 itemCheckoutResponse.setSuccess(Boolean.FALSE);
-                itemCheckoutResponse.setScreenMessage("Failure due to " + checkoutItemResponse.getProblems());
+                itemCheckoutResponse.setScreenMessage(failureReason + checkoutItemResponse.getProblems());
                 return itemCheckoutResponse;
             } else {
                 log.info(responseObject.toString());
@@ -255,7 +267,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                 itemCheckoutResponse.setPatronIdentifier(checkoutItemResponse.getUserId().getUserIdentifierValue());
                 itemCheckoutResponse.setDueDate(responseObject.getString("dueDate"));
                 itemCheckoutResponse.setSuccess(Boolean.TRUE);
-                itemCheckoutResponse.setScreenMessage("Success");
+                itemCheckoutResponse.setScreenMessage(success);
                 return itemCheckoutResponse;
             }
 
@@ -280,7 +292,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
         try {
             CheckinItem checkInItem = new CheckinItem();
-            CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemIdentifier, patronIdentifier, getNcipAgencyId(), getNcipScheme());
+            CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemIdentifier, behalfAgency, getNcipAgencyId(), getNcipScheme());
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
 
             String requestBody = checkInItem.getRequestBody(ncipToolkitUtil, checkInItemInitiationData);
@@ -299,7 +311,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
-                throw new Exception("Http call to " + getEndPointUrl() + " returned response code " + responseCode + ".  Response body: " + responseString);
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, httpCallTo + getEndPointUrl() + returnedResponseCode + responseCode + responseBody + responseString);
             }
             //transforms the NCIP xml response into NCIP Objects
             InputStream stream = new ByteArrayInputStream(responseString.getBytes(StandardCharsets.UTF_8));
@@ -312,14 +324,14 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
             if (!checkinItemResponse.getProblems().isEmpty()) {
                 itemCheckinResponse.setSuccess(Boolean.FALSE);
-                itemCheckinResponse.setScreenMessage("Failure due to " + checkinItemResponse.getProblems());
+                itemCheckinResponse.setScreenMessage(failureReason + checkinItemResponse.getProblems());
                 return itemCheckinResponse;
             } else {
                 log.info(responseObject.toString());
 
                 itemCheckinResponse.setItemBarcode(checkinItemResponse.getItemId().getItemIdentifierValue());
                 itemCheckinResponse.setSuccess(Boolean.TRUE);
-                itemCheckinResponse.setScreenMessage("Success");
+                itemCheckinResponse.setScreenMessage(success);
                 itemCheckinResponse.setItemOwningInstitution(getInstitution());
                 return itemCheckinResponse;
             }
@@ -338,73 +350,26 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     @Override
     public Object placeHold(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
         log.info("Item barcode {} received for hold request in " + itemInstitutionId + " for patron {}", itemIdentifier, patronIdentifier);
+       // ItemCheckoutResponse itemCheckoutResponse;
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
-        String responseString = null;
-        JSONObject responseObject;
 
-        try {
-            AcceptItem acceptItem = new AcceptItem();
-            AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber, getNcipAgencyId(), getNcipScheme());
-            NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
-            String requestBody = acceptItem.getRequestBody(ncipToolkitUtil, acceptItemInitiationData);
-            log.info("AcceptItem Request Body >>> " + requestBody);
+        if (callInstitutionId.equalsIgnoreCase(itemInstitutionId)) {
+                itemHoldResponse.setSuccess(Boolean.TRUE);
+           //     itemHoldResponse.
 
-            CloseableHttpClient client = buildCloseableHttpClient();
-
-            HttpUriRequest request = getHttpRequest(requestBody);
-
-            HttpResponse response = client.execute(request);
-
-            HttpEntity entity = response.getEntity();
-            responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
-
-
-            log.info(ncipRequest);
-            log.info(requestBody);
-            log.info(ncipResponse);
-            log.info(responseString);
-            int responseCode = response.getStatusLine().getStatusCode();
-            if (responseCode > 399) {
-                throw new Exception("Http call to " + getEndPointUrl() + " returned response code " + responseCode + ".  Response body: " + responseString);
+       /*         itemCheckoutResponse = checkOutItem(itemIdentifier, requestId, patronIdentifier);
+                if (!itemCheckoutResponse.isSuccess()) {
+                    itemCheckoutResponse.setSuccess(Boolean.FALSE);
+                    itemCheckoutResponse.setScreenMessage(itemCheckoutResponse.getScreenMessage());
+                    return itemCheckoutResponse;
+                } else {
+                    itemHoldResponse = acceptItem(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
+                }
+       */
             }
-            //transforms the NCIP xml response into NCIP Objects
-            InputStream stream = new ByteArrayInputStream(responseString.getBytes(StandardCharsets.UTF_8));
-            NCIPResponseData responseData = ncipToolkitUtil.translator.createResponseData(ncipToolkitUtil.serviceContext, stream);
-
-            //transforms the  NCIP Objects into a JSON response object
-            AcceptItemResponseData acceptItemResponse = (AcceptItemResponseData) responseData;
-            responseObject = acceptItem.getAcceptItemResponse(acceptItemResponse);
-            log.info(responseObject.toString());
-
-            if (!acceptItemResponse.getProblems().isEmpty()) {
-                itemHoldResponse.setSuccess(Boolean.FALSE);
-                itemHoldResponse.setScreenMessage("Failure due to " + acceptItemResponse.getProblems());
-                return itemHoldResponse;
+            else {
+                itemHoldResponse = acceptItem(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
             }
-
-            itemHoldResponse.setItemOwningInstitution(itemInstitutionId);
-            itemHoldResponse.setItemBarcode(acceptItemResponse.getItemId().getItemIdentifierValue());
-            itemHoldResponse.setPatronIdentifier(patronIdentifier);
-            itemHoldResponse.setSuccess(Boolean.TRUE);
-            itemHoldResponse.setScreenMessage("Success");
-            itemHoldResponse.setTitleIdentifier(acceptItemResponse.getItemId().getItemIdentifierValue());
-            itemHoldResponse.setPickupLocation(pickupLocation);
-            itemHoldResponse.setInstitutionID(getInstitution());
-            itemHoldResponse.setCreatedDate(new Date().toString());
-            itemHoldResponse.setUpdatedDate(new Date().toString());
-            Date expirationDateforHold = DateUtils.addYears(new Date(), 1);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
-            itemHoldResponse.setExpirationDate(simpleDateFormat.format(expirationDateforHold));
-
-        } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR, httpException);
-            itemHoldResponse.setSuccess(false);
-            itemHoldResponse.setScreenMessage(httpException.getStatusText());
-        } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
-            itemHoldResponse.setSuccess(false);
-            itemHoldResponse.setScreenMessage(e.getMessage());
-        }
         return itemHoldResponse;
     }
 
@@ -416,7 +381,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
         try {
             CancelRequestItem cancelRequestItem = new CancelRequestItem();
-            CancelRequestItemInitiationData cancelRequestItemInitiationData = cancelRequestItem.getCancelRequestItemInitiationData(itemIdentifier, requestId, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, trackingId, getNcipAgencyId(), getNcipScheme());
+            CancelRequestItemInitiationData cancelRequestItemInitiationData = cancelRequestItem.getCancelRequestItemInitiationData(requestId, patronIdentifier, getNcipAgencyId(), getNcipScheme());
 
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, cancelRequestItemInitiationData);
@@ -435,7 +400,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
-                throw new Exception("Http call to " + getEndPointUrl() + " returned response code " + responseCode + ".  Response body: " + responseString);
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, httpCallTo + getEndPointUrl() + returnedResponseCode + responseCode + responseBody + responseString);
             }
             //transforms the NCIP xml response into NCIP Objects
             InputStream stream = new ByteArrayInputStream(responseString.getBytes(StandardCharsets.UTF_8));
@@ -449,7 +414,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
             if (!cancelItemResponse.getProblems().isEmpty()) {
                 itemHoldResponse.setSuccess(Boolean.FALSE);
-                itemHoldResponse.setScreenMessage("Failure due to " + cancelItemResponse.getProblems());
+                itemHoldResponse.setScreenMessage(failureReason + cancelItemResponse.getProblems());
                 return itemHoldResponse;
             }
 
@@ -489,7 +454,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
         try {
             LookupUser lookupUser = new LookupUser();
-            LookupUserInitiationData lookupUserInitiationData = lookupUser.getLookupUserInitiationData(patronIdentifier, getNcipAgencyId(), getNcipScheme());
+            LookupUserInitiationData lookupUserInitiationData = lookupUser.getLookupUserInitiationData(patronIdentifier, getNcipAgencyId());
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, lookupUserInitiationData);
             String requestBody = IOUtils.toString(requestMessageStream, StandardCharsets.UTF_8);
@@ -507,7 +472,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
-                throw new Exception("Http call to " + getEndPointUrl() + " returned response code " + responseCode + ".  Response body: " + responseString);
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, httpCallTo + getEndPointUrl() + returnedResponseCode + responseCode + responseBody + responseString);
             }
             //transforms the NCIP xml response into  NCIP Objects
             InputStream stream = new ByteArrayInputStream(responseString.getBytes(StandardCharsets.UTF_8));
@@ -519,7 +484,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
             if (!lookupUserResponseData.getProblems().isEmpty()) {
                 patronInformationResponse.setSuccess(Boolean.FALSE);
-                patronInformationResponse.setScreenMessage("Failure due to " + lookupUserResponseData.getProblems());
+                patronInformationResponse.setScreenMessage(failureReason + lookupUserResponseData.getProblems());
 
                 return patronInformationResponse;
             } else {
@@ -527,7 +492,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
                 patronInformationResponse.setPatronName(responseObject.getString("name"));
                 patronInformationResponse.setSuccess(Boolean.TRUE);
-                patronInformationResponse.setScreenMessage("Success");
+                patronInformationResponse.setScreenMessage(success);
                 patronInformationResponse.setHomeAddress(lookupUserResponseData.getUserOptionalFields().getUserAddressInformation(0).getPhysicalAddress().getStructuredAddress().getStreet().concat(",").concat(
                         lookupUserResponseData.getUserOptionalFields().getUserAddressInformation(0).getPhysicalAddress().getStructuredAddress().getLocality()).concat(",").
                         concat(lookupUserResponseData.getUserOptionalFields().getUserAddressInformation(0).getPhysicalAddress().getStructuredAddress().getRegion().concat(",").
@@ -559,7 +524,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
         try {
             RecallItem recallItem = new RecallItem();
-            RecallItemInitiationData recallItemInitiationData = recallItem.getRecallItemInitiationData(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation, getNcipAgencyId(), getNcipScheme());
+            RecallItemInitiationData recallItemInitiationData = recallItem.getRecallItemInitiationData(itemIdentifier, patronIdentifier, getNcipAgencyId());
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             InputStream requestMessageStream = ncipToolkitUtil.translator.createInitiationMessageStream(ncipToolkitUtil.serviceContext, recallItemInitiationData);
             String requestBody = IOUtils.toString(requestMessageStream, StandardCharsets.UTF_8);
@@ -576,7 +541,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             log.info(responseString);
             int responseCode = response.getStatusLine().getStatusCode();
             if (responseCode > 399) {
-                throw new Exception("Http call to " + getEndPointUrl() + " returned response code " + responseCode + ".  Response body: " + responseString);
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, httpCallTo + getEndPointUrl() + returnedResponseCode + responseCode + responseBody + responseString);
             }
             //transforms the NCIP xml response into NCIP Objects
             InputStream stream = new ByteArrayInputStream(responseString.getBytes(StandardCharsets.UTF_8));
@@ -600,7 +565,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             itemRecallResponse.setExpirationDate(simpleDateFormat.format(expirationDateforRecall));
 
             itemRecallResponse.setSuccess(Boolean.TRUE);
-            itemRecallResponse.setScreenMessage("Success");
+            itemRecallResponse.setScreenMessage(success);
 
         } catch (HttpClientErrorException httpException) {
             log.error(RecapCommonConstants.LOG_ERROR, httpException);
@@ -637,12 +602,80 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         ItemLookupData itemData = itemResponse.getItemLookupData();
         BibLookupData bibData = itemResponse.getBibLookupData();
         itemLookUpInformationResponse.setBarcode((String)itemData.getBarcode());
-        HashMap itemProcessMap = (HashMap) itemData.getProcesstype();
+        HashMap<String, Object> itemProcessMap = (HashMap) itemData.getProcesstype();
         itemLookUpInformationResponse.setProcesstype((HashMap) itemData.getProcesstype());
         itemLookUpInformationResponse.setCirculationStatus((String) itemProcessMap.get("value"));
         itemLookUpInformationResponse.setBibId((String) bibData.getBibId());
         itemLookUpInformationResponse.setTitle((String) bibData.getTitle());
 
         return  itemLookUpInformationResponse;
+    }
+
+    private ItemHoldResponse acceptItem(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
+        AcceptItem acceptItem = new AcceptItem();
+        ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
+        String responseString = null;
+        JSONObject responseObject;
+        try {
+            NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
+            CloseableHttpClient client = buildCloseableHttpClient();
+            AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, title, author, callNumber, getNcipAgencyId(), getNcipScheme());
+            String requestBody = acceptItem.getRequestBody(ncipToolkitUtil, acceptItemInitiationData);
+            log.info("AcceptItem Request Body >>> " + requestBody);
+            HttpUriRequest request = getHttpRequest(requestBody);
+            HttpResponse response = client.execute(request);
+            HttpEntity entity = response.getEntity();
+            responseString = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+
+
+            log.info(ncipRequest);
+            log.info(requestBody);
+            log.info(ncipResponse);
+            log.info(responseString);
+            int responseCode = response.getStatusLine().getStatusCode();
+            if (responseCode > 399) {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, getEndPointUrl() + returnedResponseCode + responseCode + responseBody + responseString);
+            }
+            //transforms the NCIP xml response into NCIP Objects
+            InputStream stream = new ByteArrayInputStream(responseString.getBytes(StandardCharsets.UTF_8));
+            NCIPResponseData responseData = ncipToolkitUtil.translator.createResponseData(ncipToolkitUtil.serviceContext, stream);
+
+            //transforms the  NCIP Objects into a JSON response object
+            AcceptItemResponseData acceptItemResponse = (AcceptItemResponseData) responseData;
+            responseObject = acceptItem.getAcceptItemResponse(acceptItemResponse);
+            log.info(responseObject.toString());
+
+            if (!acceptItemResponse.getProblems().isEmpty()) {
+                itemHoldResponse.setSuccess(Boolean.FALSE);
+                itemHoldResponse.setScreenMessage(failureReason + acceptItemResponse.getProblems());
+                itemHoldResponse = (ItemHoldResponse) cancelHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, expirationDate, bibId, pickupLocation, trackingId);
+                return itemHoldResponse;
+            }
+
+            itemHoldResponse.setItemOwningInstitution(itemInstitutionId);
+            itemHoldResponse.setItemBarcode(acceptItemResponse.getItemId().getItemIdentifierValue());
+            itemHoldResponse.setPatronIdentifier(patronIdentifier);
+            itemHoldResponse.setSuccess(Boolean.TRUE);
+            itemHoldResponse.setScreenMessage(success);
+            itemHoldResponse.setTitleIdentifier(acceptItemResponse.getItemId().getItemIdentifierValue());
+            itemHoldResponse.setPickupLocation(pickupLocation);
+            itemHoldResponse.setInstitutionID(getInstitution());
+            itemHoldResponse.setCreatedDate(new Date().toString());
+            itemHoldResponse.setUpdatedDate(new Date().toString());
+            Date expirationDateforHold = DateUtils.addYears(new Date(), 1);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
+            itemHoldResponse.setExpirationDate(simpleDateFormat.format(expirationDateforHold));
+        }
+        catch(HttpClientErrorException httpException){
+            log.error(RecapCommonConstants.LOG_ERROR, httpException);
+            itemHoldResponse.setSuccess(false);
+            itemHoldResponse.setScreenMessage(httpException.getStatusText());
+        } catch(Exception e){
+            log.error(RecapCommonConstants.LOG_ERROR, e);
+            itemHoldResponse.setSuccess(false);
+            itemHoldResponse.setScreenMessage(e.getMessage());
+        }
+        return itemHoldResponse;
+
     }
 }

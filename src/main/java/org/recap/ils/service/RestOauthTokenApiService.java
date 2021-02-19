@@ -22,7 +22,7 @@ public class RestOauthTokenApiService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", authorization);
 
-        HttpEntity<String> requestEntity = new HttpEntity("grant_type=client_credentials", headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>("grant_type=client_credentials", headers);
         ResponseEntity<String> responseEntity = restTemplate.exchange(oauthTokenApiUrl, HttpMethod.POST, requestEntity, String.class);
         JSONObject jsonObject = new JSONObject(responseEntity.getBody());
         return (String) jsonObject.get("access_token");

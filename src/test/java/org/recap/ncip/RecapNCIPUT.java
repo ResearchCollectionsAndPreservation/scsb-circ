@@ -1,9 +1,15 @@
-package org.recap;
+package org.recap.ncip;
 
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.AcceptItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
+import org.extensiblecatalog.ncip.v2.service.Problem;
+import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
 
@@ -17,7 +23,7 @@ public class RecapNCIPUT extends BaseTestCaseUT {
     @Test
     public void generateProblem() {
         NCIPResponseData ncipResponseData = getAcceptItemResponseData();
-        JSONObject returnJson = recapNCIP.generateProblem(ncipResponseData);
+        JSONObject returnJson = recapNCIP.generateNcipProblems(ncipResponseData);
         assertNotNull(returnJson);
     }
 

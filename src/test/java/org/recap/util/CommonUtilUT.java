@@ -194,13 +194,13 @@ public class CommonUtilUT extends BaseTestCaseUT {
         assertNotNull(imsLocationCode);
     }
 
-    @Test
+    /*@Test
     public void getExistingItemEntityOwningInstItemId() {
         BibliographicEntity fetchedBibliographicEntity = getBibliographicEntity();
         ItemEntity incomingItemEntity = getBibliographicEntity().getItemEntities().get(0);
         incomingItemEntity.setOwningInstitutionItemId("55555");
         ReflectionTestUtils.invokeMethod(commonUtil, "getExistingItemEntityOwningInstItemId", fetchedBibliographicEntity, incomingItemEntity);
-    }
+    }*/
 
     @Test
     public void getBarcodesList() {

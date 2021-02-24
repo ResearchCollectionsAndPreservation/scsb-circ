@@ -416,7 +416,7 @@ public class ItemRequestService {
                     }
                     logger.info("Gfa status After modifying : {}",gfaItemStatus);
                     boolean isImsItemStatusAvailable = commonUtil.isImsItemStatusAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus);
-                    logger.info("Condition satified {}", isImsItemStatusAvailable);
+                    logger.info("Condition satisfied {}", isImsItemStatusAvailable);
                     if (isImsItemStatusAvailable) {
                         itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
                         itemRequestInfo.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
@@ -424,6 +424,7 @@ public class ItemRequestService {
                         itemRequestInfo.setPatronBarcode(requestItemEntity.getPatronId());
                         setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntity);
                         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+                        itemRequestInfo.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
                         updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
                         logger.info("Successfully placed the request to Queue");
                         requestItemDetailsRepository.save(requestItemEntity);

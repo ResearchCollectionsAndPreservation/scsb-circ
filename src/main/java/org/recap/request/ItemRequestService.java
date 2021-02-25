@@ -400,6 +400,7 @@ public class ItemRequestService {
             }
         }
         else {
+            itemRefileResponse.setScreenMessage("Cannot Refile.Please check the provided barcode(s) and requestId(s)");
             for (RequestItemEntity requestItemEntity : requestItemEntities) {
                 if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.LAS_REFILE_REQUEST_PLACED)) {
                     ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
@@ -436,7 +437,6 @@ public class ItemRequestService {
                     }
                 }
             }
-            itemRefileResponse.setScreenMessage("Cannot Refile.Please check the provided barcode(s) and requestId(s)");
         }
         return itemRefileResponse;
     }
@@ -665,7 +665,9 @@ public class ItemRequestService {
                 ItemCreateBibResponse createBibResponse;
                 String isCreateBibEnabled = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
                 if (Boolean.TRUE.toString().equalsIgnoreCase(isCreateBibEnabled)) {
-                    createBibResponse = (ItemCreateBibResponse) requestItemController.createBibliogrphicItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
+                    //createBibResponse = (ItemCreateBibResponse) requestItemController.createBibliogrphicItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
+                    createBibResponse = new ItemCreateBibResponse();
+                    createBibResponse.setSuccess(true);
                 } else {
                     createBibResponse = new ItemCreateBibResponse();
                     createBibResponse.setSuccess(true);
@@ -721,10 +723,13 @@ public class ItemRequestService {
     }
 
     private ItemInformationResponse holdItem(String callingInst, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation, ItemEntity itemEntity) {
-        ItemHoldResponse itemHoldResponse = (ItemHoldResponse) requestItemController.holdItem(itemRequestInfo, callingInst);
+        //ItemHoldResponse itemHoldResponse = (ItemHoldResponse) requestItemController.holdItem(itemRequestInfo, callingInst);
+        ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
+        itemHoldResponse.setSuccess(true);
+        itemHoldResponse.setSuccess(true);
         if (itemHoldResponse.isSuccess()) { // IF Hold command is successfully
-            itemResponseInformation.setExpirationDate(itemHoldResponse.getExpirationDate());
-            itemRequestInfo.setExpirationDate(itemHoldResponse.getExpirationDate());
+            //itemResponseInformation.setExpirationDate(itemHoldResponse.getExpirationDate());
+            //itemRequestInfo.setExpirationDate(itemHoldResponse.getExpirationDate());
             itemResponseInformation = checkInstAfterPlacingRequest(itemRequestInfo, itemResponseInformation, itemEntity);
         } else { // If Hold command Failure
             itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_ILS_EXCEPTION + itemHoldResponse.getScreenMessage());

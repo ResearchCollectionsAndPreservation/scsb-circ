@@ -665,9 +665,7 @@ public class ItemRequestService {
                 ItemCreateBibResponse createBibResponse;
                 String isCreateBibEnabled = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.create.bib.api.enabled");
                 if (Boolean.TRUE.toString().equalsIgnoreCase(isCreateBibEnabled)) {
-                    //createBibResponse = (ItemCreateBibResponse) requestItemController.createBibliogrphicItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
-                    createBibResponse = new ItemCreateBibResponse();
-                    createBibResponse.setSuccess(true);
+                    createBibResponse = (ItemCreateBibResponse) requestItemController.createBibliogrphicItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
                 } else {
                     createBibResponse = new ItemCreateBibResponse();
                     createBibResponse.setSuccess(true);
@@ -723,13 +721,10 @@ public class ItemRequestService {
     }
 
     private ItemInformationResponse holdItem(String callingInst, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation, ItemEntity itemEntity) {
-        //ItemHoldResponse itemHoldResponse = (ItemHoldResponse) requestItemController.holdItem(itemRequestInfo, callingInst);
-        ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
-        itemHoldResponse.setSuccess(true);
-        itemHoldResponse.setSuccess(true);
+        ItemHoldResponse itemHoldResponse = (ItemHoldResponse) requestItemController.holdItem(itemRequestInfo, callingInst);
         if (itemHoldResponse.isSuccess()) { // IF Hold command is successfully
-            //itemResponseInformation.setExpirationDate(itemHoldResponse.getExpirationDate());
-            //itemRequestInfo.setExpirationDate(itemHoldResponse.getExpirationDate());
+            itemResponseInformation.setExpirationDate(itemHoldResponse.getExpirationDate());
+            itemRequestInfo.setExpirationDate(itemHoldResponse.getExpirationDate());
             itemResponseInformation = checkInstAfterPlacingRequest(itemRequestInfo, itemResponseInformation, itemEntity);
         } else { // If Hold command Failure
             itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_ILS_EXCEPTION + itemHoldResponse.getScreenMessage());

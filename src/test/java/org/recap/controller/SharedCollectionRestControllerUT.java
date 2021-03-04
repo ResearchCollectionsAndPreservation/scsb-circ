@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by premkb on 26/12/16.
@@ -45,6 +46,13 @@ public class SharedCollectionRestControllerUT {
         Mockito.when(deAccessionService.deAccession(deAccessionRequest)).thenReturn(map);
         ResponseEntity result = sharedCollectionRestController.deAccession(deAccessionRequest);
         assertNotNull(result);
+    }
+    @Test
+    public void deAccessionNull() throws Exception {
+        DeAccessionRequest deAccessionRequest = new DeAccessionRequest();
+        Mockito.when(deAccessionService.deAccession(deAccessionRequest)).thenReturn(null);
+        ResponseEntity result = sharedCollectionRestController.deAccession(deAccessionRequest);
+        assertNull(result);
     }
 
 }

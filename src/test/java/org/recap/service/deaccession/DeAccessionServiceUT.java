@@ -97,6 +97,9 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
     @Mock
     DeaccesionItemChangeLogDetailsRepository deaccesionItemChangeLogDetailsRepository;
 
+    @Mock
+    ItemEntity itemEntity;
+
     @Before
     public void setup() {
         Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
@@ -112,12 +115,12 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = getItemEntity();
         itemEntity.setCatalogingStatus("Complete");
         RequestItemEntity requestItemEntity = getRequestItem();
-        String itemBarcode ="123456";
+        String itemBarcode = "123456";
         Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
-        barcodeAndStopCodeMap.put("123456","PA");
+        barcodeAndStopCodeMap.put("123456", "PA");
         Set<String> itemBarcodeList = barcodeAndStopCodeMap.keySet();
         Map<Integer, String> itemIdAndMessageMap = new HashMap<>();
-        itemIdAndMessageMap.put(1,"LAS server is not reachable. Please contact ReCAP staff (<a href=\"mailto:null\">null</a>) for further assistance.");
+        itemIdAndMessageMap.put(1, "LAS server is not reachable. Please contact ReCAP staff (<a href=\"mailto:null\">null</a>) for further assistance.");
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         List<DeaccessionItemChangeLog> itemChangeLogEntities = new ArrayList<>();
         DeaccessionItemChangeLog deaccessionItemChangeLog = getDeaccessionItemChangeLog(itemIdAndMessageMap);
@@ -132,7 +135,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         when(requestItemDetailsRepository.findByItemBarcode(itemBarcode)).thenReturn(Arrays.asList(requestItemEntity));
         when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
         when(requestItemController.itemInformation(any(), any())).thenReturn(itemInformationResponse);
-        Mockito.when(requestItemController.cancelHoldItem(any(),any())).thenReturn(itemHoldResponse);
+        Mockito.when(requestItemController.cancelHoldItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(getRequestItem().getRequestStatusEntity());
         Mockito.when(requestItemDetailsRepository.save(any())).thenReturn(requestItemEntity);
         Mockito.when(deaccesionItemChangeLogDetailsRepository.saveAll(itemChangeLogEntities)).thenReturn(Arrays.asList(deaccessionItemChangeLog));
@@ -157,7 +160,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void deaccessionWithoutDeaccessionItems(){
+    public void deaccessionWithoutDeaccessionItems() {
         DeAccessionRequest deAccessionRequest = new DeAccessionRequest();
         DeAccessionItem deAccessionItem = getDeAccessionItem();
         deAccessionRequest.setDeAccessionItems(Collections.EMPTY_LIST);
@@ -201,8 +204,8 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         Mockito.when(requestItemDetailsRepository.save(any())).thenReturn(getRequestItem());
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(requestStatusEntity);
         Mockito.doNothing().when(itemRequestServiceUtil).updateSolrIndex(any());
-        Mockito.when(requestItemController.itemInformation(any(),any())).thenReturn(itemInformationResponse);
-        Mockito.when(requestItemController.cancelHoldItem(any(),any())).thenReturn(itemHoldResponse);
+        Mockito.when(requestItemController.itemInformation(any(), any())).thenReturn(itemInformationResponse);
+        Mockito.when(requestItemController.cancelHoldItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(requestItemDetailsRepository.findByItemBarcode("123")).thenReturn(Arrays.asList(getRequestItem()));
         deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
         assertNotNull(barcodeAndStopCodeMap);
@@ -215,6 +218,19 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         assertNotNull(barcodeAndStopCodeMap);
 
     }
+
+    @Test
+    public void checkAndCancelHoldsException() throws Exception {
+        RequestItemEntity requestItemEntity = getRequestItem();
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        barcodeAndStopCodeMap.put("123456", "PB");
+        barcodeAndStopCodeMap.put("123", "AB");
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        Mockito.when(requestItemDetailsRepository.findByItemBarcode("123")).thenThrow(new NullPointerException());
+        deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
+        assertNotNull(barcodeAndStopCodeMap);
+    }
+
     @Test
     public void checkAndCancelHoldsWithoutActiveRecallRequestAndActiveRetrievalRequest() throws Exception {
         RequestItemEntity requestItemEntity = getRequestItem();
@@ -229,6 +245,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
         assertNotNull(barcodeAndStopCodeMap);
     }
+
     @Test
     public void checkAndCancelHoldsWithActiveRecallRequestAndActiveRetrievalRequest() throws Exception {
         RequestItemEntity requestItemEntity = getRequestItem();
@@ -247,7 +264,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
         Mockito.when(requestItemController.cancelHoldItem(any(), any())).thenReturn(itemHoldResponse);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcode("123")).thenReturn(Arrays.asList(requestItemEntity,requestItemEntity1));
+        Mockito.when(requestItemDetailsRepository.findByItemBarcode("123")).thenReturn(Arrays.asList(requestItemEntity, requestItemEntity1));
         Mockito.when(requestItemDetailsRepository.save(any())).thenReturn(getRequestItem());
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(getRequestItem().getRequestStatusEntity());
         deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
@@ -256,6 +273,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
         assertNotNull(barcodeAndStopCodeMap);
     }
+
     @Test
     public void checkAndCancelHoldsWithActiveRecallRequestAndActiveRetrievalRequestDifferentRequestingId() throws Exception {
         RequestItemEntity requestItemEntity = getRequestItem();
@@ -276,13 +294,14 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
         Mockito.when(requestItemController.cancelHoldItem(any(), any())).thenReturn(itemHoldResponse);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcode("123")).thenReturn(Arrays.asList(requestItemEntity,requestItemEntity1));
+        Mockito.when(requestItemDetailsRepository.findByItemBarcode("123")).thenReturn(Arrays.asList(requestItemEntity, requestItemEntity1));
         Mockito.when(requestItemDetailsRepository.save(any())).thenReturn(getRequestItem());
         Mockito.when(requestItemController.itemInformation(any(), any())).thenReturn(itemInformationResponse);
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(getRequestItem().getRequestStatusEntity());
         deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
         assertNotNull(barcodeAndStopCodeMap);
     }
+
     @Test
     public void checkAndCancelHoldsForInitialLoadRequest() throws Exception {
         RequestItemEntity requestItemEntity = getRequestItem();
@@ -301,6 +320,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         deAccessionService.checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, "Test");
         assertNotNull(barcodeAndStopCodeMap);
     }
+
     @Test
     public void checkAndCancelHoldsWithActiveRecallRequestAndWithoutActiveRetrievalRequest() throws Exception {
         RequestItemEntity requestItemEntity = getRequestItem();
@@ -318,7 +338,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void callGfaDeaccessionServiceWithResponse(){
+    public void callGfaDeaccessionServiceWithResponse() {
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
         deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.NOT_AVAILABLE);
         deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
@@ -326,24 +346,159 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
         String username = "test";
         GFAPwiResponse gfaPwiResponse = getGfaPwiResponse();
-        Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(),any())).thenReturn(Boolean.TRUE.toString());
+        Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
         Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
         Mockito.when(abstractLASImsLocationConnector.gfaPermanentWithdrawalInDirect(any())).thenReturn(gfaPwiResponse);
-        ReflectionTestUtils.invokeMethod(deAccessionService,"callGfaDeaccessionService",deAccessionDBResponseEntities,username);
+        ReflectionTestUtils.invokeMethod(deAccessionService, "callGfaDeaccessionService", deAccessionDBResponseEntities, username);
     }
+
     @Test
-    public void callGfaDeaccessionServiceWithoutResponse(){
+    public void callGfaDeaccessionServiceWithoutResponse() {
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
         deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.NOT_AVAILABLE);
         deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
         String username = "test";
-        Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(),any())).thenReturn(Boolean.TRUE.toString());
+        Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
         Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
         Mockito.when(abstractLASImsLocationConnector.gfaPermanentWithdrawalInDirect(any())).thenReturn(null);
-        ReflectionTestUtils.invokeMethod(deAccessionService,"callGfaDeaccessionService",deAccessionDBResponseEntities,username);
+        ReflectionTestUtils.invokeMethod(deAccessionService, "callGfaDeaccessionService", deAccessionDBResponseEntities, username);
     }
+
+    @Test
+    public void rollbackLASRejectedItems() {
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
+        deAccessionDBResponseEntity.setReasonForFailure(RecapCommonConstants.LAS_SERVER_NOT_REACHABLE);
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        String username = "test";
+        ReflectionTestUtils.invokeMethod(deAccessionService, "rollbackLASRejectedItems", deAccessionDBResponseEntities, username);
+    }
+
+    @Test
+    public void checkGfaItemStatusItemDeleted() {
+        List<DeAccessionItem> deAccessionItems = new ArrayList<>();
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
+        deAccessionItems.add(deAccessionItem);
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setDeleted(true);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+    }
+
+    @Test
+    public void checkGfaItemStatusItemNotCmpleted() {
+        List<DeAccessionItem> deAccessionItems = new ArrayList<>();
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
+        deAccessionItems.add(deAccessionItem);
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setCatalogingStatus(RecapCommonConstants.INCOMPLETE_STATUS);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+    }
+
+    @Test
+    public void checkGfaItemStatusSchOnStatus() {
+        List<DeAccessionItem> deAccessionItems = new ArrayList<>();
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
+        deAccessionItems.add(deAccessionItem);
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn(RecapConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER);
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+    }
+
+    @Test
+    public void checkGfaItemStatusItemNotAvailable() {
+        List<DeAccessionItem> deAccessionItems = new ArrayList<>();
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
+        deAccessionItems.add(deAccessionItem);
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
+        itemEntity.getItemStatusEntity().setStatusCode(RecapCommonConstants.NOT_AVAILABLE);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn(RecapConstants.ILS_CONNECTION_FAILED);
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+    }
+
+    @Test
+    public void checkGfaItemStatusBlankStatus() {
+        List<DeAccessionItem> deAccessionItems = new ArrayList<>();
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
+        deAccessionItems.add(deAccessionItem);
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn("");
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+    }
+
+    @Test
+    public void checkGfaItemStatusWithoutItemEntites() {
+        List<DeAccessionItem> deAccessionItems = new ArrayList<>();
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
+        deAccessionItems.add(deAccessionItem);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Collections.EMPTY_LIST);
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+    }
+
+    @Test
+    public void checkGfaItemStatusBlankBarcode() {
+        List<DeAccessionItem> deAccessionItems = new ArrayList<>();
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
+        deAccessionItem.setItemBarcode("");
+        deAccessionItems.add(deAccessionItem);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+    }
+
+    @Test
+    public void checkGfaItemStatusException() {
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", null, null, null);
+    }
+
+    @Test
+    public void callGfaDeaccessionService() {
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.AVAILABLE);
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        String username = "test";
+        Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
+        Mockito.when(abstractLASImsLocationConnector.gfaPermanentWithdrawalDirect(any())).thenReturn(null);
+        ReflectionTestUtils.invokeMethod(deAccessionService, "callGfaDeaccessionService", deAccessionDBResponseEntities, username);
+    }
+
     private DeAccessionDBResponseEntity getDeAccessionDBResponseEntity() {
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
         deAccessionDBResponseEntity.setBarcode("12345");
@@ -357,7 +512,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void cancelRequest(){
+    public void cancelRequest() {
         RequestItemEntity requestItemEntity = getMockRequestItemEntities().get(0);
         String username = "username";
         ItemRequestInformation itemRequestInformation = getItemRequestInformation2();
@@ -375,43 +530,47 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Mockito.doNothing().when(itemRequestServiceUtil).updateSolrIndex(requestItemEntity.getItemEntity());
         Mockito.when(requestItemDetailsRepository.save(requestItemEntity)).thenReturn(requestItemEntity);
-        ItemHoldResponse itemHoldResponse = deAccessionService.cancelRequest(requestItemEntity,username);
+        ItemHoldResponse itemHoldResponse = deAccessionService.cancelRequest(requestItemEntity, username);
         assertNotNull(itemHoldResponse);
     }
+
     @Test
-    public void deAccessionItemsInDB(){
+    public void deAccessionItemsInDB() {
         Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
-        barcodeAndStopCodeMap.put("1","345890");
+        barcodeAndStopCodeMap.put("1", "345890");
         Set<String> itemBarcodeList = barcodeAndStopCodeMap.keySet();
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
         String username = "username";
         Mockito.when(itemDetailsRepository.findByBarcodeIn(new ArrayList<>(itemBarcodeList))).thenReturn(Arrays.asList(getItemEntity()));
         Mockito.when(holdingsDetailsRepository.getNonDeletedItemsCount(1, "1")).thenReturn(1l);
         Mockito.when(bibliographicDetailsRepository.getNonDeletedItemsCount(1, "1234")).thenReturn(1l);
-        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap,deAccessionDBResponseEntities,username);
+        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap, deAccessionDBResponseEntities, username);
     }
+
     @Test
-    public void deAccessionItemsInDBInnerException(){
+    public void deAccessionItemsInDBInnerException() {
         Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
-        barcodeAndStopCodeMap.put("1","345890");
+        barcodeAndStopCodeMap.put("1", "345890");
         Set<String> itemBarcodeList = barcodeAndStopCodeMap.keySet();
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
         String username = "username";
         Mockito.when(itemDetailsRepository.findByBarcodeIn(new ArrayList<>(itemBarcodeList))).thenReturn(Arrays.asList(getItemEntity()));
         Mockito.when(holdingsDetailsRepository.getNonDeletedItemsCount(1, "1")).thenReturn(null);
-        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap,deAccessionDBResponseEntities,username);
+        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap, deAccessionDBResponseEntities, username);
     }
+
     @Test
-    public void deAccessionItemsInDBException(){
+    public void deAccessionItemsInDBException() {
         Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
         Set<String> itemBarcodeList = barcodeAndStopCodeMap.keySet();
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
         String username = "username";
         Mockito.when(itemDetailsRepository.findByBarcodeIn(new ArrayList<>(itemBarcodeList))).thenReturn(null);
-        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap,deAccessionDBResponseEntities,username);
+        deAccessionService.deAccessionItemsInDB(barcodeAndStopCodeMap, deAccessionDBResponseEntities, username);
     }
+
     @Test
-    public  void deAcessionItemsInSolrSuccess(){
+    public void deAcessionItemsInSolrSuccess() {
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
         deAccessionDBResponseEntity.setBarcode("123456");
@@ -421,10 +580,11 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         deAccessionDBResponseEntity.setItemId(1);
         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
         Map<String, String> resultMap = new HashMap<>();
-        deAccessionService.deAccessionItemsInSolr(deAccessionDBResponseEntities,resultMap);
+        deAccessionService.deAccessionItemsInSolr(deAccessionDBResponseEntities, resultMap);
     }
+
     @Test
-    public  void deAcessionItemsInSolrFailure(){
+    public void deAcessionItemsInSolrFailure() {
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
         deAccessionDBResponseEntity.setBarcode("123456");
@@ -432,8 +592,9 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         deAccessionDBResponseEntity.setReasonForFailure("Barcode UnAvailable");
         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
         Map<String, String> resultMap = new HashMap<>();
-        deAccessionService.deAccessionItemsInSolr(deAccessionDBResponseEntities,resultMap);
+        deAccessionService.deAccessionItemsInSolr(deAccessionDBResponseEntities, resultMap);
     }
+
     public ItemInformationResponse getItemInformationResponse() {
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
         itemInformationResponse.setCirculationStatus("test");
@@ -455,7 +616,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         return itemInformationResponse;
     }
 
-    private ItemRequestInformation getItemRequestInformation2(){
+    private ItemRequestInformation getItemRequestInformation2() {
         ItemEntity itemEntity = getMockRequestItemEntities().get(0).getItemEntity();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
@@ -486,6 +647,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         itemRequestInformation.setRequestType("RETRIEVAL");
         return itemRequestInformation;
     }
+
     public RequestItemEntity getRequestItem() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("PUL");
@@ -498,7 +660,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         requestTypeEntity.setRequestTypeCode("RETRIEVAL");
         requestTypeEntity.setRequestTypeDesc("RETRIEVAL");
         ItemEntity itemEntity = getItemEntity();
-        RequestStatusEntity requestStatusEntity =  new RequestStatusEntity();
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
         requestStatusEntity.setRequestStatusCode("LAS_REFILE_REQUEST_PLACED");
         requestStatusEntity.setRequestStatusDescription("RETRIEVAL ORDER PLACED");
         requestItemEntity.setId(1);
@@ -519,6 +681,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         requestItemEntity.setLastUpdatedDate(new Date());
         return requestItemEntity;
     }
+
     private ItemEntity getItemEntity() {
 
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
@@ -555,6 +718,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         assertTrue(itemEntity.isCgdProtection());
         return itemEntity;
     }
+
     private ImsLocationEntity getImsLocationEntity() {
         ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
         imsLocationEntity.setImsLocationCode("1");
@@ -785,7 +949,8 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
 
         return requestItemEntities;
     }
-    private GFAPwdResponse getGFAPwdResponse(){
+
+    private GFAPwdResponse getGFAPwdResponse() {
         GFAPwdResponse gfaPwdResponse = new GFAPwdResponse();
         GFAPwdDsItemResponse gfaPwdDsItemResponse = new GFAPwdDsItemResponse();
         GFAPwdTtItemResponse gfaPwdTtItemResponse = new GFAPwdTtItemResponse();
@@ -808,7 +973,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
     }
 
     private GFAPwiResponse getGfaPwiResponse() {
-        GFAPwiResponse gfaPwiResponse  = new GFAPwiResponse();
+        GFAPwiResponse gfaPwiResponse = new GFAPwiResponse();
         GFAPwiDsItemResponse gfaPwiDsItemResponse = new GFAPwiDsItemResponse();
         GFAPwiTtItemResponse gfaPwiTtItemResponse = new GFAPwiTtItemResponse();
         gfaPwiTtItemResponse.setCustomerCode("CA");

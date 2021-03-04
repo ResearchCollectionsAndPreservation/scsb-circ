@@ -3,22 +3,20 @@ package org.recap.ils;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.extensiblecatalog.ncip.v2.common.Translator;
-import org.extensiblecatalog.ncip.v2.service.ServiceContext;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.recap.BaseTestCaseUT;
 import org.recap.ils.model.nypl.BibLookupData;
 import org.recap.ils.model.nypl.ItemLookupData;
 import org.recap.ils.model.nypl.response.ItemLookupResponse;
-import org.recap.ils.model.nypl.response.RefileResponse;
+import org.recap.ils.model.response.ItemLookUpInformationResponse;
 import org.recap.ils.service.RestApiResponseUtil;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,8 +30,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 
 
 public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
@@ -75,12 +71,19 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
     @Mock
     RestTemplate restTemplate;
 
+    @Mock
+    org.springframework.http.HttpHeaders headers;
+
     @Test
     public void checkGetters(){
         ncipProtocolConnector.getNcipScheme();
         ncipProtocolConnector.getEndPointUrl();
         ncipProtocolConnector.getRestTemplate();
         ncipProtocolConnector.getRestApiResponseUtil();
+        ncipProtocolConnector.getHttpHeader();
+        ncipProtocolConnector.getHttpEntity(headers);
+        Mockito.when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("");
+        ncipProtocolConnector.getApiUrl("4565778");
     }
     @Test
     public void supports() {
@@ -161,6 +164,11 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         assertNotNull(result);
     }
 
+    @Test
+    public void lookupItem() throws Exception {
+        AbstractResponseItem abstractResponseItem = ncipProtocolConnector.lookupItem("13245676");
+        assertNotNull(abstractResponseItem);
+    }
     @Test
     public void checkOutItemHttpClientErrorException() throws IOException {
         String itemIdentifier = "23456";
@@ -372,6 +380,13 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
     public void refileItem() {
         Object result = ncipProtocolConnector.refileItem("23556");
         assertNull(result);
+    }
+
+    @Test
+    public void buildResponse(){
+        ItemLookupResponse itemLookupResponse = getItemLookupResponse();
+        ItemLookUpInformationResponse response = ncipProtocolConnector.buildResponse(itemLookupResponse);
+        assertNotNull(response);
     }
 
     private ItemLookupResponse getItemLookupResponse() {

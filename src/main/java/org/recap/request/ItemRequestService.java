@@ -75,10 +75,6 @@ public class ItemRequestService {
     private RequestItemDetailsRepository requestItemDetailsRepository;
 
     @Autowired
-    private ImsLocationDetailsRepository imsLocationDetailsRepository;
-
-
-    @Autowired
     RestTemplate restTemplate;
 
     @Autowired
@@ -172,12 +168,8 @@ public class ItemRequestService {
                     itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 }
                 itemRequestInfo.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+                itemRequestInfo.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
                 logger.info("itemEntity.getImsLocationEntity().getImsLocationCode() >>>> "  + itemEntity.getImsLocationEntity().getImsLocationCode());
-
-                ImsLocationEntity imsLocationEntity = imsLocationDetailsRepository.findByImsLocationCode(itemEntity.getImsLocationId().toString());
-                logger.info("getImsLocationCode() now >>>> "  + imsLocationEntity.getImsLocationCode());
-
-                itemRequestInfo.setImsLocationCode(imsLocationEntity.getImsLocationCode());
                 SearchResultRow searchResultRow = searchRecords(itemEntity); //Solr
 
                 itemRequestInfo.setTitleIdentifier(getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, searchResultRow));
@@ -1053,6 +1045,7 @@ public class ItemRequestService {
      * @return the boolean
      */
     public boolean isUseQueueLasCall(String imsLocationCode) {
+        logger.info("proprty value for las.use.queue >>>> " + propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.use.queue"));
         return Boolean.parseBoolean(this.propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.use.queue"));
     }
 

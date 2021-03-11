@@ -12,4 +12,7 @@ import java.util.List;
 public interface ImsLocationDetailsRepository extends JpaRepository<ImsLocationEntity, Integer> {
     @Query(value = "select IMS_LOCATION_CODE from ims_location_t where IMS_LOCATION_CODE != 'UN';",nativeQuery = true)
     List<String> findAllImsLocationCodeExceptUN();
+
+    ImsLocationEntity findByImsLocationCode(String imsLocationCode);
+
 }

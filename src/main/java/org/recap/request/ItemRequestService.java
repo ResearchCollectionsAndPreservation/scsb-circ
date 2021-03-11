@@ -75,6 +75,10 @@ public class ItemRequestService {
     private RequestItemDetailsRepository requestItemDetailsRepository;
 
     @Autowired
+    private ImsLocationDetailsRepository imsLocationDetailsRepository;
+
+
+    @Autowired
     RestTemplate restTemplate;
 
     @Autowired
@@ -168,7 +172,12 @@ public class ItemRequestService {
                     itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 }
                 itemRequestInfo.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
-                itemRequestInfo.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
+                logger.info("itemEntity.getImsLocationEntity().getImsLocationCode() >>>> "  + itemEntity.getImsLocationEntity().getImsLocationCode());
+
+                ImsLocationEntity imsLocationEntity = imsLocationDetailsRepository.findByImsLocationCode(itemEntity.getImsLocationId().toString());
+                logger.info("getImsLocationCode() now >>>> "  + imsLocationEntity.getImsLocationCode());
+
+                itemRequestInfo.setImsLocationCode(imsLocationEntity.getImsLocationCode());
                 SearchResultRow searchResultRow = searchRecords(itemEntity); //Solr
 
                 itemRequestInfo.setTitleIdentifier(getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, searchResultRow));
@@ -203,7 +212,7 @@ public class ItemRequestService {
                 itemResponseInformation.setSuccess(false);
             }
             setItemResponseInformation(itemRequestInfo, itemResponseInformation);
-
+            logger.info("itemRequestInfo.getImsLocationCode() before LAS Call >>>> "  + itemRequestInfo.getImsLocationCode());
             if (isUseQueueLasCall(itemRequestInfo.getImsLocationCode()) && (StringUtils.containsIgnoreCase(itemResponseInformation.getScreenMessage(), RecapConstants.REQUEST_ILS_EXCEPTION)
                     || StringUtils.containsIgnoreCase(itemResponseInformation.getScreenMessage(), RecapConstants.REQUEST_SCSB_EXCEPTION)
                     || StringUtils.containsIgnoreCase(itemResponseInformation.getScreenMessage(), RecapConstants.REQUEST_LAS_EXCEPTION))) {

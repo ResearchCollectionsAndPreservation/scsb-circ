@@ -208,6 +208,12 @@ public class CommonUtilUT extends BaseTestCaseUT {
         List<String> itemBarcodes = commonUtil.getBarcodesList(itemEntities);
         assertNotNull(itemBarcodes);
     }
+    @Test
+    public void getItemRequestInformation(){
+        ItemEntity itemEntity = getBibliographicEntity().getItemEntities().get(0);
+        ItemRequestInformation itemRequestInformation = commonUtil.getItemRequestInformation(itemEntity);
+        assertNotNull(itemRequestInformation);
+    }
 
     private CollectionGroupEntity getCollectionGroupEntity() {
         CollectionGroupEntity collectionGroupEntity = new CollectionGroupEntity();
@@ -295,6 +301,7 @@ public class CommonUtilUT extends BaseTestCaseUT {
         itemEntity.setItemAvailabilityStatusId(1);
         itemEntity.setDeleted(false);
         itemEntity.setImsLocationEntity(getImsLocationEntity());
+        itemEntity.setInstitutionEntity(getInstitutionEntity());
         itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 

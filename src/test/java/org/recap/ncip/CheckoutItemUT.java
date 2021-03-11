@@ -1,10 +1,6 @@
 package org.recap.ncip;
 
-import org.extensiblecatalog.ncip.v2.service.CheckOutItemResponseData;
-import org.extensiblecatalog.ncip.v2.service.ItemId;
-import org.extensiblecatalog.ncip.v2.service.Problem;
-import org.extensiblecatalog.ncip.v2.service.ProblemType;
-import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.*;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -34,6 +30,12 @@ public class CheckoutItemUT extends BaseTestCaseUT {
         checkOutItemResponseData.setProblems(Collections.EMPTY_LIST);
         JSONObject returnJson = checkoutItem.getCheckoutResponse(checkOutItemResponseData);
         assertNotNull(returnJson);
+    }
+
+    @Test
+    public void getCheckOutItemInitiationDataWithoutRequestId() {
+        CheckOutItemInitiationData data = checkoutItem.getCheckOutItemInitiationData(null,null,null,null);
+        assertNotNull(data);
     }
 
     private CheckOutItemResponseData getCheckOutItemResponseData() {

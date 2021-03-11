@@ -113,7 +113,7 @@ public class RequestItemController {
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
                 itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
                 logger.info("Patron barcode and Institution info before CheckIn call : patron - {} , institution - {} ",itemRequestInformation.getPatronBarcode(),callInstitution);
-                itemCheckinResponse = (ItemCheckinResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkInItem(itemBarcode, itemRequestInformation.getPatronBarcode());
+                itemCheckinResponse = (ItemCheckinResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkInItem(itemRequestInformation, itemRequestInformation.getPatronBarcode());
                 logger.info("CheckIn Response Message : {}",itemCheckinResponse.getScreenMessage());
             } else {
                 itemCheckinResponse = new ItemCheckinResponse();

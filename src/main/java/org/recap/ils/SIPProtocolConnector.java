@@ -13,6 +13,7 @@ import org.recap.RecapConstants;
 import org.recap.ils.model.response.*;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
+import org.recap.model.jpa.ItemRequestInformation;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -268,7 +269,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public AbstractResponseItem checkInItem(String itemIdentifier, String patronIdentifier) {
+    public AbstractResponseItem checkInItem(ItemRequestInformation itemRequestInformation, String patronIdentifier) {
         SIP2SocketConnection connection = getSocketConnection();
         SIP2CheckinResponse checkinResponse = null;
         ItemCheckinResponse itemCheckinResponse = new ItemCheckinResponse();
@@ -281,7 +282,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                     SIP2ACSStatusResponse statusResponse = (SIP2ACSStatusResponse) connection.send(status);
                     if (statusResponse.getSupportedMessages().isCheckin()) {
                         sendAcsStatus(connection);
-                        SIP2CheckinRequest checkinRequest = new SIP2CheckinRequest(itemIdentifier);
+                        SIP2CheckinRequest checkinRequest = new SIP2CheckinRequest(itemRequestInformation.getItemBarcodes().get(0));
 
                         itemCheckinResponse.setEsipDataIn(checkinRequest.getData());
                         checkinResponse = (SIP2CheckinResponse) connection.send(checkinRequest);

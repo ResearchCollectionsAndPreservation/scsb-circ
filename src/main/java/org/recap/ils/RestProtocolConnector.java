@@ -14,6 +14,7 @@ import org.recap.ils.service.RestOauthTokenApiService;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.jpa.ItemRefileResponse;
+import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.processor.RestProtocolJobResponsePollingProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -279,19 +280,19 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
     /**
      * Checks in item in REST protocol using Institution for the given patron.
      *
-     * @param itemIdentifier   the item identifier
+     * @param itemRequestInformation   the item identifier
      * @param patronIdentifier the patron identifier
      * @return
      */
     @Override
-    public ItemCheckinResponse checkInItem(String itemIdentifier, String patronIdentifier) {
-        log.info("Item barcode {} received for a checkin in {} for patron {}", itemIdentifier, this.institutionCode, patronIdentifier);
+    public ItemCheckinResponse checkInItem(ItemRequestInformation itemRequestInformation, String patronIdentifier) {
+        log.info("Item barcode {} received for a checkin in {} for patron {}", itemRequestInformation.getItemBarcodes().get(0), this.institutionCode, patronIdentifier);
         ItemCheckinResponse itemCheckinResponse = new ItemCheckinResponse();
         try {
             String apiUrl = getRestDataApiUrl() + RecapConstants.REST_CHECKIN_REQUEST_URL;
 
             CheckinRequest checkinRequest = getCheckInRequest();
-            checkinRequest.setItemBarcode(itemIdentifier);
+            checkinRequest.setItemBarcode(itemRequestInformation.getItemBarcodes().get(0));
 
             HttpEntity<CheckinRequest> requestEntity = new HttpEntity<>(checkinRequest, getHttpHeaders());
             ResponseEntity<CheckinResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, CheckinResponse.class);

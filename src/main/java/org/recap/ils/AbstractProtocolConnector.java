@@ -2,6 +2,7 @@ package org.recap.ils;
 
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
+import org.recap.model.jpa.ItemRequestInformation;
 
 public abstract class AbstractProtocolConnector {
 
@@ -54,11 +55,11 @@ public abstract class AbstractProtocolConnector {
     /**
      * Check in item object.
      *
-     * @param itemIdentifier   the item identifier
+     * @param itemRequestInformation   the item identifier
      * @param patronIdentifier the patron identifier
      * @return the object
      */
-    public abstract Object checkInItem(String itemIdentifier, String patronIdentifier);
+    public abstract Object checkInItem(ItemRequestInformation itemRequestInformation, String patronIdentifier);
 
     /**
      * Place hold object.

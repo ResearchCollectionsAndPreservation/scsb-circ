@@ -1098,7 +1098,7 @@ public class ItemRequestService {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_PENDING));
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
-                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_EXCEPTION.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION));
@@ -1118,7 +1118,7 @@ public class ItemRequestService {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, RecapConstants.REQUEST_STATUS_PENDING);
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
-                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_EXCEPTION.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, RecapConstants.REQUEST_STATUS_EXCEPTION);
@@ -1139,7 +1139,7 @@ public class ItemRequestService {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, RecapConstants.REQUEST_STATUS_PENDING);
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
-                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_EXCEPTION.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, RecapConstants.REQUEST_STATUS_EXCEPTION);

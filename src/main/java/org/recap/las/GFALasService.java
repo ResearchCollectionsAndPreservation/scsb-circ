@@ -490,22 +490,12 @@ public class GFALasService {
      */
     public String buildRequestInfoAndReplaceToLAS(RequestItemEntity requestItemEntity) {
         try {
-            String json = null;
-            String requestTypeCode = requestItemEntity.getRequestTypeEntity().getRequestTypeCode();
-            if (RecapCommonConstants.RETRIEVAL.equalsIgnoreCase(requestTypeCode)) {
-                GFARetrieveItemRequest gfaRetrieveItemRequest = buildGFARetrieveItemRequest(requestItemEntity);
-                ObjectMapper objectMapper = new ObjectMapper();
-                json = objectMapper.writeValueAsString(gfaRetrieveItemRequest);
-            } else if (RecapConstants.EDD_REQUEST.equalsIgnoreCase(requestTypeCode)) {
-                GFARetrieveEDDItemRequest gfaRetrieveEDDItemRequest = buildGFAEddItemRequest(requestItemEntity);
-                ObjectMapper objectMapper = new ObjectMapper();
-                json = objectMapper.writeValueAsString(gfaRetrieveEDDItemRequest);
-            }
+            ItemRequestInformation itemRequestInformation = itemRequestService.getItemRequestInformationByRequestEntity(requestItemEntity, requestItemEntity.getItemEntity());
             String itemStatus = callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
             String imsLocationCode = commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode());
             if (commonUtil.isImsItemStatusAvailable(imsLocationCode, itemStatus)) {
-                producerTemplate.sendBodyAndHeader(RecapConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-            } else {
+                producerTemplate.sendBodyAndHeader(RecapConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+            } else if (StringUtils.isNotBlank(itemStatus)) {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getId());

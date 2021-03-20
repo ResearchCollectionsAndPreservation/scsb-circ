@@ -1239,6 +1239,7 @@ public class ItemRequestService {
     public ItemRequestInformation getItemRequestInformationByRequestEntity(RequestItemEntity requestItemEntity, ItemEntity itemEntity) {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setRequestId(requestItemEntity.getId());
+        itemRequestInformation.setCustomerCode(requestItemEntity.getItemEntity().getCustomerCode());
         itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
         itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
         itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());

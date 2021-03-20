@@ -753,6 +753,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
     public void setRequestItemEntity() {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         RequestItemEntity requestItemEntity = createRequestItem();
+        Mockito.when(mockedGfaLasService.callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode())).thenReturn("Available");
         Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenThrow(new NullPointerException());
         ReflectionTestUtils.invokeMethod(mockedItemRequestService, "setRequestItemEntity", itemRequestInformation, requestItemEntity);
     }

@@ -436,10 +436,16 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     @Test
     public void buildRequestInfoAndReplaceToLAS(){
         RequestItemEntity requestItemEntity = getRequestItemEntity();
-        SearchResultRow searchResultRow = new SearchResultRow();
-        searchResultRow.setAuthor("test");
-        searchResultRow.setTitle("TEST");
-        Mockito.when(itemRequestService.searchRecords(any())).thenReturn(searchResultRow);
+        Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode())).thenReturn("HD");
+        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
+        assertNotNull(result);
+    }
+    @Test
+    public void buildRequestInfoAndReplaceToLASException(){
+        RequestItemEntity requestItemEntity = getRequestItemEntity();
+        Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode())).thenReturn("HD");
+        Mockito.doThrow(new NullPointerException()).when(commonUtil).isImsItemStatusAvailable(any(), any());
         String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
         assertNotNull(result);
     }
@@ -447,6 +453,9 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     public void buildRequestInfoAndReplaceToLASForRETRIEVAL(){
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         requestItemEntity.getRequestTypeEntity().setRequestTypeCode("RETRIEVAL");
+        GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
+        Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
+        Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(any())).thenReturn("test");
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
         assertNotNull(result);
@@ -472,62 +481,26 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(getGfaItemStatusCheckResponse());
         gfaLasService.getGFAItemStatusCheckResponseByBarcodesAndImsLocationList(itemsStatusCheckModel);
     }
+
     @Test
-    public void callGfaDeaccessionServiceWithAvailableStatus(){
-        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
-        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
-        deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.AVAILABLE);
-        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
-        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
-        String username = "test";
-        GFAPwdResponse gfaPwdResponse = getGfaPwdResponse();
-        //Mockito.when(getGfaLasService.gfaPermanentWithdrawlDirect(any())).thenReturn(gfaPwdResponse);
-       // Mockito.doCallRealMethod().when(getGfaLasService).callGfaDeaccessionService(deAccessionDBResponseEntities,username);
-        //getGfaLasService.callGfaDeaccessionService(deAccessionDBResponseEntities,username);
+    public void buildGFAEddItemRequest(){
+        RequestItemEntity requestItemEntity = getRequestItemEntity();
+        SearchResultRow searchResultRow = new SearchResultRow();
+        searchResultRow.setAuthor("test");
+        searchResultRow.setTitle("TEST");
+        Mockito.doNothing().when(itemRequestServiceUtil).setEddInfoToGfaRequest(any(), any());
+        Mockito.when(itemRequestService.searchRecords(any())).thenReturn(searchResultRow);
+        ReflectionTestUtils.invokeMethod(gfaLasService,"buildGFAEddItemRequest",requestItemEntity);
+    }
+    @Test
+    public void buildGFARetrieveItemRequest(){
+        RequestItemEntity requestItemEntity = getRequestItemEntity();
+        ReflectionTestUtils.invokeMethod(gfaLasService,"buildGFARetrieveItemRequest",requestItemEntity);
     }
 
     @Test
-    public void callGfaDeaccessionServiceWithAvailableStatusWithoutResponse(){
-        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
-        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
-        deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.AVAILABLE);
-        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
-        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
-        String username = "test";
-        //Mockito.doCallRealMethod().when(getGfaLasService).callGfaDeaccessionService(deAccessionDBResponseEntities,username);
-        //getGfaLasService.callGfaDeaccessionService(deAccessionDBResponseEntities,username);
-    }
-    @Test
-    public void callGfaDeaccessionServiceWithNotAvailableStatusWithoutResponse(){
-        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
-        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
-        deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.NOT_AVAILABLE);
-        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
-        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
-        String username = "test";
-        //Mockito.doCallRealMethod().when(getGfaLasService).callGfaDeaccessionService(deAccessionDBResponseEntities,username);
-        //getGfaLasService.callGfaDeaccessionService(deAccessionDBResponseEntities,username);
-    }
-    @Test
-    public void callGfaDeaccessionServiceWithNotAvailableStatus(){
-        DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
-        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
-        deAccessionDBResponseEntity.setItemStatus(RecapCommonConstants.NOT_AVAILABLE);
-        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
-        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
-        String username = "test";
-        GFAPwiResponse gfaPwiResponse = getGfaPwiResponse();
-       /* Mockito.when(getGfaLasService.gfaPermanentWithdrawlInDirect(any())).thenReturn(gfaPwiResponse);
-        Mockito.doCallRealMethod().when(getGfaLasService).callGfaDeaccessionService(deAccessionDBResponseEntities,username);
-        getGfaLasService.callGfaDeaccessionService(deAccessionDBResponseEntities,username);*/
-    }
-    @Test
     public void checkGetters(){
         gfaLasService.getRestTemplate();
-        /*gfaLasService.getRequestItemDetailsRepository();
-        gfaLasService.getItemDetailsRepository();
-        gfaLasService.getItemStatusDetailsRepository();
-        gfaLasService.getItemChangeLogDetailsRepository();*/
     }
     private GFAPwiRequest getGFAPwiRequest() {
         GFAPwiRequest gfaPwiRequest = new GFAPwiRequest();

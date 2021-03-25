@@ -753,6 +753,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
     public void setRequestItemEntity() {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         RequestItemEntity requestItemEntity = createRequestItem();
+        Mockito.when(mockedGfaLasService.callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode())).thenReturn("Available");
         Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenThrow(new NullPointerException());
         ReflectionTestUtils.invokeMethod(mockedItemRequestService, "setRequestItemEntity", itemRequestInformation, requestItemEntity);
     }
@@ -1382,6 +1383,44 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(mockedRequestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, RecapConstants.REQUEST_STATUS_EXCEPTION)).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
+    }
+
+    @Test
+    public void getTitle(){
+        String title = "";
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setUseRestrictions("test");
+        SearchResultRow searchResultRow = new SearchResultRow();
+        searchResultRow.setAuthor("test");
+        searchResultRow.setTitle("Mathematische Poetik / von Solomon Marcus ; aus dem Rumaenichen uebertragen von Edith Mandroiu.Cumulative bulletin - Bureau of Alcohol, Tobacco & Firearms.");
+        mockedItemRequestService.getTitle(title,itemEntity,searchResultRow);
+    }
+
+    @Test
+    public void getTitleWithoutSearchResultRow(){
+        String title = "";
+        mockedItemRequestService.getTitle(title,null,null);
+    }
+
+    @Test
+    public void setItemRequestInfoForRequest() {
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.getBibliographicEntities().get(0).setOwningInstitutionBibId("");
+        ItemRequestInformation itemRequestInfo = getItemRequestInformation();
+        itemRequestInfo.setRequestingInstitution("CUL");
+        RequestItemEntity requestItemEntity = createRequestItem();
+        requestItemEntity.getRequestTypeEntity().setRequestTypeCode("EDD");
+        SearchResultRow searchResultRow = new SearchResultRow();
+        searchResultRow.setAuthor("test");
+        searchResultRow.setTitle("test");
+        HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
+        ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
+        })).thenReturn(responseEntity);
+        ReflectionTestUtils.invokeMethod(mockedItemRequestService, "setItemRequestInfoForRequest", itemEntity, itemRequestInfo, requestItemEntity);
     }
 
     private ReplaceRequest getReplaceRequest() {

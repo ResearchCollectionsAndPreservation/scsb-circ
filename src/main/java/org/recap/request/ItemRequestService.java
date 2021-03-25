@@ -1103,6 +1103,9 @@ public class ItemRequestService {
                 if (RecapConstants.REQUEST_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(RecapConstants.REQUEST_STATUS_PENDING));
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
+                } else if (RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
+                    resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_EXCEPTION.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION));
                     resultMap = buildRequestInfoAndReplaceToSCSB(requestItemEntities);
@@ -1121,6 +1124,9 @@ public class ItemRequestService {
                 if (RecapConstants.REQUEST_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_PENDING));
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
+                } else if (RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
+                    resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_EXCEPTION.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION));
                     resultMap = buildRequestInfoAndReplaceToSCSB(requestItemEntities);
@@ -1137,6 +1143,9 @@ public class ItemRequestService {
                 Integer endRequestId = Integer.valueOf(replaceRequest.getEndRequestId());
                 if (RecapConstants.REQUEST_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, RecapConstants.REQUEST_STATUS_PENDING);
+                    resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
+                } else if (RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_EXCEPTION.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, RecapConstants.REQUEST_STATUS_EXCEPTION);
@@ -1155,6 +1164,9 @@ public class ItemRequestService {
                 Date toDate = dateFormatter.parse(replaceRequest.getToDate());
                 if (RecapConstants.REQUEST_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, RecapConstants.REQUEST_STATUS_PENDING);
+                    resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
+                } else if (RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (RecapConstants.REQUEST_STATUS_EXCEPTION.equalsIgnoreCase(requestStatus)) {
                     List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, RecapConstants.REQUEST_STATUS_EXCEPTION);
@@ -1242,24 +1254,33 @@ public class ItemRequestService {
      * @return
      */
     private String buildRetrieveRequestInfoAndReplaceToSCSB(RequestItemEntity requestItemEntity) {
-        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
-        itemRequestInformation.setItemBarcodes(Collections.singletonList(requestItemEntity.getItemEntity().getBarcode()));
-        itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
-        itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
-        itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
-        itemRequestInformation.setItemOwningInstitution(requestItemEntity.getItemEntity().getInstitutionEntity().getInstitutionCode());
-        itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-        itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
-
-        String notes = requestItemEntity.getNotes();
-        new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
+        ItemRequestInformation itemRequestInformation = getItemRequestInformationByRequestEntity(requestItemEntity, requestItemEntity.getItemEntity());
 
         String validationMessage = validateItemRequest(itemRequestInformation);
         if (!RecapCommonConstants.VALID_REQUEST.equals(validationMessage)) {
             return RecapCommonConstants.FAILURE + " : " + validationMessage;
         }
         return setRequestItemEntity(itemRequestInformation, requestItemEntity);
+    }
+
+    public ItemRequestInformation getItemRequestInformationByRequestEntity(RequestItemEntity requestItemEntity, ItemEntity itemEntity) {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setRequestId(requestItemEntity.getId());
+        itemRequestInformation.setCustomerCode(requestItemEntity.getItemEntity().getCustomerCode());
+        itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
+        itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
+        itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
+        itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
+        itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
+        itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+        itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
+        String imsLocationCode = commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode());
+        itemRequestInformation.setImsLocationCode(imsLocationCode);
+
+        String notes = requestItemEntity.getNotes();
+        new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
+        return itemRequestInformation;
     }
 
     /**
@@ -1269,18 +1290,7 @@ public class ItemRequestService {
      */
     private String buildEddRequestInfoAndReplaceToSCSB(RequestItemEntity requestItemEntity) {
         ItemEntity itemEntity = requestItemEntity.getItemEntity();
-        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setUsername(requestItemEntity.getCreatedBy());
-        itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
-        itemRequestInformation.setPatronBarcode(requestItemEntity.getPatronId());
-        itemRequestInformation.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
-        itemRequestInformation.setEmailAddress(securityUtil.getDecryptedValue(requestItemEntity.getEmailId()));
-        itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
-        itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-        itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
-
-        String notes = requestItemEntity.getNotes();
-        new BufferedReader(new StringReader(notes)).lines().forEach(line -> itemRequestServiceUtil.setEddInfoToScsbRequest(line, itemRequestInformation));
+        ItemRequestInformation itemRequestInformation = getItemRequestInformationByRequestEntity(requestItemEntity, itemEntity);
 
         SearchResultRow searchResultRow = searchRecords(itemEntity);
         itemRequestInformation.setTitleIdentifier(searchResultRow.getTitle());
@@ -1299,7 +1309,7 @@ public class ItemRequestService {
             String itemStatus = gfaLasService.callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
             if (commonUtil.isImsItemStatusAvailable(requestItemEntity.getItemEntity().getImsLocationEntity().getImsLocationCode(), itemStatus)) {
                 producerTemplate.sendBodyAndHeader(RecapConstants.REQUEST_ITEM_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
-            } else {
+            } else if (StringUtils.isNotBlank(itemStatus)) {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getId());

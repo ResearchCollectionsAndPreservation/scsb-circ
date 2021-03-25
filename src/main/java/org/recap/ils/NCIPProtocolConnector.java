@@ -175,6 +175,10 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         return new org.springframework.http.HttpEntity<>(body.toString(), headers);
     }
 
+    public org.springframework.http.HttpEntity getHttpEntity(HttpHeaders headers){
+        return new org.springframework.http.HttpEntity<>(headers);
+    }
+
     /**
      * Gets nypl data api url.
      *
@@ -205,9 +209,9 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
 
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
-        itemInformationResponse.setCirculationStatus("CHARGED");
+     //   itemInformationResponse.setCirculationStatus("CHARGED");
         // Commeneted for testing
-       /* try {
+        try {
             String owningInstitution = getRestApiResponseUtil().getItemOwningInstitutionByItemBarcode(itemIdentifier);
 
             String apiUrl = getApiUrl(itemIdentifier);
@@ -236,7 +240,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             itemInformationResponse.setSuccess(false);
             itemInformationResponse.setScreenMessage(e.getMessage());
         }
-       */
+
         return itemInformationResponse;
     }
 

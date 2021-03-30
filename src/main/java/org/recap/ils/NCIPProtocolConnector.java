@@ -127,9 +127,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         this.ilsConfigProperties = ilsConfigProperties;
     }
 
-    @Value("${ils.behalf.agency}")
-    private String behalfAgency;
-
     @Value("${ils.discharge.token}")
     private String dischargeToken;
 
@@ -323,9 +320,21 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         JSONObject responseObject = new JSONObject();
 
         try {
-            if(itemRequestInformation.getRequestingInstitution() == null || !itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())) {
+            String behalfAgency = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getItemOwningInstitution(), "ils.behalf.agency");
+            if(behalfAgency == null) {
+                behalfAgency = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.behalf.agency");
+                if(behalfAgency.equals(RecapCommonConstants.ITEM)) {
+                    behalfAgency = null;
+                }
+            }
+            String isCheckinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkin.institution");
+
+            if ((itemRequestInformation.getRequestingInstitution() == null || !itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())
+                    ) || Boolean.FALSE.toString().equalsIgnoreCase(isCheckinInstitution)) {
+
+
                 CheckinItem checkInItem = new CheckinItem();
-                CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), behalfAgency, getNcipAgencyId(), getNcipScheme());
+                CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), behalfAgency, getNcipAgencyId(), getNcipScheme());
                 NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
 
                 String requestBody = checkInItem.getRequestBody(ncipToolkitUtil, checkInItemInitiationData);
@@ -361,11 +370,20 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                     itemCheckinResponse.setScreenMessage(failureReason + checkinItemResponse.getProblems());
                     return itemCheckinResponse;
                 }
+            }
+        }
+                catch (HttpClientErrorException httpException) {
+                    log.error(RecapCommonConstants.LOG_ERROR, httpException);
+                    itemCheckinResponse.setSuccess(false);
+                    itemCheckinResponse.setScreenMessage(httpException.getStatusText());
+                } catch (Exception e) {
+                    log.error(RecapCommonConstants.LOG_ERROR, e);
+                    itemCheckinResponse.setSuccess(false);
+                    itemCheckinResponse.setScreenMessage(e.getMessage());
+                }
                 String isDischargeInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getItemOwningInstitution(), "ils.discharge.institution");
 
                 if (Boolean.TRUE.toString().equalsIgnoreCase(isDischargeInstitution)) {
-                    log.info("Inside if equals >>");
-
                     List<ItemEntity> itemEntities = getItemDetailsRepository().findByBarcode(itemRequestInformation.getItemBarcodes().get(0));
                     ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
 
@@ -385,30 +403,17 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     JSONObject authJson = new JSONObject();
                     authJson.put("auth_token", dischargeToken);
-                    // String requestBody =   "auth_token =" + dischargeToken;
 
                     org.springframework.http.HttpEntity requestEntity = getHttpEntity(authJson, headers);
                     ResponseEntity<String> respnseLookupEntity = restTemplate.exchange(dischargeApiEndpoint, HttpMethod.POST, requestEntity, String.class, params);
                     log.info("responseLookupEntity >>>>>>>>> " + respnseLookupEntity);
                 }
                     log.info(responseObject.toString());
-                    itemCheckinResponse.setItemBarcode(checkinItemResponse.getItemId().getItemIdentifierValue());
                     itemCheckinResponse.setSuccess(Boolean.TRUE);
                     itemCheckinResponse.setScreenMessage(success);
                     itemCheckinResponse.setItemOwningInstitution(getInstitution());
 
                     return itemCheckinResponse;
-                }
-        } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR, httpException);
-            itemCheckinResponse.setSuccess(false);
-            itemCheckinResponse.setScreenMessage(httpException.getStatusText());
-        } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
-            itemCheckinResponse.setSuccess(false);
-            itemCheckinResponse.setScreenMessage(e.getMessage());
-        }
-        return itemCheckinResponse;
     }
 
     public Map<String, String> getParamsMap(String bibId, String holdingId, String itemId) {

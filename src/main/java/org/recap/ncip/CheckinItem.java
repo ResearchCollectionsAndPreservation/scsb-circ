@@ -8,20 +8,31 @@ import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.OnBehalfOfAgency;
 import org.json.JSONObject;
+import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.repository.jpa.ItemDetailsRepository;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @Slf4j
 public class CheckinItem extends RecapNCIP {
 
-    public CheckInItemInitiationData getCheckInItemInitiationData(String itemIdentifier, String behalfAgency, String ncipAgencyId, String ncipScheme) {
+    public CheckInItemInitiationData getCheckInItemInitiationData(String itemIdentifier, ItemDetailsRepository itemDetailsRepository, String behalfAgency, String ncipAgencyId, String ncipScheme) {
         CheckInItemInitiationData checkinItemInitiationData = new CheckInItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
         initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
-        OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
-        onBehalfOfAgency.setAgencyId(new AgencyId(null,behalfAgency));
-        initiationHeader.setOnBehalfOfAgency(onBehalfOfAgency);
+        if(behalfAgency != null) {
+            if(behalfAgency.equals(RecapCommonConstants.ITEM)) {
+                List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemIdentifier);
+                ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
+                behalfAgency = itemEntity.getItemLibrary();
+            }
+            OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
+            onBehalfOfAgency.setAgencyId(new AgencyId(null, behalfAgency));
+            initiationHeader.setOnBehalfOfAgency(onBehalfOfAgency);
+        }
         ItemId itemId = new ItemId();
        // itemId.setAgencyId(new AgencyId(ncipScheme, ncipAgencyId));
         itemId.setItemIdentifierValue(itemIdentifier);

@@ -370,7 +370,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             }
                 String isDischargeInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getItemOwningInstitution(), "ils.discharge.institution");
 
-                if (Boolean.TRUE.toString().equalsIgnoreCase(isDischargeInstitution)) {
+                if (Boolean.TRUE.toString().equalsIgnoreCase(isDischargeInstitution) && getInstitution().equals(itemRequestInformation.getItemOwningInstitution())) {
                     List<ItemEntity> itemEntities = getItemDetailsRepository().findByBarcode(itemRequestInformation.getItemBarcodes().get(0));
                     ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
 

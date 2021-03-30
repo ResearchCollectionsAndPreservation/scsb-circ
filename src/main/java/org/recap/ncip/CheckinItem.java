@@ -27,7 +27,11 @@ public class CheckinItem extends RecapNCIP {
             if(behalfAgency.equals(RecapCommonConstants.ITEM)) {
                 List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemIdentifier);
                 ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
-                behalfAgency = itemEntity.getItemLibrary();
+                String imsLocation = itemEntity.getImsLocationEntity().getImsLocationCode();
+                if(imsLocation.equalsIgnoreCase(RecapCommonConstants.RECAP)) {
+                    imsLocation = "RD";
+                }
+                behalfAgency = itemEntity.getItemLibrary() + "_" + imsLocation;
             }
             OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
             onBehalfOfAgency.setAgencyId(new AgencyId(null, behalfAgency));

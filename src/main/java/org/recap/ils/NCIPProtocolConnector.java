@@ -332,7 +332,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             if ((itemRequestInformation.getRequestingInstitution() == null || !itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())
                     ) || Boolean.FALSE.toString().equalsIgnoreCase(isCheckinInstitution)) {
 
-
                 CheckinItem checkInItem = new CheckinItem();
                 CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), behalfAgency, getNcipAgencyId(), getNcipScheme());
                 NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
@@ -371,16 +370,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                     return itemCheckinResponse;
                 }
             }
-        }
-                catch (HttpClientErrorException httpException) {
-                    log.error(RecapCommonConstants.LOG_ERROR, httpException);
-                    itemCheckinResponse.setSuccess(false);
-                    itemCheckinResponse.setScreenMessage(httpException.getStatusText());
-                } catch (Exception e) {
-                    log.error(RecapCommonConstants.LOG_ERROR, e);
-                    itemCheckinResponse.setSuccess(false);
-                    itemCheckinResponse.setScreenMessage(e.getMessage());
-                }
                 String isDischargeInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getItemOwningInstitution(), "ils.discharge.institution");
 
                 if (Boolean.TRUE.toString().equalsIgnoreCase(isDischargeInstitution)) {
@@ -413,7 +402,18 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                     itemCheckinResponse.setScreenMessage(success);
                     itemCheckinResponse.setItemOwningInstitution(getInstitution());
 
-                    return itemCheckinResponse;
+        }
+        catch (HttpClientErrorException httpException) {
+            log.error(RecapCommonConstants.LOG_ERROR, httpException);
+            itemCheckinResponse.setSuccess(false);
+            itemCheckinResponse.setScreenMessage(httpException.getStatusText());
+        } catch (Exception e) {
+            log.error(RecapCommonConstants.LOG_ERROR, e);
+            itemCheckinResponse.setSuccess(false);
+            itemCheckinResponse.setScreenMessage(e.getMessage());
+        }
+
+        return itemCheckinResponse;
     }
 
     public Map<String, String> getParamsMap(String bibId, String holdingId, String itemId) {

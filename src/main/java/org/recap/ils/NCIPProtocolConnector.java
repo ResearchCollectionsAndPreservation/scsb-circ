@@ -320,12 +320,10 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         JSONObject responseObject = new JSONObject();
 
         try {
-            String behalfAgency = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getItemOwningInstitution(), "ils.behalf.agency");
-            if(behalfAgency == null) {
-                behalfAgency = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.behalf.agency");
-                if(behalfAgency.equals(RecapCommonConstants.ITEM)) {
-                    behalfAgency = null;
-                }
+            String behalfAgency = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.behalf.agency");
+            if(getInstitution().equals(itemRequestInformation.getRequestingInstitution()) && behalfAgency.equals(RecapCommonConstants.ITEM))
+            {
+                behalfAgency = null;
             }
             String isCheckinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkin.institution");
 

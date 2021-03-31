@@ -41,7 +41,7 @@ public class CheckinItem extends RecapNCIP {
             OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
             onBehalfOfAgency.setAgencyId(new AgencyId(ncipScheme, behalfAgency));
             initiationHeader.setOnBehalfOfAgency(onBehalfOfAgency);
-            itemId.setAgencyId(new AgencyId(ncipScheme));
+            itemId.setAgencyId(new AgencyId(ncipScheme, ncipAgencyId));
             itemId.setItemIdentifierValue(itemIdentifier);
             checkinItemInitiationData.setItemId(itemId);
         }

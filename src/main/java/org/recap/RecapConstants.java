@@ -423,4 +423,12 @@ public final class RecapConstants {
     public static final String ITEM_BARCODE = "itemBarcode";
     public static final String PATRON_IDENTIFIER = "patronIdentifier";
 
+    public static final String HARVARD_DEPOSITORY = "HD";
+    public static final String RECAP_DEPOSITORY = "RD";
+    public static final String NCIP_REMOTE_STORAGE = "NCIP_REMOTE_STORAGE";
+    public static final String HARVARD_PROFILE = "HDEP";
+    public static final String RECAP_PROFILE = "RECAP";
+
+
+
 }

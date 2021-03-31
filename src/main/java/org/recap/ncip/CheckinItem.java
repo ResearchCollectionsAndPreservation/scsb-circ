@@ -1,12 +1,7 @@
 package org.recap.ncip;
 
 import lombok.extern.slf4j.Slf4j;
-import org.extensiblecatalog.ncip.v2.service.AgencyId;
-import org.extensiblecatalog.ncip.v2.service.CheckInItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.CheckInItemResponseData;
-import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
-import org.extensiblecatalog.ncip.v2.service.ItemId;
-import org.extensiblecatalog.ncip.v2.service.OnBehalfOfAgency;
+import org.extensiblecatalog.ncip.v2.service.*;
 import org.json.JSONObject;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
@@ -19,28 +14,45 @@ import java.util.List;
 @Slf4j
 public class CheckinItem extends RecapNCIP {
 
-    public CheckInItemInitiationData getCheckInItemInitiationData(String itemIdentifier, ItemDetailsRepository itemDetailsRepository, String behalfAgency, String ncipAgencyId, String ncipScheme) {
+    public CheckInItemInitiationData getCheckInItemInitiationData(String itemIdentifier, ItemDetailsRepository itemDetailsRepository, String behalfAgency, String ncipAgencyId, String ncipScheme, Boolean isRemoteCheckin) {
         CheckInItemInitiationData checkinItemInitiationData = new CheckInItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
-        initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
-        if(behalfAgency != null) {
-            if(behalfAgency.equals(RecapCommonConstants.ITEM)) {
-                List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemIdentifier);
-                ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
-                String imsLocation = itemEntity.getImsLocationEntity().getImsLocationCode();
-                if(imsLocation.equalsIgnoreCase(RecapCommonConstants.RECAP)) {
-                    imsLocation = "RD";
-                }
-                behalfAgency = itemEntity.getItemLibrary() + "_" + imsLocation;
+        ItemId itemId = new ItemId();
+        if(isRemoteCheckin) {
+            FromSystemId fromSystemId = new FromSystemId(RecapConstants.NCIP_REMOTE_STORAGE);
+            initiationHeader.setFromSystemId(fromSystemId);
+            initiationHeader = getInitiationHeaderwithoutProfile(initiationHeader, ncipScheme, ncipAgencyId, ncipAgencyId);
+            List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemIdentifier);
+            ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
+            String imsLocation = itemEntity.getImsLocationEntity().getImsLocationCode();
+            ApplicationProfileType applicationProfileType = null;
+            if (imsLocation.equalsIgnoreCase(RecapCommonConstants.RECAP)) {
+                applicationProfileType = new ApplicationProfileType(null, RecapConstants.RECAP_PROFILE);
+            } else {
+                applicationProfileType = new ApplicationProfileType(null, RecapConstants.HARVARD_PROFILE);
             }
+            initiationHeader.setApplicationProfileType(applicationProfileType);
+            if (behalfAgency != null && behalfAgency.equals(RecapCommonConstants.ITEM)) {
+                if (imsLocation.equalsIgnoreCase(RecapCommonConstants.RECAP)) {
+                    imsLocation = RecapConstants.RECAP_DEPOSITORY;
+                }
+                behalfAgency = itemEntity.getItemLibrary() + "." + itemEntity.getItemLibrary() + "_" + imsLocation;
+            }
+            OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
+            onBehalfOfAgency.setAgencyId(new AgencyId(ncipScheme, behalfAgency));
+            initiationHeader.setOnBehalfOfAgency(onBehalfOfAgency);
+            itemId.setAgencyId(new AgencyId(ncipScheme));
+            itemId.setItemIdentifierValue(itemIdentifier);
+            checkinItemInitiationData.setItemId(itemId);
+        }
+        else {
+            initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
             OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
             onBehalfOfAgency.setAgencyId(new AgencyId(null, behalfAgency));
             initiationHeader.setOnBehalfOfAgency(onBehalfOfAgency);
+            itemId.setItemIdentifierValue(itemIdentifier);
+            checkinItemInitiationData.setItemId(itemId);
         }
-        ItemId itemId = new ItemId();
-       // itemId.setAgencyId(new AgencyId(ncipScheme, ncipAgencyId));
-        itemId.setItemIdentifierValue(itemIdentifier);
-        checkinItemInitiationData.setItemId(itemId);
         checkinItemInitiationData.setInitiationHeader(initiationHeader);
         return checkinItemInitiationData;
     }

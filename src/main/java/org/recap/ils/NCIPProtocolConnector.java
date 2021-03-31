@@ -321,17 +321,22 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
         try {
             String behalfAgency = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.behalf.agency");
+            String remoteCheckin = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.remote.checkin");
+            Boolean isRemoteCheckin = Boolean.FALSE;
+            if(Boolean.TRUE.toString().equalsIgnoreCase(remoteCheckin) && getInstitution().equals(itemRequestInformation.getItemOwningInstitution())) {
+                isRemoteCheckin = Boolean.TRUE;
+            }
             if(getInstitution().equals(itemRequestInformation.getRequestingInstitution()) && behalfAgency.equals(RecapCommonConstants.ITEM))
             {
                 behalfAgency = null;
             }
-            String isCheckinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkin.institution");
+            String checkinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkin.institution");
 
             if ((itemRequestInformation.getRequestingInstitution() == null || !itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())
-                    ) || Boolean.FALSE.toString().equalsIgnoreCase(isCheckinInstitution)) {
+                    ) || Boolean.FALSE.toString().equalsIgnoreCase(checkinInstitution)) {
 
                 CheckinItem checkInItem = new CheckinItem();
-                CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), behalfAgency, getNcipAgencyId(), getNcipScheme());
+                CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), behalfAgency, getNcipAgencyId(), getNcipScheme(),isRemoteCheckin);
                 NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
 
                 String requestBody = checkInItem.getRequestBody(ncipToolkitUtil, checkInItemInitiationData);

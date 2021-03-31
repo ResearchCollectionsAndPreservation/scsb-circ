@@ -323,11 +323,12 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             String behalfAgency = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.behalf.agency");
             String remoteCheckin = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.remote.checkin");
             Boolean isRemoteCheckin = Boolean.FALSE;
-            if(Boolean.TRUE.toString().equalsIgnoreCase(remoteCheckin) && getInstitution().equals(itemRequestInformation.getItemOwningInstitution())
-             || Boolean.TRUE.toString().equalsIgnoreCase(remoteCheckin) && itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution())) {
+            if(Boolean.TRUE.toString().equalsIgnoreCase(remoteCheckin) && (
+                    getInstitution().equals(itemRequestInformation.getItemOwningInstitution())
+              || itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()))) {
                 isRemoteCheckin = Boolean.TRUE;
             }
-            if(getInstitution().equals(itemRequestInformation.getRequestingInstitution()) && behalfAgency.equals(RecapCommonConstants.ITEM))
+            if(behalfAgency.equals(RecapCommonConstants.ITEM) && Boolean.TRUE.toString().equalsIgnoreCase(remoteCheckin))
             {
                 behalfAgency = null;
             }

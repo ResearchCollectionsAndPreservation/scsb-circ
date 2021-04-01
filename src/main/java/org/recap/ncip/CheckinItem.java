@@ -43,6 +43,7 @@ public class CheckinItem extends RecapNCIP {
         OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
         onBehalfOfAgency.setAgencyId(new AgencyId(ncipScheme, behalfAgency));
         initiationHeader.setOnBehalfOfAgency(onBehalfOfAgency);
+        checkinItemInitiationData.setInitiationHeader(initiationHeader);
         itemId.setAgencyId(new AgencyId(ncipScheme, ncipAgencyId));
         itemId.setItemIdentifierValue(itemIdentifier);
         checkinItemInitiationData.setItemId(itemId);
@@ -51,16 +52,16 @@ public class CheckinItem extends RecapNCIP {
         public CheckInItemInitiationData getCheckInItemInitiationData(String itemIdentifier, String behalfAgency, String ncipAgencyId) {
             CheckInItemInitiationData checkinItemInitiationData = new CheckInItemInitiationData();
             InitiationHeader initiationHeader = new InitiationHeader();
-            ItemId itemId = new ItemId();
             initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
             if(behalfAgency != null) {
                 OnBehalfOfAgency onBehalfOfAgency = new OnBehalfOfAgency();
                 onBehalfOfAgency.setAgencyId(new AgencyId(null, behalfAgency));
                 initiationHeader.setOnBehalfOfAgency(onBehalfOfAgency);
             }
+            checkinItemInitiationData.setInitiationHeader(initiationHeader);
+            ItemId itemId = new ItemId();
             itemId.setItemIdentifierValue(itemIdentifier);
             checkinItemInitiationData.setItemId(itemId);
-        checkinItemInitiationData.setInitiationHeader(initiationHeader);
         return checkinItemInitiationData;
     }
 

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.las.GFALasService;
+import org.recap.model.ILSConfigProperties;
 import org.recap.model.ItemRefileRequest;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCreateBibResponse;
@@ -168,6 +169,7 @@ public class ItemRequestService {
                 }
                 itemRequestInfo.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
                 itemRequestInfo.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
+                logger.info("itemEntity.getImsLocationEntity().getImsLocationCode() >>>> "  + itemEntity.getImsLocationEntity().getImsLocationCode());
                 SearchResultRow searchResultRow = searchRecords(itemEntity); //Solr
 
                 itemRequestInfo.setTitleIdentifier(getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, searchResultRow));
@@ -202,7 +204,7 @@ public class ItemRequestService {
                 itemResponseInformation.setSuccess(false);
             }
             setItemResponseInformation(itemRequestInfo, itemResponseInformation);
-
+            logger.info("itemRequestInfo.getImsLocationCode() before LAS Call >>>> "  + itemRequestInfo.getImsLocationCode());
             if (isUseQueueLasCall(itemRequestInfo.getImsLocationCode()) && (StringUtils.containsIgnoreCase(itemResponseInformation.getScreenMessage(), RecapConstants.REQUEST_ILS_EXCEPTION)
                     || StringUtils.containsIgnoreCase(itemResponseInformation.getScreenMessage(), RecapConstants.REQUEST_SCSB_EXCEPTION)
                     || StringUtils.containsIgnoreCase(itemResponseInformation.getScreenMessage(), RecapConstants.REQUEST_LAS_EXCEPTION))) {
@@ -928,14 +930,27 @@ public class ItemRequestService {
     }
 
     private void rollbackAfterGFA(ItemEntity itemEntity, ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation) {
+        logger.info("rollbackAfterGFA itemEntity >>> ");
         if (!itemResponseInformation.getScreenMessage().equalsIgnoreCase(RecapConstants.GFA_ITEM_STATUS_CHECK_FAILED)) {
             rollbackUpdateItemAvailabilityStatus(itemEntity, itemRequestInfo.getUsername());
             saveItemChangeLogEntity(itemEntity.getId(), getUser(itemRequestInfo.getUsername()), RecapConstants.REQUEST_ITEM_GFA_FAILURE, itemRequestInfo.getPatronBarcode() + " - " + itemResponseInformation.getScreenMessage());
         }
-        requestItemController.cancelHoldItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
+
+        String isCheckinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.checkin.institution");
+        logger.info("protocol in rollbackAfterGFA  >>> " + isCheckinInstitution);
+
+        if (Boolean.TRUE.toString().equalsIgnoreCase(isCheckinInstitution) && itemRequestInfo.isOwningInstitutionItem()) {
+        }
+        else if (Boolean.TRUE.toString().equalsIgnoreCase(isCheckinInstitution) && !itemRequestInfo.isOwningInstitutionItem()) {
+            requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
+        }
+        else {
+            requestItemController.cancelHoldItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());
+        }
     }
 
     private void rollbackAfterGFA(ItemInformationResponse itemResponseInformation) {
+        logger.info("rollbackAfterGFA >>> ");
         ItemRequestInformation itemRequestInformation = itemRequestDBService.rollbackAfterGFA(itemResponseInformation);
         Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemResponseInformation.getRequestId());
         if (requestItemEntity.isPresent()) {
@@ -944,7 +959,18 @@ public class ItemRequestService {
         if (itemResponseInformation.isBulk()) {
             requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
         } else {
-            requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
+            logger.info("itemRequestInformation.getRequestingInstitution() >>>>" + itemRequestInformation.getRequestingInstitution());
+
+            String isCheckinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkin.institution");
+            logger.info("protocol in rollbackAfterGFA  >>> " + isCheckinInstitution);
+            if (Boolean.TRUE.toString().equalsIgnoreCase(isCheckinInstitution) && itemRequestInformation.isOwningInstitutionItem()) {
+            }
+            else if (Boolean.TRUE.toString().equalsIgnoreCase(isCheckinInstitution) && !itemRequestInformation.isOwningInstitutionItem()) {
+                requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
+            }
+            else {
+                requestItemController.cancelHoldItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
+            }
         }
     }
 
@@ -1019,6 +1045,7 @@ public class ItemRequestService {
      * @return the boolean
      */
     public boolean isUseQueueLasCall(String imsLocationCode) {
+        logger.info("proprty value for las.use.queue >>>> " + propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.use.queue"));
         return Boolean.parseBoolean(this.propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.use.queue"));
     }
 

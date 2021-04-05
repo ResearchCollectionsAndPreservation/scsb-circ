@@ -379,7 +379,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                     ) || Boolean.FALSE.toString().equalsIgnoreCase(checkinInstitution)) {
 
                 if (isRemoteCheckin.booleanValue()) {
-                    if (!itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution())) {
+                    if (!itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()) || itemRequestInformation.getRequestType().equals(RecapCommonConstants.REQUEST_TYPE_EDD)) {
                         CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), null, getNcipAgencyId());
                         CheckInItemResponseData checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);
                         if (!checkinItemResponse.getProblems().isEmpty()) {

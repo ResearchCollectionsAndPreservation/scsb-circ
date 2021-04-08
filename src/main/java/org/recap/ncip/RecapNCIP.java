@@ -76,4 +76,13 @@ public class RecapNCIP {
         return initiationHeader;
     }
 
+    public InitiationHeader getInitiationHeaderwithoutProfile(InitiationHeader initiationHeader, String ncipScheme, String fromAgency, String toAgency){
+        FromAgencyId fromAgencyId = new FromAgencyId();
+        fromAgencyId.setAgencyId(new AgencyId(ncipScheme, fromAgency));
+        ToAgencyId toAgencyId = new ToAgencyId();
+        toAgencyId.setAgencyId(new AgencyId(ncipScheme, toAgency));
+        initiationHeader.setFromAgencyId(fromAgencyId);
+        initiationHeader.setToAgencyId(toAgencyId);
+        return initiationHeader;
+    }
 }

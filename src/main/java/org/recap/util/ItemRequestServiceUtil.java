@@ -168,10 +168,12 @@ public class ItemRequestServiceUtil {
     public String getPatronIdBorrowingInstitution(String requestingInstitution, String owningInstitution, String requestType) {
         String patronId = "";
         GenericPatronEntity genericPatronEntity = genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(requestingInstitution, owningInstitution);
-        if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
-            patronId = genericPatronEntity.getEddGenericPatron();
-        } else {
-            patronId = genericPatronEntity.getRetrievalGenericPatron();
+        if(genericPatronEntity != null) {
+            if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+                patronId = genericPatronEntity.getEddGenericPatron();
+            } else {
+                patronId = genericPatronEntity.getRetrievalGenericPatron();
+            }
         }
         logger.info("Own Ins: {}, Req Ins: {}, Cross PatronId: {}", owningInstitution, requestingInstitution, patronId);
         return patronId;

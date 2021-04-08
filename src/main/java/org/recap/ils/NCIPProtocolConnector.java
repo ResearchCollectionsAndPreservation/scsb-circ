@@ -176,22 +176,9 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         return new org.springframework.http.HttpEntity<>(headers);
     }
 
-    /**
-     * Gets nypl data api url.
-     *
-     * @return the nypl data api url
-     */
-    public String getRestDataApiUrl() {
-        return ilsConfigProperties.getIlsRestDataApi();
-    }
 
     public String getBibDataApiUrl() {
         return ilsConfigProperties.getIlsBibdataApiEndpoint();
-    }
-
-
-    public String getApiUrl(String itemIdentifier) {
-        return  getRestDataApiUrl() + "/items?item_barcode=" + itemIdentifier;
     }
 
     public CloseableHttpClient buildCloseableHttpClient(){
@@ -204,40 +191,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         log.info("NCIP Connector Port: {}", getPort());
         log.info("NCIP Connector Location: {}", getOperatorLocation());
 
-
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
-     //   itemInformationResponse.setCirculationStatus("CHARGED");
-        // Commeneted for testing
-        try {
-            String owningInstitution = getRestApiResponseUtil().getItemOwningInstitutionByItemBarcode(itemIdentifier);
-
-            String apiUrl = getApiUrl(itemIdentifier);
-
-            HttpHeaders headers = getHttpHeader();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            org.springframework.http.HttpEntity requestEntity = getHttpEntity(headers);
-
-            ResponseEntity<ItemLookupResponse> responseLookupEntity = restTemplate.exchange(apiUrl + "&apikey=" + ilsConfigProperties.getIlsApiKey(), HttpMethod.GET, requestEntity, ItemLookupResponse.class);
-            ItemLookupResponse itemResponse = responseLookupEntity.getBody();
-            log.info ("itemResponse {}" + itemResponse);
-
-            ItemLookUpInformationResponse itemLookupData = buildResponse(itemResponse);
-            itemInformationResponse.setItemBarcode(itemLookupData.getBarcode());
-            itemInformationResponse.setCirculationStatus(itemLookupData.getCirculationStatus());
-            itemInformationResponse.setBibID(itemLookupData.getBibId());
-            itemInformationResponse.setTitleIdentifier(itemLookupData.getTitle());
-            itemInformationResponse.setItemOwningInstitution(owningInstitution);
-
-        } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR, httpException);
-            itemInformationResponse.setSuccess(false);
-            itemInformationResponse.setScreenMessage(httpException.getStatusText());
-        } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
-            itemInformationResponse.setSuccess(false);
-            itemInformationResponse.setScreenMessage(e.getMessage());
-        }
-
         return itemInformationResponse;
     }
 
@@ -271,7 +225,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             if (responseCode > 399) {
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST , httpCallTo + getEndPointUrl() + returnedResponseCode + responseCode + responseBody + responseString);
             }
-            //transforms the NCIP xml response into NCIP Objects
 
             InputStream stream = new ByteArrayInputStream(responseString.getBytes(StandardCharsets.UTF_8));
             NCIPResponseData responseData = ncipToolkitUtil.translator.createResponseData(ncipToolkitUtil.serviceContext, stream);
@@ -373,7 +326,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                 isRemoteCheckin = Boolean.TRUE;
             }
           String checkinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkin.institution");
-            log.info("isRemoteCheckin >>>>>" + isRemoteCheckin);
 
             if ((itemRequestInformation.getRequestingInstitution() == null || !itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())
                     ) || Boolean.FALSE.toString().equalsIgnoreCase(checkinInstitution)) {
@@ -428,10 +380,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                     List<HoldingsEntity> holdingsEntities = itemEntity != null ? itemEntity.getHoldingsEntities() : new ArrayList<>();
                     HoldingsEntity holdingsEntity = !holdingsEntities.isEmpty() ? holdingsEntities.get(0) : null;
                     String holdingId = holdingsEntity != null ? holdingsEntity.getOwningInstitutionHoldingsId() : null;
-                    log.info("itemEntity >>> " + itemEntity.getId() + " <<<<<<<>>>>>  " + itemEntity.getBarcode());
-                    log.info("bibliographicEntity.getOwningInstitutionBibId() >>> " + bibliographicEntity.getOwningInstitutionBibId());
-                    log.info("holdingsEntity.getOwningInstitutionHoldingsId() >>> " + holdingsEntity.getOwningInstitutionHoldingsId());
-                    log.info("itemEntity getOwningInstitutionItemId >>> " + itemEntity.getOwningInstitutionItemId());
                     Map<String, String> params = getParamsMap(bibId, holdingId, itemId);
                     HttpHeaders headers = getHttpHeader();
                     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -440,12 +388,10 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
                     org.springframework.http.HttpEntity requestEntity = getHttpEntity(authJson, headers);
                     ResponseEntity<String> respnseLookupEntity = restTemplate.exchange(dischargeApiEndpoint, HttpMethod.POST, requestEntity, String.class, params);
-                    log.info("responseLookupEntity >>>>>>>>> " + respnseLookupEntity);
                 }
                     itemCheckinResponse.setSuccess(Boolean.TRUE);
                     itemCheckinResponse.setScreenMessage(success);
                     itemCheckinResponse.setItemOwningInstitution(getInstitution());
-
 
         return itemCheckinResponse;
     }
@@ -460,7 +406,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
     @Override
     public Object placeHold(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
-        log.info("Inside placeHold >>>" + callInstitutionId +  " <<>>" + itemInstitutionId);
         log.info("Item barcode {} received for hold request in " + itemInstitutionId + " for patron {}", itemIdentifier, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         if (callInstitutionId.equalsIgnoreCase(itemInstitutionId)) {
@@ -587,8 +532,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
                 return patronInformationResponse;
             } else {
-                log.info("responseobject toString >>> " + responseObject.toString());
-
                 patronInformationResponse.setPatronName(responseObject.getString("name"));
                 patronInformationResponse.setSuccess(Boolean.TRUE);
                 patronInformationResponse.setScreenMessage(success);
@@ -616,7 +559,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
     @Override
     public Object recallItem(String itemIdentifier, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation) {
-        log.info("Lookup for patron {}", patronIdentifier);
+        log.info("recallItem for Item {}", itemIdentifier);
         ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         String responseString;
         JSONObject responseObject;
@@ -720,7 +663,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             CloseableHttpClient client = buildCloseableHttpClient();
             AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, title, author, callNumber, getNcipAgencyId(), getNcipScheme());
             String requestBody = acceptItem.getRequestBody(ncipToolkitUtil, acceptItemInitiationData);
-            log.info("AcceptItem Request Body >>> " + requestBody);
             HttpUriRequest request = getHttpRequest(requestBody);
             HttpResponse response = client.execute(request);
             HttpEntity entity = response.getEntity();
@@ -774,6 +716,4 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         }
         return itemHoldResponse;
     }
-
-
 }

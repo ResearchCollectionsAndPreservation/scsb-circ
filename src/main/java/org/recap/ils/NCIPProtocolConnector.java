@@ -325,11 +325,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
               || itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()))) {
                 isRemoteCheckin = Boolean.TRUE;
             }
-          String checkinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkin.institution");
-
-            if ((itemRequestInformation.getRequestingInstitution() == null || !itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())
-                    ) || Boolean.FALSE.toString().equalsIgnoreCase(checkinInstitution)) {
-
                 if (isRemoteCheckin.booleanValue()) {
                     if (!itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()) || itemRequestInformation.getRequestType().equals(RecapCommonConstants.REQUEST_TYPE_EDD)) {
                         CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), null, getNcipAgencyId());
@@ -365,7 +360,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                             return itemCheckinResponse;
                         }
                     }
-            }
                     itemCheckinResponse.setSuccess(Boolean.TRUE);
                     itemCheckinResponse.setScreenMessage(success);
                     itemCheckinResponse.setItemOwningInstitution(getInstitution());

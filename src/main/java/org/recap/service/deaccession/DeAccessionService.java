@@ -223,9 +223,9 @@ public class DeAccessionService {
         if(!(validateUserRoles(rolesUser))){
             List<String>  itemBarcodesList = deAccessionItems.stream().map(item -> item.getItemBarcode()).collect(Collectors.toList());
             List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeIn(itemBarcodesList);
-            for (ItemEntity i : itemEntityList){
-                if(!(institutionList.get(i.getOwningInstitutionId()).equalsIgnoreCase(institutionCodeUser))){
-                    deAccessionDBResponseEntities.add(prepareFailureResponse(i.getBarcode(), getDeliveryLcation(i.getBarcode(),deAccessionRequest,removeDeaccessionItems), RecapConstants.DEACCESSION_NO_BARCODE_PROVIDED_ERROR, i));
+            for (ItemEntity itemEntity : itemEntityList){
+                if(!(institutionList.get(itemEntity.getOwningInstitutionId()).equalsIgnoreCase(institutionCodeUser))){
+                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemEntity.getBarcode(), getDeliveryLcation(itemEntity.getBarcode(),deAccessionRequest,removeDeaccessionItems), RecapConstants.DEACCESSION_NO_BARCODE_PROVIDED_ERROR, itemEntity));
                 }
             }
             removeDeaccessionItems(removeDeaccessionItems,deAccessionRequest,resultMap);
@@ -233,14 +233,14 @@ public class DeAccessionService {
     }
     private Boolean validateUserRoles(List<String> userRoles) {
         int roleCount = 0;
-        for (String s : userRoles){
-            roleCount = (s.equalsIgnoreCase(RecapConstants.ROLE_RECAP) || s.equalsIgnoreCase(RecapConstants.ROLE_SUPER_ADMIN)) ? roleCount++: roleCount;
+        for (String role : userRoles){
+            roleCount = (role.equalsIgnoreCase(RecapConstants.ROLE_RECAP) || role.equalsIgnoreCase(RecapConstants.ROLE_SUPER_ADMIN)) ? roleCount++: roleCount;
         }
         return (roleCount > 0) ? RecapConstants.BOOLEAN_TRUE : RecapConstants.BOOLEAN_FALSE;
     }
     private Map<Integer, String> mappingInstitution() {
         Map<Integer, String> institutionList = new HashMap<>();
-        List<InstitutionEntity> institutionEntities = institutionDetailsRepository.getInstitutionCodes();
+        List<InstitutionEntity> institutionEntities = institutionDetailsRepository.getCodes();
         institutionEntities.stream().forEach(inst -> institutionList.put(inst.getId(), inst.getInstitutionCode()));
         return institutionList;
     }

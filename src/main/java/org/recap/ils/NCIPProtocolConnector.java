@@ -127,10 +127,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         this.ilsConfigProperties = ilsConfigProperties;
     }
 
-    @Value("${ils.discharge.api.endpoint}")
-    private String dischargeApiEndpoint;
-
-
     /**
      * Get rest template rest template.
      *

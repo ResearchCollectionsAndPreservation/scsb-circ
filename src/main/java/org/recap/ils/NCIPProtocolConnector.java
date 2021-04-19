@@ -127,13 +127,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         this.ilsConfigProperties = ilsConfigProperties;
     }
 
-    @Value("${ils.discharge.token}")
-    private String dischargeToken;
-
-    @Value("${ils.discharge.api.endpoint}")
-    private String dischargeApiEndpoint;
-
-
     /**
      * Get rest template rest template.
      *
@@ -325,11 +318,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
               || itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()))) {
                 isRemoteCheckin = Boolean.TRUE;
             }
-          String checkinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkin.institution");
-
-            if ((itemRequestInformation.getRequestingInstitution() == null || !itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())
-                    ) || Boolean.FALSE.toString().equalsIgnoreCase(checkinInstitution)) {
-
                 if (isRemoteCheckin.booleanValue()) {
                     if (!itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()) || itemRequestInformation.getRequestType().equals(RecapCommonConstants.REQUEST_TYPE_EDD)) {
                         CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), null, getNcipAgencyId());
@@ -365,30 +353,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                             return itemCheckinResponse;
                         }
                     }
-            }
-
-                String isDischargeInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getItemOwningInstitution(), "ils.discharge.institution");
-
-                if (Boolean.TRUE.toString().equalsIgnoreCase(isDischargeInstitution) && getInstitution().equals(itemRequestInformation.getItemOwningInstitution())) {
-                    List<ItemEntity> itemEntities = getItemDetailsRepository().findByBarcode(itemRequestInformation.getItemBarcodes().get(0));
-                    ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
-
-                    String itemId = itemEntity != null ? itemEntity.getOwningInstitutionItemId() : null;
-                    List<BibliographicEntity> bibliographicEntities = itemEntity != null ? itemEntity.getBibliographicEntities() : new ArrayList<>();
-                    BibliographicEntity bibliographicEntity = !bibliographicEntities.isEmpty() ? bibliographicEntities.get(0) : null;
-                    String bibId = bibliographicEntity != null ? bibliographicEntity.getOwningInstitutionBibId() : null;
-                    List<HoldingsEntity> holdingsEntities = itemEntity != null ? itemEntity.getHoldingsEntities() : new ArrayList<>();
-                    HoldingsEntity holdingsEntity = !holdingsEntities.isEmpty() ? holdingsEntities.get(0) : null;
-                    String holdingId = holdingsEntity != null ? holdingsEntity.getOwningInstitutionHoldingsId() : null;
-                    Map<String, String> params = getParamsMap(bibId, holdingId, itemId);
-                    HttpHeaders headers = getHttpHeader();
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                    JSONObject authJson = new JSONObject();
-                    authJson.put("auth_token", dischargeToken);
-
-                    org.springframework.http.HttpEntity requestEntity = getHttpEntity(authJson, headers);
-                    ResponseEntity<String> respnseLookupEntity = restTemplate.exchange(dischargeApiEndpoint, HttpMethod.POST, requestEntity, String.class, params);
-                }
                     itemCheckinResponse.setSuccess(Boolean.TRUE);
                     itemCheckinResponse.setScreenMessage(success);
                     itemCheckinResponse.setItemOwningInstitution(getInstitution());

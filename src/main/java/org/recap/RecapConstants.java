@@ -427,7 +427,7 @@ public final class RecapConstants {
     public static final String RECAP_DEPOSITORY = "RD";
     public static final String NCIP_REMOTE_STORAGE = "NCIP_REMOTE_STORAGE";
     public static final String HARVARD_PROFILE = "HDEP";
-    public static final String RECAP_PROFILE = "RECAP";
+    public static final String RECAP_PROFILE = "SCSB";
 
 
 

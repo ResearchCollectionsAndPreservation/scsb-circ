@@ -167,7 +167,7 @@ public class GFALasService {
         try {
             ttitem001.setCustomerCode(itemRequestInfo.getCustomerCode());
             ttitem001.setItemBarcode(itemRequestInfo.getItemBarcodes().get(0));
-            ttitem001.setDestination(itemRequestInfo.getDeliveryLocation());
+            ttitem001.setDestination(itemRequestInfo.getTranslatedDeliveryLocation());
             ttitem001.setRequestId(itemRequestInfo.getRequestId().toString());
             ttitem001.setRequestor(itemRequestInfo.getPatronBarcode());
 
@@ -218,7 +218,8 @@ public class GFALasService {
         try {
             ttitem001.setCustomerCode(itemRequestInfo.getCustomerCode());
             ttitem001.setItemBarcode(itemRequestInfo.getItemBarcodes().get(0));
-            ttitem001.setDestination(itemRequestInfo.getDeliveryLocation());
+            ttitem001.setDestination(itemRequestInfo.getTranslatedDeliveryLocation());
+
             ttitem001.setRequestId(itemRequestInfo.getRequestId().toString());
             ttitem001.setRequestor(itemRequestInfo.getPatronBarcode());
 

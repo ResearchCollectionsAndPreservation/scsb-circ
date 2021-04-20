@@ -5,19 +5,19 @@ import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.BulkRequestItemEntity;
-import org.recap.model.jpa.CustomerCodeEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.OwnerCodeEntity;
 import org.recap.model.jpa.RequestItemEntity;
 import org.recap.model.jpa.RequestStatusEntity;
 import org.recap.model.jpa.RequestTypeEntity;
-import org.recap.repository.jpa.CustomerCodeDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
+import org.recap.repository.jpa.OwnerCodeDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
@@ -64,7 +64,7 @@ public class ItemRequestDBService {
     private RequestTypeDetailsRepository requestTypeDetailsRepository;
 
     @Autowired
-    private CustomerCodeDetailsRepository customerCodeDetailsRepository;
+    private OwnerCodeDetailsRepository ownerCodeDetailsRepository;
 
     @Autowired
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
@@ -294,13 +294,13 @@ public class ItemRequestDBService {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemInformationResponse.getRequestId());
         if(requestItemEntity.isPresent()) {
-            CustomerCodeEntity customerCodeEntity= customerCodeDetailsRepository.findByCustomerCode(requestItemEntity.get().getItemEntity().getCustomerCode());
+            OwnerCodeEntity ownerCodeEntity= ownerCodeDetailsRepository.findByOwnerCode(requestItemEntity.get().getItemEntity().getCustomerCode());
             commonUtil.rollbackUpdateItemAvailabilityStatus(requestItemEntity.get().getItemEntity(), RecapConstants.GUEST_USER);
             commonUtil.saveItemChangeLogEntity(itemInformationResponse.getRequestId(), requestItemEntity.get().getCreatedBy(), RecapConstants.REQUEST_ITEM_GFA_FAILURE, RecapConstants.REQUEST_ITEM_GFA_FAILURE + itemInformationResponse.getScreenMessage());
             itemRequestInformation.setBibId(requestItemEntity.get().getItemEntity().getBibliographicEntities().get(0).getOwningInstitutionBibId());
             itemRequestInformation.setPatronBarcode(requestItemEntity.get().getPatronId());
             itemRequestInformation.setItemBarcodes(Collections.singletonList(requestItemEntity.get().getItemEntity().getBarcode()));
-            itemRequestInformation.setPickupLocation(customerCodeEntity.getPickupLocation());
+            itemRequestInformation.setPickupLocation(ownerCodeEntity.getPickupLocation());
             itemRequestInformation.setItemOwningInstitution(requestItemEntity.get().getItemEntity().getInstitutionEntity().getInstitutionCode());
             itemRequestInformation.setRequestingInstitution(requestItemEntity.get().getInstitutionEntity().getInstitutionCode());
         }

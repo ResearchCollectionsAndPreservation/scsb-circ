@@ -3,18 +3,41 @@ package org.recap.request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.jpa.*;
-import org.recap.repository.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.BulkRequestItemEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.OwnerCodeEntity;
+import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.RequestTypeEntity;
+import org.recap.repository.jpa.InstitutionDetailsRepository;
+import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.repository.jpa.ItemStatusDetailsRepository;
+import org.recap.repository.jpa.OwnerCodeDetailsRepository;
+import org.recap.repository.jpa.RequestItemDetailsRepository;
+import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
+import org.recap.repository.jpa.RequestTypeDetailsRepository;
 import org.recap.util.CommonUtil;
 import org.recap.util.SecurityUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,7 +56,7 @@ public class ItemRequestDBServiceUT{
     ItemDetailsRepository itemDetailsRepository;
 
     @Mock
-    CustomerCodeDetailsRepository customerCodeDetailsRepository;
+    OwnerCodeDetailsRepository ownerCodeDetailsRepository;
 
     @Mock
     SecurityUtil securityUtil;
@@ -311,14 +334,14 @@ public class ItemRequestDBServiceUT{
     public void rollbackAfterGFA() {
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         RequestItemEntity requestItemEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0);
-        CustomerCodeEntity customerCodeEntity = new CustomerCodeEntity();
-        customerCodeEntity.setOwningInstitutionId(1);
-        customerCodeEntity.setInstitutionEntity(getBulkRequestItemEntity().getInstitutionEntity());
-        customerCodeEntity.setCustomerCode("PA");
-        customerCodeEntity.setId(1);
-        customerCodeEntity.setDescription("test");
+        OwnerCodeEntity ownerCodeEntity = new OwnerCodeEntity();
+        ownerCodeEntity.setInstitutionId(1);
+        ownerCodeEntity.setInstitutionEntity(getBulkRequestItemEntity().getInstitutionEntity());
+        ownerCodeEntity.setOwnerCode("PA");
+        ownerCodeEntity.setId(1);
+        ownerCodeEntity.setDescription("test");
         Mockito.when(requestItemDetailsRepository.findById(itemInformationResponse.getRequestId())).thenReturn(Optional.of(requestItemEntity));
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCode(requestItemEntity.getItemEntity().getCustomerCode())).thenReturn(customerCodeEntity);
+        Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(requestItemEntity.getItemEntity().getCustomerCode())).thenReturn(ownerCodeEntity);
         ItemRequestInformation itemRequestInformation = itemRequestDBService.rollbackAfterGFA(itemInformationResponse);
         assertNotNull(itemRequestInformation);
     }

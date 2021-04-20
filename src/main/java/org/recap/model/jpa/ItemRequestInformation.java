@@ -27,6 +27,7 @@ public class ItemRequestInformation implements Serializable {
     private String trackingId; // NYPL - trackingId
     private String author; // NYPL - author
     private String callNumber; // NYPL - callNumber
+    private String translatedDeliveryLocation = "";
 
     /**
      * EDD Request

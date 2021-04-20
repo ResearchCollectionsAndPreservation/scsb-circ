@@ -75,6 +75,10 @@ public class ItemRequestService {
     private RequestItemDetailsRepository requestItemDetailsRepository;
 
     @Autowired
+    private DeliveryCodeDetailsRepository deliveryCodeDetailsRepository;
+
+
+    @Autowired
     RestTemplate restTemplate;
 
     @Autowired
@@ -90,7 +94,11 @@ public class ItemRequestService {
     private ItemRequestDBService itemRequestDBService;
 
     @Autowired
-    private CustomerCodeDetailsRepository customerCodeDetailsRepository;
+    private OwnerCodeDetailsRepository ownerCodeDetailsRepository;
+
+    @Autowired
+    private InstitutionDetailsRepository institutionDetailsRepository;
+
 
     @Autowired
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
@@ -106,6 +114,10 @@ public class ItemRequestService {
 
     @Autowired
     private RequestParamaterValidatorService requestParamaterValidatorService;
+
+    @Autowired
+    private DeliveryCodeTranslationDetailsRepository deliveryCodeTranslationDetailsRepository;
+
 
     @Autowired
     private ItemValidatorService itemValidatorService;
@@ -163,19 +175,32 @@ public class ItemRequestService {
 
             if (itemEntities != null && !itemEntities.isEmpty()) {
                 itemEntity = itemEntities.get(0);
-                CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(itemRequestInfo.getDeliveryLocation());
+                OwnerCodeEntity ownerCodeEntity = ownerCodeDetailsRepository.findByOwnerCode(itemRequestInfo.getDeliveryLocation());
                 if (StringUtils.isBlank(itemRequestInfo.getBibId())) {
                     itemRequestInfo.setBibId(itemEntity.getBibliographicEntities().get(0).getOwningInstitutionBibId());
                 }
                 itemRequestInfo.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
                 itemRequestInfo.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
+
+                DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCode(itemRequestInfo.getDeliveryLocation());
+                InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(itemRequestInfo.getRequestingInstitution());
+
+                DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(institutionEntity.getId(), deliveryCodeEntity.getId(), itemEntity.getImsLocationEntity().getId());
+                if(deliveryCodeTranslationEntity != null && deliveryCodeTranslationEntity.getImsLocationDeliveryCode() != null) {
+                    logger.info(" Translation Code >>>> "  + deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
+
+                    itemRequestInfo.setTranslatedDeliveryLocation(deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
+                }
+                else {
+                    itemRequestInfo.setTranslatedDeliveryLocation(itemRequestInfo.getDeliveryLocation());
+                }
                 logger.info("itemEntity.getImsLocationEntity().getImsLocationCode() >>>> "  + itemEntity.getImsLocationEntity().getImsLocationCode());
                 SearchResultRow searchResultRow = searchRecords(itemEntity); //Solr
 
                 itemRequestInfo.setTitleIdentifier(getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, searchResultRow));
                 itemRequestInfo.setAuthor(searchResultRow.getAuthor());
                 itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
-                itemRequestInfo.setPickupLocation(customerCodeEntity.getPickupLocation());
+                itemRequestInfo.setPickupLocation(ownerCodeEntity.getPickupLocation());
                 itemResponseInformation.setItemId(itemEntity.getId());
 
                 boolean isItemStatusAvailable;
@@ -1030,8 +1055,8 @@ public class ItemRequestService {
     }
 
     private String getPickupLocation(String deliveryLocation) {
-        CustomerCodeEntity customerCodeEntity = customerCodeDetailsRepository.findByCustomerCode(deliveryLocation);
-        return customerCodeEntity.getPickupLocation();
+        OwnerCodeEntity ownerCodeEntity = ownerCodeDetailsRepository.findByOwnerCode(deliveryLocation);
+        return ownerCodeEntity.getPickupLocation();
     }
 
     /**

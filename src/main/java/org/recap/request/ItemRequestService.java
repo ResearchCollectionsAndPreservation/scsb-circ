@@ -200,7 +200,9 @@ public class ItemRequestService {
                 itemRequestInfo.setTitleIdentifier(getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, searchResultRow));
                 itemRequestInfo.setAuthor(searchResultRow.getAuthor());
                 itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
-                itemRequestInfo.setPickupLocation(ownerCodeEntity.getPickupLocation());
+                if (ownerCodeEntity != null) {
+                    itemRequestInfo.setPickupLocation(ownerCodeEntity.getPickupLocation());
+                }
                 itemResponseInformation.setItemId(itemEntity.getId());
 
                 boolean isItemStatusAvailable;

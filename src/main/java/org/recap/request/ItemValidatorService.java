@@ -65,6 +65,10 @@ public class ItemValidatorService {
     private OwnerCodeDetailsRepository onwerCodeDetailsRepository;
 
     @Autowired
+    private DeliveryCodeDetailsRepository deliveryCodeDetailsRepository;
+
+
+    @Autowired
     private RequestItemDetailsRepository requestItemDetailsRepository;
 
     /**
@@ -245,9 +249,9 @@ public class ItemValidatorService {
      */
     public int checkDeliveryLocation(String onwerCode, ItemRequestInformation itemRequestInformation) {
         int bSuccess = 0;
-        OwnerCodeEntity onwerCodeEntity = onwerCodeDetailsRepository.findByOwnerCode(itemRequestInformation.getDeliveryLocation());
-        if (onwerCodeEntity != null && onwerCodeEntity.getOwnerCode().equalsIgnoreCase(itemRequestInformation.getDeliveryLocation())) {
-                onwerCodeEntity = onwerCodeDetailsRepository.findByOwnerCode(onwerCode);
+        DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCode(itemRequestInformation.getDeliveryLocation());
+        if (deliveryCodeEntity != null && deliveryCodeEntity.getDeliveryCode().equalsIgnoreCase(itemRequestInformation.getDeliveryLocation())) {
+                OwnerCodeEntity onwerCodeEntity = onwerCodeDetailsRepository.findByOwnerCode(onwerCode);
                 String requestingInstitution = itemRequestInformation.getRequestingInstitution();
                 institutionDetailsRepository.findByInstitutionCode(requestingInstitution);
 

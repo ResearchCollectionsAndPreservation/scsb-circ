@@ -72,6 +72,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -200,14 +201,16 @@ public class DeAccessionService {
             List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
             String username = StringUtils.isNotBlank(deAccessionRequest.getUsername()) ? deAccessionRequest.getUsername() : RecapConstants.DISCOVERY;
             validateBarcodesWithUserName(deAccessionRequest,username,deAccessionDBResponseEntities,resultMap);
-            checkGfaItemStatus(deAccessionRequest.getDeAccessionItems(), deAccessionDBResponseEntities, barcodeAndStopCodeMap);
-            checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, username);
-            deAccessionItemsInDB(barcodeAndStopCodeMap, deAccessionDBResponseEntities, username);
-            callGfaDeaccessionService(deAccessionDBResponseEntities, username);
-            rollbackLASRejectedItems(deAccessionDBResponseEntities, username);
-            deAccessionItemsInSolr(deAccessionDBResponseEntities, resultMap);
-            processAndSaveReportEntities(deAccessionDBResponseEntities);
-            processAndSaveDeaccessionChangeLog(deAccessionRequest,username,deAccessionDBResponseEntities);
+            if(!deAccessionRequest.getDeAccessionItems().isEmpty()) {
+                checkGfaItemStatus(deAccessionRequest.getDeAccessionItems(), deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+                checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, username);
+                deAccessionItemsInDB(barcodeAndStopCodeMap, deAccessionDBResponseEntities, username);
+                callGfaDeaccessionService(deAccessionDBResponseEntities, username);
+                rollbackLASRejectedItems(deAccessionDBResponseEntities, username);
+                deAccessionItemsInSolr(deAccessionDBResponseEntities, resultMap);
+                processAndSaveReportEntities(deAccessionDBResponseEntities);
+                processAndSaveDeaccessionChangeLog(deAccessionRequest, username, deAccessionDBResponseEntities);
+            }
         } else {
             resultMap.put("", RecapConstants.DEACCESSION_NO_BARCODE_ERROR);
             return resultMap;
@@ -254,7 +257,16 @@ public class DeAccessionService {
     }
 
     private DeAccessionRequest removeDeaccessionItems(List<DeAccessionItem> removeDeaccessionItems, DeAccessionRequest deAccessionRequest, Map<String, String> resultMap) {
-        deAccessionRequest.getDeAccessionItems().removeAll(removeDeaccessionItems);
+        Predicate<DeAccessionItem> removeItem = deAccessionItem -> {
+            int count = 0;
+            for (DeAccessionItem deAccessionItemList : removeDeaccessionItems) {
+                if (deAccessionItemList.getItemBarcode().equalsIgnoreCase(deAccessionItem.getItemBarcode())) {
+                    count++;
+                }
+            }
+            return (count > 0) ? RecapConstants.BOOLEAN_TRUE : RecapConstants.BOOLEAN_FALSE;
+        };
+        deAccessionRequest.getDeAccessionItems().removeIf(item->removeItem.test(item));
         String itemBarcdes = removeDeaccessionItems.stream().map(item -> item.getItemBarcode().toString()).collect(Collectors.joining());
         resultMap.put(itemBarcdes,RecapConstants.FAILURE_UPDATE_CGD);
         return deAccessionRequest;

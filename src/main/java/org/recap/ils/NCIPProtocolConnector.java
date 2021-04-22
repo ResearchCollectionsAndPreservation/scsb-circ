@@ -26,9 +26,6 @@ import org.extensiblecatalog.ncip.v2.service.RecallItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RecallItemResponseData;
 import org.json.JSONObject;
 
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.ncip.AcceptItem;
 import org.recap.ncip.CancelRequestItem;
@@ -54,13 +51,9 @@ import org.recap.model.AbstractResponseItem;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -69,7 +62,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -126,13 +121,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     public void setIlsConfigProperties(ILSConfigProperties ilsConfigProperties) {
         this.ilsConfigProperties = ilsConfigProperties;
     }
-
-    @Value("${ils.discharge.token}")
-    private String dischargeToken;
-
-    @Value("${ils.discharge.api.endpoint}")
-    private String dischargeApiEndpoint;
-
 
     /**
      * Get rest template rest template.
@@ -191,8 +179,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         log.info("NCIP Connector Port: {}", getPort());
         log.info("NCIP Connector Location: {}", getOperatorLocation());
 
-        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
-        return itemInformationResponse;
+        return new ItemInformationResponse();
     }
 
     @Override
@@ -276,7 +263,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             CloseableHttpClient client = buildCloseableHttpClient();
 
             String responseString = null;
-            JSONObject responseObject = new JSONObject();
 
             HttpResponse response = client.execute(request);
 
@@ -298,7 +284,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
             //transforms the NCIP Objects into a JSON response object
             checkinItemResponse = (CheckInItemResponseData) responseData;
-            responseObject = checkInItem.getCheckInResponse(checkinItemResponse);
+            checkInItem.getCheckInResponse(checkinItemResponse);
                    }
         catch (HttpClientErrorException httpException) {
             log.error(RecapCommonConstants.LOG_ERROR, httpException);
@@ -317,29 +303,25 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         CheckinItem checkInItem = new CheckinItem();
         ItemCheckinResponse itemCheckinResponse = new ItemCheckinResponse();
 
-            String behalfAgency = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.behalf.agency");
             String remoteCheckin = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.remote.checkin");
-            Boolean isRemoteCheckin = Boolean.FALSE;
+            String remoteProfileType = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.remote.profile.type");
+
+        Boolean isRemoteCheckin = Boolean.FALSE;
            if(Boolean.TRUE.toString().equalsIgnoreCase(remoteCheckin) && (
                     getInstitution().equals(itemRequestInformation.getItemOwningInstitution())
               || itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()))) {
                 isRemoteCheckin = Boolean.TRUE;
             }
-          String checkinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "ils.checkin.institution");
-
-            if ((itemRequestInformation.getRequestingInstitution() == null || !itemRequestInformation.getItemOwningInstitution().equalsIgnoreCase(itemRequestInformation.getRequestingInstitution())
-                    ) || Boolean.FALSE.toString().equalsIgnoreCase(checkinInstitution)) {
-
                 if (isRemoteCheckin.booleanValue()) {
                     if (!itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()) || itemRequestInformation.getRequestType().equals(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), null, getNcipAgencyId());
+                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0),  getNcipAgencyId());
                         CheckInItemResponseData checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);
                         if (!checkinItemResponse.getProblems().isEmpty()) {
                             itemCheckinResponse.setSuccess(Boolean.FALSE);
                             itemCheckinResponse.setScreenMessage(failureReason + checkinItemResponse.getProblems());
                             return itemCheckinResponse;
                         }
-                        checkInItemInitiationData = checkInItem.getCheckInItemInitiationRemoteData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), behalfAgency, getNcipAgencyId(), getNcipScheme());
+                        checkInItemInitiationData = checkInItem.getCheckInItemInitiationRemoteData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), remoteProfileType, getNcipAgencyId(), getNcipScheme());
                         checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);
                         if (!checkinItemResponse.getProblems().isEmpty()) {
                             itemCheckinResponse.setSuccess(Boolean.FALSE);
@@ -347,7 +329,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                             return itemCheckinResponse;
                         }
                     } else {
-                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationRemoteData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), behalfAgency, getNcipAgencyId(), getNcipScheme());
+                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationRemoteData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), remoteProfileType, getNcipAgencyId(), getNcipScheme());
                         CheckInItemResponseData checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);
                         if (!checkinItemResponse.getProblems().isEmpty()) {
                             itemCheckinResponse.setSuccess(Boolean.FALSE);
@@ -357,7 +339,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                       }
 
                 } else {
-                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), behalfAgency, getNcipAgencyId());
+                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0), getNcipAgencyId());
                         CheckInItemResponseData checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);
                         if (!checkinItemResponse.getProblems().isEmpty()) {
                             itemCheckinResponse.setSuccess(Boolean.FALSE);
@@ -365,30 +347,6 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                             return itemCheckinResponse;
                         }
                     }
-            }
-
-                String isDischargeInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getItemOwningInstitution(), "ils.discharge.institution");
-
-                if (Boolean.TRUE.toString().equalsIgnoreCase(isDischargeInstitution) && getInstitution().equals(itemRequestInformation.getItemOwningInstitution())) {
-                    List<ItemEntity> itemEntities = getItemDetailsRepository().findByBarcode(itemRequestInformation.getItemBarcodes().get(0));
-                    ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
-
-                    String itemId = itemEntity != null ? itemEntity.getOwningInstitutionItemId() : null;
-                    List<BibliographicEntity> bibliographicEntities = itemEntity != null ? itemEntity.getBibliographicEntities() : new ArrayList<>();
-                    BibliographicEntity bibliographicEntity = !bibliographicEntities.isEmpty() ? bibliographicEntities.get(0) : null;
-                    String bibId = bibliographicEntity != null ? bibliographicEntity.getOwningInstitutionBibId() : null;
-                    List<HoldingsEntity> holdingsEntities = itemEntity != null ? itemEntity.getHoldingsEntities() : new ArrayList<>();
-                    HoldingsEntity holdingsEntity = !holdingsEntities.isEmpty() ? holdingsEntities.get(0) : null;
-                    String holdingId = holdingsEntity != null ? holdingsEntity.getOwningInstitutionHoldingsId() : null;
-                    Map<String, String> params = getParamsMap(bibId, holdingId, itemId);
-                    HttpHeaders headers = getHttpHeader();
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                    JSONObject authJson = new JSONObject();
-                    authJson.put("auth_token", dischargeToken);
-
-                    org.springframework.http.HttpEntity requestEntity = getHttpEntity(authJson, headers);
-                    ResponseEntity<String> respnseLookupEntity = restTemplate.exchange(dischargeApiEndpoint, HttpMethod.POST, requestEntity, String.class, params);
-                }
                     itemCheckinResponse.setSuccess(Boolean.TRUE);
                     itemCheckinResponse.setScreenMessage(success);
                     itemCheckinResponse.setItemOwningInstitution(getInstitution());
@@ -412,7 +370,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                 itemHoldResponse.setSuccess(Boolean.TRUE);
             }
             else {
-                itemHoldResponse = acceptItem(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
+                itemHoldResponse = acceptItem(itemIdentifier, requestId, patronIdentifier, itemInstitutionId, pickupLocation, title, author, callNumber);
             }
         return itemHoldResponse;
     }
@@ -653,7 +611,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         return  itemLookUpInformationResponse;
     }
 
-    private ItemHoldResponse acceptItem(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
+    private ItemHoldResponse acceptItem(String itemIdentifier, Integer requestId, String patronIdentifier, String itemInstitutionId,  String pickupLocation, String title, String author, String callNumber) {
         AcceptItem acceptItem = new AcceptItem();
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         String responseString = null;

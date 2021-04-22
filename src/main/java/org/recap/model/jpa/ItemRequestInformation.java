@@ -2,8 +2,6 @@ package org.recap.model.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
@@ -27,6 +25,7 @@ public class ItemRequestInformation implements Serializable {
     private String trackingId; // NYPL - trackingId
     private String author; // NYPL - author
     private String callNumber; // NYPL - callNumber
+    private String translatedDeliveryLocation = "";
 
     /**
      * EDD Request

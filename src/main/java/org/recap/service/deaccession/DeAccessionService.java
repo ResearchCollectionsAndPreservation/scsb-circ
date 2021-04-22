@@ -234,12 +234,14 @@ public class DeAccessionService {
             removeDeaccessionItems(removeDeaccessionItems,deAccessionRequest,resultMap);
         }
     }
+
     private Boolean validateUserRoles(List<String> userRoles) {
-        int roleCount = 0;
-        for (String role : userRoles){
-            roleCount = (role.equalsIgnoreCase(RecapConstants.ROLE_RECAP) || role.equalsIgnoreCase(RecapConstants.ROLE_SUPER_ADMIN)) ? roleCount++: roleCount;
+        for (String role : userRoles) {
+            if (role.equalsIgnoreCase(RecapConstants.ROLE_RECAP) || role.equalsIgnoreCase(RecapConstants.ROLE_SUPER_ADMIN)) {
+                return RecapConstants.BOOLEAN_TRUE;
+            }
         }
-        return (roleCount > 0) ? RecapConstants.BOOLEAN_TRUE : RecapConstants.BOOLEAN_FALSE;
+        return RecapConstants.BOOLEAN_FALSE;
     }
     private Map<Integer, String> mappingInstitution() {
         Map<Integer, String> institutionList = new HashMap<>();
@@ -258,16 +260,15 @@ public class DeAccessionService {
 
     private DeAccessionRequest removeDeaccessionItems(List<DeAccessionItem> removeDeaccessionItems, DeAccessionRequest deAccessionRequest, Map<String, String> resultMap) {
         Predicate<DeAccessionItem> removeItem = deAccessionItem -> {
-            int count = 0;
-            for (DeAccessionItem deAccessionItemList : removeDeaccessionItems) {
+             for (DeAccessionItem deAccessionItemList : removeDeaccessionItems) {
                 if (deAccessionItemList.getItemBarcode().equalsIgnoreCase(deAccessionItem.getItemBarcode())) {
-                    count++;
+                    return RecapConstants.BOOLEAN_TRUE;
                 }
             }
-            return (count > 0) ? RecapConstants.BOOLEAN_TRUE : RecapConstants.BOOLEAN_FALSE;
+            return RecapConstants.BOOLEAN_FALSE;
         };
         deAccessionRequest.getDeAccessionItems().removeIf(item->removeItem.test(item));
-        String itemBarcdes = removeDeaccessionItems.stream().map(item -> item.getItemBarcode().toString()).collect(Collectors.joining());
+        String itemBarcdes = removeDeaccessionItems.stream().map(item -> item.getItemBarcode().toString()+", ").collect(Collectors.joining());
         resultMap.put(itemBarcdes,RecapConstants.FAILURE_UPDATE_CGD);
         return deAccessionRequest;
     }

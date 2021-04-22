@@ -619,7 +619,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         try {
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             CloseableHttpClient client = buildCloseableHttpClient();
-            AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, title, author, callNumber, getNcipAgencyId(), getNcipScheme());
+            AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, title, author, pickupLocation,callNumber, getNcipAgencyId(), getNcipScheme());
             String requestBody = acceptItem.getRequestBody(ncipToolkitUtil, acceptItemInitiationData);
             HttpUriRequest request = getHttpRequest(requestBody);
             HttpResponse response = client.execute(request);

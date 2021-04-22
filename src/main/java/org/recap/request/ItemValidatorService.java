@@ -143,7 +143,7 @@ public class ItemValidatorService {
                 if (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL) || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
                     int validateCustomerCode = checkDeliveryLocation(itemEntity.getCustomerCode(), itemRequestInformation);
                     if (validateCustomerCode == 1) {
-                        int validateDeliveryTranslationCode = checkDeliveryLocationTranslationCode(itemRequestInformation);
+                        int validateDeliveryTranslationCode = checkDeliveryLocationTranslationCode(itemEntity, itemRequestInformation);
                         if (validateDeliveryTranslationCode == 1) {
                             responseEntity1 = new ResponseEntity<>(RecapCommonConstants.VALID_REQUEST, getHttpHeaders(), HttpStatus.OK);
                         } else if (validateDeliveryTranslationCode == 0) {
@@ -241,7 +241,7 @@ public class ItemValidatorService {
             if (!(itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD))) {
                 int validateCustomerCode = checkDeliveryLocation(itemEntity.getCustomerCode(), itemRequestInformation);
                 if (validateCustomerCode == 1) {
-                 int validateDeliveryTranslationCode = checkDeliveryLocationTranslationCode(itemRequestInformation);
+                 int validateDeliveryTranslationCode = checkDeliveryLocationTranslationCode(itemEntity, itemRequestInformation);
                     if (validateDeliveryTranslationCode == 1) {
                         if (itemEntity.getBibliographicEntities().size() == bibliographicIds.size()) {
                             bibliographicList = itemEntity.getBibliographicEntities();
@@ -306,17 +306,18 @@ public class ItemValidatorService {
         return bSuccess;
     }
 
-    public int checkDeliveryLocationTranslationCode(ItemRequestInformation itemRequestInformation) {
+    public int checkDeliveryLocationTranslationCode(ItemEntity itemEntity, ItemRequestInformation itemRequestInformation) {
         int bSuccess = -1;
         DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCode(itemRequestInformation.getDeliveryLocation());
         InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(itemRequestInformation.getRequestingInstitution());
-        DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(institutionEntity.getId(), deliveryCodeEntity.getId(), imsLocationDetailsRepository.findByImsLocationCode(itemRequestInformation.getImsLocationCode()).getId());
-
+        if(itemRequestInformation.getImsLocationCode() != null) {
+            DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(institutionEntity.getId(), deliveryCodeEntity.getId(), itemEntity.getImsLocationId());
             if (deliveryCodeTranslationEntity != null) {
                 bSuccess = 1;
             } else {
                 bSuccess = -1;
             }
+        }
         return bSuccess;
     }
 

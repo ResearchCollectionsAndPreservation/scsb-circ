@@ -260,8 +260,8 @@ public class DeAccessionService {
 
     private DeAccessionRequest removeDeaccessionItems(List<DeAccessionItem> removeDeaccessionItems, DeAccessionRequest deAccessionRequest, Map<String, String> resultMap) {
         Predicate<DeAccessionItem> removeItem = deAccessionItem -> {
-             for (DeAccessionItem deAccessionItemList : removeDeaccessionItems) {
-                if (deAccessionItemList.getItemBarcode().equalsIgnoreCase(deAccessionItem.getItemBarcode())) {
+             for (DeAccessionItem removeDeAccessionItem : removeDeaccessionItems) {
+                if (removeDeAccessionItem.getItemBarcode().equalsIgnoreCase(deAccessionItem.getItemBarcode())) {
                     return RecapConstants.BOOLEAN_TRUE;
                 }
             }

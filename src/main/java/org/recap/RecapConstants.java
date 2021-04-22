@@ -21,6 +21,8 @@ public final class RecapConstants {
     public static final String ITEMBARCODE_WITH_DIFFERENT_BIB = "All items must be attached to the same bibliographic record, have the same customer code, and the same availability.";
     public static final String INVALID_CUSTOMER_CODE = "Please enter the valid delivery Code";
     public static final String INVALID_DELIVERY_CODE = "Delivery location not valid for this item.";
+    public static final String INVALID_TRANSLATED_CODE = "Translated Delivery Location not available for the requested Delivery Location.";
+
     public static final String INVALID_ITEM_BARCODE = "Item is not available";
     public static final String ITEM_BARCODE_IS_REQUIRED = "Item Barcode is required";
     public static final String MULTIPLE_ITEMS_NOT_ALLOWED_FOR_EDD = "EDD requests must be done on a single item.";

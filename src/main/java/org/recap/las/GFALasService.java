@@ -10,12 +10,26 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.las.model.*;
+import org.recap.las.model.GFAEddItemResponse;
+import org.recap.las.model.GFAItemStatus;
+import org.recap.las.model.GFAItemStatusCheckRequest;
+import org.recap.las.model.GFARetrieveEDDItemRequest;
+import org.recap.las.model.GFARetrieveItemRequest;
+import org.recap.las.model.GFARetrieveItemResponse;
+import org.recap.las.model.RetrieveItemEDDRequest;
+import org.recap.las.model.RetrieveItemRequest;
+import org.recap.las.model.TtitemEDDResponse;
+import org.recap.las.model.TtitemRequest;
 import org.recap.model.gfa.Dsitem;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
 import org.recap.model.gfa.ScsbLasItemStatusCheckModel;
 import org.recap.model.gfa.Ttitem;
-import org.recap.model.jpa.*;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.model.jpa.RequestInformation;
+import org.recap.model.jpa.RequestItemEntity;
+import org.recap.model.jpa.RequestStatusEntity;
+import org.recap.model.jpa.SearchResultRow;
 import org.recap.processor.LasItemStatusCheckPollingProcessor;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
@@ -29,7 +43,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sudhishk on 27/1/17.
@@ -167,7 +186,7 @@ public class GFALasService {
         try {
             ttitem001.setCustomerCode(itemRequestInfo.getCustomerCode());
             ttitem001.setItemBarcode(itemRequestInfo.getItemBarcodes().get(0));
-            ttitem001.setDestination(itemRequestInfo.getDeliveryLocation());
+            ttitem001.setDestination(itemRequestInfo.getTranslatedDeliveryLocation());
             ttitem001.setRequestId(itemRequestInfo.getRequestId().toString());
             ttitem001.setRequestor(itemRequestInfo.getPatronBarcode());
 
@@ -218,7 +237,8 @@ public class GFALasService {
         try {
             ttitem001.setCustomerCode(itemRequestInfo.getCustomerCode());
             ttitem001.setItemBarcode(itemRequestInfo.getItemBarcodes().get(0));
-            ttitem001.setDestination(itemRequestInfo.getDeliveryLocation());
+            ttitem001.setDestination(itemRequestInfo.getTranslatedDeliveryLocation());
+
             ttitem001.setRequestId(itemRequestInfo.getRequestId().toString());
             ttitem001.setRequestor(itemRequestInfo.getPatronBarcode());
 

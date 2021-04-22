@@ -310,14 +310,12 @@ public class ItemValidatorService {
         int bSuccess = -1;
         DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCode(itemRequestInformation.getDeliveryLocation());
         InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(itemRequestInformation.getRequestingInstitution());
-        if(itemRequestInformation.getImsLocationCode() != null) {
             DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(institutionEntity.getId(), deliveryCodeEntity.getId(), itemEntity.getImsLocationId());
             if (deliveryCodeTranslationEntity != null) {
                 bSuccess = 1;
             } else {
                 bSuccess = -1;
             }
-        }
         return bSuccess;
     }
 

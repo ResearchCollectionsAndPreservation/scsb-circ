@@ -248,8 +248,8 @@ public class DeAccessionService {
                                     deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), "Cannot Deaccession as Item is awaiting for Refile.Please try again later or contact ReCAP staff for further assistance.", itemEntity));
                                 }
                                 else if ((StringUtils.isNotBlank(gfaItemStatus) && !RecapConstants.GFA_STATUS_NOT_ON_FILE.equalsIgnoreCase(gfaItemStatus))
-                                        && ((RecapCommonConstants.AVAILABLE.equals(scsbItemStatus) && commonUtil.isImsItemStatusAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus))
-                                        || (RecapCommonConstants.NOT_AVAILABLE.equals(scsbItemStatus) && commonUtil.isImsItemStatusNotAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus)))) {
+                                        && ((RecapCommonConstants.AVAILABLE.equals(scsbItemStatus) && isImsItemStatusAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus))
+                                        || (RecapCommonConstants.NOT_AVAILABLE.equals(scsbItemStatus) && isImsItemStatusNotAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus)))) {
                                     barcodeAndStopCodeMap.put(itemBarcode.trim(), deAccessionItem.getDeliveryLocation());
                                 } else {
                                     deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), MessageFormat.format(RecapConstants.GFA_ITEM_STATUS_MISMATCH, recapAssistanceEmailTo, recapAssistanceEmailTo), itemEntity));
@@ -785,5 +785,15 @@ public class DeAccessionService {
                 }
             }
         }
+    }
+
+    private boolean isImsItemStatusAvailable(String imsLocationCode, String imsItemStatus) {
+        String imsAvailableCodes = propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.available.item.status.codes");
+        return StringUtils.startsWithAny(imsItemStatus, imsAvailableCodes.split(","));
+    }
+
+    public boolean isImsItemStatusNotAvailable(String imsLocationCode, String imsItemStatus) {
+        String imsNotAvailableCodes = propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.not.available.item.status.codes");
+        return StringUtils.startsWithAny(imsItemStatus, imsNotAvailableCodes.split(","));
     }
 }

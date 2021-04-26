@@ -36,4 +36,12 @@ public interface InstitutionDetailsRepository extends BaseRepository<Institution
 
     @Query(value = "select INSTITUTION_CODE from institution_t where INSTITUTION_CODE != 'HTC';",nativeQuery = true)
     List<String> findAllInstitutionCodeExceptHTC();
+
+    /**
+     * To get the list of institution entities for home page.
+     *
+     * @return the institutions
+     */
+    @Query(value="select inst from InstitutionEntity inst  where inst.institutionCode not in ('HTC') ORDER BY inst.id")
+    List<InstitutionEntity> getCodes();
 }

@@ -71,6 +71,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -269,7 +270,7 @@ public class DeAccessionService {
         };
         deAccessionRequest.getDeAccessionItems().removeIf(item->removeItem.test(item));
         String itemBarcdes = removeDeaccessionItems.stream().map(item -> item.getItemBarcode().toString()+", ").collect(Collectors.joining());
-        resultMap.put(itemBarcdes,RecapConstants.FAILURE_UPDATE_CGD);
+        if(!(itemBarcdes.isBlank())){resultMap.put(itemBarcdes,RecapConstants.FAILURE_UPDATE_CGD);}
         return deAccessionRequest;
     }
     private void rollbackLASRejectedItems(List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities, String username) {
@@ -354,8 +355,15 @@ public class DeAccessionService {
 
     private void callGfaDeaccessionService(List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities, String username) {
         if (CollectionUtils.isNotEmpty(deAccessionDBResponseEntities)) {
+            String recapAssistanceEmailTo = null;
             for (DeAccessionDBResponseEntity deAccessionDBResponseEntity : deAccessionDBResponseEntities) {
-                String recapAssistanceEmailTo = getRecapAssistanceEmailTo(deAccessionDBResponseEntity.getImsLocationCode());
+                if(!Objects.isNull(deAccessionDBResponseEntity.getImsLocationCode())) {
+                    try {
+                        recapAssistanceEmailTo = getRecapAssistanceEmailTo(deAccessionDBResponseEntity.getImsLocationCode());
+                    } catch (Exception e) {
+                        logger.info("Exception occured while pulling recap asssistance email to: {}",e.getMessage());
+                    }
+                }
                 if (RecapCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && RecapCommonConstants.AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
                     GFAPwdRequest gfaPwdRequest = new GFAPwdRequest();
                     GFAPwdDsItemRequest gfaPwdDsItemRequest = new GFAPwdDsItemRequest();

@@ -146,7 +146,7 @@ public class AcceptItem extends RecapNCIP {
         return this.itemOptionalFields.get(RecapConstants.ITEM_DESCRIPTION).get(RecapConstants.CALL_NUMBER);
     }
 
-    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String title, String author, String callNumber, String ncipAgencyId, String ncipScheme)  {
+    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String title, String author, String itemPickupLocation, String callNumber, String ncipAgencyId, String ncipScheme)  {
         AcceptItemInitiationData acceptItemInitationData = new AcceptItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
         initiationHeader = getInitiationHeaderwithScheme(initiationHeader, ncipScheme, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
@@ -172,7 +172,7 @@ public class AcceptItem extends RecapNCIP {
         ItemDescription itemDescription = new ItemDescription();
         itemDescription.setCallNumber(callNumber);
         itemOptFields.setItemDescription(itemDescription);
-        PickupLocation pickupLocation = new PickupLocation(pickupLocationString);
+        PickupLocation pickupLocation = new PickupLocation(itemPickupLocation);
 
         Calendar cal = new GregorianCalendar();
         Date dueDate = DateUtils.addYears(new Date(), 1);

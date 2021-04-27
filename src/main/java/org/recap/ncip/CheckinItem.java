@@ -1,7 +1,14 @@
 package org.recap.ncip;
 
 import lombok.extern.slf4j.Slf4j;
-import org.extensiblecatalog.ncip.v2.service.*;
+import org.extensiblecatalog.ncip.v2.service.AgencyId;
+import org.extensiblecatalog.ncip.v2.service.ApplicationProfileType;
+import org.extensiblecatalog.ncip.v2.service.CheckInItemInitiationData;
+import org.extensiblecatalog.ncip.v2.service.CheckInItemResponseData;
+import org.extensiblecatalog.ncip.v2.service.FromSystemId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.OnBehalfOfAgency;
 import org.json.JSONObject;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
@@ -70,6 +77,5 @@ public class CheckinItem extends RecapNCIP {
         returnJson.put(RecapConstants.ITEM_ID, itemId);
         returnJson.put(RecapConstants.DUE_DATE, dueDateString);
         return returnJson;
-
     }
 }

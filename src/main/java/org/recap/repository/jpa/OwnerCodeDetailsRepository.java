@@ -1,7 +1,6 @@
 package org.recap.repository.jpa;
 
 
-import org.recap.model.jpa.DeliveryCodeEntity;
 import org.recap.model.jpa.OwnerCodeEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

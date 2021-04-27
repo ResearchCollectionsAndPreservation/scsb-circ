@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
@@ -187,14 +188,15 @@ public class ItemRequestService {
 
                 DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(institutionEntity.getId(), deliveryCodeEntity.getId(), itemEntity.getImsLocationEntity().getId());
                 if(deliveryCodeTranslationEntity != null && deliveryCodeTranslationEntity.getImsLocationDeliveryCode() != null) {
-                    logger.info(" Translation Code >>>> "  + deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
+                    logger.info(" Translation Code >>>> {} "  , deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
 
                     itemRequestInfo.setTranslatedDeliveryLocation(deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
                 }
                 else {
-                    itemRequestInfo.setTranslatedDeliveryLocation(itemRequestInfo.getDeliveryLocation());
+                    itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_SCSB_EXCEPTION + RecapConstants.INVALID_TRANSLATED_CODE);
+                    itemResponseInformation.setSuccess(false);
                 }
-                logger.info("itemEntity.getImsLocationEntity().getImsLocationCode() >>>> "  + itemEntity.getImsLocationEntity().getImsLocationCode());
+                logger.info("itemEntity.getImsLocationEntity().getImsLocationCode() >>>> {} "  , itemEntity.getImsLocationEntity().getImsLocationCode());
                 SearchResultRow searchResultRow = searchRecords(itemEntity); //Solr
 
                 itemRequestInfo.setTitleIdentifier(getTitle(itemRequestInfo.getTitleIdentifier(), itemEntity, searchResultRow));
@@ -231,7 +233,7 @@ public class ItemRequestService {
                 itemResponseInformation.setSuccess(false);
             }
             setItemResponseInformation(itemRequestInfo, itemResponseInformation);
-            logger.info("itemRequestInfo.getImsLocationCode() before LAS Call >>>> "  + itemRequestInfo.getImsLocationCode());
+            logger.info("itemRequestInfo.getImsLocationCode() before LAS Call >>>> {} "  , itemRequestInfo.getImsLocationCode());
             if (isUseQueueLasCall(itemRequestInfo.getImsLocationCode()) && (StringUtils.containsIgnoreCase(itemResponseInformation.getScreenMessage(), RecapConstants.REQUEST_ILS_EXCEPTION)
                     || StringUtils.containsIgnoreCase(itemResponseInformation.getScreenMessage(), RecapConstants.REQUEST_SCSB_EXCEPTION)
                     || StringUtils.containsIgnoreCase(itemResponseInformation.getScreenMessage(), RecapConstants.REQUEST_LAS_EXCEPTION))) {
@@ -965,6 +967,7 @@ public class ItemRequestService {
         String isCheckinInstitution = propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "ils.checkin.institution");
 
         if (Boolean.TRUE.toString().equalsIgnoreCase(isCheckinInstitution) && itemRequestInfo.isOwningInstitutionItem()) {
+        //DO NOTHING
         }
         else if (Boolean.TRUE.toString().equalsIgnoreCase(isCheckinInstitution) && !itemRequestInfo.isOwningInstitutionItem()) {
             requestItemController.checkinItem(itemRequestInfo, itemRequestInfo.getRequestingInstitution());

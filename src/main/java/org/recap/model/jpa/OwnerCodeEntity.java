@@ -9,9 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.Objects;
 
-/**
- * Created by rajeshbabuk on 18/10/16.
- */
 @Entity
 @Table(name = "OWNER_CODES_T", schema = "recap", catalog = "")
 @AttributeOverride(name = "id", column = @Column(name = "OWNER_CODE_ID"))

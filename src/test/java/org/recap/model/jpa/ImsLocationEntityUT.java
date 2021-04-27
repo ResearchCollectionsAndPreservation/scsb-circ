@@ -14,7 +14,7 @@ public class ImsLocationEntityUT extends BaseTestCaseUT {
     public void getImsLocationEntity(){
         ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
         imsLocationEntity.setImsLocationName("test");
-        imsLocationEntity.setImsLocationId(1);
+        imsLocationEntity.setId(1);
         imsLocationEntity.setUpdatedDate(new Date());
         imsLocationEntity.setImsLocationCode("1");
         imsLocationEntity.setDescription("imslocation");
@@ -30,7 +30,7 @@ public class ImsLocationEntityUT extends BaseTestCaseUT {
         imsLocationEntity.toString();
 
         assertTrue(imsLocationEntity.isActive());
-        assertNotNull(imsLocationEntity.getImsLocationId());
+        assertNotNull(imsLocationEntity.getId());
         assertNotNull(imsLocationEntity.getImsLocationCode());
         assertNotNull(imsLocationEntity.getImsLocationName());
         assertNotNull(imsLocationEntity.getCreatedBy());

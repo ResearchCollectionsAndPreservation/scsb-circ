@@ -13,15 +13,12 @@ import org.json.JSONObject;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.repository.jpa.ItemDetailsRepository;
-
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 @Slf4j
 public class CheckinItem extends RecapNCIP {
 
-    public CheckInItemInitiationData getCheckInItemInitiationRemoteData(String itemIdentifier, ItemDetailsRepository itemDetailsRepository, String remoteProfileType, String ncipAgencyId, String ncipScheme) {
+    public CheckInItemInitiationData getCheckInItemInitiationRemoteData(String itemIdentifier, ItemEntity itemEntity, String imsLocation, String remoteProfileType, String ncipAgencyId, String ncipScheme) {
 
         CheckInItemInitiationData checkinItemInitiationData = new CheckInItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
@@ -30,9 +27,6 @@ public class CheckinItem extends RecapNCIP {
         FromSystemId fromSystemId = new FromSystemId(RecapConstants.NCIP_REMOTE_STORAGE);
         initiationHeader.setFromSystemId(fromSystemId);
         initiationHeader = getInitiationHeaderwithoutProfile(initiationHeader, ncipScheme, ncipAgencyId, ncipAgencyId);
-        List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemIdentifier);
-        ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
-        String imsLocation = itemEntity != null ? itemEntity.getImsLocationEntity().getImsLocationCode() : null;
         initiationHeader.setApplicationProfileType(new ApplicationProfileType(null, remoteProfileType));
             if (imsLocation != null && imsLocation.equalsIgnoreCase(RecapCommonConstants.RECAP)) {
                 imsLocation = RecapConstants.RECAP_DEPOSITORY;

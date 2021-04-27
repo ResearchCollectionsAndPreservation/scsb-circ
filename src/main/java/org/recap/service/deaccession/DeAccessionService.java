@@ -269,8 +269,6 @@ public class DeAccessionService {
             return RecapConstants.BOOLEAN_FALSE;
         };
         deAccessionRequest.getDeAccessionItems().removeIf(item->removeItem.test(item));
-        //String itemBarcdes = removeDeaccessionItems.stream().map(item -> item.getItemBarcode().toString()+", ").collect(Collectors.joining());
-        //if(!(itemBarcdes.isBlank())){resultMap.put(itemBarcdes,RecapConstants.FAILURE_UPDATE_CGD);}
         return deAccessionRequest;
     }
     private void rollbackLASRejectedItems(List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities, String username) {

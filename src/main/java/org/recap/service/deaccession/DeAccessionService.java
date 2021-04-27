@@ -166,23 +166,20 @@ public class DeAccessionService {
 
     @Autowired
     CommonUtil commonUtil;
-
+    /**
+     * The Scsb solr client url.
+     */
+    @Value("${scsb.solr.doc.url}")
+    String scsbSolrClientUrl;
     @Autowired
     private InstitutionDetailsRepository institutionDetailsRepository;
 
     @Autowired
     private DeaccesionItemChangeLogDetailsRepository deaccesionItemChangeLogDetailsRepository;
 
-    public RestHeaderService getRestHeaderService(){
+    public RestHeaderService getRestHeaderService() {
         return restHeaderService;
     }
-
-    /**
-     * The Scsb solr client url.
-     */
-    @Value("${scsb.solr.doc.url}")
-    String scsbSolrClientUrl;
-
 
     private String getRecapAssistanceEmailTo(String imsLocationCode) {
         return this.propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.email.assist.to");
@@ -197,12 +194,13 @@ public class DeAccessionService {
      */
     public Map<String, String> deAccession(DeAccessionRequest deAccessionRequest) {
         Map<String, String> resultMap = new HashMap<>();
+        List<DeAccessionItem> removeDeaccessionItemsList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(deAccessionRequest.getDeAccessionItems())) {
             Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
             List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
             String username = StringUtils.isNotBlank(deAccessionRequest.getUsername()) ? deAccessionRequest.getUsername() : RecapConstants.DISCOVERY;
-            validateBarcodesWithUserName(deAccessionRequest,username,deAccessionDBResponseEntities,resultMap);
-            if(!deAccessionRequest.getDeAccessionItems().isEmpty()) {
+            validateBarcodesWithUserName(deAccessionRequest, username, deAccessionDBResponseEntities, removeDeaccessionItemsList, resultMap);
+            if (!deAccessionRequest.getDeAccessionItems().isEmpty()) {
                 checkGfaItemStatus(deAccessionRequest.getDeAccessionItems(), deAccessionDBResponseEntities, barcodeAndStopCodeMap);
                 checkAndCancelHolds(barcodeAndStopCodeMap, deAccessionDBResponseEntities, username);
                 deAccessionItemsInDB(barcodeAndStopCodeMap, deAccessionDBResponseEntities, username);
@@ -211,6 +209,10 @@ public class DeAccessionService {
                 deAccessionItemsInSolr(deAccessionDBResponseEntities, resultMap);
                 processAndSaveReportEntities(deAccessionDBResponseEntities);
                 processAndSaveDeaccessionChangeLog(deAccessionRequest, username, deAccessionDBResponseEntities);
+            } else {
+                for (DeAccessionItem deAccessionItem : removeDeaccessionItemsList) {
+                    resultMap.put(deAccessionItem.getItemBarcode(), RecapConstants.FAILURE_UPDATE_CGD);
+                }
             }
         } else {
             resultMap.put("", RecapConstants.DEACCESSION_NO_BARCODE_ERROR);
@@ -218,21 +220,22 @@ public class DeAccessionService {
         }
         return resultMap;
     }
-    private void validateBarcodesWithUserName(DeAccessionRequest deAccessionRequest,String userName,List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities,Map<String, String> resultMap){
+
+    private void validateBarcodesWithUserName(DeAccessionRequest deAccessionRequest, String userName, List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities, List<DeAccessionItem> removeDeaccessionItemsList, Map<String, String> resultMap) {
         String institutionCodeUser = userDetailRepository.findInstitutionCodeByUserName(userName);
         List<DeAccessionItem> deAccessionItems = deAccessionRequest.getDeAccessionItems();
         Map<Integer, String> institutionList = mappingInstitution();
         List<DeAccessionItem> removeDeaccessionItems = new ArrayList<>();
         List<String> rolesUser = userDetailRepository.getUserRoles(userName);
-        if(!(validateUserRoles(rolesUser))){
-            List<String>  itemBarcodesList = deAccessionItems.stream().map(item -> item.getItemBarcode()).collect(Collectors.toList());
+        if (!(validateUserRoles(rolesUser))) {
+            List<String> itemBarcodesList = deAccessionItems.stream().map(item -> item.getItemBarcode()).collect(Collectors.toList());
             List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeIn(itemBarcodesList);
-            for (ItemEntity itemEntity : itemEntityList){
-                if(!(institutionList.get(itemEntity.getOwningInstitutionId()).equalsIgnoreCase(institutionCodeUser))){
-                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemEntity.getBarcode(), getDeliveryLcation(itemEntity.getBarcode(),deAccessionRequest,removeDeaccessionItems), RecapConstants.DEACCESSION_NO_BARCODE_PROVIDED_ERROR, itemEntity));
+            for (ItemEntity itemEntity : itemEntityList) {
+                if (!(institutionList.get(itemEntity.getOwningInstitutionId()).equalsIgnoreCase(institutionCodeUser))) {
+                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemEntity.getBarcode(), getDeliveryLcation(itemEntity.getBarcode(), deAccessionRequest, removeDeaccessionItems), RecapConstants.FAILURE_UPDATE_CGD, itemEntity));
                 }
             }
-            removeDeaccessionItems(removeDeaccessionItems,deAccessionRequest,resultMap);
+            removeDeaccessionItems(removeDeaccessionItems, deAccessionRequest, removeDeaccessionItemsList, resultMap);
         }
     }
 
@@ -244,13 +247,15 @@ public class DeAccessionService {
         }
         return RecapConstants.BOOLEAN_FALSE;
     }
+
     private Map<Integer, String> mappingInstitution() {
         Map<Integer, String> institutionList = new HashMap<>();
         List<InstitutionEntity> institutionEntities = institutionDetailsRepository.getCodes();
         institutionEntities.stream().forEach(inst -> institutionList.put(inst.getId(), inst.getInstitutionCode()));
         return institutionList;
     }
-    private String getDeliveryLcation(String barCode,DeAccessionRequest deAccessionRequest,List<DeAccessionItem> removeDeaccessionItems){
+
+    private String getDeliveryLcation(String barCode, DeAccessionRequest deAccessionRequest, List<DeAccessionItem> removeDeaccessionItems) {
         DeAccessionItem deAccessionItem = new DeAccessionItem();
         String deliveryLocation = deAccessionRequest.getDeAccessionItems().stream().filter(item -> item.getItemBarcode().equalsIgnoreCase(barCode)).findAny().get().getItemBarcode();
         deAccessionItem.setDeliveryLocation(deliveryLocation);
@@ -259,20 +264,22 @@ public class DeAccessionService {
         return deliveryLocation;
     }
 
-    private DeAccessionRequest removeDeaccessionItems(List<DeAccessionItem> removeDeaccessionItems, DeAccessionRequest deAccessionRequest, Map<String, String> resultMap) {
+    private DeAccessionRequest removeDeaccessionItems(List<DeAccessionItem> removeDeaccessionItems, DeAccessionRequest deAccessionRequest, List<DeAccessionItem> removeDeaccessionItemsList, Map<String, String> resultMap) {
         Predicate<DeAccessionItem> removeItem = deAccessionItem -> {
-             for (DeAccessionItem removeDeAccessionItem : removeDeaccessionItems) {
+            for (DeAccessionItem removeDeAccessionItem : removeDeaccessionItems) {
                 if (removeDeAccessionItem.getItemBarcode().equalsIgnoreCase(deAccessionItem.getItemBarcode())) {
                     return RecapConstants.BOOLEAN_TRUE;
                 }
             }
             return RecapConstants.BOOLEAN_FALSE;
         };
-        deAccessionRequest.getDeAccessionItems().removeIf(item->removeItem.test(item));
-        String itemBarcdes = removeDeaccessionItems.stream().map(item -> item.getItemBarcode().toString()+", ").collect(Collectors.joining());
-        if(!(itemBarcdes.isBlank())){resultMap.put(itemBarcdes,RecapConstants.FAILURE_UPDATE_CGD);}
+        deAccessionRequest.getDeAccessionItems().removeIf(item -> removeItem.test(item));
+        for (DeAccessionItem deAccessionItem : removeDeaccessionItems) {
+            removeDeaccessionItemsList.add(deAccessionItem);
+        }
         return deAccessionRequest;
     }
+
     private void rollbackLASRejectedItems(List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities, String username) {
         if (CollectionUtils.isNotEmpty(deAccessionDBResponseEntities)) {
             Map<Integer, String> itemIdAndMessageMap = new HashMap<>();
@@ -326,7 +333,7 @@ public class DeAccessionService {
                                 gfaItemStatus = gfaItemStatus.toUpperCase();
                                 gfaItemStatus = gfaItemStatus.contains(":") ? gfaItemStatus.substring(0, gfaItemStatus.indexOf(':') + 1) : gfaItemStatus;
                                 logger.info("GFA Item Status after trimming : {}", gfaItemStatus);
-                                if((StringUtils.isNotBlank(gfaItemStatus) && RecapConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.equals(gfaItemStatus))){
+                                if ((StringUtils.isNotBlank(gfaItemStatus) && RecapConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.equals(gfaItemStatus))) {
                                     deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), "Cannot Deaccession as Item is awaiting for Refile.Please try again later or contact ReCAP staff for further assistance.", itemEntity));
                                 }
                                 else if ((StringUtils.isNotBlank(gfaItemStatus) && !RecapConstants.GFA_STATUS_NOT_ON_FILE.equalsIgnoreCase(gfaItemStatus))
@@ -357,11 +364,11 @@ public class DeAccessionService {
         if (CollectionUtils.isNotEmpty(deAccessionDBResponseEntities)) {
             String recapAssistanceEmailTo = null;
             for (DeAccessionDBResponseEntity deAccessionDBResponseEntity : deAccessionDBResponseEntities) {
-                if(!Objects.isNull(deAccessionDBResponseEntity.getImsLocationCode())) {
+                if (!Objects.isNull(deAccessionDBResponseEntity.getImsLocationCode())) {
                     try {
                         recapAssistanceEmailTo = getRecapAssistanceEmailTo(deAccessionDBResponseEntity.getImsLocationCode());
                     } catch (Exception e) {
-                        logger.info("Exception occured while pulling recap asssistance email to: {}",e.getMessage());
+                        logger.info("Exception occured while pulling recap asssistance email to: {}", e.getMessage());
                     }
                 }
                 if (RecapCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && RecapCommonConstants.AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
@@ -622,7 +629,7 @@ public class DeAccessionService {
         try {
             String barcode = null;
             String deliveryLocation = null;
-            for(ItemEntity itemEntity : itemEntityList) {
+            for (ItemEntity itemEntity : itemEntityList) {
                 try {
                     barcode = itemEntity.getBarcode();
                     deliveryLocation = barcodeAndStopCodeMap.get(barcode);
@@ -641,7 +648,7 @@ public class DeAccessionService {
                 }
             }
         } catch (Exception ex) {
-            logger.error(RecapCommonConstants.LOG_ERROR,ex);
+            logger.error(RecapCommonConstants.LOG_ERROR, ex);
         }
     }
 
@@ -756,7 +763,7 @@ public class DeAccessionService {
             try {
                 populateDeAccessionDBResponseEntity(itemEntity, deAccessionDBResponseEntity);
             } catch (JSONException e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
+                logger.error(RecapCommonConstants.LOG_ERROR, e);
             }
         }
         return deAccessionDBResponseEntity;
@@ -853,7 +860,7 @@ public class DeAccessionService {
                     RestTemplate restTemplate = new RestTemplate();
                     HttpEntity<DeAccessionSolrRequest> requestEntity = new HttpEntity<>(deAccessionSolrRequest, getRestHeaderService().getHttpHeaders());
                     ResponseEntity<String> responseEntity = restTemplate.exchange(deAccessionSolrClientUrl, HttpMethod.POST, requestEntity, String.class);
-                    logger.info("Deaccession Item Solr update status : {}" , responseEntity.getBody());
+                    logger.info("Deaccession Item Solr update status : {}", responseEntity.getBody());
                 }
             }
         } catch (Exception e) {

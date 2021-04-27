@@ -473,7 +473,8 @@ public class DeAccessionService {
                                 }
                             } else { // If retrieval order institution and recall order institution are different, cancel retrieval request and recall request.
                                 ItemInformationResponse itemInformationResponse = getItemInformation(activeRetrievalRequest);
-                                if (getHoldQueueLength(itemInformationResponse) > 0) {
+                                String checkedOutCirculationStatuses = propertyUtil.getPropertyByInstitutionAndKey(retrievalRequestingInstitution, "ils.checkedout.circulation.status");
+                                if (getHoldQueueLength(itemInformationResponse) > 0 || (StringUtils.isNotBlank(checkedOutCirculationStatuses) && StringUtils.containsIgnoreCase(checkedOutCirculationStatuses, itemInformationResponse.getCirculationStatus()))) {
                                     ItemHoldResponse cancelRetrievalResponse = cancelRequest(activeRetrievalRequest, username);
                                     if (cancelRetrievalResponse.isSuccess()) {
                                         ItemHoldResponse cancelRecallResponse = cancelRequest(activeRecallRequest, username);
@@ -491,7 +492,8 @@ public class DeAccessionService {
                             }
                         } else if (activeRetrievalRequest != null && activeRecallRequest == null) {
                             ItemInformationResponse itemInformationResponse = getItemInformation(activeRetrievalRequest);
-                            if (getHoldQueueLength(itemInformationResponse) > 0) {
+                            String checkedOutCirculationStatuses = propertyUtil.getPropertyByInstitutionAndKey(activeRetrievalRequest.getInstitutionEntity().getInstitutionCode(), "ils.checkedout.circulation.status");
+                            if (getHoldQueueLength(itemInformationResponse) > 0 || (StringUtils.isNotBlank(checkedOutCirculationStatuses) && StringUtils.containsIgnoreCase(checkedOutCirculationStatuses, itemInformationResponse.getCirculationStatus()))) {
                                 ItemHoldResponse cancelRetrievalResponse = cancelRequest(activeRetrievalRequest, username);
                                 if (cancelRetrievalResponse.isSuccess()) {
                                     barcodeAndStopCodeMap.put(itemBarcode, deliveryLocation);
@@ -600,7 +602,7 @@ public class DeAccessionService {
     private int getHoldQueueLength(ItemInformationResponse itemInformationResponse) {
         int iholdQueue = 0;
         if (StringUtils.isNotBlank(itemInformationResponse.getHoldQueueLength())) {
-            iholdQueue = Integer.parseInt(itemInformationResponse.getHoldQueueLength());
+            iholdQueue = Integer.parseInt(itemInformationResponse.getHoldQueueLength().trim());
         }
         return iholdQueue;
     }

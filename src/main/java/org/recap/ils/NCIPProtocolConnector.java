@@ -308,18 +308,16 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemIdentifier);
         ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
         String imsLocation = itemEntity != null ? itemEntity.getImsLocationEntity().getImsLocationCode() : null;
-
+        Boolean isRemoteCheckin = Boolean.FALSE;
 
         String remoteCheckin = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.remote.checkin");
-        String remoteProfileType = propertyUtil.getPropertyByInstitutionAndLocationAndKey(getInstitution(), imsLocation,"ils.remote.profile.type");
-
-        Boolean isRemoteCheckin = Boolean.FALSE;
            if(Boolean.TRUE.toString().equalsIgnoreCase(remoteCheckin) && (
                     getInstitution().equals(itemRequestInformation.getItemOwningInstitution())
               || itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()))) {
                 isRemoteCheckin = Boolean.TRUE;
             }
                 if (isRemoteCheckin.booleanValue()) {
+                    String remoteProfileType = propertyUtil.getPropertyByInstitutionAndLocationAndKey(getInstitution(), imsLocation,"ils.remote.profile.type");
                     if (!itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()) || itemRequestInformation.getRequestType().equals(RecapCommonConstants.REQUEST_TYPE_EDD)) {
                         CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemIdentifier,  getNcipAgencyId());
                         CheckInItemResponseData checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);

@@ -229,7 +229,7 @@ public class DeAccessionService {
             List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeIn(itemBarcodesList);
             for (ItemEntity itemEntity : itemEntityList){
                 if(!(institutionList.get(itemEntity.getOwningInstitutionId()).equalsIgnoreCase(institutionCodeUser))){
-                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemEntity.getBarcode(), getDeliveryLcation(itemEntity.getBarcode(),deAccessionRequest,removeDeaccessionItems), RecapConstants.DEACCESSION_NO_BARCODE_PROVIDED_ERROR, itemEntity));
+                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemEntity.getBarcode(), getDeliveryLcation(itemEntity.getBarcode(),deAccessionRequest,removeDeaccessionItems), RecapConstants.FAILURE_UPDATE_CGD, itemEntity));
                 }
             }
             removeDeaccessionItems(removeDeaccessionItems,deAccessionRequest,resultMap);
@@ -269,8 +269,8 @@ public class DeAccessionService {
             return RecapConstants.BOOLEAN_FALSE;
         };
         deAccessionRequest.getDeAccessionItems().removeIf(item->removeItem.test(item));
-        String itemBarcdes = removeDeaccessionItems.stream().map(item -> item.getItemBarcode().toString()+", ").collect(Collectors.joining());
-        if(!(itemBarcdes.isBlank())){resultMap.put(itemBarcdes,RecapConstants.FAILURE_UPDATE_CGD);}
+        //String itemBarcdes = removeDeaccessionItems.stream().map(item -> item.getItemBarcode().toString()+", ").collect(Collectors.joining());
+        //if(!(itemBarcdes.isBlank())){resultMap.put(itemBarcdes,RecapConstants.FAILURE_UPDATE_CGD);}
         return deAccessionRequest;
     }
     private void rollbackLASRejectedItems(List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities, String username) {
@@ -307,7 +307,7 @@ public class DeAccessionService {
         try {
             for (DeAccessionItem deAccessionItem : deAccessionItems) {
                 logger.info("Deaccession Item Barcode = {} Delivery Location = {}", deAccessionItem.getItemBarcode(), deAccessionItem.getDeliveryLocation());
-                String itemBarcode = deAccessionItem.getItemBarcode();
+                    String itemBarcode = deAccessionItem.getItemBarcode();
                 if (StringUtils.isNotBlank(itemBarcode)) {
                     List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemBarcode.trim());
                     if (CollectionUtils.isNotEmpty(itemEntities)) {

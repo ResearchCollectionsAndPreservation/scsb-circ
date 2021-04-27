@@ -26,6 +26,7 @@ import org.extensiblecatalog.ncip.v2.service.RecallItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RecallItemResponseData;
 import org.json.JSONObject;
 
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.ncip.AcceptItem;
 import org.recap.ncip.CancelRequestItem;
@@ -64,6 +65,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -302,26 +304,29 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         log.info("Item barcode {} received for a checkin in" + getInstitution() + " for patron {}", itemRequestInformation.getItemBarcodes().get(0), patronIdentifier);
         CheckinItem checkInItem = new CheckinItem();
         ItemCheckinResponse itemCheckinResponse = new ItemCheckinResponse();
-
-            String remoteCheckin = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.remote.checkin");
-            String remoteProfileType = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.remote.profile.type");
-
+        String itemIdentifier = itemRequestInformation.getItemBarcodes().get(0);
+        List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemIdentifier);
+        ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
+        String imsLocation = itemEntity != null ? itemEntity.getImsLocationEntity().getImsLocationCode() : null;
         Boolean isRemoteCheckin = Boolean.FALSE;
+
+        String remoteCheckin = propertyUtil.getPropertyByInstitutionAndKey(getInstitution(), "ils.remote.checkin");
            if(Boolean.TRUE.toString().equalsIgnoreCase(remoteCheckin) && (
                     getInstitution().equals(itemRequestInformation.getItemOwningInstitution())
               || itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()))) {
                 isRemoteCheckin = Boolean.TRUE;
             }
                 if (isRemoteCheckin.booleanValue()) {
+                    String remoteProfileType = propertyUtil.getPropertyByInstitutionAndLocationAndKey(getInstitution(), imsLocation,"ils.remote.profile.type");
                     if (!itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()) || itemRequestInformation.getRequestType().equals(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemRequestInformation.getItemBarcodes().get(0),  getNcipAgencyId());
+                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemIdentifier,  getNcipAgencyId());
                         CheckInItemResponseData checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);
                         if (!checkinItemResponse.getProblems().isEmpty()) {
                             itemCheckinResponse.setSuccess(Boolean.FALSE);
                             itemCheckinResponse.setScreenMessage(failureReason + checkinItemResponse.getProblems());
                             return itemCheckinResponse;
                         }
-                        checkInItemInitiationData = checkInItem.getCheckInItemInitiationRemoteData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), remoteProfileType, getNcipAgencyId(), getNcipScheme());
+                        checkInItemInitiationData = checkInItem.getCheckInItemInitiationRemoteData(itemIdentifier, itemEntity, imsLocation, remoteProfileType, getNcipAgencyId(), getNcipScheme());
                         checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);
                         if (!checkinItemResponse.getProblems().isEmpty()) {
                             itemCheckinResponse.setSuccess(Boolean.FALSE);
@@ -329,7 +334,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                             return itemCheckinResponse;
                         }
                     } else {
-                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationRemoteData(itemRequestInformation.getItemBarcodes().get(0), getItemDetailsRepository(), remoteProfileType, getNcipAgencyId(), getNcipScheme());
+                        CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationRemoteData(itemIdentifier, itemEntity, imsLocation, remoteProfileType, getNcipAgencyId(), getNcipScheme());
                         CheckInItemResponseData checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);
                         if (!checkinItemResponse.getProblems().isEmpty()) {
                             itemCheckinResponse.setSuccess(Boolean.FALSE);

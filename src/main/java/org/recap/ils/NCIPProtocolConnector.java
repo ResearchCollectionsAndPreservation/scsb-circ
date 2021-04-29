@@ -180,8 +180,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         log.info("NCIP Connector Host: {}", getHost());
         log.info("NCIP Connector Port: {}", getPort());
         log.info("NCIP Connector Location: {}", getOperatorLocation());
-
-        return new ItemInformationResponse();
+        ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
+        itemInformationResponse.setHoldQueueLength("1");
+        itemInformationResponse.setSuccess(false);
+        itemInformationResponse.setScreenMessage("Lookup Item API not implemented");
+        return itemInformationResponse;
     }
 
     @Override

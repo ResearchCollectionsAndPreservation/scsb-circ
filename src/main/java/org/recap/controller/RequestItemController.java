@@ -107,11 +107,9 @@ public class RequestItemController {
     @PostMapping(value = "/checkinItem", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AbstractResponseItem checkinItem(@RequestBody ItemRequestInformation itemRequestInformation, String callInstitution) {
         ItemCheckinResponse itemCheckinResponse;
-        String itemBarcode;
         try {
             String callInst = callingInstitution(callInstitution, itemRequestInformation);
             if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
-                itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
                 logger.info("Patron barcode and Institution info before CheckIn call : patron - {} , institution - {} ",itemRequestInformation.getPatronBarcode(),callInstitution);
                 itemCheckinResponse = (ItemCheckinResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).checkInItem(itemRequestInformation, itemRequestInformation.getPatronBarcode());
                 logger.info("CheckIn Response Message : {}",itemCheckinResponse.getScreenMessage());

@@ -151,7 +151,7 @@ public class GFALasService {
                 if (StringUtils.isBlank(itemRequestInfo.getImsLocationCode())) {
                     itemResponseInformation.setSuccess(false);
                     itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_SCSB_EXCEPTION + RecapConstants.IMS_LOCATION_CODE_BLANK_ERROR);
-                } else if (commonUtil.isImsItemStatusAvailable(itemRequestInfo.getImsLocationCode(), gfaOnlyStatus)) {
+                } else if (commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemRequestInfo.getImsLocationCode(), gfaOnlyStatus, true)) {
                     if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
                         itemResponseInformation = callItemRetrievable(itemRequestInfo, itemResponseInformation);
                     } else if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
@@ -513,7 +513,7 @@ public class GFALasService {
             ItemRequestInformation itemRequestInformation = itemRequestService.getItemRequestInformationByRequestEntity(requestItemEntity, requestItemEntity.getItemEntity());
             String itemStatus = callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
             String imsLocationCode = commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode());
-            if (commonUtil.isImsItemStatusAvailable(imsLocationCode, itemStatus)) {
+            if (commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(imsLocationCode, itemStatus, true)) {
                 producerTemplate.sendBodyAndHeader(RecapConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
             } else if (StringUtils.isNotBlank(itemStatus)) {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);

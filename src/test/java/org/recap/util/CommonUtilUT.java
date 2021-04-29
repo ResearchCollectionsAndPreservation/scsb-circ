@@ -148,7 +148,7 @@ public class CommonUtilUT extends BaseTestCaseUT {
         String imsItemStatus = "RECAP";
         String imsAvailableCodes = "HD,HTC,UN,RECAP";
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.available.item.status.codes")).thenReturn(imsAvailableCodes);
-        boolean result = commonUtil.isImsItemStatusAvailable(imsLocationCode, imsItemStatus);
+        boolean result = commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(imsLocationCode, imsItemStatus, true);
         assertNotNull(result);
         assertTrue(result);
     }
@@ -159,7 +159,7 @@ public class CommonUtilUT extends BaseTestCaseUT {
         String imsItemStatus = "RECAP";
         String imsNotAvailableCodes = "HD,HTC,UN,RECAP";
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.not.available.item.status.codes")).thenReturn(imsNotAvailableCodes);
-        boolean result = commonUtil.isImsItemStatusNotAvailable(imsLocationCode, imsItemStatus);
+        boolean result = commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(imsLocationCode, imsItemStatus, false);
         assertNotNull(result);
         assertTrue(result);
     }

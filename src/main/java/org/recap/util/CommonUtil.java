@@ -272,25 +272,13 @@ public class CommonUtil {
      * @param imsItemStatus IMS Item Status
      * @return boolean
      */
-    public boolean isImsItemStatusAvailable(String imsLocationCode, String imsItemStatus) {
-        String imsAvailableCodes = propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.available.item.status.codes");
-        List<String> imsAvailableCodesList = Arrays.asList(imsAvailableCodes.split(","));
-        return imsAvailableCodesList.contains(imsItemStatus);
+    public boolean checkIfImsItemStatusIsAvailableOrNotAvailable(String imsLocationCode, String imsItemStatus, boolean checkAvailable) {
+        String propertyKey = checkAvailable ? "las.available.item.status.codes" : "las.not.available.item.status.codes";
+        String imsItemStatusCodes = propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, propertyKey);
+        return StringUtils.startsWithAny(imsItemStatus, imsItemStatusCodes.split(","));
     }
 
-    /**
-     * Checks if the Gfa item status is not available
-     * @param imsLocationCode IMS Location Code
-     * @param imsItemStatus IMS Item Status
-     * @return boolean
-     */
-    public boolean isImsItemStatusNotAvailable(String imsLocationCode, String imsItemStatus) {
-        String imsNotAvailableCodes = propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.not.available.item.status.codes");
-        List<String> imsNotAvailableCodesList = Arrays.asList(imsNotAvailableCodes.split(","));
-        return imsNotAvailableCodesList.contains(imsItemStatus);
-    }
-    public ItemRequestInformation getItemRequestInformation(ItemEntity itemEntity)
-    {
+    public ItemRequestInformation getItemRequestInformation(ItemEntity itemEntity) {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
         itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());

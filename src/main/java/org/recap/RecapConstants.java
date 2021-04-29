@@ -116,7 +116,6 @@ public final class RecapConstants {
 
     public static final String REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE = "1 - 2";
     public static final String REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK = "2 - 1";
-    public static final String REQUEST_ITEM_TITLE_SUFFIX = " [RECAP]";
     public static final String REQUEST_USE_RESTRICTIONS = "No Restrictions";
 
     public static final String UPDATE_ITEM_STATUS_SOLR = "/updateItem/updateItemAvailablityStatus";

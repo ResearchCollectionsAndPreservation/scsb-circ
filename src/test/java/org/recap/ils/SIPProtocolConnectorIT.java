@@ -9,8 +9,10 @@ import org.mockito.Spy;
 import org.recap.BaseTestCaseUT;
 import org.recap.RecapConstants;
 import org.recap.model.ILSConfigProperties;
+import org.recap.model.jpa.ItemRequestInformation;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
@@ -179,7 +181,7 @@ public class SIPProtocolConnectorIT extends BaseTestCaseUT {
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
         sipProtocolConnector.setInstitution("PUL");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
-        sipProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        sipProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
     }
 
     @Test
@@ -190,7 +192,7 @@ public class SIPProtocolConnectorIT extends BaseTestCaseUT {
         ILSConfigProperties ilsConfigProperties = new ILSConfigProperties();
         sipProtocolConnector.setInstitution("PUL");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
-        sipProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        sipProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
     }
 
     @Test
@@ -353,4 +355,14 @@ public class SIPProtocolConnectorIT extends BaseTestCaseUT {
         SIPProtocolConnector sipProtocolConnector = new SIPProtocolConnector();
         sipProtocolConnector.refileItem(itemIdentifier);
     }
+
+    private ItemRequestInformation getItemRequestInformation() {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Collections.singletonList("123456"));
+        itemRequestInformation.setItemOwningInstitution("PUL");
+        itemRequestInformation.setRequestingInstitution("PUL");
+        itemRequestInformation.setRequestType("RETRIEVAL");
+        return itemRequestInformation;
+    }
+
 }

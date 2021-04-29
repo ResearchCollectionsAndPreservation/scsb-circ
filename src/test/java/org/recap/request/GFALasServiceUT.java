@@ -185,7 +185,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         gfaRetrieveItemResponse.setSuccess(false);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
-        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true)).thenReturn(Boolean.TRUE);
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
         Mockito.when(abstractLASImsLocationConnector.itemRetrieval(any(GFARetrieveItemRequest.class))).thenReturn(getGfaRetrieveItemResponse());
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.FALSE.toString());
@@ -203,7 +203,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         gfaRetrieveItemResponse.setSuccess(false);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
-        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true)).thenReturn(Boolean.TRUE);
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
         ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
         assertNotNull(response);
@@ -219,7 +219,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
         Mockito.when(abstractLASImsLocationConnector.itemRetrieval(any(GFARetrieveItemRequest.class))).thenThrow(new RestClientException("Bad Request"));
-        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true)).thenReturn(Boolean.TRUE);
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.FALSE.toString());
         ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
         assertNotNull(response);
@@ -233,7 +233,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
-        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true)).thenReturn(Boolean.TRUE);
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
         ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
         assertNotNull(response);
@@ -248,7 +248,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         gfaEddItemResponse.setSuccess(false);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         gfaItemStatusCheckResponse.getDsitem().getTtitem().get(0).setItemStatus("VER ON REFILE WO:");
-        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true)).thenReturn(Boolean.TRUE);
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.FALSE.toString());
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
         Mockito.when(abstractLASImsLocationConnector.itemEDDRetrieval(any(GFARetrieveEDDItemRequest.class))).thenReturn(gfaEddItemResponse);
@@ -437,7 +437,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     public void buildRequestInfoAndReplaceToLAS(){
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode())).thenReturn("HD");
-        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true)).thenReturn(Boolean.TRUE);
         String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
         assertNotNull(result);
     }
@@ -445,7 +445,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     public void buildRequestInfoAndReplaceToLASException(){
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode())).thenReturn("HD");
-        Mockito.doThrow(new NullPointerException()).when(commonUtil).isImsItemStatusAvailable(any(), any());
+        Mockito.doThrow(new NullPointerException()).when(commonUtil).checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true);
         String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
         assertNotNull(result);
     }

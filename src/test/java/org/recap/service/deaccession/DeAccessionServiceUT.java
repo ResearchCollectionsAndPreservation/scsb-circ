@@ -102,7 +102,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
 
     @Before
     public void setup() {
-        Mockito.when(commonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true)).thenReturn(Boolean.TRUE);
     }
 
     @Test

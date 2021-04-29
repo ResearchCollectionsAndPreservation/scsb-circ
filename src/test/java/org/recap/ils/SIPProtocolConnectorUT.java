@@ -15,8 +15,10 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.recap.RecapConstants;
 import org.recap.model.ILSConfigProperties;
+import org.recap.model.jpa.ItemRequestInformation;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
@@ -99,7 +101,7 @@ public class SIPProtocolConnectorUT {
         Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2SCStatusRequest.class))).thenReturn(sip2ACSStatusResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2CheckinRequest.class))).thenReturn(sip2CheckinResponse);
-        sipProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        sipProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
     }
 
     @Test
@@ -365,6 +367,15 @@ public class SIPProtocolConnectorUT {
         ilsConfigProperties.setOperatorPassword("recap");
         ilsConfigProperties.setOperatorLocation("location");
         return ilsConfigProperties;
+    }
+
+    private ItemRequestInformation getItemRequestInformation() {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Collections.singletonList("123456"));
+        itemRequestInformation.setItemOwningInstitution("PUL");
+        itemRequestInformation.setRequestingInstitution("PUL");
+        itemRequestInformation.setRequestType("RETRIEVAL");
+        return itemRequestInformation;
     }
 }
 

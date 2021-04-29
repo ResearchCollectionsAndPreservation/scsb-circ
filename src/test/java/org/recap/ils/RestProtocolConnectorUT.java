@@ -22,6 +22,7 @@ import org.recap.ils.service.RestOauthTokenApiService;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.jpa.ItemRefileResponse;
+import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.processor.RestProtocolJobResponsePollingProcessor;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -286,7 +287,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
         when(restApiResponseUtil.buildItemCheckinResponse(checkinResponse)).thenReturn(new ItemCheckinResponse());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(getJobResponse());
-        ItemCheckinResponse response = restProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        ItemCheckinResponse response = restProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
         assertNotNull(response);
     }
 
@@ -306,7 +307,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
         when(restApiResponseUtil.buildItemCheckinResponse(checkinResponse)).thenReturn(new ItemCheckinResponse());
         when(restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(any(), any())).thenReturn(new JobResponse());
-        ItemCheckinResponse response = restProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        ItemCheckinResponse response = restProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
         assertNotNull(response);
     }
 
@@ -322,7 +323,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
                 ArgumentMatchers.any(),
                 ArgumentMatchers.<Class<CheckinResponse>>any());
         when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("https:8080//recap/rest");
-        ItemCheckinResponse response = restProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        ItemCheckinResponse response = restProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
         assertNotNull(response);
     }
 
@@ -330,7 +331,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
     public void checkInItemException() throws Exception {
         String itemIdentifier = "236784";
         String patronIdentifier = "234673";
-        ItemCheckinResponse response = restProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        ItemCheckinResponse response = restProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
         assertNotNull(response);
     }
 
@@ -824,4 +825,14 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         jobResponse.setData(jobData);
         return jobResponse;
     }
+
+    private ItemRequestInformation getItemRequestInformation() {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Collections.singletonList("123456"));
+        itemRequestInformation.setItemOwningInstitution("PUL");
+        itemRequestInformation.setRequestingInstitution("PUL");
+        itemRequestInformation.setRequestType("RETRIEVAL");
+        return itemRequestInformation;
+    }
+
 }

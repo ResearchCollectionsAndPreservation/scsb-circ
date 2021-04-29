@@ -21,6 +21,8 @@ public final class RecapConstants {
     public static final String ITEMBARCODE_WITH_DIFFERENT_BIB = "All items must be attached to the same bibliographic record, have the same customer code, and the same availability.";
     public static final String INVALID_CUSTOMER_CODE = "Please enter the valid delivery Code";
     public static final String INVALID_DELIVERY_CODE = "Delivery location not valid for this item.";
+    public static final String INVALID_TRANSLATED_CODE = "Translated Delivery Location not available for the requested Delivery Location.";
+
     public static final String INVALID_ITEM_BARCODE = "Item is not available";
     public static final String ITEM_BARCODE_IS_REQUIRED = "Item Barcode is required";
     public static final String MULTIPLE_ITEMS_NOT_ALLOWED_FOR_EDD = "EDD requests must be done on a single item.";
@@ -120,7 +122,6 @@ public final class RecapConstants {
 
     public static final String REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE = "1 - 2";
     public static final String REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK = "2 - 1";
-    public static final String REQUEST_ITEM_TITLE_SUFFIX = " [RECAP]";
     public static final String REQUEST_USE_RESTRICTIONS = "No Restrictions";
 
     public static final String UPDATE_ITEM_STATUS_SOLR = "/updateItem/updateItemAvailablityStatus";
@@ -428,5 +429,8 @@ public final class RecapConstants {
     public static final String HOLD = "Hold";
     public static final String ITEM_BARCODE = "itemBarcode";
     public static final String PATRON_IDENTIFIER = "patronIdentifier";
+
+    public static final String RECAP_DEPOSITORY = "RD";
+    public static final String NCIP_REMOTE_STORAGE = "NCIP_REMOTE_STORAGE";
 
 }

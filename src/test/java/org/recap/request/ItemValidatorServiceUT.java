@@ -9,8 +9,20 @@ import org.recap.BaseTestCaseUT;
 import org.recap.RecapCommonConstants;
 import org.recap.RecapConstants;
 import org.recap.controller.ItemController;
-import org.recap.model.jpa.*;
-import org.recap.repository.jpa.*;
+import org.recap.model.jpa.BibliographicEntity;
+import org.recap.model.jpa.HoldingsEntity;
+import org.recap.model.jpa.ImsLocationEntity;
+import org.recap.model.jpa.InstitutionEntity;
+import org.recap.model.jpa.ItemEntity;
+import org.recap.model.jpa.ItemRequestInformation;
+import org.recap.model.jpa.ItemStatusEntity;
+import org.recap.model.jpa.OwnerCodeEntity;
+import org.recap.model.jpa.RequestItemEntity;
+import org.recap.repository.jpa.BibliographicDetailsRepository;
+import org.recap.repository.jpa.ImsLocationDetailsRepository;
+import org.recap.repository.jpa.ItemStatusDetailsRepository;
+import org.recap.repository.jpa.OwnerCodeDetailsRepository;
+import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 
@@ -46,7 +58,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
     private ItemController itemController;
 
     @Mock
-    CustomerCodeDetailsRepository customerCodeDetailsRepository;
+    OwnerCodeDetailsRepository ownerCodeDetailsRepository;
 
     @Mock
     private RequestItemDetailsRepository requestItemDetailsRepository;
@@ -67,7 +79,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         ItemStatusEntity itemStatusEntity = getItemStatusEntity();
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         RequestItemEntity requestItemEntity1 = getRequestItemEntity();
-        CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
+        OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
         ImsLocationEntity imsLocationEntity = getImsLocationEntity();
         Mockito.when(itemController.findByBarcodeIn(itemBarcodes.toString())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
@@ -104,7 +116,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         assertNotNull(responseEntity5);
         itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_EDD);
         Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity);
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndRecapDeliveryRestrictionLikeEDD(itemEntity.getCustomerCode())).thenReturn(customerCodeEntity);
+      //  Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndRecapDeliveryRestrictionLikeEDD(itemEntity.getCustomerCode())).thenReturn(ownerCodeEntity);
         ResponseEntity responseEntity6 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity6);
         itemBarcodes.add("1355321");
@@ -119,14 +131,13 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         itemBarcodes.add("10123");
         ItemRequestInformation itemRequestInformation = getItemRequestInformation(itemBarcodes);
         ItemEntity itemEntity = getItemEntity();
-        CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
-        customerCodeEntity.setDeliveryRestrictions("PA");
+        OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
         ImsLocationEntity imsLocationEntity = getImsLocationEntity();
         itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RECALL);
         itemValidatorService.itemValidation(itemRequestInformation);
         Mockito.when(itemController.findByBarcodeIn(itemBarcodes.toString())).thenReturn(Arrays.asList(itemEntity));
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
-//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(getCustomerCodeEntity());
+        Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(any())).thenReturn(ownerCodeEntity);
+//        Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(getOwnerCodeEntity());
         itemValidatorService.itemValidation(itemRequestInformation);
         Mockito.when(imsLocationDetailsRepository.findById(any())).thenReturn(Optional.of(imsLocationEntity));
         itemValidatorService.itemValidation(itemRequestInformation);
@@ -134,43 +145,41 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         itemRequestInformation1.setDeliveryLocation("PA");
         itemRequestInformation1.setRequestType(RecapCommonConstants.REQUEST_TYPE_RECALL);
         itemValidatorService.itemValidation(itemRequestInformation1);
-//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(),any())).thenReturn(getCustomerCodeEntity());
+//        Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndOwningInstitutionCode(any(),any())).thenReturn(getOwnerCodeEntity());
   //      itemValidatorService.itemValidation(itemRequestInformation1);
     }
     @Test
     public void getCheckDeliveryLocation(){
-        String customerCode = "PA";
+        String ownerCode = "PA";
         ItemRequestInformation itemRequestInformation = getItemRequestInformation(Arrays.asList("2456744"));
-        CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
-//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(customerCodeEntity);
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
-        itemValidatorService.checkDeliveryLocation(customerCode,itemRequestInformation);
-        customerCodeEntity.setDeliveryRestrictions("CA");
-        itemValidatorService.checkDeliveryLocation(customerCode,itemRequestInformation);
-        customerCodeEntity.setDeliveryRestrictions("PA");
-        itemValidatorService.checkDeliveryLocation(customerCode,itemRequestInformation);
+        OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
+//        Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(ownerCodeEntity);
+        Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(any())).thenReturn(ownerCodeEntity);
+        itemValidatorService.checkDeliveryLocation(ownerCode,itemRequestInformation);
+        itemValidatorService.checkDeliveryLocation(ownerCode,itemRequestInformation);
+        itemValidatorService.checkDeliveryLocation(ownerCode,itemRequestInformation);
     }
     @Test
     public void getCheckDeliveryLocationForDifferentInstitution(){
-        String customerCode = "PA";
+        String ownerCode = "PA";
         ItemRequestInformation itemRequestInformation = getItemRequestInformation(Arrays.asList("2456744"));
         itemRequestInformation.setRequestingInstitution("3");
-        CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
-//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(customerCodeEntity);
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
-        itemValidatorService.checkDeliveryLocation(customerCode,itemRequestInformation);
+        OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
+//        Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndOwningInstitutionCode(itemRequestInformation.getDeliveryLocation(), itemRequestInformation.getRequestingInstitution())).thenReturn(ownerCodeEntity);
+        Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(any())).thenReturn(ownerCodeEntity);
+        itemValidatorService.checkDeliveryLocation(ownerCode,itemRequestInformation);
     }
     @Test
     public void getCheckDeliveryLocationForDifferentInstitutionWithSameDeliveryRestrictions(){
-        String customerCode = "PA";
+        String ownerCode = "PA";
         ItemRequestInformation itemRequestInformation = getItemRequestInformation(Arrays.asList("2456744"));
         itemRequestInformation.setRequestingInstitution("PUL");
-        CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
-//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(), any())).thenReturn(customerCodeEntity);
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
-        itemValidatorService.checkDeliveryLocation(customerCode,itemRequestInformation);
+        OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
+//        Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndOwningInstitutionCode(any(), any())).thenReturn(ownerCodeEntity);
+        Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(any())).thenReturn(ownerCodeEntity);
+        itemValidatorService.checkDeliveryLocation(ownerCode,itemRequestInformation);
         itemRequestInformation.setDeliveryLocation("PA");
-        itemValidatorService.checkDeliveryLocation(customerCode,itemRequestInformation);
+        itemValidatorService.checkDeliveryLocation(ownerCode,itemRequestInformation);
     }
 
     private ItemRequestInformation getItemRequestInformation(List<String> itemBarcodes) {
@@ -205,8 +214,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         RequestItemEntity requestItemEntity1 = getRequestItemEntity();
         requestItemEntity1.setId(0);
         itemBarcodes.add("1355321");
-        CustomerCodeEntity customerCodeEntity = getCustomerCodeEntity();
-        customerCodeEntity.setDeliveryRestrictions("PB");
+        OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
         Mockito.when(itemController.findByBarcodeIn(itemBarcodes.toString())).thenReturn(Arrays.asList(itemEntity));
         itemRequestInformation.setRequestType(RecapCommonConstants.RECALL);
         ResponseEntity responseEntity = itemValidatorService.itemValidation(itemRequestInformation);
@@ -232,31 +240,25 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity1);
         ResponseEntity responseEntity4 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity4);
-//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(),any())).thenReturn(customerCodeEntity);
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity);
+//        Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndOwningInstitutionCode(any(),any())).thenReturn(ownerCodeEntity);
+        Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(any())).thenReturn(ownerCodeEntity);
         ResponseEntity responseEntity5 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity5);
 
-        CustomerCodeEntity customerCodeEntity1 = getCustomerCodeEntity();
-        customerCodeEntity1.setDeliveryRestrictions("PA");
-//        Mockito.when(customerCodeDetailsRepository.findByCustomerCodeAndOwningInstitutionCode(any(),any())).thenReturn(customerCodeEntity1);
-        Mockito.when(customerCodeDetailsRepository.findByCustomerCode(any())).thenReturn(customerCodeEntity1);
+        OwnerCodeEntity ownerCodeEntity1 = getOwnerCodeEntity();
+//        Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndOwningInstitutionCode(any(),any())).thenReturn(ownerCodeEntity1);
+        Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(any())).thenReturn(ownerCodeEntity1);
         ResponseEntity responseEntity6 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity6);
 
     }
-    private CustomerCodeEntity getCustomerCodeEntity() {
+    private OwnerCodeEntity getOwnerCodeEntity() {
         ItemEntity itemEntity =getItemEntity();
-        CustomerCodeEntity customerCodeEntity = new CustomerCodeEntity();
-        customerCodeEntity.setId(1);
-        customerCodeEntity.setCustomerCode(itemEntity.getCustomerCode());
-        customerCodeEntity.setPickupLocation("PA");
-        customerCodeEntity.setPwdDeliveryRestrictions("PU");
-        DeliveryRestrictionEntity deliveryRestrictionEntity = new DeliveryRestrictionEntity();
-        deliveryRestrictionEntity.setDeliveryRestriction("PA");
-        deliveryRestrictionEntity.setInstitutionEntity(getInstitutionEntity());
-        customerCodeEntity.setDeliveryRestrictionEntityList(Arrays.asList(deliveryRestrictionEntity));
-        return customerCodeEntity;
+        OwnerCodeEntity ownerCodeEntity = new OwnerCodeEntity();
+        ownerCodeEntity.setId(1);
+        ownerCodeEntity.setOwnerCode(itemEntity.getCustomerCode());
+        ownerCodeEntity.setPickupLocation("PA");
+        return ownerCodeEntity;
     }
     private InstitutionEntity getInstitutionEntity(){
         InstitutionEntity institutionEntity = new InstitutionEntity();

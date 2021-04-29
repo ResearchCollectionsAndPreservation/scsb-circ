@@ -480,7 +480,7 @@ public class DeAccessionService {
                                 }
                             } else { // If retrieval order institution and recall order institution are different, cancel retrieval request and recall request.
                                 ItemInformationResponse itemInformationResponse = getItemInformation(activeRetrievalRequest);
-                                  if (isAllowedToCancelRequest(itemInformationResponse, retrievalRequestingInstitution)) {
+                                if (isAllowedToCancelRequest(itemInformationResponse, retrievalRequestingInstitution)) {
                                     ItemHoldResponse cancelRetrievalResponse = cancelRequest(activeRetrievalRequest, username);
                                     if (cancelRetrievalResponse.isSuccess()) {
                                         ItemHoldResponse cancelRecallResponse = cancelRequest(activeRecallRequest, username);

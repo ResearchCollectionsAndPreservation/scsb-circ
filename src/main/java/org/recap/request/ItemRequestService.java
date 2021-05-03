@@ -203,7 +203,7 @@ public class ItemRequestService {
                 itemRequestInfo.setAuthor(searchResultRow.getAuthor());
                 itemRequestInfo.setCustomerCode(itemEntity.getCustomerCode());
                 if (ownerCodeEntity != null) {
-                    itemRequestInfo.setPickupLocation(ownerCodeEntity.getPickupLocation());
+                    itemRequestInfo.setPickupLocation(deliveryCodeEntity.getPickupLocation());
                 }
                 itemResponseInformation.setItemId(itemEntity.getId());
 
@@ -1064,8 +1064,8 @@ public class ItemRequestService {
     }
 
     private String getPickupLocation(String deliveryLocation) {
-        OwnerCodeEntity ownerCodeEntity = ownerCodeDetailsRepository.findByOwnerCode(deliveryLocation);
-        return ownerCodeEntity.getPickupLocation();
+        DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCode(deliveryLocation);
+        return deliveryCodeEntity.getPickupLocation();
     }
 
     /**

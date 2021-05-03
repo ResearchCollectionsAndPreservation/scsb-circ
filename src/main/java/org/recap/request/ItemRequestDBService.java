@@ -4,23 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.recap.RecapConstants;
 import org.recap.RecapCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
-import org.recap.model.jpa.BulkRequestItemEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.OwnerCodeEntity;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.model.jpa.RequestTypeEntity;
-import org.recap.repository.jpa.InstitutionDetailsRepository;
-import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ItemStatusDetailsRepository;
-import org.recap.repository.jpa.OwnerCodeDetailsRepository;
-import org.recap.repository.jpa.RequestItemDetailsRepository;
-import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.recap.repository.jpa.RequestTypeDetailsRepository;
+import org.recap.model.jpa.*;
+import org.recap.repository.jpa.*;
 import org.recap.util.CommonUtil;
 import org.recap.util.SecurityUtil;
 import org.slf4j.Logger;
@@ -65,6 +50,9 @@ public class ItemRequestDBService {
 
     @Autowired
     private OwnerCodeDetailsRepository ownerCodeDetailsRepository;
+
+    @Autowired
+    private DeliveryCodeDetailsRepository deliveryCodeDetailsRepository;
 
     @Autowired
     private ItemStatusDetailsRepository itemStatusDetailsRepository;
@@ -295,12 +283,13 @@ public class ItemRequestDBService {
         Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemInformationResponse.getRequestId());
         if(requestItemEntity.isPresent()) {
             OwnerCodeEntity ownerCodeEntity= ownerCodeDetailsRepository.findByOwnerCode(requestItemEntity.get().getItemEntity().getCustomerCode());
+            DeliveryCodeEntity deliveryCodeEntity= deliveryCodeDetailsRepository.findByDeliveryCode( requestItemEntity.get().getStopCode());
             commonUtil.rollbackUpdateItemAvailabilityStatus(requestItemEntity.get().getItemEntity(), RecapConstants.GUEST_USER);
             commonUtil.saveItemChangeLogEntity(itemInformationResponse.getRequestId(), requestItemEntity.get().getCreatedBy(), RecapConstants.REQUEST_ITEM_GFA_FAILURE, RecapConstants.REQUEST_ITEM_GFA_FAILURE + itemInformationResponse.getScreenMessage());
             itemRequestInformation.setBibId(requestItemEntity.get().getItemEntity().getBibliographicEntities().get(0).getOwningInstitutionBibId());
             itemRequestInformation.setPatronBarcode(requestItemEntity.get().getPatronId());
             itemRequestInformation.setItemBarcodes(Collections.singletonList(requestItemEntity.get().getItemEntity().getBarcode()));
-            itemRequestInformation.setPickupLocation(ownerCodeEntity.getPickupLocation());
+            itemRequestInformation.setPickupLocation(deliveryCodeEntity.getPickupLocation());
             itemRequestInformation.setItemOwningInstitution(requestItemEntity.get().getItemEntity().getInstitutionEntity().getInstitutionCode());
             itemRequestInformation.setRequestingInstitution(requestItemEntity.get().getInstitutionEntity().getInstitutionCode());
         }

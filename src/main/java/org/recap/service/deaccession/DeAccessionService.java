@@ -26,29 +26,8 @@ import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.model.deaccession.DeAccessionSolrRequest;
-import org.recap.model.jpa.BibliographicEntity;
-import org.recap.model.jpa.CollectionGroupEntity;
-import org.recap.model.jpa.DeaccessionItemChangeLog;
-import org.recap.model.jpa.HoldingsEntity;
-import org.recap.model.jpa.ImsLocationEntity;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.jpa.ItemRequestInformation;
-import org.recap.model.jpa.ItemStatusEntity;
-import org.recap.model.jpa.ReportDataEntity;
-import org.recap.model.jpa.ReportEntity;
-import org.recap.model.jpa.RequestItemEntity;
-import org.recap.model.jpa.RequestStatusEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
-import org.recap.repository.jpa.DeaccesionItemChangeLogDetailsRepository;
-import org.recap.repository.jpa.HoldingsDetailsRepository;
-import org.recap.repository.jpa.InstitutionDetailsRepository;
-import org.recap.repository.jpa.ItemChangeLogDetailsRepository;
-import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.repository.jpa.ReportDetailRepository;
-import org.recap.repository.jpa.RequestItemDetailsRepository;
-import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.recap.repository.jpa.UserDetailRepository;
+import org.recap.model.jpa.*;
+import org.recap.repository.jpa.*;
 import org.recap.service.RestHeaderService;
 import org.recap.util.CommonUtil;
 import org.recap.util.ItemRequestServiceUtil;
@@ -135,6 +114,36 @@ public class DeAccessionService {
     UserDetailRepository userDetailRepository;
 
     /**
+     * The Delivery Code Translation Details Repository
+     */
+    @Autowired
+    DeliveryCodeTranslationDetailsRepository deliveryCodeTranslationDetailsRepository;
+
+    /**
+     * The Delivery Code Details Repository
+     */
+    @Autowired
+    DeliveryCodeDetailsRepository deliveryCodeDetailsRepository;
+
+    /**
+     * The Institution Details Repository
+     */
+    @Autowired
+    private InstitutionDetailsRepository institutionDetailsRepository;
+
+    /**
+     * The Ims Location Details Repository
+     */
+    @Autowired
+    private ImsLocationDetailsRepository imsLocationDetailsRepository;
+
+    /**
+     * The Deaccesion Item Change Log Details Repository
+     */
+    @Autowired
+    private DeaccesionItemChangeLogDetailsRepository deaccesionItemChangeLogDetailsRepository;
+
+    /**
      * The Request item controller.
      */
     @Autowired
@@ -166,16 +175,12 @@ public class DeAccessionService {
 
     @Autowired
     CommonUtil commonUtil;
+
     /**
      * The Scsb solr client url.
      */
     @Value("${scsb.solr.doc.url}")
     String scsbSolrClientUrl;
-    @Autowired
-    private InstitutionDetailsRepository institutionDetailsRepository;
-
-    @Autowired
-    private DeaccesionItemChangeLogDetailsRepository deaccesionItemChangeLogDetailsRepository;
 
     public RestHeaderService getRestHeaderService() {
         return restHeaderService;
@@ -184,7 +189,6 @@ public class DeAccessionService {
     private String getRecapAssistanceEmailTo(String imsLocationCode) {
         return this.propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.email.assist.to");
     }
-
 
     /**
      * De accession map.
@@ -368,7 +372,7 @@ public class DeAccessionService {
                     try {
                         recapAssistanceEmailTo = getRecapAssistanceEmailTo(deAccessionDBResponseEntity.getImsLocationCode());
                     } catch (Exception e) {
-                        logger.info("Exception occured while pulling recap asssistance email to: {}", e.getMessage());
+                        logger.info("Exception occurred while pulling recap assistance email to: {}", e.getMessage());
                     }
                 }
                 if (RecapCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && RecapCommonConstants.AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
@@ -377,7 +381,17 @@ public class DeAccessionService {
                     GFAPwdTtItemRequest gfaPwdTtItemRequest = new GFAPwdTtItemRequest();
                     gfaPwdTtItemRequest.setCustomerCode(deAccessionDBResponseEntity.getCustomerCode());
                     gfaPwdTtItemRequest.setItemBarcode(deAccessionDBResponseEntity.getBarcode());
-                    gfaPwdTtItemRequest.setDestination(deAccessionDBResponseEntity.getDeliveryLocation());
+                    DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCode(deAccessionDBResponseEntity.getDeliveryLocation());
+                    InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(deAccessionDBResponseEntity.getInstitutionCode());
+                    ImsLocationEntity imsLocationEntity = imsLocationDetailsRepository.findByImsLocationCode(deAccessionDBResponseEntity.getImsLocationCode());
+                    if (deliveryCodeEntity != null && institutionEntity != null && imsLocationEntity != null) {
+                        DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(institutionEntity.getId(), deliveryCodeEntity.getId(), imsLocationEntity.getId());
+                        logger.info("Deaccession Process - Translated Code From {} >>>> {} ", deAccessionDBResponseEntity.getDeliveryLocation(), deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
+                        gfaPwdTtItemRequest.setDestination(deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
+                    } else {
+                        gfaPwdTtItemRequest.setDestination(deAccessionDBResponseEntity.getDeliveryLocation());
+
+                    }
                     gfaPwdTtItemRequest.setRequestor(username);
                     gfaPwdDsItemRequest.setTtitem(Collections.singletonList(gfaPwdTtItemRequest));
                     gfaPwdRequest.setDsitem(gfaPwdDsItemRequest);

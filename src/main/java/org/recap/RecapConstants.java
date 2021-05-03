@@ -9,7 +9,7 @@ import java.util.List;
 public final class RecapConstants {
 
     public static final String GFA = "GFA";
-
+    public  static  final String FAILURE_UPDATE_CGD = "Failure: User is not allowed to update other instituion Item";
     public static final String INVALID_REQUEST_INSTITUTION = "Please enter valid Institution {0} for requestingInstitution";
     public static final String INVALID_EMAIL_ADDRESS = "Please enter valid emailAddress";
     public static final String START_PAGE_AND_END_PAGE_REQUIRED = "Start page and end page required.";
@@ -55,6 +55,12 @@ public final class RecapConstants {
     // Retrieval,EDD, Hold, Recall, Borrow Direct
     public static final String REQUEST_TYPE_PW_INDIRECT = "PWI";
     public static final String REQUEST_TYPE_PW_DIRECT = "PWD";
+
+    //Permissions
+    public static final String ROLE_SUPER_ADMIN = "Super Admin";
+    public static final String ROLE_RECAP = "ReCAP";
+    public static final Boolean BOOLEAN_TRUE = true;
+    public static final Boolean BOOLEAN_FALSE = false;
 
     // MQ URI
     public static final String REQUEST_ITEM_QUEUE = "scsbactivemq:queue:RequestItemQ?asyncConsumer=true&concurrentConsumers=10&destination.consumer.prefetchSize=20";
@@ -116,7 +122,6 @@ public final class RecapConstants {
 
     public static final String REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE = "1 - 2";
     public static final String REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK = "2 - 1";
-    public static final String REQUEST_ITEM_TITLE_SUFFIX = " [RECAP]";
     public static final String REQUEST_USE_RESTRICTIONS = "No Restrictions";
 
     public static final String UPDATE_ITEM_STATUS_SOLR = "/updateItem/updateItemAvailablityStatus";

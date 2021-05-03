@@ -16,6 +16,7 @@ import org.recap.ils.model.response.ItemLookUpInformationResponse;
 import org.recap.ils.service.RestApiResponseUtil;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
+import org.recap.model.jpa.ItemRequestInformation;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -24,9 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,7 +82,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         ncipProtocolConnector.getHttpHeader();
         ncipProtocolConnector.getHttpEntity(headers);
         Mockito.when(ilsConfigProperties.getIlsRestDataApi()).thenReturn("");
-        ncipProtocolConnector.getApiUrl("4565778");
+        //ncipProtocolConnector.getApiUrl("4565778");
     }
     @Test
     public void supports() {
@@ -185,7 +184,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         String patronIdentifier = "123456";
         getMockedResponse();
         Mockito.when(statusLine.getStatusCode()).thenReturn(200);
-        Object result = ncipProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        Object result = ncipProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
         assertNotNull(result);
     }
 
@@ -195,7 +194,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         String patronIdentifier = "123456";
         getMockedResponse();
         Mockito.when(statusLine.getStatusCode()).thenReturn(400);
-        Object result = ncipProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        Object result = ncipProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
         assertNotNull(result);
     }
 
@@ -204,7 +203,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         String itemIdentifier = "1456883";
         String patronIdentifier = "123456";
         getHttpClientErrorException();
-        Object result = ncipProtocolConnector.checkInItem(itemIdentifier, patronIdentifier);
+        Object result = ncipProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
         assertNotNull(result);
     }
 
@@ -433,5 +432,13 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         Mockito.when(client.execute(any())).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
     }
 
+    private ItemRequestInformation getItemRequestInformation() {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        itemRequestInformation.setItemBarcodes(Collections.singletonList("123456"));
+        itemRequestInformation.setItemOwningInstitution("PUL");
+        itemRequestInformation.setRequestingInstitution("PUL");
+        itemRequestInformation.setRequestType("RETRIEVAL");
+        return itemRequestInformation;
+    }
 
 }

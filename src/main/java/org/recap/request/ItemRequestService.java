@@ -447,7 +447,7 @@ public class ItemRequestService {
                         gfaItemStatus = gfaItemStatus.toUpperCase();
                     }
                     logger.info("Gfa status After modifying : {}",gfaItemStatus);
-                    boolean isImsItemStatusAvailable = commonUtil.isImsItemStatusAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus);
+                    boolean isImsItemStatusAvailable = commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus, true);
                     logger.info("Condition satisfied {}", isImsItemStatusAvailable);
                     if (isImsItemStatusAvailable) {
                         itemRequestInfo.setItemBarcodes(Collections.singletonList(itemBarcode));
@@ -927,11 +927,15 @@ public class ItemRequestService {
     public String getTitle(String title, ItemEntity itemEntity, SearchResultRow searchResultRow) {
         String titleIdentifier = "";
         String useRestrictions = RecapConstants.REQUEST_USE_RESTRICTIONS;
+        String imsLocationCode = "";
         String lTitle;
         String returnTitle = "";
         try {
-            if (itemEntity != null && StringUtils.isNotBlank(itemEntity.getUseRestrictions())) {
-                useRestrictions = itemEntity.getUseRestrictions();
+            if (itemEntity != null) {
+                imsLocationCode = itemEntity.getImsLocationEntity().getImsLocationCode();
+                if (StringUtils.isNotBlank(itemEntity.getUseRestrictions())) {
+                    useRestrictions = itemEntity.getUseRestrictions();
+                }
             }
             if (!(title != null && title.trim().length() > 0)) {
                 if (searchResultRow != null) {
@@ -948,7 +952,7 @@ public class ItemRequestService {
                 lTitle = "";
             }
             if (lTitle != null) {
-                titleIdentifier = String.format("[%s] %s%s", useRestrictions, lTitle.toUpperCase(), RecapConstants.REQUEST_ITEM_TITLE_SUFFIX);
+                titleIdentifier = String.format("[%s] %s [%s]", useRestrictions, lTitle.toUpperCase(), imsLocationCode);
             }
             returnTitle = removeDiacritical(titleIdentifier);
             logger.info(returnTitle);
@@ -1332,7 +1336,7 @@ public class ItemRequestService {
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(itemRequestInformation);
             String itemStatus = gfaLasService.callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
-            if (commonUtil.isImsItemStatusAvailable(requestItemEntity.getItemEntity().getImsLocationEntity().getImsLocationCode(), itemStatus)) {
+            if (commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(requestItemEntity.getItemEntity().getImsLocationEntity().getImsLocationCode(), itemStatus, true)) {
                 producerTemplate.sendBodyAndHeader(RecapConstants.REQUEST_ITEM_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
             } else if (StringUtils.isNotBlank(itemStatus)) {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);

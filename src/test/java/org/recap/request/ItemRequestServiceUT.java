@@ -562,7 +562,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemRequestInformation itemRequestInfo = getItemRequestInformation(requestItemEntity, itemEntity, itemBarcode);
         Mockito.when(mockedGfaLasService.callGfaItemStatus(itemEntity.getBarcode())).thenReturn("IN");
         List<String> requestItemStatusList = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
-        Mockito.when(mockedCommonUtil.isImsItemStatusAvailable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(mockedCommonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true)).thenReturn(Boolean.TRUE);
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(null);
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes())).thenReturn(Arrays.asList(requestItemEntity));
         SearchResultRow searchResultRow = new SearchResultRow();
@@ -786,7 +786,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         RequestItemEntity requestItemEntity = createRequestItem();
         Mockito.when(mockedGfaLasService.callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode())).thenReturn("test");
-        Mockito.when(mockedCommonUtil.isImsItemStatusAvailable(any(), anyString())).thenReturn(Boolean.TRUE);
+        Mockito.when(mockedCommonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), anyString(), true)).thenReturn(Boolean.TRUE);
         Mockito.doNothing().when(mockedProducerTemplate).sendBodyAndHeader(anyString(), any(), any(), any());
         ReflectionTestUtils.invokeMethod(mockedItemRequestService, "setRequestItemEntity", itemRequestInformation, requestItemEntity);
     }

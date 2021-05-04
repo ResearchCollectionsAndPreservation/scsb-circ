@@ -257,7 +257,6 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         OwnerCodeEntity ownerCodeEntity = new OwnerCodeEntity();
         ownerCodeEntity.setId(1);
         ownerCodeEntity.setOwnerCode(itemEntity.getCustomerCode());
-        ownerCodeEntity.setPickupLocation("PA");
         return ownerCodeEntity;
     }
     private InstitutionEntity getInstitutionEntity(){

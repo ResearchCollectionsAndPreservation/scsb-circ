@@ -23,6 +23,7 @@ import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.recap.repository.jpa.OwnerCodeDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
+import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
+import java.util.Map;
 
 /**
  * Created by hemalathas on 11/11/16.
@@ -86,9 +87,11 @@ public class ItemValidatorService {
     @Autowired
     private DeliveryCodeDetailsRepository deliveryCodeDetailsRepository;
 
-
     @Autowired
     private RequestItemDetailsRepository requestItemDetailsRepository;
+
+    @Autowired
+    private PropertyUtil propertyUtil;
 
     /**
      * Item validation response entity.
@@ -98,12 +101,15 @@ public class ItemValidatorService {
      */
     public ResponseEntity itemValidation(ItemRequestInformation itemRequestInformation) {
         List<ItemEntity> itemEntityList = getItemEntities(itemRequestInformation.getItemBarcodes());
-        
+        Map<String, String> frozenInstitutionPropertyMap = propertyUtil.getPropertyByKeyForAllInstitutions(RecapCommonConstants.KEY_ILS_ENABLE_CIRCULATION_FREEZE);
         if (itemRequestInformation.getItemBarcodes().size() == 1) {
             if (itemEntityList != null && !itemEntityList.isEmpty()) {
                 for (ItemEntity itemEntity1 : itemEntityList) {
                     if (!checkRequestItemStatus(itemEntity1.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)) {
                         return new ResponseEntity<>(RecapConstants.INITIAL_LOAD_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                    }
+                    if (Boolean.parseBoolean(frozenInstitutionPropertyMap.get(itemEntity1.getInstitutionEntity().getInstitutionCode()))) {
+                        return new ResponseEntity<>(RecapConstants.CIRCULATION_FREEZE_UNAVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
                     }
                     String availabilityStatus = getItemStatus(itemEntity1.getItemAvailabilityStatusId());
                     if (availabilityStatus.equalsIgnoreCase(RecapCommonConstants.NOT_AVAILABLE) && (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.RETRIEVAL)
@@ -171,7 +177,7 @@ public class ItemValidatorService {
                     bibliographicIds.add(bibliographicEntityDetails.getId());
                 }
             }
-            return multipleRequestItemValidation(itemEntityList, bibliographicIds, itemRequestInformation);
+            return multipleRequestItemValidation(itemEntityList, bibliographicIds, itemRequestInformation, frozenInstitutionPropertyMap);
         }
         return new ResponseEntity<>(RecapCommonConstants.VALID_REQUEST, getHttpHeaders(), HttpStatus.OK);
     }
@@ -220,13 +226,16 @@ public class ItemValidatorService {
         return imsLocationCode;
     }
 
-    private ResponseEntity multipleRequestItemValidation(List<ItemEntity> itemEntityList, Set<Integer> bibliographicIds, ItemRequestInformation itemRequestInformation) {
+    private ResponseEntity multipleRequestItemValidation(List<ItemEntity> itemEntityList, Set<Integer> bibliographicIds, ItemRequestInformation itemRequestInformation, Map<String, String> frozenInstitutionPropertyMap) {
         String status = "";
         List<BibliographicEntity> bibliographicList;
 
         for (ItemEntity itemEntity : itemEntityList) {
             if (!checkRequestItemStatus(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)) {
                 return new ResponseEntity<>(RecapConstants.INITIAL_LOAD_ITEM_EXISTS, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+            }
+            if (Boolean.parseBoolean(frozenInstitutionPropertyMap.get(itemEntity.getInstitutionEntity().getInstitutionCode()))) {
+                return new ResponseEntity<>(RecapConstants.CIRCULATION_FREEZE_UNAVAILABLE_ITEM, getHttpHeaders(), HttpStatus.BAD_REQUEST);
             }
             if (itemEntity.getItemAvailabilityStatusId() == 2 && (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.RETRIEVAL)
                     || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD))) {

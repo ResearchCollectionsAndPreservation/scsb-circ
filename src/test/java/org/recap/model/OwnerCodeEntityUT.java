@@ -26,14 +26,12 @@ public class OwnerCodeEntityUT{
         ownerCodeEntity.setDescription("test");
         ownerCodeEntity.setInstitutionId(institutionEntity.getId());
         ownerCodeEntity.setInstitutionEntity(institutionEntity);
-        ownerCodeEntity.setPickupLocation("Discovery");
         ownerCodeEntity.equals(ownerCodeEntity);
         ownerCodeEntity.equals(null);
 
         assertNotNull(ownerCodeEntity.getId());
         assertEquals("AB", ownerCodeEntity.getOwnerCode());
         assertEquals("test", ownerCodeEntity.getDescription());
-        assertEquals("Discovery", ownerCodeEntity.getPickupLocation());
         assertNotNull(ownerCodeEntity.getInstitutionId());
         assertNotNull(ownerCodeEntity.getInstitutionEntity());
 

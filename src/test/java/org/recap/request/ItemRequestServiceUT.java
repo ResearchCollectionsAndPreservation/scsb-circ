@@ -998,7 +998,6 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         OwnerCodeEntity ownerCodeEntity = new OwnerCodeEntity();
         ownerCodeEntity.setInstitutionId(1);
-        ownerCodeEntity.setPickupLocation(itemRequestInformation.getDeliveryLocation());
         ItemRecallResponse itemRecallResponse = getItemRecallResponse();
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
@@ -1039,7 +1038,6 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemInformationResponse.setCirculationStatus("CHARGED");
         OwnerCodeEntity ownerCodeEntity = new OwnerCodeEntity();
         ownerCodeEntity.setInstitutionId(1);
-        ownerCodeEntity.setPickupLocation(itemRequestInformation.getDeliveryLocation());
         ItemRecallResponse itemRecallResponse = getItemRecallResponse();
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenThrow(new RestClientException("Bad Request"));
         ItemInformationResponse response = mockedItemRequestService.recallItem(itemRequestInformation, exchange);
@@ -1071,7 +1069,6 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         OwnerCodeEntity ownerCodeEntity = new OwnerCodeEntity();
         ownerCodeEntity.setInstitutionId(1);
-        ownerCodeEntity.setPickupLocation(itemRequestInformation.getDeliveryLocation());
         ItemRecallResponse itemRecallResponse = getItemRecallResponse();
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         itemHoldResponse.setSuccess(true);
@@ -1121,7 +1118,6 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         OwnerCodeEntity ownerCodeEntity = new OwnerCodeEntity();
         ownerCodeEntity.setInstitutionId(1);
-        ownerCodeEntity.setPickupLocation(itemRequestInformation.getDeliveryLocation());
         ItemRecallResponse itemRecallResponse = getItemRecallResponse();
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         itemHoldResponse.setSuccess(true);
@@ -1697,7 +1693,6 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
 
     private OwnerCodeEntity getOwnerCodeEntity() {
         OwnerCodeEntity ownerCodeEntity = new OwnerCodeEntity();
-        ownerCodeEntity.setPickupLocation("PA");
         ownerCodeEntity.setId(1);
         return ownerCodeEntity;
     }

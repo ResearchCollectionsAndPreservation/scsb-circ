@@ -12,14 +12,14 @@ import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserPrivilege;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbCommonConstants;
 
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
-public class LookupUser extends RecapNCIP {
+public class LookupUser extends ScsbNCIP {
 
     protected String fromAgency;
     private String stringValue = "value";
@@ -141,7 +141,7 @@ public class LookupUser extends RecapNCIP {
     }
 
     private boolean isEmailPattern(String email) {
-        String regex = RecapCommonConstants.REGEX_FOR_EMAIL_ADDRESS;
+        String regex = ScsbCommonConstants.REGEX_FOR_EMAIL_ADDRESS;
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();

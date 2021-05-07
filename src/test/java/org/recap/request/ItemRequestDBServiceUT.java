@@ -9,8 +9,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.BulkRequestItemEntity;
@@ -170,7 +170,7 @@ public class ItemRequestDBServiceUT{
         RequestItemEntity requestItemEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0);
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
         Mockito.when(requestItemDetailsRepository.findById(itemInformationResponse.getRequestId())).thenReturn(Optional.of(requestItemEntity));
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_EXCEPTION)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_EXCEPTION)).thenReturn(requestStatusEntity);
         Mockito.when(requestItemDetailsRepository.saveAndFlush(requestItemEntity)).thenReturn(requestItemEntity);
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestItem(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
@@ -184,7 +184,7 @@ public class ItemRequestDBServiceUT{
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         RequestTypeEntity requestTypeEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestTypeEntity();
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestStatusEntity);
         Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(itemInformationResponse.getRequestType())).thenReturn(requestTypeEntity);
         Mockito.when(institutionDetailsRepository.findByInstitutionCode(itemInformationResponse.getRequestingInstitution())).thenReturn(getBulkRequestItemEntity().getInstitutionEntity());
         Mockito.when(securityUtil.getEncryptedValue(itemInformationResponse.getEmailAddress())).thenReturn("test@gmail.com");
@@ -201,7 +201,7 @@ public class ItemRequestDBServiceUT{
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         RequestTypeEntity requestTypeEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestTypeEntity();
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_EDD)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_EDD)).thenReturn(requestStatusEntity);
         Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(itemInformationResponse.getRequestType())).thenReturn(requestTypeEntity);
         Mockito.when(institutionDetailsRepository.findByInstitutionCode(itemInformationResponse.getRequestingInstitution())).thenReturn(getBulkRequestItemEntity().getInstitutionEntity());
         Mockito.when(securityUtil.getEncryptedValue(itemInformationResponse.getEmailAddress())).thenReturn("test@gmail.com");
@@ -218,7 +218,7 @@ public class ItemRequestDBServiceUT{
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         RequestTypeEntity requestTypeEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestTypeEntity();
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)).thenReturn(requestStatusEntity);
         Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(itemInformationResponse.getRequestType())).thenReturn(requestTypeEntity);
         Mockito.when(institutionDetailsRepository.findByInstitutionCode(itemInformationResponse.getRequestingInstitution())).thenReturn(getBulkRequestItemEntity().getInstitutionEntity());
         Mockito.when(securityUtil.getEncryptedValue(itemInformationResponse.getEmailAddress())).thenReturn("test@gmail.com");
@@ -236,7 +236,7 @@ public class ItemRequestDBServiceUT{
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         RequestTypeEntity requestTypeEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestTypeEntity();
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)).thenReturn(requestStatusEntity);
         Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(itemInformationResponse.getRequestType())).thenReturn(requestTypeEntity);
         Mockito.when(institutionDetailsRepository.findByInstitutionCode(itemInformationResponse.getRequestingInstitution())).thenReturn(getBulkRequestItemEntity().getInstitutionEntity());
         Mockito.when(requestItemDetailsRepository.saveAndFlush(requestItemEntity)).thenReturn(requestItemEntity);
@@ -262,7 +262,7 @@ public class ItemRequestDBServiceUT{
         requestTypeEntity.setRequestTypeCode("RETRIEVAL");
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)).thenReturn(requestStatusEntity);
         Mockito.when(requestItemDetailsRepository.findById(itemInformationResponse.getRequestId())).thenReturn(Optional.of(requestItemEntity));
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestStatus(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
@@ -275,7 +275,7 @@ public class ItemRequestDBServiceUT{
         requestTypeEntity.setRequestTypeCode("RECALL");
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)).thenReturn(requestStatusEntity);
         Mockito.when(requestItemDetailsRepository.findById(itemInformationResponse.getRequestId())).thenReturn(Optional.of(requestItemEntity));
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestStatus(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
@@ -285,7 +285,7 @@ public class ItemRequestDBServiceUT{
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         RequestItemEntity requestItemEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0);
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_EDD)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_EDD)).thenReturn(requestStatusEntity);
         Mockito.when(requestItemDetailsRepository.findById(itemInformationResponse.getRequestId())).thenReturn(Optional.of(requestItemEntity));
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestStatus(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
@@ -298,7 +298,7 @@ public class ItemRequestDBServiceUT{
         RequestItemEntity requestItemEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0);
         requestItemEntity.setBulkRequestItemEntity(null);
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_EXCEPTION)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_EXCEPTION)).thenReturn(requestStatusEntity);
         Mockito.when(requestItemDetailsRepository.findById(itemInformationResponse.getRequestId())).thenReturn(Optional.of(requestItemEntity));
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestStatus(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
@@ -320,8 +320,8 @@ public class ItemRequestDBServiceUT{
         String userName = "userName";
         ItemStatusEntity itemStatusEntity = getItemEntity().getItemStatusEntity();
         Mockito.when(commonUtil.getUser(userName)).thenReturn("userName");
-        Mockito.when(itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
-        Mockito.doNothing().when(commonUtil).saveItemChangeLogEntity(itemEntities.get(0).getId(), userName, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
+        Mockito.when(itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
+        Mockito.doNothing().when(commonUtil).saveItemChangeLogEntity(itemEntities.get(0).getId(), userName, ScsbConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, ScsbConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
         itemRequestDBService.updateItemAvailabilityStatus(itemEntities, userName);
     }
 

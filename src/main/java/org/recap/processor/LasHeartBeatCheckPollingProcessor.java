@@ -5,8 +5,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.callable.LasHeartBeatCheckPollingCallable;
 import org.recap.las.LASImsLocationConnectorFactory;
 import org.recap.las.model.GFALasStatusCheckResponse;
@@ -54,21 +54,21 @@ public class LasHeartBeatCheckPollingProcessor {
                         && !gfaLasStatusCheckResponse.getDsitem().getTtitem().isEmpty()
                         && BooleanUtils.toBoolean(gfaLasStatusCheckResponse.getDsitem().getTtitem().get(0).getSuccess())) {
                     log.info("Sending to Outgoing Queue at {}", itemRequestInformation.getImsLocationCode());
-                    producerTemplate.sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE_PREFIX + itemRequestInformation.getImsLocationCode() + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+                    producerTemplate.sendBodyAndHeader(ScsbConstants.LAS_OUTGOING_QUEUE_PREFIX + itemRequestInformation.getImsLocationCode() + ScsbConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
                 }
                 executor.shutdown();
             } catch (InterruptedException e) {
-                log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
                 Thread.currentThread().interrupt();
                 executor.shutdown();
             } catch (ExecutionException e) {
-                log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
             } catch (Exception e) {
-                log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
             }
         } else {
             log.info("");
-            producerTemplate.sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE_PREFIX + itemRequestInformation.getImsLocationCode() + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+            producerTemplate.sendBodyAndHeader(ScsbConstants.LAS_OUTGOING_QUEUE_PREFIX + itemRequestInformation.getImsLocationCode() + ScsbConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
         }
     }
 }

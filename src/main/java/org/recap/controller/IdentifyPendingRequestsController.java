@@ -1,7 +1,7 @@
 package org.recap.controller;
 
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.service.IdentifyPendingRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,10 +19,10 @@ public class IdentifyPendingRequestsController {
     public String identifyAndNotifyPendingRequests(){
         boolean identifyPendingRequest = pendingRequestService.identifyPendingRequest();
         if(identifyPendingRequest) {
-            return RecapCommonConstants.SUCCESS;
+            return ScsbCommonConstants.SUCCESS;
         }
         else {
-            return RecapConstants.NO_PENDING_REQUESTS_FOUND;
+            return ScsbConstants.NO_PENDING_REQUESTS_FOUND;
         }
     }
 }

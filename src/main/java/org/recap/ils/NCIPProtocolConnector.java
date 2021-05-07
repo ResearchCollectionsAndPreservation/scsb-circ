@@ -34,8 +34,8 @@ import org.recap.ncip.CheckinItem;
 import org.recap.ncip.CheckoutItem;
 import org.recap.ncip.LookupUser;
 import org.recap.ncip.RecallItem;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.ils.model.nypl.BibLookupData;
 import org.recap.ils.model.nypl.ItemLookupData;
 import org.recap.ils.model.nypl.response.ItemLookupResponse;
@@ -95,7 +95,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
     @Override
     public boolean supports(String protocol) {
-        return RecapConstants.NCIP_PROTOCOL.equalsIgnoreCase(protocol);
+        return ScsbConstants.NCIP_PROTOCOL.equalsIgnoreCase(protocol);
     }
 
     @Override
@@ -246,11 +246,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             }
 
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR, httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR, httpException);
             itemCheckoutResponse.setSuccess(false);
             itemCheckoutResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
             itemCheckoutResponse.setSuccess(false);
             itemCheckoutResponse.setScreenMessage(e.getMessage());
         }
@@ -292,11 +292,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             checkInItem.getCheckInResponse(checkinItemResponse);
                    }
         catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR, httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR, httpException);
             itemCheckinResponse.setSuccess(false);
             itemCheckinResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
             itemCheckinResponse.setSuccess(false);
             itemCheckinResponse.setScreenMessage(e.getMessage());
         }
@@ -321,7 +321,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             }
                 if (isRemoteCheckin.booleanValue()) {
                     String remoteProfileType = propertyUtil.getPropertyByInstitutionAndLocationAndKey(getInstitution(), imsLocation,"ils.remote.profile.type");
-                    if (!itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()) || itemRequestInformation.getRequestType().equals(RecapCommonConstants.REQUEST_TYPE_EDD)) {
+                    if (!itemRequestInformation.getRequestingInstitution().equals(itemRequestInformation.getItemOwningInstitution()) || itemRequestInformation.getRequestType().equals(ScsbCommonConstants.REQUEST_TYPE_EDD)) {
                         CheckInItemInitiationData checkInItemInitiationData = checkInItem.getCheckInItemInitiationData(itemIdentifier,  getNcipAgencyId());
                         CheckInItemResponseData checkinItemResponse = getCheckinResponse(checkInItem, checkInItemInitiationData);
                         if (!checkinItemResponse.getProblems().isEmpty()) {
@@ -434,11 +434,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             itemHoldResponse.setSuccess(Boolean.TRUE);
             itemHoldResponse.setTitleIdentifier(cancelItemResponse.getItemId().getItemIdentifierValue());
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR, httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR, httpException);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(e.getMessage());
         }
@@ -512,11 +512,11 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                 return patronInformationResponse;
             }
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR, httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR, httpException);
             patronInformationResponse.setSuccess(false);
             patronInformationResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
             patronInformationResponse.setSuccess(false);
             patronInformationResponse.setScreenMessage(e.getMessage());
         }
@@ -569,18 +569,18 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             itemRecallResponse.setItemBarcode(recallItemResponse.getItemId().getItemIdentifierValue());
             itemRecallResponse.setItemOwningInstitution(institutionId);
             Date expirationDateforRecall = DateUtils.addYears(new Date(), 1);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScsbConstants.DATE_FORMAT);
             itemRecallResponse.setExpirationDate(simpleDateFormat.format(expirationDateforRecall));
 
             itemRecallResponse.setSuccess(Boolean.TRUE);
             itemRecallResponse.setScreenMessage(success);
 
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR, httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR, httpException);
             itemRecallResponse.setSuccess(false);
             itemRecallResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
             itemRecallResponse.setSuccess(false);
             itemRecallResponse.setScreenMessage(e.getMessage());
         }
@@ -669,14 +669,14 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
             itemHoldResponse.setCreatedDate(new Date().toString());
             itemHoldResponse.setUpdatedDate(new Date().toString());
             Date expirationDateforHold = DateUtils.addYears(new Date(), 1);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScsbConstants.DATE_FORMAT);
             itemHoldResponse.setExpirationDate(simpleDateFormat.format(expirationDateforHold));
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR, httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR, httpException);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(e.getMessage());
         }

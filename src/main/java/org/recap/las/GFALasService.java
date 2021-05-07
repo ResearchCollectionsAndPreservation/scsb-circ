@@ -7,8 +7,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.las.model.GFAEddItemResponse;
 import org.recap.las.model.GFAItemStatus;
@@ -150,21 +150,21 @@ public class GFALasService {
                 // Call Retrieval Order
                 if (StringUtils.isBlank(itemRequestInfo.getImsLocationCode())) {
                     itemResponseInformation.setSuccess(false);
-                    itemResponseInformation.setScreenMessage(RecapConstants.REQUEST_SCSB_EXCEPTION + RecapConstants.IMS_LOCATION_CODE_BLANK_ERROR);
+                    itemResponseInformation.setScreenMessage(ScsbConstants.REQUEST_SCSB_EXCEPTION + ScsbConstants.IMS_LOCATION_CODE_BLANK_ERROR);
                 } else if (commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemRequestInfo.getImsLocationCode(), gfaOnlyStatus, true)) {
-                    if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
+                    if (itemRequestInfo.getRequestType().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
                         itemResponseInformation = callItemRetrievable(itemRequestInfo, itemResponseInformation);
-                    } else if (itemRequestInfo.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
+                    } else if (itemRequestInfo.getRequestType().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_EDD)) {
                         itemResponseInformation = callItemEDDRetrievable(itemRequestInfo, itemResponseInformation);
                     }
-                } else if (RecapConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.toLowerCase().contains(gfaOnlyStatus.toLowerCase())) {
+                } else if (ScsbConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.toLowerCase().contains(gfaOnlyStatus.toLowerCase())) {
                     log.info("Request Received while GFA status is Sch on Refile WO");
                     itemResponseInformation.setRequestTypeForScheduledOnWO(true);
                     itemResponseInformation.setSuccess(true);
-                    itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                    itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
                 } else {
                     itemResponseInformation.setSuccess(false);
-                    itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ITEM_NOT_AVAILABLE);
+                    itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ITEM_NOT_AVAILABLE);
                 }
             } else {
                 lasPolling(itemRequestInfo, itemResponseInformation);
@@ -173,8 +173,8 @@ public class GFALasService {
             }
         } catch (Exception e) {
             itemResponseInformation.setSuccess(false);
-            itemResponseInformation.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            itemResponseInformation.setScreenMessage(ScsbConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemResponseInformation;
     }
@@ -197,23 +197,23 @@ public class GFALasService {
             gfaRetrieveItemRequest.setDsitem(retrieveItem);
 
             if (isUseQueueLasCall(itemRequestInfo.getImsLocationCode())) { // Queue
-                producerTemplate.sendBodyAndHeader(RecapConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + itemRequestInfo.getImsLocationCode() + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInfo, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
+                producerTemplate.sendBodyAndHeader(ScsbConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + itemRequestInfo.getImsLocationCode() + ScsbConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInfo, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
                 itemResponseInformation.setSuccess(true);
-                itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 GFARetrieveItemResponse gfaRetrieveItemResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(itemRequestInfo.getImsLocationCode()).itemRetrieval(gfaRetrieveItemRequest);
                 if (gfaRetrieveItemResponse.isSuccess()) {
                     itemResponseInformation.setSuccess(true);
-                    itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                    itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
                 } else {
                     itemResponseInformation.setSuccess(false);
                     itemResponseInformation.setScreenMessage(gfaRetrieveItemResponse.getScreenMessage());
                 }
             }
         } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
             itemResponseInformation.setSuccess(false);
-            itemResponseInformation.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            itemResponseInformation.setScreenMessage(ScsbConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
         }
         return itemResponseInformation;
     }
@@ -222,9 +222,9 @@ public class GFALasService {
         ItemInformationResponse itemInformationResponse = null;
         ItemRequestInformation itemRequestInfo = (ItemRequestInformation) exchange.getIn().getBody();
         log.info("Message Processing from LAS OUTGOING QUEUE at {} : {}", itemRequestInfo.getImsLocationCode(), itemRequestInfo.toString());
-        if (RecapCommonConstants.REQUEST_TYPE_RETRIEVAL.equalsIgnoreCase(itemRequestInfo.getRequestType())) {
+        if (ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL.equalsIgnoreCase(itemRequestInfo.getRequestType())) {
             itemInformationResponse = callItemRetrieveApi(itemRequestInfo);
-        } else if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(itemRequestInfo.getRequestType())) {
+        } else if (ScsbCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(itemRequestInfo.getRequestType())) {
             itemInformationResponse = callItemEDDRetrieveApi(itemRequestInfo);
         }
         return itemInformationResponse;
@@ -251,7 +251,7 @@ public class GFALasService {
             GFARetrieveItemResponse gfaRetrieveItemResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(itemRequestInfo.getImsLocationCode()).itemRetrieval(gfaRetrieveItemRequest);
             if (gfaRetrieveItemResponse.isSuccess()) {
                 itemResponseInformation.setSuccess(true);
-                itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 itemResponseInformation.setSuccess(false);
                 itemResponseInformation.setScreenMessage(gfaRetrieveItemResponse.getScreenMessage());
@@ -260,12 +260,12 @@ public class GFALasService {
             if (isUseQueueLasCall(itemRequestInfo.getImsLocationCode())) { // Queue
                 ObjectMapper objectMapper = new ObjectMapper();
                 String json = objectMapper.writeValueAsString(gfaRetrieveItemResponse);
-                producerTemplate.sendBodyAndHeader(RecapConstants.LAS_INCOMING_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
+                producerTemplate.sendBodyAndHeader(ScsbConstants.LAS_INCOMING_QUEUE, json, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
             }
         } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
             itemResponseInformation.setSuccess(false);
-            itemResponseInformation.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            itemResponseInformation.setScreenMessage(ScsbConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
         }
         return itemResponseInformation;
     }
@@ -309,14 +309,14 @@ public class GFALasService {
             retrieveItemEDDRequest.setTtitem(ttitems);
             gfaRetrieveEDDItemRequest.setDsitem(retrieveItemEDDRequest);
             if (isUseQueueLasCall(itemRequestInfo.getImsLocationCode())) { // Queue
-                producerTemplate.sendBodyAndHeader(RecapConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + itemRequestInfo.getImsLocationCode() + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInfo, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
+                producerTemplate.sendBodyAndHeader(ScsbConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + itemRequestInfo.getImsLocationCode() + ScsbConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInfo, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
                 itemResponseInformation.setSuccess(true);
-                itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 gfaEddItemResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(itemRequestInfo.getImsLocationCode()).itemEDDRetrieval(gfaRetrieveEDDItemRequest);
                 if (gfaEddItemResponse.isSuccess()) {
                     itemResponseInformation.setSuccess(true);
-                    itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                    itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
                 } else {
                     itemResponseInformation.setSuccess(false);
                     itemResponseInformation.setScreenMessage(gfaEddItemResponse.getScreenMessage());
@@ -324,8 +324,8 @@ public class GFALasService {
             }
         } catch (Exception e) {
             itemResponseInformation.setSuccess(false);
-            itemResponseInformation.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            itemResponseInformation.setScreenMessage(ScsbConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemResponseInformation;
     }
@@ -366,7 +366,7 @@ public class GFALasService {
             gfaEddItemResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(itemRequestInfo.getImsLocationCode()).itemEDDRetrieval(gfaRetrieveEDDItemRequest);
             if (gfaEddItemResponse.isSuccess()) {
                 itemResponseInformation.setSuccess(true);
-                itemResponseInformation.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 itemResponseInformation.setSuccess(false);
                 itemResponseInformation.setScreenMessage(gfaEddItemResponse.getScreenMessage());
@@ -375,12 +375,12 @@ public class GFALasService {
             if (isUseQueueLasCall(itemRequestInfo.getImsLocationCode())) { // Queue
                 ObjectMapper objectMapper = getObjectMapper();
                 String json = objectMapper.writeValueAsString(gfaEddItemResponse);
-                producerTemplate.sendBodyAndHeader(RecapConstants.LAS_INCOMING_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
+                producerTemplate.sendBodyAndHeader(ScsbConstants.LAS_INCOMING_QUEUE, json, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
             }
         } catch (Exception e) {
             itemResponseInformation.setSuccess(false);
-            itemResponseInformation.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            itemResponseInformation.setScreenMessage(ScsbConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemResponseInformation;
     }
@@ -400,14 +400,14 @@ public class GFALasService {
             if (gfaRetrieveItemResponse.isSuccess()) {
                 itemInformationResponse.setRequestId(gfaRetrieveItemResponse.getDsitem().getTtitem().get(0).getRequestId());
                 itemInformationResponse.setSuccess(true);
-                itemInformationResponse.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemInformationResponse.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 itemInformationResponse.setRequestId(gfaRetrieveItemResponse.getDsitem().getTtitem().get(0).getRequestId());
                 itemInformationResponse.setSuccess(false);
                 itemInformationResponse.setScreenMessage(gfaRetrieveItemResponse.getScreenMessage());
             }
         } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemInformationResponse;
     }
@@ -427,14 +427,14 @@ public class GFALasService {
             if (null != gfaEddItemResponse && gfaEddItemResponse.isSuccess()) {
                 itemInformationResponse.setRequestId(gfaEddItemResponse.getDsitem().getTtitem().get(0).getRequestId());
                 itemInformationResponse.setSuccess(true);
-                itemInformationResponse.setScreenMessage(RecapConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
+                itemInformationResponse.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
             } else {
                 itemInformationResponse.setRequestId(gfaEddItemResponse != null ? gfaEddItemResponse.getDsitem().getTtitem().get(0).getRequestId() : 0);
                 itemInformationResponse.setSuccess(false);
                 itemInformationResponse.setScreenMessage(gfaEddItemResponse != null ? gfaEddItemResponse.getScreenMessage() : "");
             }
         } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemInformationResponse;
     }
@@ -462,7 +462,7 @@ public class GFALasService {
     private void lasPolling(ItemRequestInformation itemRequestInfo, ItemInformationResponse itemResponseInformation) {
         // Update Request_item_t table with new status - each Item
         try {
-            RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
+            RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
             RequestItemEntity requestItemEntity = requestItemDetailsRepository.findRequestItemById(itemRequestInfo.getRequestId());
             requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
             requestItemEntity.setLastUpdatedDate(new Date());
@@ -475,13 +475,13 @@ public class GFALasService {
             requestInformation.setItemResponseInformation(itemResponseInformation);
             json = objectMapper.writeValueAsString(requestInformation);
             log.info(json);
-            log.info("Rest Service Status -> {}", RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS);
-            if (RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
-                producerTemplate.getCamelContext().getRouteController().stopRoute(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
+            log.info("Rest Service Status -> {}", ScsbConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS);
+            if (ScsbConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
+                producerTemplate.getCamelContext().getRouteController().stopRoute(ScsbConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
             }
-            producerTemplate.sendBodyAndHeader(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE, json, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
+            producerTemplate.sendBodyAndHeader(ScsbConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE, json, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInfo.getRequestType());
             itemRequestServiceUtil.updateSolrIndex(requestItemEntity.getItemEntity());
-            if (RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
+            if (ScsbConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS == 0) {
                 // Start Polling program - Once
                 startPolling(itemRequestInfo.getItemBarcodes().get(0), itemRequestInfo.getImsLocationCode());
             }
@@ -495,7 +495,7 @@ public class GFALasService {
     public void startPolling(String barcode, String imsLocationCode) {
         try {
             log.info("Start Polling Process Once");
-            RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS = 1;
+            ScsbConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS = 1;
             lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode, imsLocationCode, producerTemplate.getCamelContext());
         } catch (Exception e) {
             log.error("Exception ", e);
@@ -514,18 +514,18 @@ public class GFALasService {
             String itemStatus = callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
             String imsLocationCode = commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode());
             if (commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(imsLocationCode, itemStatus, true)) {
-                producerTemplate.sendBodyAndHeader(RecapConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
+                producerTemplate.sendBodyAndHeader(ScsbConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + ScsbConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
             } else if (StringUtils.isNotBlank(itemStatus)) {
-                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED);
+                RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                 requestItemDetailsRepository.save(requestItemEntity);
             }
         } catch (Exception exception) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, exception);
-            return RecapCommonConstants.FAILURE + ":" + exception.getMessage();
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, exception);
+            return ScsbCommonConstants.FAILURE + ":" + exception.getMessage();
         }
-        return RecapCommonConstants.SUCCESS;
+        return ScsbCommonConstants.SUCCESS;
     }
 
     /**

@@ -1,6 +1,6 @@
 package org.recap.controller;
 
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.ils.ILSProtocolConnectorFactory;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.request.ItemValidatorService;
@@ -55,7 +55,7 @@ public class RequestItemValidatorController {
         if (responseEntity == null) {
             responseEntity = itemValidatorService.itemValidation(itemRequestInformation);
             if (responseEntity.getStatusCode() == HttpStatus.OK && !ilsProtocolConnectorFactory.getIlsProtocolConnector(itemRequestInformation.getRequestingInstitution()).patronValidation(itemRequestInformation.getRequestingInstitution(), itemRequestInformation.getPatronBarcode())) {
-                    responseEntity = new ResponseEntity<>(RecapConstants.INVALID_PATRON, requestParamaterValidatorService.getHttpHeaders(), HttpStatus.BAD_REQUEST);
+                    responseEntity = new ResponseEntity<>(ScsbConstants.INVALID_PATRON, requestParamaterValidatorService.getHttpHeaders(), HttpStatus.BAD_REQUEST);
                 }
         }
         logger.info(String.format("Request Validation: %s - %s",responseEntity.getStatusCode(), responseEntity.getBody()));

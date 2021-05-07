@@ -6,11 +6,11 @@ import org.extensiblecatalog.ncip.v2.service.RecallItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.RecallItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.json.JSONObject;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 
 import java.text.SimpleDateFormat;
 
-public class RecallItem extends RecapNCIP {
+public class RecallItem extends ScsbNCIP {
 
     public RecallItemInitiationData getRecallItemInitiationData(String itemIdentifier, String patronIdentifier, String ncipAgencyId) {
         RecallItemInitiationData recallItemInitiationData = new RecallItemInitiationData();
@@ -42,7 +42,7 @@ public class RecallItem extends RecapNCIP {
             dueDateString = formatter.format(recallItemResponseData.getDateDue().getTime());
         }
 
-        returnJson.put(RecapConstants.ITEM_ID, recallItemResponseData.getItemId().getItemIdentifierValue());
+        returnJson.put(ScsbConstants.ITEM_ID, recallItemResponseData.getItemId().getItemIdentifierValue());
         returnJson.put("userId", recallItemResponseData.getUserId());
         returnJson.put("expirationDate", dueDateString);
         return  returnJson;

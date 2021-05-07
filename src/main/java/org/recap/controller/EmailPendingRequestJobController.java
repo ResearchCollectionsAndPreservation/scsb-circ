@@ -1,8 +1,8 @@
 package org.recap.controller;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.service.ActiveMqQueuesInfo;
 import org.recap.util.CommonUtil;
@@ -54,16 +54,16 @@ public class EmailPendingRequestJobController {
     @PostMapping(value = "/sendEmailForPendingRequest")
     public String sendEmailForPendingRequest() throws Exception {
         for (String imsLocationCode : commonUtil.findAllImsLocationCodeExceptUN()) {
-            Integer pendingRequests = activemqQueuesInfo.getActivemqQueuesInfo("las" + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX);
+            Integer pendingRequests = activemqQueuesInfo.getActivemqQueuesInfo("las" + imsLocationCode + ScsbConstants.OUTGOING_QUEUE_SUFFIX);
             if (pendingRequests >= pendingRequestLimit) {
                 logger.info("Pending Request at {} : {}", imsLocationCode, pendingRequests);
                 EmailPayLoad emailPayLoad = new EmailPayLoad();
                 emailPayLoad.setPendingRequestLimit(String.valueOf(pendingRequestLimit));
                 emailPayLoad.setTo(propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.email.assist.to"));
-                producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.EMAIL_HEADER_REQUEST_PENDING);
+                producerTemplate.sendBodyAndHeader(ScsbConstants.EMAIL_Q, emailPayLoad, ScsbConstants.EMAIL_BODY_FOR, ScsbConstants.EMAIL_HEADER_REQUEST_PENDING);
             }
         }
-        return RecapCommonConstants.SUCCESS;
+        return ScsbCommonConstants.SUCCESS;
     }
 
 }

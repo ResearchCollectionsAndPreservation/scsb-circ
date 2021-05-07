@@ -10,14 +10,14 @@ import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.OnBehalfOfAgency;
 import org.json.JSONObject;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.model.jpa.ItemEntity;
 
 import java.text.SimpleDateFormat;
 
 @Slf4j
-public class CheckinItem extends RecapNCIP {
+public class CheckinItem extends ScsbNCIP {
 
     public CheckInItemInitiationData getCheckInItemInitiationRemoteData(String itemIdentifier, ItemEntity itemEntity, String imsLocation, String remoteProfileType, String ncipAgencyId, String ncipScheme) {
 
@@ -25,12 +25,12 @@ public class CheckinItem extends RecapNCIP {
         InitiationHeader initiationHeader = new InitiationHeader();
         String behalfAgency = null;
         ItemId itemId = new ItemId();
-        FromSystemId fromSystemId = new FromSystemId(RecapConstants.NCIP_REMOTE_STORAGE);
+        FromSystemId fromSystemId = new FromSystemId(ScsbConstants.NCIP_REMOTE_STORAGE);
         initiationHeader.setFromSystemId(fromSystemId);
         initiationHeader = getInitiationHeaderwithoutProfile(initiationHeader, ncipScheme, ncipAgencyId, ncipAgencyId);
         initiationHeader.setApplicationProfileType(new ApplicationProfileType(null, remoteProfileType));
-            if (imsLocation != null && imsLocation.equalsIgnoreCase(RecapCommonConstants.RECAP)) {
-                imsLocation = RecapConstants.RECAP_DEPOSITORY;
+            if (imsLocation != null && imsLocation.equalsIgnoreCase(ScsbConstants.RECAP)) {
+                imsLocation = ScsbConstants.RECAP_DEPOSITORY;
             }
             if(itemEntity != null) {
                 behalfAgency = itemEntity.getItemLibrary() + "." + itemEntity.getItemLibrary() + "_" + imsLocation;
@@ -47,7 +47,7 @@ public class CheckinItem extends RecapNCIP {
         public CheckInItemInitiationData getCheckInItemInitiationData(String itemIdentifier, String ncipAgencyId) {
             CheckInItemInitiationData checkinItemInitiationData = new CheckInItemInitiationData();
             InitiationHeader initiationHeader = new InitiationHeader();
-            initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
+            initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, ScsbConstants.AGENCY_ID_SCSB, ncipAgencyId);
             checkinItemInitiationData.setInitiationHeader(initiationHeader);
             ItemId itemId = new ItemId();
             itemId.setItemIdentifierValue(itemIdentifier);
@@ -69,8 +69,8 @@ public class CheckinItem extends RecapNCIP {
                 dueDateString = formatter.format(checkinItemResponse.getItemOptionalFields().getDateDue().getTime());
         }
         String itemId = checkinItemResponse.getItemId().getItemIdentifierValue();
-        returnJson.put(RecapConstants.ITEM_ID, itemId);
-        returnJson.put(RecapConstants.DUE_DATE, dueDateString);
+        returnJson.put(ScsbConstants.ITEM_ID, itemId);
+        returnJson.put(ScsbConstants.DUE_DATE, dueDateString);
         return returnJson;
     }
 }

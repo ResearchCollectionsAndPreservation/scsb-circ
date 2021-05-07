@@ -1,7 +1,7 @@
 package org.recap.request;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class EmailService {
         emailPayLoad.setMessageDisplay(messageDisplay);
         emailPayLoad.setPatronBarcode(patronBarcode);
         emailPayLoad.setSubject(subject + itemBarcode);
-        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.REQUEST_RECALL_MAIL_QUEUE);
+        producer.sendBodyAndHeader(ScsbConstants.EMAIL_Q, emailPayLoad, ScsbConstants.EMAIL_BODY_FOR, ScsbConstants.REQUEST_RECALL_MAIL_QUEUE);
     }
 
     /**
@@ -62,7 +62,7 @@ public class EmailService {
         emailPayLoad.setBulkRequestStatus(bulkRequestStatus);
         emailPayLoad.setBulkRequestCsvFileData(bulkRequestCsvFileData);
         emailPayLoad.setSubject(subject);
-        producer.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.BULK_REQUEST_EMAIL_QUEUE);
+        producer.sendBodyAndHeader(ScsbConstants.EMAIL_Q, emailPayLoad, ScsbConstants.EMAIL_BODY_FOR, ScsbConstants.BULK_REQUEST_EMAIL_QUEUE);
     }
 
     /**
@@ -70,7 +70,7 @@ public class EmailService {
      * @return
      */
     private String emailIdTo(String institution, String imsLocationCode) {
-        if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
+        if (institution.equalsIgnoreCase(ScsbConstants.GFA)) {
             return propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.email.request.cancel.to");
         } else {
             return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.recall.request.to");
@@ -78,7 +78,7 @@ public class EmailService {
     }
 
     private String emailIdCC(String institution, String imsLocationCode) {
-        if (institution.equalsIgnoreCase(RecapConstants.GFA)) {
+        if (institution.equalsIgnoreCase(ScsbConstants.GFA)) {
             return propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, "las.email.request.recall.cc");
         } else {
             return propertyUtil.getPropertyByInstitutionAndKey(institution, "email.request.recall.cc");

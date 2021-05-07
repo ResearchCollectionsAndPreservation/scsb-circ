@@ -8,8 +8,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.controller.RequestItemValidatorController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
@@ -83,7 +83,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     public void testEddRequestItem() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
-        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
+        ResponseEntity res = new ResponseEntity(ScsbConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
         itemRequestInfo.setRequestingInstitution("UC");
 
@@ -107,7 +107,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.getGfaLasService()).thenReturn(gfaLasService);
         Mockito.when(gfaLasService.isUseQueueLasCall(any())).thenReturn(true);
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
-        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(1);
+        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(1);
         Mockito.when(requestItemController.getItemRequestService()).thenReturn(itemRequestService);
         Mockito.when(genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(any(), any())).thenReturn(getGenericPatronEntity());
         Mockito.when(itemRequestService.updateGFA(any(), any())).thenReturn(itemResponseInformation);
@@ -128,7 +128,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     public void testEddRequestItemInnerException() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
-        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
+        ResponseEntity res = new ResponseEntity(ScsbConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
         itemRequestInfo.setRequestingInstitution("UC");
 
@@ -164,7 +164,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     public void testEddRequestItemWithFailureResponse() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
-        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
+        ResponseEntity res = new ResponseEntity(ScsbConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
         itemRequestInfo.setRequestingInstitution("PUL");
 
@@ -177,8 +177,8 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = bibliographicEntity.getItemEntities().get(0);
         Mockito.when(itemRequestService.searchRecords(any())).thenReturn(searchResultRow);
         Mockito.when(itemRequestService.removeDiacritical(searchResultRow.getTitle().replaceAll("[^\\x00-\\x7F]", "?"))).thenReturn("Title Of the Book");
-        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING)).thenReturn(1);
-        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING)).thenReturn(1);
+        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING)).thenReturn(1);
+        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PENDING)).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
         Mockito.when(itemRequestService.getGfaLasService()).thenReturn(gfaLasService);
@@ -194,7 +194,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     public void testEddRequestItemWithFailureResponseInnerException() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
-        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
+        ResponseEntity res = new ResponseEntity(ScsbConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
         itemRequestInfo.setRequestingInstitution("PUL");
 
@@ -207,8 +207,8 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = bibliographicEntity.getItemEntities().get(0);
         Mockito.when(itemRequestService.searchRecords(any())).thenReturn(searchResultRow);
         Mockito.when(itemRequestService.removeDiacritical(searchResultRow.getTitle().replaceAll("[^\\x00-\\x7F]", "?"))).thenReturn("Title Of the Book");
-        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING)).thenReturn(1);
-        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PENDING)).thenReturn(1);
+        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING)).thenReturn(1);
+        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PENDING)).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
         Mockito.when(itemRequestService.getGfaLasService()).thenReturn(gfaLasService);
@@ -226,7 +226,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     public void testEddRequestItemwWithoutStatusAvailability() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
-        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
+        ResponseEntity res = new ResponseEntity(ScsbConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
         ItemInformationResponse itemResponseInformation = new ItemInformationResponse();
         itemResponseInformation.setSuccess(true);
@@ -235,7 +235,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = bibliographicEntity.getItemEntities().get(0);
         Mockito.when(itemRequestService.searchRecords(any())).thenReturn(searchResultRow);
         Mockito.when(itemRequestService.removeDiacritical(searchResultRow.getTitle().replaceAll("[^\\x00-\\x7F]", "?"))).thenReturn("Title Of the Book");
-        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING)).thenReturn(1);
+        Mockito.when(itemRequestService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING)).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(false);
         Mockito.when(itemDetailsRepository.findByBarcodeIn(itemRequestInfo.getItemBarcodes())).thenReturn(bibliographicEntity.getItemEntities());
@@ -248,7 +248,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     public void testEddRequestItemWithoutItemEntity() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
-        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
+        ResponseEntity res = new ResponseEntity(ScsbConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
         ItemInformationResponse itemResponseInformation = new ItemInformationResponse();
         itemResponseInformation.setSuccess(true);
@@ -262,7 +262,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     public void testEddRequestItemWithoutRequestId() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setTitle("Title Of the Book");
-        ResponseEntity res = new ResponseEntity(RecapConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
+        ResponseEntity res = new ResponseEntity(ScsbConstants.WRONG_ITEM_BARCODE, HttpStatus.CONTINUE);
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
         ItemInformationResponse itemResponseInformation = new ItemInformationResponse();
         itemResponseInformation.setSuccess(true);
@@ -329,9 +329,9 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     public void getPatronIdForOwningInstitutionOnEdd() {
         GenericPatronEntity genericPatronEntity = getGenericPatronEntity();
         Mockito.when(genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(any(), any())).thenReturn(genericPatronEntity);
-        itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(RecapCommonConstants.PRINCETON);
-        itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(RecapCommonConstants.COLUMBIA);
-        itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(RecapCommonConstants.NYPL);
+        itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(ScsbCommonConstants.PRINCETON);
+        itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(ScsbCommonConstants.COLUMBIA);
+        itemEDDRequestService.getPatronIdForOwningInstitutionOnEdd(ScsbCommonConstants.NYPL);
     }
 
     private GenericPatronEntity getGenericPatronEntity() {

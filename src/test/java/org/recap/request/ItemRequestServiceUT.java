@@ -11,8 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.AbstractProtocolConnector;
 import org.recap.ils.ILSProtocolConnectorFactory;
@@ -187,18 +187,18 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemHoldResponse.setSuccess(true);
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         Mockito.when(mockedRequestItemController.holdItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(mockedOwnerCodeDetailsRepository.findByOwnerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(ownerCodeEntity);
-        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
+        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(mockedItemDetailsRepository.findById(itemEntity.getId())).thenReturn(Optional.of(itemEntity));
         Mockito.doNothing().when(mockedItemRequestDBService).updateItemAvailabilityStatus(Arrays.asList(itemEntity), itemRequestInfo.getUsername());
-        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
+        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
         Mockito.when(mockedGfaLasService.isUseQueueLasCall(any())).thenReturn(true);
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
         ItemInformationResponse itemInformationResponse = mockedItemRequestService.requestItem(itemRequestInfo, exchange);
@@ -226,18 +226,18 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemHoldResponse.setSuccess(true);
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         Mockito.when(mockedRequestItemController.holdItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(mockedOwnerCodeDetailsRepository.findByOwnerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(ownerCodeEntity);
-        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
+        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(mockedItemDetailsRepository.findById(itemEntity.getId())).thenReturn(Optional.of(itemEntity));
         Mockito.doNothing().when(mockedItemRequestDBService).updateItemAvailabilityStatus(Arrays.asList(itemEntity), itemRequestInfo.getUsername());
-        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
+        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
         Mockito.when(mockedGfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemResponseInformation);
         Mockito.when(mockedGfaLasService.isUseQueueLasCall(any())).thenReturn(true);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(itemRequestInfo.getRequestingInstitution(), "use.generic.patron.retrieval.cross")).thenReturn(Boolean.TRUE.toString());
@@ -264,17 +264,17 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemHoldResponse.setSuccess(true);
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(mockedOwnerCodeDetailsRepository.findByOwnerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(ownerCodeEntity);
-        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
+        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(mockedItemDetailsRepository.findById(itemEntity.getId())).thenReturn(Optional.of(itemEntity));
         Mockito.doNothing().when(mockedItemRequestDBService).updateItemAvailabilityStatus(Arrays.asList(itemEntity), itemRequestInfo.getUsername());
-        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
+        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
         ItemInformationResponse itemInformationResponse = mockedItemRequestService.requestItem(itemRequestInfo, exchange);
         assertNotNull(itemInformationResponse);
@@ -318,21 +318,21 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemHoldResponse.setSuccess(true);
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         ItemInformationResponse itemInformationResponse = mockedItemRequestService.requestItem(itemRequestInfo, exchange);
         assertNotNull(itemInformationResponse);
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         Mockito.when(mockedOwnerCodeDetailsRepository.findByOwnerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(ownerCodeEntity);
-        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
+        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(mockedItemDetailsRepository.findById(itemEntity.getId())).thenReturn(Optional.of(itemEntity));
         Mockito.doNothing().when(mockedCommonUtil).rollbackUpdateItemAvailabilityStatus(itemEntity, itemRequestInfo.getUsername());
         ItemInformationResponse itemInformationResponse1 = mockedItemRequestService.requestItem(itemRequestInfo, exchange);
         assertNotNull(itemInformationResponse1);
-        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
+        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
         ItemInformationResponse itemInformationResponse2 = mockedItemRequestService.requestItem(itemRequestInfo, exchange);
         assertNotNull(itemInformationResponse2);
     }
@@ -358,16 +358,16 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemCreateBibResponse.setSuccess(false);
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(mockedRequestItemController.holdItem(any(), any())).thenReturn(itemHoldResponse);
-        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
+        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInfo, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
         Mockito.when(mockedItemDetailsRepository.findByBarcodeIn(any())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         Mockito.when(mockedOwnerCodeDetailsRepository.findByOwnerCode(itemRequestInfo.getDeliveryLocation())).thenReturn(ownerCodeEntity);
-        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
+        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(itemStatusEntity);
         Mockito.when(mockedItemDetailsRepository.findById(itemEntity.getId())).thenReturn(Optional.of(itemEntity));
         Mockito.when(mockedGfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemResponseInformation);
         ItemInformationResponse itemInformationResponse1 = mockedItemRequestService.requestItem(itemRequestInfo, exchange);
@@ -395,13 +395,13 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = requestItemEntity.getItemEntity();
         itemEntity.setItemAvailabilityStatusId(2);
         String itemBarcode = itemEntity.getBarcode();
-        List<String> requestItemStatusList = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
+        List<String> requestItemStatusList = Arrays.asList(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ScsbCommonConstants.REQUEST_STATUS_EDD, ScsbCommonConstants.REQUEST_STATUS_CANCELED, ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), anyString())).thenReturn("FALSE");
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes())).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Mockito.when(mockedGfaLasService.callGfaItemStatus(itemEntity.getBarcode())).thenReturn("REFILED SUCCESSFULLY");
-        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity);
+        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity);
         Mockito.doNothing().when(mockedItemRequestServiceUtil).updateSolrIndex(itemEntity);
         ItemRefileResponse response = mockedItemRequestService.reFileItem(itemRefileRequest, itemRefileResponse);
         assertNotNull(response);
@@ -419,12 +419,12 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = requestItemEntity.getItemEntity();
         itemEntity.setItemAvailabilityStatusId(2);
         String itemBarcode = itemEntity.getBarcode();
-        List<String> requestItemStatusList = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
+        List<String> requestItemStatusList = Arrays.asList(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ScsbCommonConstants.REQUEST_STATUS_EDD, ScsbCommonConstants.REQUEST_STATUS_CANCELED, ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), anyString())).thenReturn("FALSE");
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes())).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
-        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity);
+        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity);
         Mockito.doNothing().when(mockedItemRequestServiceUtil).updateSolrIndex(itemEntity);
         ItemRefileResponse response = mockedItemRequestService.reFileItem(itemRefileRequest, itemRefileResponse);
         assertNotNull(response);
@@ -446,14 +446,14 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemResponseInformation = new ItemInformationResponse();
         itemResponseInformation.setRequestTypeForScheduledOnWO(true);
         itemResponseInformation.setSuccess(true);
-        List<String> requestItemStatusList = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
+        List<String> requestItemStatusList = Arrays.asList(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ScsbCommonConstants.REQUEST_STATUS_EDD, ScsbCommonConstants.REQUEST_STATUS_CANCELED, ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(anyString(), anyString())).thenReturn("FALSE");
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes())).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Mockito.when(mockedGfaLasService.callGfaItemStatus(itemEntity.getBarcode())).thenReturn("REFILED SUCCESSFULLY");
         requestItemEntityRecalled.setRequestingInstitutionId(3);
-        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntityRecalled);
+        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntityRecalled);
         Mockito.when(mockedGfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemResponseInformation);
         ItemRefileResponse response = mockedItemRequestService.reFileItem(itemRefileRequest, itemRefileResponse);
         assertNotNull(response);
@@ -475,13 +475,13 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemResponseInformation = new ItemInformationResponse();
         itemResponseInformation.setRequestTypeForScheduledOnWO(true);
         itemResponseInformation.setSuccess(true);
-        List<String> requestItemStatusList = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
+        List<String> requestItemStatusList = Arrays.asList(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ScsbCommonConstants.REQUEST_STATUS_EDD, ScsbCommonConstants.REQUEST_STATUS_CANCELED, ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(anyString(), anyString())).thenReturn("FALSE");
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes())).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         requestItemEntityRecalled.setRequestingInstitutionId(3);
-        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntityRecalled);
+        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntityRecalled);
         Mockito.when(mockedGfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemResponseInformation);
         ItemRefileResponse response = mockedItemRequestService.reFileItem(itemRefileRequest, itemRefileResponse);
         assertNotNull(response);
@@ -510,16 +510,16 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
         itemRequestInfo.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
 
-        List<String> requestItemStatusList = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
+        List<String> requestItemStatusList = Arrays.asList(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ScsbCommonConstants.REQUEST_STATUS_EDD, ScsbCommonConstants.REQUEST_STATUS_CANCELED, ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
         Mockito.when(mockedRequestItemController.getIlsProtocolConnectorFactory()).thenReturn(ilsProtocolConnectorFactory);
         Mockito.when(mockedRequestItemController.getIlsProtocolConnectorFactory().getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes())).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_REFILED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Mockito.when(mockedGfaLasService.callGfaItemStatus(itemEntity.getBarcode())).thenReturn("REFILED SUCCESSFULLY");
         Mockito.when(genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(any(), any())).thenReturn(genericPatronEntity);
-        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(null);
+        Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(null);
         Mockito.doNothing().when(mockedItemRequestServiceUtil).updateSolrIndex(itemEntity);
         mockedItemRequestService.reFileItem(itemRefileRequest, itemRefileResponse);
     }
@@ -561,7 +561,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);
         ItemRequestInformation itemRequestInfo = getItemRequestInformation(requestItemEntity, itemEntity, itemBarcode);
         Mockito.when(mockedGfaLasService.callGfaItemStatus(itemEntity.getBarcode())).thenReturn("IN");
-        List<String> requestItemStatusList = Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_CANCELED, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
+        List<String> requestItemStatusList = Arrays.asList(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ScsbCommonConstants.REQUEST_STATUS_EDD, ScsbCommonConstants.REQUEST_STATUS_CANCELED, ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         Mockito.when(mockedCommonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), true)).thenReturn(Boolean.TRUE);
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(null);
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodes(itemRefileRequest.getItemBarcodes())).thenReturn(Arrays.asList(requestItemEntity));
@@ -570,9 +570,9 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         searchResultRow.setTitle("TEST");
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         Mockito.when(mockedGfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemResponseInformation);
@@ -625,51 +625,51 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         Exchange exchange = new DefaultExchange(ctx);
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.PRINCETON, RecapCommonConstants.REQUEST_TYPE_RETRIEVAL, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.PRINCETON, ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.COLUMBIA, RecapCommonConstants.REQUEST_TYPE_RETRIEVAL, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.COLUMBIA, ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.NYPL, RecapCommonConstants.REQUEST_TYPE_RETRIEVAL, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.NYPL, ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.PRINCETON, RecapCommonConstants.REQUEST_TYPE_EDD, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.PRINCETON, ScsbCommonConstants.REQUEST_TYPE_EDD, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.COLUMBIA, RecapCommonConstants.REQUEST_TYPE_EDD, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.COLUMBIA, ScsbCommonConstants.REQUEST_TYPE_EDD, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.NYPL, RecapCommonConstants.REQUEST_TYPE_EDD, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.NYPL, ScsbCommonConstants.REQUEST_TYPE_EDD, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.PRINCETON, RecapCommonConstants.REQUEST_TYPE_RECALL, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.PRINCETON, ScsbCommonConstants.REQUEST_TYPE_RECALL, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.COLUMBIA, RecapCommonConstants.REQUEST_TYPE_RECALL, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.COLUMBIA, ScsbCommonConstants.REQUEST_TYPE_RECALL, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.NYPL, RecapCommonConstants.REQUEST_TYPE_RECALL, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.NYPL, ScsbCommonConstants.REQUEST_TYPE_RECALL, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.PRINCETON, RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.PRINCETON, ScsbCommonConstants.REQUEST_TYPE_BORROW_DIRECT, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.COLUMBIA, RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.COLUMBIA, ScsbCommonConstants.REQUEST_TYPE_BORROW_DIRECT, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
         try {
-            mockedItemRequestService.sendMessageToTopic(RecapCommonConstants.NYPL, RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT, itemInformationResponse, exchange);
+            mockedItemRequestService.sendMessageToTopic(ScsbCommonConstants.NYPL, ScsbCommonConstants.REQUEST_TYPE_BORROW_DIRECT, itemInformationResponse, exchange);
         } catch (Exception e) {
         }
     }
@@ -757,7 +757,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
+        itemEntity.setCatalogingStatus(ScsbCommonConstants.COMPLETE_STATUS);
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         List<ItemEntity> list = new ArrayList<ItemEntity>();
         list.add(itemEntity);
@@ -777,7 +777,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         RequestItemEntity requestItemEntity = createRequestItem();
         Mockito.when(mockedGfaLasService.callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode())).thenReturn("Available");
-        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenThrow(new NullPointerException());
+        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.LAS_REFILE_REQUEST_PLACED)).thenThrow(new NullPointerException());
         ReflectionTestUtils.invokeMethod(mockedItemRequestService, "setRequestItemEntity", itemRequestInformation, requestItemEntity);
     }
 
@@ -1000,9 +1000,9 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ownerCodeEntity.setInstitutionId(1);
         ItemRecallResponse itemRecallResponse = getItemRecallResponse();
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn(itemInformationResponse.getCirculationStatus());
@@ -1014,7 +1014,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(mockedRequestItemController.recallItem(any(), any())).thenReturn(itemRecallResponse);
         ItemInformationResponse response = mockedItemRequestService.recallItem(itemRequestInformation, exchange);
         assertNotNull(response);
-        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
+        Mockito.when(mockedItemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING, null)).thenReturn(1);
         ItemInformationResponse response1 = mockedItemRequestService.recallItem(itemRequestInformation, exchange);
         assertNotNull(response1);
     }
@@ -1075,9 +1075,9 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemHoldResponse.setScreenMessage("Success");
         ItemCreateBibResponse itemCreateBibResponse = getItemCreateBibResponse();
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
@@ -1124,9 +1124,9 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemHoldResponse.setScreenMessage("Success");
         ItemCreateBibResponse itemCreateBibResponse = getItemCreateBibResponse();
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
 //        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), "use.generic.patron.retrieval.cross")).thenReturn(Boolean.TRUE.toString());
@@ -1169,8 +1169,8 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         RequestItemEntity requestItemEntity = createRequestItem();
         Map<String, String> result = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result);
-        Mockito.when(mockedRequestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(RecapConstants.REQUEST_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
-        Mockito.when(mockedGfaLasService.buildRequestInfoAndReplaceToLAS(any())).thenReturn(RecapCommonConstants.SUCCESS);
+        Mockito.when(mockedRequestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(ScsbConstants.REQUEST_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedGfaLasService.buildRequestInfoAndReplaceToLAS(any())).thenReturn(ScsbCommonConstants.SUCCESS);
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
@@ -1196,18 +1196,18 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapCommonConstants.REQUEST_IDS);
+        replaceRequest.setReplaceRequestByType(ScsbCommonConstants.REQUEST_IDS);
         replaceRequest.setRequestStatus("EXCEPTION");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
-        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(ScsbConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
         RequestTypeEntity requestTypeEntity = new RequestTypeEntity();
         requestTypeEntity.setRequestTypeCode("EDD");
         requestTypeEntity.setRequestTypeDesc("EDD");
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);
-        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(ScsbConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result2 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result2);
     }
@@ -1217,7 +1217,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapCommonConstants.REQUEST_IDS);
+        replaceRequest.setReplaceRequestByType(ScsbCommonConstants.REQUEST_IDS);
         replaceRequest.setRequestStatus("EXCEPTION");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
@@ -1226,7 +1226,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         requestTypeEntity.setRequestTypeDesc("RETRIEVAL");
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);
         ResponseEntity responseEntity = new ResponseEntity<>("All request parameters are valid.Patron is eligible to raise a request", HttpStatus.OK);
-        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(ScsbConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedGfaLasService.callGfaItemStatus(any())).thenReturn("IN");
         Mockito.when(mockedItemValidatorService.itemValidation(any())).thenReturn(responseEntity);
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
@@ -1238,7 +1238,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapCommonConstants.REQUEST_IDS);
+        replaceRequest.setReplaceRequestByType(ScsbCommonConstants.REQUEST_IDS);
         replaceRequest.setRequestStatus("EXCEPTION");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
@@ -1251,17 +1251,17 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = getItemEntity();
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         ResponseEntity responseEntity1 = new ResponseEntity<>("All request parameters are valid.Patron is eligible to raise a request", HttpStatus.OK);
         Mockito.when(mockedItemValidatorService.itemValidation(any())).thenReturn(responseEntity1);
-        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(ScsbConstants.REQUEST_STATUS_EXCEPTION))).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedGfaLasService.callGfaItemStatus(any())).thenReturn("OUT");
         Mockito.when(mockedRequestItemDetailsRepository.save(any())).thenReturn(requestItemEntity);
-        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
     }
@@ -1271,11 +1271,11 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapCommonConstants.REQUEST_IDS);
+        replaceRequest.setReplaceRequestByType(ScsbCommonConstants.REQUEST_IDS);
         replaceRequest.setRequestStatus("PENDING");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
-        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(RecapConstants.REQUEST_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(requestIds, Collections.singletonList(ScsbConstants.REQUEST_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
     }
@@ -1285,7 +1285,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapCommonConstants.REQUEST_IDS);
+        replaceRequest.setReplaceRequestByType(ScsbCommonConstants.REQUEST_IDS);
         replaceRequest.setRequestStatus("PLACED");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
@@ -1298,7 +1298,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapCommonConstants.REQUEST_IDS);
+        replaceRequest.setReplaceRequestByType(ScsbCommonConstants.REQUEST_IDS);
         replaceRequest.setRequestStatus("");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
@@ -1311,13 +1311,13 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapConstants.REQUEST_IDS_RANGE);
+        replaceRequest.setReplaceRequestByType(ScsbConstants.REQUEST_IDS_RANGE);
         replaceRequest.setRequestStatus("PENDING");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
         Integer startRequestId = Integer.valueOf(replaceRequest.getStartRequestId());
         Integer endRequestId = Integer.valueOf(replaceRequest.getEndRequestId());
-        Mockito.when(mockedRequestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, RecapConstants.REQUEST_STATUS_PENDING)).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, ScsbConstants.REQUEST_STATUS_PENDING)).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
     }
@@ -1327,13 +1327,13 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapConstants.REQUEST_IDS_RANGE);
+        replaceRequest.setReplaceRequestByType(ScsbConstants.REQUEST_IDS_RANGE);
         replaceRequest.setRequestStatus("EXCEPTION");
         List<Integer> requestIds = new ArrayList<>();
         requestIds.add(1);
         Integer startRequestId = Integer.valueOf(replaceRequest.getStartRequestId());
         Integer endRequestId = Integer.valueOf(replaceRequest.getEndRequestId());
-        Mockito.when(mockedRequestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, RecapConstants.REQUEST_STATUS_EXCEPTION)).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.getRequestsBasedOnRequestIdRangeAndRequestStatusCode(startRequestId, endRequestId, ScsbConstants.REQUEST_STATUS_EXCEPTION)).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
     }
@@ -1342,7 +1342,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
     public void replaceRequestsToLASQueueForRangeOfRequestIdsForOthers() {
         ReplaceRequest replaceRequest = getReplaceRequest();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapConstants.REQUEST_IDS_RANGE);
+        replaceRequest.setReplaceRequestByType(ScsbConstants.REQUEST_IDS_RANGE);
         replaceRequest.setRequestStatus("PLACED");
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
@@ -1352,7 +1352,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
     public void replaceRequestsToLASQueueForRangeOfRequestIdsForBlank() {
         ReplaceRequest replaceRequest = getReplaceRequest();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapConstants.REQUEST_IDS_RANGE);
+        replaceRequest.setReplaceRequestByType(ScsbConstants.REQUEST_IDS_RANGE);
         replaceRequest.setRequestStatus("");
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
@@ -1363,12 +1363,12 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapConstants.REQUEST_DATES_RANGE);
+        replaceRequest.setReplaceRequestByType(ScsbConstants.REQUEST_DATES_RANGE);
         replaceRequest.setRequestStatus("PENDING");
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(RecapConstants.DEFAULT_DATE_FORMAT);
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(ScsbConstants.DEFAULT_DATE_FORMAT);
         Date fromDate = dateFormatter.parse(replaceRequest.getFromDate());
         Date toDate = dateFormatter.parse(replaceRequest.getToDate());
-        Mockito.when(mockedRequestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, RecapConstants.REQUEST_STATUS_PENDING)).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, ScsbConstants.REQUEST_STATUS_PENDING)).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
     }
@@ -1378,9 +1378,9 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = getReplaceRequest();
         RequestItemEntity requestItemEntity = createRequestItem();
         replaceRequest.setRequestIds("1");
-        replaceRequest.setReplaceRequestByType(RecapConstants.REQUEST_DATES_RANGE);
+        replaceRequest.setReplaceRequestByType(ScsbConstants.REQUEST_DATES_RANGE);
         replaceRequest.setRequestStatus("EXCEPTION");
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(RecapConstants.DEFAULT_DATE_FORMAT);
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(ScsbConstants.DEFAULT_DATE_FORMAT);
         Date fromDate = dateFormatter.parse(replaceRequest.getFromDate());
         Date toDate = dateFormatter.parse(replaceRequest.getToDate());
         ItemEntity itemEntity = getItemEntity();
@@ -1392,14 +1392,14 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         ResponseEntity responseEntity1 = new ResponseEntity<>("All edd request parameters are valid.Patron is eligible to raise a request", HttpStatus.OK);
         Mockito.when(mockedItemValidatorService.itemValidation(any())).thenReturn(responseEntity1);
-        Mockito.when(mockedRequestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, RecapConstants.REQUEST_STATUS_EXCEPTION)).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.getRequestsBasedOnDateRangeAndRequestStatusCode(fromDate, toDate, ScsbConstants.REQUEST_STATUS_EXCEPTION)).thenReturn(Arrays.asList(requestItemEntity));
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);
     }
@@ -1434,9 +1434,9 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         searchResultRow.setTitle("test");
         HttpEntity requestEntity = new HttpEntity<>(restHeaderService.getHttpHeaders());
         ResponseEntity<List<SearchResultRow>> responseEntity = new ResponseEntity<List<SearchResultRow>>(Arrays.asList(searchResultRow), HttpStatus.OK);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.SEARCH_RECORDS_SOLR)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
-                .queryParam(RecapConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.SEARCH_RECORDS_SOLR)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME, ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_NAME_VALUE)
+                .queryParam(ScsbConstants.SEARCH_RECORDS_SOLR_PARAM_FIELD_VALUE, itemEntity.getBarcode());
         Mockito.when(restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<SearchResultRow>>() {
         })).thenReturn(responseEntity);
         ReflectionTestUtils.invokeMethod(mockedItemRequestService, "setItemRequestInfoForRequest", itemEntity, itemRequestInfo, requestItemEntity);
@@ -1511,7 +1511,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         Mockito.when(mockedRequestItemDetailsRepository.findById(itemRequestInfo.getRequestId())).thenReturn(Optional.of(requestItemEntity));
         Mockito.when(mockedGfaLasService.executeRetrieveOrder(itemRequestInfo, itemResponseInformation)).thenReturn(itemResponseInformation);
-        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_PENDING)).thenReturn(requestStatusEntity);
+        Mockito.when(mockedRequestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_PENDING)).thenReturn(requestStatusEntity);
         mockedItemRequestService.executeLasitemCheck(itemRequestInfo, itemResponseInformation);
     }
 
@@ -1532,7 +1532,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = getItemEntity();
         itemEntities.add(itemEntity);
         String username = "test";
-        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE)).thenReturn(itemEntities.get(0).getItemStatusEntity());
+        Mockito.when(mockedItemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(itemEntities.get(0).getItemStatusEntity());
         Mockito.when(mockedItemDetailsRepository.findById(itemEntity.getId())).thenReturn(Optional.of(itemEntity));
         boolean result = mockedItemRequestService.updateItemAvailabilityStatus(itemEntities, username);
 //        assertTrue(result);
@@ -1619,7 +1619,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
+        itemEntity.setCatalogingStatus(ScsbCommonConstants.COMPLETE_STATUS);
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));

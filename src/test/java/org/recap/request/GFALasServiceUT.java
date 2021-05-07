@@ -13,15 +13,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.las.AbstractLASImsLocationConnector;
 import org.recap.las.GFALasService;
 import org.recap.las.GFALasServiceUtil;
 import org.recap.las.LASImsLocationConnectorFactory;
 import org.recap.las.model.*;
-import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.gfa.Dsitem;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
 import org.recap.model.gfa.ScsbLasItemStatusCheckModel;
@@ -279,7 +278,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         RequestStatusEntity requestStatusEntity = getRequestItemEntity().getRequestStatusEntity();
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING)).thenReturn(requestStatusEntity);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING)).thenReturn(requestStatusEntity);
         Mockito.when(requestItemDetailsRepository.findRequestItemById(any())).thenReturn(getRequestItemEntity());
         ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
         assertNotNull(response);
@@ -456,7 +455,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
         Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(any())).thenReturn("test");
-        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(requestItemEntity.getRequestStatusEntity());
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.LAS_REFILE_REQUEST_PLACED)).thenReturn(requestItemEntity.getRequestStatusEntity());
         String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
         assertNotNull(result);
     }
@@ -703,7 +702,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
+        itemEntity.setCatalogingStatus(ScsbCommonConstants.COMPLETE_STATUS);
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);
         institutionEntity.setInstitutionCode("PUL");

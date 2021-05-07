@@ -10,7 +10,7 @@ import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.json.JSONObject;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -18,13 +18,13 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 @Slf4j
-public class CheckoutItem extends RecapNCIP {
+public class CheckoutItem extends ScsbNCIP {
 
     public CheckOutItemInitiationData getCheckOutItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String ncipAgencyId) {
         try {
             CheckOutItemInitiationData checkoutItemInitiationData = new CheckOutItemInitiationData();
             InitiationHeader initiationHeader = new InitiationHeader();
-            initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
+            initiationHeader = getInitiationHeaderwithoutScheme(initiationHeader, ScsbConstants.AGENCY_ID_SCSB, ncipAgencyId);
             UserId userid = new UserId();
             userid.setUserIdentifierValue(patronIdentifier);
             ItemId itemId = new ItemId();
@@ -66,9 +66,9 @@ public class CheckoutItem extends RecapNCIP {
             formatter.setCalendar(checkoutItemResponse.getDateDue());
             dueDateString = formatter.format(checkoutItemResponse.getDateDue().getTime());
         }
-        returnJson.put(RecapConstants.ITEM_BARCODE, checkoutItemResponse.getItemId().getItemIdentifierValue());
-        returnJson.put(RecapConstants.PATRON_IDENTIFIER, checkoutItemResponse.getUserId().getUserIdentifierValue());
-        returnJson.put(RecapConstants.DUE_DATE, dueDateString);
+        returnJson.put(ScsbConstants.ITEM_BARCODE, checkoutItemResponse.getItemId().getItemIdentifierValue());
+        returnJson.put(ScsbConstants.PATRON_IDENTIFIER, checkoutItemResponse.getUserId().getUserIdentifierValue());
+        returnJson.put(ScsbConstants.DUE_DATE, dueDateString);
         return returnJson;
     }
 }

@@ -3,8 +3,8 @@ package org.recap.service.deaccession;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemHoldResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -228,7 +228,7 @@ public class DeAccessionService {
         if (CollectionUtils.isNotEmpty(deAccessionRequest.getDeAccessionItems())) {
             Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
             List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
-            String username = StringUtils.isNotBlank(deAccessionRequest.getUsername()) ? deAccessionRequest.getUsername() : RecapConstants.DISCOVERY;
+            String username = StringUtils.isNotBlank(deAccessionRequest.getUsername()) ? deAccessionRequest.getUsername() : ScsbConstants.DISCOVERY;
             validateBarcodesWithUserName(deAccessionRequest, username, deAccessionDBResponseEntities, removeDeaccessionItemsList, resultMap);
             if (!deAccessionRequest.getDeAccessionItems().isEmpty()) {
                 checkGfaItemStatus(deAccessionRequest.getDeAccessionItems(), deAccessionDBResponseEntities, barcodeAndStopCodeMap);
@@ -241,11 +241,11 @@ public class DeAccessionService {
                 processAndSaveDeaccessionChangeLog(deAccessionRequest, username, deAccessionDBResponseEntities);
             } else {
                 for (DeAccessionItem deAccessionItem : removeDeaccessionItemsList) {
-                    resultMap.put(deAccessionItem.getItemBarcode(), RecapConstants.FAILURE_UPDATE_CGD);
+                    resultMap.put(deAccessionItem.getItemBarcode(), ScsbConstants.FAILURE_UPDATE_CGD);
                 }
             }
         } else {
-            resultMap.put("", RecapConstants.DEACCESSION_NO_BARCODE_ERROR);
+            resultMap.put("", ScsbConstants.DEACCESSION_NO_BARCODE_ERROR);
             return resultMap;
         }
         return resultMap;
@@ -262,7 +262,7 @@ public class DeAccessionService {
             List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeIn(itemBarcodesList);
             for (ItemEntity itemEntity : itemEntityList) {
                 if (!(institutionList.get(itemEntity.getOwningInstitutionId()).equalsIgnoreCase(institutionCodeUser))) {
-                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemEntity.getBarcode(), getDeliveryLcation(itemEntity.getBarcode(), deAccessionRequest, removeDeaccessionItems), RecapConstants.FAILURE_UPDATE_CGD, itemEntity));
+                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemEntity.getBarcode(), getDeliveryLcation(itemEntity.getBarcode(), deAccessionRequest, removeDeaccessionItems), ScsbConstants.FAILURE_UPDATE_CGD, itemEntity));
                 }
             }
             removeDeaccessionItems(removeDeaccessionItems, deAccessionRequest, removeDeaccessionItemsList, resultMap);
@@ -271,11 +271,11 @@ public class DeAccessionService {
 
     private Boolean validateUserRoles(List<String> userRoles) {
         for (String role : userRoles) {
-            if (role.equalsIgnoreCase(RecapConstants.ROLE_RECAP) || role.equalsIgnoreCase(RecapConstants.ROLE_SUPER_ADMIN)) {
-                return RecapConstants.BOOLEAN_TRUE;
+            if (role.equalsIgnoreCase(ScsbConstants.ROLE_RECAP) || role.equalsIgnoreCase(ScsbConstants.ROLE_SUPER_ADMIN)) {
+                return ScsbConstants.BOOLEAN_TRUE;
             }
         }
-        return RecapConstants.BOOLEAN_FALSE;
+        return ScsbConstants.BOOLEAN_FALSE;
     }
 
     private Map<Integer, String> mappingInstitution() {
@@ -298,10 +298,10 @@ public class DeAccessionService {
         Predicate<DeAccessionItem> removeItem = deAccessionItem -> {
             for (DeAccessionItem removeDeAccessionItem : removeDeaccessionItems) {
                 if (removeDeAccessionItem.getItemBarcode().equalsIgnoreCase(deAccessionItem.getItemBarcode())) {
-                    return RecapConstants.BOOLEAN_TRUE;
+                    return ScsbConstants.BOOLEAN_TRUE;
                 }
             }
-            return RecapConstants.BOOLEAN_FALSE;
+            return ScsbConstants.BOOLEAN_FALSE;
         };
         deAccessionRequest.getDeAccessionItems().removeIf(item -> removeItem.test(item));
         for (DeAccessionItem deAccessionItem : removeDeaccessionItems) {
@@ -317,9 +317,9 @@ public class DeAccessionService {
             List<Integer> holdingsIds = new ArrayList<>();
             List<Integer> itemIds = new ArrayList<>();
             for (DeAccessionDBResponseEntity deAccessionDBResponseEntity : deAccessionDBResponseEntities) {
-                if (deAccessionDBResponseEntity.getStatus().equalsIgnoreCase(RecapCommonConstants.FAILURE)
-                        && (deAccessionDBResponseEntity.getReasonForFailure().contains(RecapCommonConstants.LAS_REJECTED)
-                        || deAccessionDBResponseEntity.getReasonForFailure().contains(RecapCommonConstants.LAS_SERVER_NOT_REACHABLE))) {
+                if (deAccessionDBResponseEntity.getStatus().equalsIgnoreCase(ScsbCommonConstants.FAILURE)
+                        && (deAccessionDBResponseEntity.getReasonForFailure().contains(ScsbCommonConstants.LAS_REJECTED)
+                        || deAccessionDBResponseEntity.getReasonForFailure().contains(ScsbCommonConstants.LAS_SERVER_NOT_REACHABLE))) {
                     bibIds.addAll(deAccessionDBResponseEntity.getBibliographicIds());
                     holdingsIds.addAll(deAccessionDBResponseEntity.getHoldingIds());
                     itemIds.add(deAccessionDBResponseEntity.getItemId());
@@ -335,7 +335,7 @@ public class DeAccessionService {
             }
             if (CollectionUtils.isNotEmpty(itemIds)) {
                 itemDetailsRepository.markItemsAsNotDeleted(itemIds, username, currentDate);
-                saveDeAccessionItemChangeLogEntities(itemIds, username, RecapConstants.DEACCESSION_ROLLBACK, currentDate, RecapConstants.DEACCESSION_ROLLBACK_NOTES, itemIdAndMessageMap);
+                saveDeAccessionItemChangeLogEntities(itemIds, username, ScsbConstants.DEACCESSION_ROLLBACK, currentDate, ScsbConstants.DEACCESSION_ROLLBACK_NOTES, itemIdAndMessageMap);
             }
         }
     }
@@ -350,9 +350,9 @@ public class DeAccessionService {
                     if (CollectionUtils.isNotEmpty(itemEntities)) {
                         ItemEntity itemEntity = itemEntities.get(0);
                         if (itemEntity.isDeleted()) {
-                            deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), RecapCommonConstants.REQUESTED_ITEM_DEACCESSIONED, itemEntity));
+                            deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), ScsbCommonConstants.REQUESTED_ITEM_DEACCESSIONED, itemEntity));
                         } else if (!itemEntity.isComplete()) {
-                            deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), RecapCommonConstants.ITEM_BARCDE_DOESNOT_EXIST, itemEntity));
+                            deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), ScsbCommonConstants.ITEM_BARCDE_DOESNOT_EXIST, itemEntity));
                         } else {
                             String scsbItemStatus = itemEntity.getItemStatusEntity().getStatusCode();
                             String recapAssistanceEmailTo = getRecapAssistanceEmailTo(itemEntity.getImsLocationEntity().getImsLocationCode());
@@ -363,26 +363,26 @@ public class DeAccessionService {
                                 gfaItemStatus = gfaItemStatus.toUpperCase();
                                 gfaItemStatus = gfaItemStatus.contains(":") ? gfaItemStatus.substring(0, gfaItemStatus.indexOf(':') + 1) : gfaItemStatus;
                                 logger.info("GFA Item Status after trimming : {}", gfaItemStatus);
-                                if ((StringUtils.isNotBlank(gfaItemStatus) && RecapConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.equals(gfaItemStatus))) {
+                                if ((StringUtils.isNotBlank(gfaItemStatus) && ScsbConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.equals(gfaItemStatus))) {
                                     deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), "Cannot Deaccession as Item is awaiting for Refile.Please try again later or contact ReCAP staff for further assistance.", itemEntity));
                                 }
-                                else if ((StringUtils.isNotBlank(gfaItemStatus) && !RecapConstants.GFA_STATUS_NOT_ON_FILE.equalsIgnoreCase(gfaItemStatus))
-                                        && ((RecapCommonConstants.AVAILABLE.equals(scsbItemStatus) && commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus, true))
-                                        || (RecapCommonConstants.NOT_AVAILABLE.equals(scsbItemStatus) && commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus, false)))) {
+                                else if ((StringUtils.isNotBlank(gfaItemStatus) && !ScsbConstants.GFA_STATUS_NOT_ON_FILE.equalsIgnoreCase(gfaItemStatus))
+                                        && ((ScsbCommonConstants.AVAILABLE.equals(scsbItemStatus) && commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus, true))
+                                        || (ScsbCommonConstants.NOT_AVAILABLE.equals(scsbItemStatus) && commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus, false)))) {
                                     barcodeAndStopCodeMap.put(itemBarcode.trim(), deAccessionItem.getDeliveryLocation());
                                 } else {
-                                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), MessageFormat.format(RecapConstants.GFA_ITEM_STATUS_MISMATCH, recapAssistanceEmailTo, recapAssistanceEmailTo), itemEntity));
+                                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), MessageFormat.format(ScsbConstants.GFA_ITEM_STATUS_MISMATCH, recapAssistanceEmailTo, recapAssistanceEmailTo), itemEntity));
                                 }
 
                             } else {
-                                deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), MessageFormat.format(RecapConstants.GFA_SERVER_DOWN, recapAssistanceEmailTo, recapAssistanceEmailTo), itemEntity));
+                                deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), MessageFormat.format(ScsbConstants.GFA_SERVER_DOWN, recapAssistanceEmailTo, recapAssistanceEmailTo), itemEntity));
                             }
                         }
                     } else {
-                        deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), RecapCommonConstants.ITEM_BARCDE_DOESNOT_EXIST, null));
+                        deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), ScsbCommonConstants.ITEM_BARCDE_DOESNOT_EXIST, null));
                     }
                 } else {
-                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), RecapConstants.DEACCESSION_NO_BARCODE_PROVIDED_ERROR, null));
+                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), ScsbConstants.DEACCESSION_NO_BARCODE_PROVIDED_ERROR, null));
                 }
             }
         } catch (Exception e) {
@@ -401,7 +401,7 @@ public class DeAccessionService {
                         logger.info("Exception occurred while pulling recap assistance email to: {}", e.getMessage());
                     }
                 }
-                if (RecapCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && RecapCommonConstants.AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
+                if (ScsbCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && ScsbCommonConstants.AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
                     GFAPwdRequest gfaPwdRequest = new GFAPwdRequest();
                     GFAPwdDsItemRequest gfaPwdDsItemRequest = new GFAPwdDsItemRequest();
                     GFAPwdTtItemRequest gfaPwdTtItemRequest = new GFAPwdTtItemRequest();
@@ -431,16 +431,16 @@ public class DeAccessionService {
                                 String errorCode = (String) gfaPwdTtItemResponse.getErrorCode();
                                 String errorNote = (String) gfaPwdTtItemResponse.getErrorNote();
                                 if (StringUtils.isNotBlank(errorCode) || StringUtils.isNotBlank(errorNote)) {
-                                    deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
-                                    deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(RecapConstants.LAS_DEACCESSION_REJECT_ERROR, RecapConstants.REQUEST_TYPE_PW_DIRECT, errorCode, errorNote));
+                                    deAccessionDBResponseEntity.setStatus(ScsbCommonConstants.FAILURE);
+                                    deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(ScsbConstants.LAS_DEACCESSION_REJECT_ERROR, ScsbConstants.REQUEST_TYPE_PW_DIRECT, errorCode, errorNote));
                                 }
                             }
                         }
                     } else {
-                        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
-                        deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(RecapConstants.LAS_SERVER_NOT_REACHABLE_ERROR, recapAssistanceEmailTo, recapAssistanceEmailTo));
+                        deAccessionDBResponseEntity.setStatus(ScsbCommonConstants.FAILURE);
+                        deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(ScsbConstants.LAS_SERVER_NOT_REACHABLE_ERROR, recapAssistanceEmailTo, recapAssistanceEmailTo));
                     }
-                } else if (RecapCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && RecapCommonConstants.NOT_AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
+                } else if (ScsbCommonConstants.SUCCESS.equalsIgnoreCase(deAccessionDBResponseEntity.getStatus()) && ScsbCommonConstants.NOT_AVAILABLE.equalsIgnoreCase(deAccessionDBResponseEntity.getItemStatus())) {
                     GFAPwiRequest gfaPwiRequest = new GFAPwiRequest();
                     GFAPwiDsItemRequest gfaPwiDsItemRequest = new GFAPwiDsItemRequest();
                     GFAPwiTtItemRequest gfaPwiTtItemRequest = new GFAPwiTtItemRequest();
@@ -458,14 +458,14 @@ public class DeAccessionService {
                                 String errorCode = gfaPwiTtItemResponse.getErrorCode();
                                 String errorNote = gfaPwiTtItemResponse.getErrorNote();
                                 if (StringUtils.isNotBlank(errorCode) || StringUtils.isNotBlank(errorNote)) {
-                                    deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
-                                    deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(RecapConstants.LAS_DEACCESSION_REJECT_ERROR, RecapConstants.REQUEST_TYPE_PW_INDIRECT, errorCode, errorNote));
+                                    deAccessionDBResponseEntity.setStatus(ScsbCommonConstants.FAILURE);
+                                    deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(ScsbConstants.LAS_DEACCESSION_REJECT_ERROR, ScsbConstants.REQUEST_TYPE_PW_INDIRECT, errorCode, errorNote));
                                 }
                             }
                         }
                     } else {
-                        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
-                        deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(RecapConstants.LAS_SERVER_NOT_REACHABLE_ERROR, recapAssistanceEmailTo, recapAssistanceEmailTo));
+                        deAccessionDBResponseEntity.setStatus(ScsbCommonConstants.FAILURE);
+                        deAccessionDBResponseEntity.setReasonForFailure(MessageFormat.format(ScsbConstants.LAS_SERVER_NOT_REACHABLE_ERROR, recapAssistanceEmailTo, recapAssistanceEmailTo));
                     }
                 }
             }
@@ -492,15 +492,15 @@ public class DeAccessionService {
                         RequestItemEntity activeRecallRequest = null;
                         RequestItemEntity initialLoadRequest = null;
                         for (RequestItemEntity requestItemEntity : requestItemEntities) { // Get active retrieval and recall requests.
-                            boolean isRequestTypeRetreivalAndFirstScan = RecapCommonConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && RecapConstants.LAS_REFILE_REQUEST_PLACED.equalsIgnoreCase(requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
-                            boolean isRequestTypeRecallAndFirstScan = RecapCommonConstants.REQUEST_TYPE_RECALL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && RecapConstants.LAS_REFILE_REQUEST_PLACED.equalsIgnoreCase(requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
-                            if ((RecapCommonConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) || isRequestTypeRetreivalAndFirstScan) {
+                            boolean isRequestTypeRetreivalAndFirstScan = ScsbCommonConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ScsbConstants.LAS_REFILE_REQUEST_PLACED.equalsIgnoreCase(requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
+                            boolean isRequestTypeRecallAndFirstScan = ScsbCommonConstants.REQUEST_TYPE_RECALL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ScsbConstants.LAS_REFILE_REQUEST_PLACED.equalsIgnoreCase(requestItemEntity.getRequestStatusEntity().getRequestStatusCode());
+                            if ((ScsbCommonConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) || isRequestTypeRetreivalAndFirstScan) {
                                 activeRetrievalRequest = requestItemEntity;
                             }
-                            if ((RecapCommonConstants.REQUEST_TYPE_RECALL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && RecapCommonConstants.REQUEST_STATUS_RECALLED.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) || isRequestTypeRecallAndFirstScan) {
+                            if ((ScsbCommonConstants.REQUEST_TYPE_RECALL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ScsbCommonConstants.REQUEST_STATUS_RECALLED.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) || isRequestTypeRecallAndFirstScan) {
                                 activeRecallRequest = requestItemEntity;
                             }
-                            if (RecapCommonConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) {
+                            if (ScsbCommonConstants.RETRIEVAL.equals(requestItemEntity.getRequestTypeEntity().getRequestTypeCode()) && ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD.equals(requestItemEntity.getRequestStatusEntity().getRequestStatusCode())) {
                                 initialLoadRequest = requestItemEntity;
                             }
                         }
@@ -516,7 +516,7 @@ public class DeAccessionService {
                                 if (cancelRecallResponse.isSuccess()) {
                                     barcodeAndStopCodeMap.put(itemBarcode, deliveryLocation);
                                 } else {
-                                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, RecapConstants.REASON_CANCEL_REQUEST_FAILED + " - " + cancelRecallResponse.getScreenMessage(), null));
+                                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, ScsbConstants.REASON_CANCEL_REQUEST_FAILED + " - " + cancelRecallResponse.getScreenMessage(), null));
                                 }
                             } else { // If retrieval order institution and recall order institution are different, cancel retrieval request and recall request.
                                 ItemInformationResponse itemInformationResponse = getItemInformation(activeRetrievalRequest);
@@ -527,10 +527,10 @@ public class DeAccessionService {
                                         if (cancelRecallResponse.isSuccess()) {
                                             barcodeAndStopCodeMap.put(itemBarcode, deliveryLocation);
                                         } else {
-                                            deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, RecapConstants.REASON_CANCEL_REQUEST_FAILED + " - " + cancelRecallResponse.getScreenMessage(), null));
+                                            deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, ScsbConstants.REASON_CANCEL_REQUEST_FAILED + " - " + cancelRecallResponse.getScreenMessage(), null));
                                         }
                                     } else {
-                                        deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, RecapConstants.REASON_CANCEL_REQUEST_FAILED + " - " + cancelRetrievalResponse.getScreenMessage(), null));
+                                        deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, ScsbConstants.REASON_CANCEL_REQUEST_FAILED + " - " + cancelRetrievalResponse.getScreenMessage(), null));
                                     }
                                 } else {
                                     barcodeAndStopCodeMap.put(itemBarcode, deliveryLocation);
@@ -543,7 +543,7 @@ public class DeAccessionService {
                                 if (cancelRetrievalResponse.isSuccess()) {
                                     barcodeAndStopCodeMap.put(itemBarcode, deliveryLocation);
                                 } else {
-                                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, RecapConstants.REASON_CANCEL_REQUEST_FAILED + " - " + cancelRetrievalResponse.getScreenMessage(), null));
+                                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, ScsbConstants.REASON_CANCEL_REQUEST_FAILED + " - " + cancelRetrievalResponse.getScreenMessage(), null));
                                 }
                             } else {
                                 barcodeAndStopCodeMap.put(itemBarcode, deliveryLocation);
@@ -557,7 +557,7 @@ public class DeAccessionService {
                         barcodeAndStopCodeMap.put(itemBarcode, deliveryLocation);
                     }
                 } catch (Exception e) {
-                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, RecapCommonConstants.FAILURE + " - " + e, null));
+                    deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deliveryLocation, ScsbCommonConstants.FAILURE + " - " + e, null));
                     logger.error(EXCEPTION_CONSTANT, e);
                 }
             }
@@ -601,7 +601,7 @@ public class DeAccessionService {
         if (itemCancelHoldResponse.isSuccess()) {
             updateRequestAsCanceled(requestItemEntity, username);
             itemCancelHoldResponse.setSuccess(true);
-            itemCancelHoldResponse.setScreenMessage(RecapConstants.REQUEST_CANCELLATION_SUCCCESS);
+            itemCancelHoldResponse.setScreenMessage(ScsbConstants.REQUEST_CANCELLATION_SUCCCESS);
         }
         return itemCancelHoldResponse;
     }
@@ -613,15 +613,15 @@ public class DeAccessionService {
      * @param username
      */
     private void updateRequestAsCanceled(RequestItemEntity requestItemEntity, String username) {
-        RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_CANCELED);
+        RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_CANCELED);
         requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
         requestItemEntity.setLastUpdatedDate(new Date());
         requestItemEntity.getItemEntity().setItemAvailabilityStatusId(2);
         String requestNotes = requestItemEntity.getNotes();
-        requestNotes = requestNotes + "\n" + "SCSB : " + RecapConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION;
+        requestNotes = requestNotes + "\n" + "SCSB : " + ScsbConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION;
         requestItemEntity.setNotes(requestNotes);
         RequestItemEntity savedRequestItemEntity = requestItemDetailsRepository.save(requestItemEntity);
-        saveDeAccessionItemChangeLogEntity(savedRequestItemEntity.getId(), username, RecapConstants.REQUEST_ITEM_CANCEL_DEACCESSION_ITEM, RecapConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION + savedRequestItemEntity.getItemId());
+        saveDeAccessionItemChangeLogEntity(savedRequestItemEntity.getId(), username, ScsbConstants.REQUEST_ITEM_CANCEL_DEACCESSION_ITEM, ScsbConstants.REQUEST_ITEM_CANCELED_FOR_DEACCESSION + savedRequestItemEntity.getItemId());
         itemRequestServiceUtil.updateSolrIndex(savedRequestItemEntity.getItemEntity());
     }
 
@@ -685,13 +685,13 @@ public class DeAccessionService {
                     deAccessionDBResponseEntity = prepareSuccessResponse(barcode, deliveryLocation, itemEntity, holdingsIds, bibliographicIds);
                     deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
                 } catch (Exception ex) {
-                    logger.error(RecapCommonConstants.LOG_ERROR, ex);
+                    logger.error(ScsbCommonConstants.LOG_ERROR, ex);
                     deAccessionDBResponseEntity = prepareFailureResponse(barcode, deliveryLocation, "Exception" + ex, null);
                     deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
                 }
             }
         } catch (Exception ex) {
-            logger.error(RecapCommonConstants.LOG_ERROR, ex);
+            logger.error(ScsbCommonConstants.LOG_ERROR, ex);
         }
     }
 
@@ -728,14 +728,14 @@ public class DeAccessionService {
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 
         ReportEntity reportEntity = new ReportEntity();
-        reportEntity.setFileName(RecapCommonConstants.DEACCESSION_REPORT);
-        reportEntity.setType(RecapCommonConstants.DEACCESSION_SUMMARY_REPORT);
+        reportEntity.setFileName(ScsbCommonConstants.DEACCESSION_REPORT);
+        reportEntity.setType(ScsbCommonConstants.DEACCESSION_SUMMARY_REPORT);
         reportEntity.setCreatedDate(new Date());
 
         List<ReportDataEntity> reportDataEntities = new ArrayList<>();
 
         ReportDataEntity dateReportDataEntity = new ReportDataEntity();
-        dateReportDataEntity.setHeaderName(RecapCommonConstants.DATE_OF_DEACCESSION);
+        dateReportDataEntity.setHeaderName(ScsbCommonConstants.DATE_OF_DEACCESSION);
         dateReportDataEntity.setHeaderValue(formatter.format(new Date()));
         reportDataEntities.add(dateReportDataEntity);
 
@@ -743,7 +743,7 @@ public class DeAccessionService {
             reportEntity.setInstitutionName(deAccessionDBResponseEntity.getInstitutionCode());
 
             ReportDataEntity owningInstitutionReportDataEntity = new ReportDataEntity();
-            owningInstitutionReportDataEntity.setHeaderName(RecapCommonConstants.OWNING_INSTITUTION);
+            owningInstitutionReportDataEntity.setHeaderName(ScsbCommonConstants.OWNING_INSTITUTION);
             owningInstitutionReportDataEntity.setHeaderValue(deAccessionDBResponseEntity.getInstitutionCode());
             reportDataEntities.add(owningInstitutionReportDataEntity);
         } else {
@@ -751,32 +751,32 @@ public class DeAccessionService {
         }
 
         ReportDataEntity barcodeReportDataEntity = new ReportDataEntity();
-        barcodeReportDataEntity.setHeaderName(RecapCommonConstants.BARCODE);
+        barcodeReportDataEntity.setHeaderName(ScsbCommonConstants.BARCODE);
         barcodeReportDataEntity.setHeaderValue(deAccessionDBResponseEntity.getBarcode());
         reportDataEntities.add(barcodeReportDataEntity);
 
         if (!org.springframework.util.StringUtils.isEmpty(owningInstitutionBibId)) {
             ReportDataEntity owningInstitutionBibIdReportDataEntity = new ReportDataEntity();
-            owningInstitutionBibIdReportDataEntity.setHeaderName(RecapCommonConstants.OWNING_INST_BIB_ID);
+            owningInstitutionBibIdReportDataEntity.setHeaderName(ScsbCommonConstants.OWNING_INST_BIB_ID);
             owningInstitutionBibIdReportDataEntity.setHeaderValue(owningInstitutionBibId);
             reportDataEntities.add(owningInstitutionBibIdReportDataEntity);
         }
 
         if (!org.springframework.util.StringUtils.isEmpty(deAccessionDBResponseEntity.getCollectionGroupCode())) {
             ReportDataEntity collectionGroupCodeReportDataEntity = new ReportDataEntity();
-            collectionGroupCodeReportDataEntity.setHeaderName(RecapCommonConstants.COLLECTION_GROUP_CODE);
+            collectionGroupCodeReportDataEntity.setHeaderName(ScsbCommonConstants.COLLECTION_GROUP_CODE);
             collectionGroupCodeReportDataEntity.setHeaderValue(deAccessionDBResponseEntity.getCollectionGroupCode());
             reportDataEntities.add(collectionGroupCodeReportDataEntity);
         }
 
         ReportDataEntity statusReportDataEntity = new ReportDataEntity();
-        statusReportDataEntity.setHeaderName(RecapCommonConstants.STATUS);
+        statusReportDataEntity.setHeaderName(ScsbCommonConstants.STATUS);
         statusReportDataEntity.setHeaderValue(deAccessionDBResponseEntity.getStatus());
         reportDataEntities.add(statusReportDataEntity);
 
         if (!org.springframework.util.StringUtils.isEmpty(deAccessionDBResponseEntity.getReasonForFailure())) {
             ReportDataEntity reasonForFailureReportDataEntity = new ReportDataEntity();
-            reasonForFailureReportDataEntity.setHeaderName(RecapCommonConstants.REASON_FOR_FAILURE);
+            reasonForFailureReportDataEntity.setHeaderName(ScsbCommonConstants.REASON_FOR_FAILURE);
             reasonForFailureReportDataEntity.setHeaderValue(deAccessionDBResponseEntity.getReasonForFailure());
             reportDataEntities.add(reasonForFailureReportDataEntity);
         }
@@ -789,7 +789,7 @@ public class DeAccessionService {
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
         deAccessionDBResponseEntity.setBarcode(itemBarcode);
         deAccessionDBResponseEntity.setDeliveryLocation(deliveryLocation);
-        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.SUCCESS);
+        deAccessionDBResponseEntity.setStatus(ScsbCommonConstants.SUCCESS);
         populateDeAccessionDBResponseEntity(itemEntity, deAccessionDBResponseEntity);
         deAccessionDBResponseEntity.setHoldingIds(holdingIds);
         deAccessionDBResponseEntity.setBibliographicIds(bibliographicIds);
@@ -800,13 +800,13 @@ public class DeAccessionService {
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
         deAccessionDBResponseEntity.setBarcode(itemBarcode);
         deAccessionDBResponseEntity.setDeliveryLocation(deliveryLocation);
-        deAccessionDBResponseEntity.setStatus(RecapCommonConstants.FAILURE);
+        deAccessionDBResponseEntity.setStatus(ScsbCommonConstants.FAILURE);
         deAccessionDBResponseEntity.setReasonForFailure(reasonForFailure);
         if (itemEntity != null) {
             try {
                 populateDeAccessionDBResponseEntity(itemEntity, deAccessionDBResponseEntity);
             } catch (JSONException e) {
-                logger.error(RecapCommonConstants.LOG_ERROR, e);
+                logger.error(ScsbCommonConstants.LOG_ERROR, e);
             }
         }
         return deAccessionDBResponseEntity;
@@ -884,9 +884,9 @@ public class DeAccessionService {
                 List<Integer> holdingsIds = new ArrayList<>();
                 List<Integer> itemIds = new ArrayList<>();
                 for (DeAccessionDBResponseEntity deAccessionDBResponseEntity : deAccessionDBResponseEntities) {
-                    if (deAccessionDBResponseEntity.getStatus().equalsIgnoreCase(RecapCommonConstants.FAILURE)) {
+                    if (deAccessionDBResponseEntity.getStatus().equalsIgnoreCase(ScsbCommonConstants.FAILURE)) {
                         resultMap.put(deAccessionDBResponseEntity.getBarcode(), deAccessionDBResponseEntity.getStatus() + " - " + deAccessionDBResponseEntity.getReasonForFailure());
-                    } else if (deAccessionDBResponseEntity.getStatus().equalsIgnoreCase(RecapCommonConstants.SUCCESS)) {
+                    } else if (deAccessionDBResponseEntity.getStatus().equalsIgnoreCase(ScsbCommonConstants.SUCCESS)) {
                         resultMap.put(deAccessionDBResponseEntity.getBarcode(), deAccessionDBResponseEntity.getStatus());
                         bibIds.addAll(deAccessionDBResponseEntity.getBibliographicIds());
                         holdingsIds.addAll(deAccessionDBResponseEntity.getHoldingIds());
@@ -894,7 +894,7 @@ public class DeAccessionService {
                     }
                 }
                 if (CollectionUtils.isNotEmpty(bibIds) || CollectionUtils.isNotEmpty(holdingsIds) || CollectionUtils.isNotEmpty(itemIds)) {
-                    String deAccessionSolrClientUrl = scsbSolrClientUrl + RecapConstants.DEACCESSION_IN_SOLR_URL;
+                    String deAccessionSolrClientUrl = scsbSolrClientUrl + ScsbConstants.DEACCESSION_IN_SOLR_URL;
                     DeAccessionSolrRequest deAccessionSolrRequest = new DeAccessionSolrRequest();
                     deAccessionSolrRequest.setBibIds(bibIds);
                     deAccessionSolrRequest.setHoldingsIds(holdingsIds);
@@ -914,11 +914,11 @@ public class DeAccessionService {
     private void processAndSaveDeaccessionChangeLog(DeAccessionRequest deAccessionRequest, String userName, List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities) {
         if (CollectionUtils.isNotEmpty(deAccessionDBResponseEntities)) {
             for (DeAccessionDBResponseEntity deAccessionItem : deAccessionDBResponseEntities) {
-                if (deAccessionItem.getStatus().contains(RecapCommonConstants.SUCCESS)) {
+                if (deAccessionItem.getStatus().contains(ScsbCommonConstants.SUCCESS)) {
                     DeaccessionItemChangeLog itemChangeLogEntity = new DeaccessionItemChangeLog();
                     itemChangeLogEntity.setUpdatedBy(userName);
                     itemChangeLogEntity.setCreatedDate(new Date());
-                    itemChangeLogEntity.setOperationType(RecapCommonConstants.DEACCESSION);
+                    itemChangeLogEntity.setOperationType(ScsbCommonConstants.DEACCESSION);
                     itemChangeLogEntity.setRecordId(deAccessionItem.getItemId());
                     String notes = deAccessionRequest.getNotes() != null ? deAccessionRequest.getNotes() : "";
                     itemChangeLogEntity.setNotes(notes);

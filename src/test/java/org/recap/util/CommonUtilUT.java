@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -96,7 +96,7 @@ public class CommonUtilUT extends BaseTestCaseUT {
     public void rollbackUpdateItemAvailabilityStatus() {
         ItemEntity itemEntity = getBibliographicEntity().getItemEntities().get(0);
         String userName = "Test";
-        Mockito.when(itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.AVAILABLE)).thenReturn(getItemStatusEntity());
+        Mockito.when(itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.AVAILABLE)).thenReturn(getItemStatusEntity());
         commonUtil.rollbackUpdateItemAvailabilityStatus(itemEntity, userName);
     }
 

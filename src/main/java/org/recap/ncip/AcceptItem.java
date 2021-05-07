@@ -17,7 +17,7 @@ import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestedActionType;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.json.JSONObject;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -27,7 +27,7 @@ import java.util.HashMap;
 @Slf4j
 @Getter
 @Setter
-public class AcceptItem extends RecapNCIP {
+public class AcceptItem extends ScsbNCIP {
 
     private String requestIdString;
     private String useridString;
@@ -40,8 +40,8 @@ public class AcceptItem extends RecapNCIP {
     private HashMap<String, HashMap<String, String>> itemOptionalFields = new HashMap<>();
 
     public AcceptItem() {
-        itemOptionalFields.put(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION, new HashMap<>());
-        itemOptionalFields.put(RecapConstants.ITEM_DESCRIPTION, new HashMap<>());
+        itemOptionalFields.put(ScsbConstants.BIBLIOGRAPHIC_DESCRIPTION, new HashMap<>());
+        itemOptionalFields.put(ScsbConstants.ITEM_DESCRIPTION, new HashMap<>());
     }
 
     public AcceptItem setRequestActionType(String action) {
@@ -75,12 +75,12 @@ public class AcceptItem extends RecapNCIP {
     }
 
     public AcceptItem addBibliographicDescription(String bibliographicDescriptionType, String value) {
-        itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(bibliographicDescriptionType, value);
+        itemOptionalFields.get(ScsbConstants.BIBLIOGRAPHIC_DESCRIPTION).put(bibliographicDescriptionType, value);
         return this;
     }
 
     public AcceptItem addItemDescription(String itemDescriptionType, String value) {
-        itemOptionalFields.get(RecapConstants.ITEM_DESCRIPTION).put(itemDescriptionType, value);
+        itemOptionalFields.get(ScsbConstants.ITEM_DESCRIPTION).put(itemDescriptionType, value);
         return this;
     }
 
@@ -101,55 +101,55 @@ public class AcceptItem extends RecapNCIP {
 
     // Convenience methods
     public AcceptItem setTitle(String title) {
-        return setInfo(RecapConstants.TITLE, title);
+        return setInfo(ScsbConstants.TITLE, title);
     }
 
     public AcceptItem setAuthor(String author) {
-        return setInfo(RecapConstants.AUTHOR, author);
+        return setInfo(ScsbConstants.AUTHOR, author);
     }
 
     public AcceptItem setPublisher(String publisher) {
-        return setInfo(RecapConstants.PUBLISHER, publisher);
+        return setInfo(ScsbConstants.PUBLISHER, publisher);
     }
 
     public AcceptItem setPublicationDate(String pubDate) {
-        return setInfo(RecapConstants.PUBLICATION_DATE, pubDate);
+        return setInfo(ScsbConstants.PUBLICATION_DATE, pubDate);
     }
 
     private AcceptItem setInfo(String var, String info) {
-        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(var, info);
+        this.itemOptionalFields.get(ScsbConstants.BIBLIOGRAPHIC_DESCRIPTION).put(var, info);
         return this;
     }
 
     public AcceptItem setIsbn(String isbn) {
-        return setInfo(RecapConstants.ISBN, isbn);
+        return setInfo(ScsbConstants.ISBN, isbn);
     }
 
     public AcceptItem setIssn(String issn) {
-        return setInfo(RecapConstants.ISSN, issn);
+        return setInfo(ScsbConstants.ISSN, issn);
     }
 
     public AcceptItem setCallNumber(String callNumber) {
-        this.itemOptionalFields.get(RecapConstants.ITEM_DESCRIPTION).put(RecapConstants.CALL_NUMBER, callNumber);
+        this.itemOptionalFields.get(ScsbConstants.ITEM_DESCRIPTION).put(ScsbConstants.CALL_NUMBER, callNumber);
         return this;
     }
 
     public String getAuthor() {
-        return this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).get(RecapConstants.AUTHOR);
+        return this.itemOptionalFields.get(ScsbConstants.BIBLIOGRAPHIC_DESCRIPTION).get(ScsbConstants.AUTHOR);
     }
 
     public String getTitle() {
-        return this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).get(RecapConstants.TITLE);
+        return this.itemOptionalFields.get(ScsbConstants.BIBLIOGRAPHIC_DESCRIPTION).get(ScsbConstants.TITLE);
     }
 
     public String getCallNo() {
-        return this.itemOptionalFields.get(RecapConstants.ITEM_DESCRIPTION).get(RecapConstants.CALL_NUMBER);
+        return this.itemOptionalFields.get(ScsbConstants.ITEM_DESCRIPTION).get(ScsbConstants.CALL_NUMBER);
     }
 
     public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String title, String author, String itemPickupLocation, String callNumber, String ncipAgencyId, String ncipScheme)  {
         AcceptItemInitiationData acceptItemInitationData = new AcceptItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
-        initiationHeader = getInitiationHeaderwithScheme(initiationHeader, ncipScheme, RecapConstants.AGENCY_ID_SCSB, ncipAgencyId);
+        initiationHeader = getInitiationHeaderwithScheme(initiationHeader, ncipScheme, ScsbConstants.AGENCY_ID_SCSB, ncipAgencyId);
         acceptItemInitationData.setInitiationHeader(initiationHeader);
         RequestId requestIdentifier = new RequestId();
         if(requestId != null) {

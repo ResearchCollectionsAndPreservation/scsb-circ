@@ -2,7 +2,7 @@ package org.recap.camel.requestinitialdataload;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class RequestDataLoadEmailService {
     public void processInput(Exchange exchange) {
         logger.info("ReqeustDataLoad EMailservice started for {}", institutionCode);
         String fileNameWithPath = (String)exchange.getIn().getHeader("CamelAwsS3Key");
-        producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, getEmailPayLoad(fileNameWithPath), RecapConstants.EMAIL_BODY_FOR, RecapConstants.REQUEST_INITIAL_DATA_LOAD);
+        producerTemplate.sendBodyAndHeader(ScsbConstants.EMAIL_Q, getEmailPayLoad(fileNameWithPath), ScsbConstants.EMAIL_BODY_FOR, ScsbConstants.REQUEST_INITIAL_DATA_LOAD);
     }
 
     public EmailPayLoad getEmailPayLoad(String fileNameWithPath){

@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -61,7 +61,7 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
         bulkRequestItemEntity.setBulkRequestFileName("bulkItemUpload");
         bulkRequestItemEntity.setBulkRequestFileData("BARCODE\tCUSTOMER_CODE\n32101075852275\tPK".getBytes());
         bulkRequestItemEntity.setRequestingInstitutionId(1);
-        bulkRequestItemEntity.setBulkRequestStatus(RecapConstants.PROCESSED);
+        bulkRequestItemEntity.setBulkRequestStatus(ScsbConstants.PROCESSED);
         bulkRequestItemEntity.setCreatedBy("TestUser");
         bulkRequestItemEntity.setCreatedDate(new Date());
         bulkRequestItemEntity.setStopCode("PA");

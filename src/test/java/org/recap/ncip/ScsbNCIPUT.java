@@ -15,15 +15,15 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertNotNull;
 
-public class RecapNCIPUT extends BaseTestCaseUT {
+public class ScsbNCIPUT extends BaseTestCaseUT {
 
     @InjectMocks
-    RecapNCIP recapNCIP;
+    ScsbNCIP scsbNCIP;
 
     @Test
     public void generateProblem() {
         NCIPResponseData ncipResponseData = getAcceptItemResponseData();
-        JSONObject returnJson = recapNCIP.generateNcipProblems(ncipResponseData);
+        JSONObject returnJson = scsbNCIP.generateNcipProblems(ncipResponseData);
         assertNotNull(returnJson);
     }
 

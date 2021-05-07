@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.ils.AbstractProtocolConnector;
 import org.recap.ils.ILSProtocolConnectorFactory;
 import org.recap.ils.model.response.*;
@@ -183,7 +183,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
     }
 
     private String getPickupLocationDB(ItemRequestInformation itemRequestInformation, String callInstitution) {
-        if (RecapCommonConstants.NYPL.equalsIgnoreCase(callInstitution)) {
+        if (ScsbCommonConstants.NYPL.equalsIgnoreCase(callInstitution)) {
             return itemRequestInformation.getDeliveryLocation();
         }
         return (StringUtils.isBlank(itemRequestInformation.getPickupLocation())) ? getPickupLocation(callInstitution) : itemRequestInformation.getPickupLocation();

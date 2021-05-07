@@ -5,7 +5,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.ils.AbstractProtocolConnector;
 import org.recap.ils.ILSProtocolConnectorFactory;
 import org.recap.model.jpa.*;
@@ -57,7 +57,7 @@ public class RequestItemValidatorControllerUT extends BaseTestCaseUT {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("45678915");
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL);
         itemRequestInformation.setDeliveryLocation("PB");
         itemRequestInformation.setItemOwningInstitution("PUL");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
@@ -96,7 +96,7 @@ public class RequestItemValidatorControllerUT extends BaseTestCaseUT {
     private ItemRequestInformation getItemRequestInformation(BibliographicEntity bibliographicEntity) {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("4567gfdr8915");
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL);
         itemRequestInformation.setDeliveryLocation("PB");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         itemRequestInformation.setItemOwningInstitution("PUL");

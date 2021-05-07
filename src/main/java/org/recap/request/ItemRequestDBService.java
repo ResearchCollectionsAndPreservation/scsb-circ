@@ -1,8 +1,8 @@
 package org.recap.request;
 
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
@@ -28,7 +28,7 @@ public class ItemRequestDBService {
 
     private static final Logger logger = LoggerFactory.getLogger(ItemRequestDBService.class);
 
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScsbConstants.DATE_FORMAT);
 
     @Autowired
     private ItemDetailsRepository itemDetailsRepository;
@@ -110,12 +110,12 @@ public class ItemRequestDBService {
             requestItemEntity.setNotes(itemRequestInformation.getRequestNotes());
             savedItemRequest = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
             requestId = savedItemRequest.getId();
-            commonUtil.saveItemChangeLogEntity(savedItemRequest.getId(), commonUtil.getUser(itemRequestInformation.getUsername()), RecapConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
+            commonUtil.saveItemChangeLogEntity(savedItemRequest.getId(), commonUtil.getUser(itemRequestInformation.getUsername()), ScsbConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
         logger.info("SCSB DB Update Successful");
         } catch (ParseException e) {
-            logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
+            logger.error(ScsbConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return requestId;
     }
@@ -134,14 +134,14 @@ public class ItemRequestDBService {
         Integer requestId = 0;
         try {
             if (!itemInformationResponse.isSuccess()) {
-                requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_EXCEPTION);
+                requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_EXCEPTION);
             }else {
-                if (itemInformationResponse.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)){
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
-                }else if (itemInformationResponse.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)){
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_EDD);
-                }else if (itemInformationResponse.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)){
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RECALLED);
+                if (itemInformationResponse.getRequestType().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL)){
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
+                }else if (itemInformationResponse.getRequestType().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_EDD)){
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_EDD);
+                }else if (itemInformationResponse.getRequestType().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_RECALL)){
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_RECALLED);
                 }
             }
 
@@ -183,14 +183,14 @@ public class ItemRequestDBService {
             savedItemRequest = requestItemDetailsRepository.saveAndFlush(requestItemEntity);
             if (savedItemRequest != null) {
                 requestId = savedItemRequest.getId();
-                commonUtil.saveItemChangeLogEntity(savedItemRequest.getId(), commonUtil.getUser(itemInformationResponse.getUsername()), RecapConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
+                commonUtil.saveItemChangeLogEntity(savedItemRequest.getId(), commonUtil.getUser(itemInformationResponse.getUsername()), ScsbConstants.REQUEST_ITEM_INSERT, savedItemRequest.getItemId() + " - " + savedItemRequest.getPatronId());
             }
             itemInformationResponse.setRequestId(requestId);
             logger.info("SCSB DB Update Successful");
         } catch (ParseException e) {
-            logger.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
+            logger.error(ScsbConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemInformationResponse;
     }
@@ -206,32 +206,32 @@ public class ItemRequestDBService {
         Optional<RequestItemEntity> requestItemEntity = requestItemDetailsRepository.findById(itemInformationResponse.getRequestId());
         if(requestItemEntity.isPresent()) {
             BulkRequestItemEntity bulkRequestItemEntity = requestItemEntity.get().getBulkRequestItemEntity();
-            String notes = RecapConstants.USER + " : " + requestItemEntity.get().getNotes();
+            String notes = ScsbConstants.USER + " : " + requestItemEntity.get().getNotes();
             if (null != bulkRequestItemEntity) {
                 itemInformationResponse.setBulk(true);
-                notes = notes + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId();
+                notes = notes + "\n" + ScsbConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId();
             }
             requestItemEntity.get().setNotes(notes);
             if (itemInformationResponse.isSuccess()) {
-                if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
-                } else if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_EDD)) {
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_EDD);
-                } else if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL)) {
+                if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
+                } else if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_EDD)) {
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_EDD);
+                } else if (requestItemEntity.get().getRequestTypeEntity().getRequestTypeCode().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_RECALL)) {
                     // This change is to update the Recall order to Retrieval order upon refile of the existing retrieval order from LAS.
-                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
+                    requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED);
                 }
             } else {
-                requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(RecapConstants.REQUEST_STATUS_EXCEPTION);
+                requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_EXCEPTION);
                 if (itemInformationResponse.isBulk()) {
                     if (null != bulkRequestItemEntity) {
-                        requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + errorNote + itemInformationResponse.getScreenMessage() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
+                        requestItemEntity.get().setNotes(notes + "\n" + ScsbConstants.REQUEST_LAS_EXCEPTION + ScsbConstants.REQUEST_ITEM_GFA_FAILURE + errorNote + itemInformationResponse.getScreenMessage() + "\n" + ScsbConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
                     }
                     else {
-                        requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + errorNote + itemInformationResponse.getScreenMessage() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT);
+                        requestItemEntity.get().setNotes(notes + "\n" + ScsbConstants.REQUEST_LAS_EXCEPTION + ScsbConstants.REQUEST_ITEM_GFA_FAILURE + errorNote + itemInformationResponse.getScreenMessage() + "\n" + ScsbConstants.BULK_REQUEST_ID_TEXT);
                     }
                 }
-                requestItemEntity.get().setNotes(notes + "\n" + RecapConstants.REQUEST_LAS_EXCEPTION + RecapConstants.REQUEST_ITEM_GFA_FAILURE + errorNote + itemInformationResponse.getScreenMessage());
+                requestItemEntity.get().setNotes(notes + "\n" + ScsbConstants.REQUEST_LAS_EXCEPTION + ScsbConstants.REQUEST_ITEM_GFA_FAILURE + errorNote + itemInformationResponse.getScreenMessage());
             }
             if(requestStatusEntity != null) {
                 requestItemEntity.get().setRequestStatusId(requestStatusEntity.getId());
@@ -248,12 +248,12 @@ public class ItemRequestDBService {
      * @param userName     the user name
      */
     public void updateItemAvailabilityStatus(List<ItemEntity> itemEntities, String userName) {
-        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.NOT_AVAILABLE);
+        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE);
         for (ItemEntity itemEntity : itemEntities) {
             itemEntity.setItemAvailabilityStatusId(itemStatusEntity.getId()); // Not Available
             itemEntity.setLastUpdatedBy(commonUtil.getUser(userName));
 
-            commonUtil.saveItemChangeLogEntity(itemEntity.getId(), commonUtil.getUser(userName), RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
+            commonUtil.saveItemChangeLogEntity(itemEntity.getId(), commonUtil.getUser(userName), ScsbConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, ScsbConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_UPDATE);
         }
         // Not Available
         itemDetailsRepository.saveAll(itemEntities);
@@ -266,7 +266,7 @@ public class ItemRequestDBService {
             try {
                 return simpleDateFormat.parse(expirationDate);
             } catch (Exception ex) {
-                logger.error(RecapCommonConstants.REQUEST_EXCEPTION, ex);
+                logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, ex);
             }
         }
         return null;
@@ -284,8 +284,8 @@ public class ItemRequestDBService {
         if(requestItemEntity.isPresent()) {
             OwnerCodeEntity ownerCodeEntity= ownerCodeDetailsRepository.findByOwnerCode(requestItemEntity.get().getItemEntity().getCustomerCode());
             DeliveryCodeEntity deliveryCodeEntity= deliveryCodeDetailsRepository.findByDeliveryCode( requestItemEntity.get().getStopCode());
-            commonUtil.rollbackUpdateItemAvailabilityStatus(requestItemEntity.get().getItemEntity(), RecapConstants.GUEST_USER);
-            commonUtil.saveItemChangeLogEntity(itemInformationResponse.getRequestId(), requestItemEntity.get().getCreatedBy(), RecapConstants.REQUEST_ITEM_GFA_FAILURE, RecapConstants.REQUEST_ITEM_GFA_FAILURE + itemInformationResponse.getScreenMessage());
+            commonUtil.rollbackUpdateItemAvailabilityStatus(requestItemEntity.get().getItemEntity(), ScsbConstants.GUEST_USER);
+            commonUtil.saveItemChangeLogEntity(itemInformationResponse.getRequestId(), requestItemEntity.get().getCreatedBy(), ScsbConstants.REQUEST_ITEM_GFA_FAILURE, ScsbConstants.REQUEST_ITEM_GFA_FAILURE + itemInformationResponse.getScreenMessage());
             itemRequestInformation.setBibId(requestItemEntity.get().getItemEntity().getBibliographicEntities().get(0).getOwningInstitutionBibId());
             itemRequestInformation.setPatronBarcode(requestItemEntity.get().getPatronId());
             itemRequestInformation.setItemBarcodes(Collections.singletonList(requestItemEntity.get().getItemEntity().getBarcode()));

@@ -2,8 +2,8 @@ package org.recap.request;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.ils.model.response.ItemCheckoutResponse;
 import org.recap.ils.model.response.ItemInformationResponse;
@@ -65,7 +65,7 @@ public class BulkItemRequestProcessService {
      */
     public void processBulkRequestItem(String itemBarcode, Integer bulkRequestId) {
         Optional<BulkRequestItemEntity> bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
-        if (RecapConstants.COMPLETE.equals(itemBarcode)) {
+        if (ScsbConstants.COMPLETE.equals(itemBarcode)) {
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
@@ -74,7 +74,7 @@ public class BulkItemRequestProcessService {
             }
             bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
             if (bulkRequestItemEntity.isPresent()) {
-                bulkRequestItemEntity.get().setBulkRequestStatus(RecapConstants.PROCESSED);
+                bulkRequestItemEntity.get().setBulkRequestStatus(ScsbConstants.PROCESSED);
                 bulkRequestItemEntity.get().setLastUpdatedDate(new Date());
                 BulkRequestItemEntity savedBulkRequestItemEntity = bulkRequestItemDetailsRepository.save(bulkRequestItemEntity.get());
                 List<RequestItemEntity> requestItemEntities = savedBulkRequestItemEntity.getRequestItemEntities();
@@ -86,9 +86,9 @@ public class BulkItemRequestProcessService {
                         bulkRequestItem.setCustomerCode(requestItemEntity.getItemEntity().getCustomerCode());
                         bulkRequestItem.setRequestId(String.valueOf(requestItemEntity.getId()));
                         bulkRequestItem.setRequestStatus(requestItemEntity.getRequestStatusEntity().getRequestStatusDescription());
-                        if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)
-                                || requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(RecapConstants.REQUEST_STATUS_PENDING)) {
-                            bulkRequestItem.setStatus(RecapCommonConstants.SUCCESS);
+                        if (requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED)
+                                || requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equals(ScsbConstants.REQUEST_STATUS_PENDING)) {
+                            bulkRequestItem.setStatus(ScsbCommonConstants.SUCCESS);
                         } else {
                             bulkRequestItem.setStatus(StringUtils.substringAfter(requestItemEntity.getNotes(), "Exception : "));
                         }
@@ -116,7 +116,7 @@ public class BulkItemRequestProcessService {
             ItemEntity itemEntity = itemEntities.get(0);
             ItemRequestInformation itemRequestInformation = buildItemRequestInformation(bulkRequestItemEntity);
             itemRequestDBService.updateItemAvailabilityStatus(itemEntities, bulkRequestItemEntity.getCreatedBy());
-            Integer requestId = itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_PROCESSING, bulkRequestItemEntity);
+            Integer requestId = itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ScsbConstants.REQUEST_STATUS_PROCESSING, bulkRequestItemEntity);
             itemRequestInformation.setRequestId(requestId);
             itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));
             itemRequestInformation.setCustomerCode(itemEntity.getCustomerCode());
@@ -125,35 +125,35 @@ public class BulkItemRequestProcessService {
             itemCheckoutResponse.setSuccess(true);
             if (itemCheckoutResponse.isSuccess()) {
                 if (gfaLasService.isUseQueueLasCall(itemRequestInformation.getImsLocationCode())) {
-                    itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_PENDING, bulkRequestItemEntity);
+                    itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ScsbConstants.REQUEST_STATUS_PENDING, bulkRequestItemEntity);
                 }
                 ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                 itemInformationResponse.setRequestId(requestId);
                 itemInformationResponse = gfaLasService.executeRetrieveOrder(itemRequestInformation, itemInformationResponse);
                 if (itemInformationResponse.isRequestTypeForScheduledOnWO()) {
                     logger.info("Bulk Request : Request received on first scan");
-                    itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.LAS_REFILE_REQUEST_PLACED, bulkRequestItemEntity);
+                    itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ScsbConstants.LAS_REFILE_REQUEST_PLACED, bulkRequestItemEntity);
                 } else if (itemInformationResponse.isSuccess()) {
-                    itemInformationResponse.setScreenMessage(RecapConstants.SUCCESSFULLY_PROCESSED_REQUEST_ITEM);
-                    itemRequestInformation.setRequestNotes(itemRequestInformation.getRequestNotes() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
+                    itemInformationResponse.setScreenMessage(ScsbConstants.SUCCESSFULLY_PROCESSED_REQUEST_ITEM);
+                    itemRequestInformation.setRequestNotes(itemRequestInformation.getRequestNotes() + "\n" + ScsbConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId());
                     if (!gfaLasService.isUseQueueLasCall(itemRequestInformation.getImsLocationCode())) {
-                        itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, bulkRequestItemEntity);
+                        itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, bulkRequestItemEntity);
                     }
                 } else {
                     requestItemController.checkinItem(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
                     commonUtil.rollbackUpdateItemAvailabilityStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
-                    itemRequestInformation.setRequestNotes(RecapConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + itemInformationResponse.getScreenMessage());
-                    itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
+                    itemRequestInformation.setRequestNotes(ScsbConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + ScsbConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + itemInformationResponse.getScreenMessage());
+                    itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ScsbConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
                 }
             } else {
                 commonUtil.rollbackUpdateItemAvailabilityStatus(itemEntity, bulkRequestItemEntity.getCreatedBy());
-                itemRequestInformation.setRequestNotes(RecapConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + RecapConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + RecapConstants.REQUEST_ILS_EXCEPTION + itemCheckoutResponse.getScreenMessage());
-                itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, RecapConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
+                itemRequestInformation.setRequestNotes(ScsbConstants.USER + ":" + itemRequestInformation.getRequestNotes() + "\n" + ScsbConstants.BULK_REQUEST_ID_TEXT + bulkRequestItemEntity.getId() + "\n" + ScsbConstants.REQUEST_ILS_EXCEPTION + itemCheckoutResponse.getScreenMessage());
+                itemRequestDBService.updateRecapRequestItem(itemRequestInformation, itemEntity, ScsbConstants.REQUEST_STATUS_EXCEPTION, bulkRequestItemEntity);
             }
             itemRequestServiceUtil.updateSolrIndex(itemEntity);
             logger.info("Request processing completed for barcode : {}", itemBarcode);
         } catch (Exception ex) {
-            logger.error(RecapCommonConstants.LOG_ERROR, itemBarcode);
+            logger.error(ScsbCommonConstants.LOG_ERROR, itemBarcode);
         }
     }
 
@@ -165,7 +165,7 @@ public class BulkItemRequestProcessService {
      */
     private ItemRequestInformation buildItemRequestInformation(BulkRequestItemEntity bulkRequestItemEntity) {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL);
         itemRequestInformation.setRequestingInstitution(bulkRequestItemEntity.getInstitutionEntity().getInstitutionCode());
         itemRequestInformation.setPatronBarcode(bulkRequestItemEntity.getPatronId());
         itemRequestInformation.setDeliveryLocation(bulkRequestItemEntity.getStopCode());

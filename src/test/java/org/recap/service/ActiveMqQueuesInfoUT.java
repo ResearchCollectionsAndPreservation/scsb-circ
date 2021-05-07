@@ -27,7 +27,7 @@ public class ActiveMqQueuesInfoUT extends BaseTestCaseUT {
 
     @Test
     public void testActiveMqQueuesInfo() {
-        Integer value = activeMqQueuesInfo.getActivemqQueuesInfo("recap");
+        Integer value = activeMqQueuesInfo.getActivemqQueuesInfo("scsb");
         String res = activeMqQueuesInfo.getEncodedActivemqCredentials();
         assertNotNull(res);
     }

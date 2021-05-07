@@ -2,8 +2,8 @@ package org.recap.processor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.callable.LasItemStatusCheckPollingCallable;
 import org.recap.las.LASImsLocationConnectorFactory;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
@@ -37,17 +37,17 @@ public class LasItemStatusCheckPollingProcessor {
                     && gfaItemStatusCheckResponse.getDsitem() != null
                     && gfaItemStatusCheckResponse.getDsitem().getTtitem() != null && !gfaItemStatusCheckResponse.getDsitem().getTtitem().isEmpty()) {
                 log.info("Start Route");
-                camelContext.getRouteController().startRoute(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
+                camelContext.getRouteController().startRoute(ScsbConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID);
             }
             executor.shutdown();
         } catch (InterruptedException e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
             Thread.currentThread().interrupt();
             executor.shutdown();
         }  catch(ExecutionException e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return gfaItemStatusCheckResponse;
     }

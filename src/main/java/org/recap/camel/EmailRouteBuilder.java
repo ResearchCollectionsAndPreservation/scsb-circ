@@ -6,8 +6,8 @@ import org.apache.camel.Processor;
 import org.apache.camel.attachment.AttachmentMessage;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,31 +67,31 @@ public class EmailRouteBuilder {
                     loadEmailBodyTemplateForSubmitCollectionEmptyDirectory();
                     loadEmailBodyTemplateForExceptionInSubmitCollection();
                     loadEmailBodyForBulkRequest();
-                    emailBodyRecall = loadEmailLasStatus(RecapConstants.REQUEST_RECALL_EMAIL_TEMPLATE);
-                    emailBodyLasStatus = loadEmailLasStatus(RecapConstants.REQUEST_LAS_STATUS_EMAIL_TEMPLATE);
-                    emailBodyDeletedRecords=loadEmailLasStatus(RecapConstants.DELETED_RECORDS_EMAIL_TEMPLATE);
+                    emailBodyRecall = loadEmailLasStatus(ScsbConstants.REQUEST_RECALL_EMAIL_TEMPLATE);
+                    emailBodyLasStatus = loadEmailLasStatus(ScsbConstants.REQUEST_LAS_STATUS_EMAIL_TEMPLATE);
+                    emailBodyDeletedRecords=loadEmailLasStatus(ScsbConstants.DELETED_RECORDS_EMAIL_TEMPLATE);
 
-                    from(RecapConstants.EMAIL_Q)
-                            .routeId(RecapConstants.EMAIL_ROUTE_ID)
+                    from(ScsbConstants.EMAIL_Q)
+                            .routeId(ScsbConstants.EMAIL_ROUTE_ID)
                             .setHeader("emailPayLoad").body(EmailPayLoad.class)
                             .onCompletion().log("Email has been sent successfully.")
                             .end()
                             .choice()
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.REQUEST_RECALL_MAIL_QUEUE))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.REQUEST_RECALL_MAIL_QUEUE))
                                     .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyRecall))
                                     .setHeader("from", simple(from))
                                     .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email for Recall")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.REQUEST_LAS_STATUS_MAIL_QUEUE))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.REQUEST_LAS_STATUS_MAIL_QUEUE))
                                     .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyLasStatus))
                                     .setHeader("from", simple(from))
                                     .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email for LAS Status")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.SUBMIT_COLLECTION))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.SUBMIT_COLLECTION))
                                     .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyForSubmitCollection))
                                     .setHeader("from", simple(from))
@@ -99,14 +99,14 @@ public class EmailRouteBuilder {
                                     .setHeader("cc", simple(emailPayLoadcc))
                                     .log("email body for submit collection")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.SUBMIT_COLLECTION_FOR_NO_FILES))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.SUBMIT_COLLECTION_FOR_NO_FILES))
                                     .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyForSubmitCollectionEmptyDirectory))
                                     .setHeader("from", simple(from))
                                     .setHeader("to", simple(emailPayLoadTo))
                                     .log("email body for submit collection")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.REQUEST_ACCESSION_RECONCILATION_MAIL_QUEUE))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.REQUEST_ACCESSION_RECONCILATION_MAIL_QUEUE))
                                     .log("email for accession Reconciliation")
                                     .setHeader(subjectHeader, simple("Barcode Reconciliation Report"))
                                     .setBody(simple(emailPayLoadMessage))
@@ -114,14 +114,14 @@ public class EmailRouteBuilder {
                                     .setHeader("to", simple(emailPayLoadTo))
                                     .setHeader("cc", simple(emailPayLoadcc))
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.DELETED_MAIL_QUEUE))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.DELETED_MAIL_QUEUE))
                                     .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyDeletedRecords))
                                     .setHeader("from", simple(from))
                                     .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email Send for Deleted Records")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo("StatusReconcilation"))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo("StatusReconcilation"))
                                     .log("email for status Reconciliation")
                                     .setHeader(subjectHeader, simple("\"Out\" Status Reconciliation Report"))
                                     .setBody(simple(emailPayLoadMessage))
@@ -129,21 +129,21 @@ public class EmailRouteBuilder {
                                     .setHeader("to", simple(emailPayLoadTo))
                                     .setHeader("cc", simple(emailPayLoadcc))
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                               .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.DAILY_RECONCILIATION))
+                               .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.DAILY_RECONCILIATION))
                                     .log("email for Daily Reconciliation")
                                     .setHeader(subjectHeader, simple("Daily Reconciliation Report"))
                                     .setBody(simple(emailPayLoadMessage))
                                     .setHeader("from", simple(from))
                                     .setHeader("to", simple(emailPayLoadTo))
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.REQUEST_INITIAL_DATA_LOAD))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.REQUEST_INITIAL_DATA_LOAD))
                                     .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailPayLoadMessage))
                                     .setHeader("from", simple(from))
                                     .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email for request initial data load")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.SUBMIT_COLLECTION_EXCEPTION))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.SUBMIT_COLLECTION_EXCEPTION))
                                     .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyForExceptionInSubmitColletion))
                                     .setHeader("from", simple(from))
@@ -151,14 +151,14 @@ public class EmailRouteBuilder {
                                     .setHeader("cc", simple(emailPayLoadcc))
                                     .log("Email sent for exception in submit collection")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.EMAIL_HEADER_REQUEST_PENDING))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.EMAIL_HEADER_REQUEST_PENDING))
                                     .setHeader(subjectHeader, simple("LAS Pending Request Queue"))
                                     .setBody(simple(emailBodyForRequestPending))
                                     .setHeader("from", simple(from))
                                     .setHeader("to", simple(emailPayLoadTo))
                                     .log("Email for request pending")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.EMAIL_HEADER_REQUEST_STATUS_PENDING))
+                                .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.EMAIL_HEADER_REQUEST_STATUS_PENDING))
                                     .setHeader(subjectHeader,simple(emailPayLoadSubject))
                                     .setBody(simple(emailPayLoadMessage))
                                     .setHeader("from", simple(from))
@@ -166,7 +166,7 @@ public class EmailRouteBuilder {
                                     .setHeader("cc", simple(emailPayLoadcc))
                                     .log("Email for pending Request status")
                                     .to(smtps + smtpServer + userName + username + password + emailPassword)
-                                 .when(header(RecapConstants.EMAIL_BODY_FOR).isEqualTo(RecapConstants.BULK_REQUEST_EMAIL_QUEUE))
+                                 .when(header(ScsbConstants.EMAIL_BODY_FOR).isEqualTo(ScsbConstants.BULK_REQUEST_EMAIL_QUEUE))
                                     .setHeader(subjectHeader, simple(emailPayLoadSubject))
                                     .setBody(simple(emailBodyForBulkRequestProcess))
                                     .process(new Processor() {
@@ -178,7 +178,7 @@ public class EmailRouteBuilder {
                                             EmailPayLoad emailPayLoad = (EmailPayLoad) in.getHeader("emailPayLoad");
                                             in.addAttachment("Results_" + emailPayLoad.getBulkRequestFileName(), new DataHandler(emailPayLoad.getBulkRequestCsvFileData(), "text/csv"));
                                         } catch (Exception ex) {
-                                            logger.info(RecapCommonConstants.LOG_ERROR , ex);
+                                            logger.info(ScsbCommonConstants.LOG_ERROR , ex);
                                         }
                                         }
                                     })
@@ -194,15 +194,15 @@ public class EmailRouteBuilder {
                 }
 
                 private void loadEmailBodyTemplateForNoData() {
-                    emailBodyForSubmitCollection = getEmailBodyString(RecapConstants.SUBMIT_COLLECTION_EMAIL_BODY_VM).toString();
+                    emailBodyForSubmitCollection = getEmailBodyString(ScsbConstants.SUBMIT_COLLECTION_EMAIL_BODY_VM).toString();
                 }
 
                 private void loadEmailBodyTemplateForSubmitCollectionEmptyDirectory() {
-                    emailBodyForSubmitCollectionEmptyDirectory = getEmailBodyString(RecapConstants.SUBMIT_COLLECTION_EMAIL_BODY_FOR_EMPTY_DIRECTORY_VM).toString();
+                    emailBodyForSubmitCollectionEmptyDirectory = getEmailBodyString(ScsbConstants.SUBMIT_COLLECTION_EMAIL_BODY_FOR_EMPTY_DIRECTORY_VM).toString();
                 }
 
                 private void loadEmailBodyTemplateForExceptionInSubmitCollection() {
-                    emailBodyForExceptionInSubmitColletion = getEmailBodyString(RecapConstants.SUBMIT_COLLECTION_EXCEPTION_BODY_VM).toString();
+                    emailBodyForExceptionInSubmitColletion = getEmailBodyString(ScsbConstants.SUBMIT_COLLECTION_EXCEPTION_BODY_VM).toString();
                 }
 
                 private void loadEmailPassword() {
@@ -211,17 +211,17 @@ public class EmailRouteBuilder {
                         try {
                             emailPassword = FileUtils.readFileToString(file, StandardCharsets.UTF_8).trim();
                         } catch (IOException e) {
-                            logger.error(RecapCommonConstants.LOG_ERROR,e);
+                            logger.error(ScsbCommonConstants.LOG_ERROR,e);
                         }
                     }
                 }
 
                 private void loadEmailBodyForRequestPending() {
-                    emailBodyForRequestPending = getEmailBodyString(RecapConstants.REQUEST_PENDING_EMAIL_BODY_VM).toString();
+                    emailBodyForRequestPending = getEmailBodyString(ScsbConstants.REQUEST_PENDING_EMAIL_BODY_VM).toString();
                 }
 
                 private void loadEmailBodyForBulkRequest() {
-                    emailBodyForBulkRequestProcess = getEmailBodyString(RecapConstants.BULK_REQUEST_EMAIL_BODY_VM).toString();
+                    emailBodyForBulkRequestProcess = getEmailBodyString(ScsbConstants.BULK_REQUEST_EMAIL_BODY_VM).toString();
                 }
 
                 private StringBuilder getEmailBodyString(String vmFileName) {
@@ -237,13 +237,13 @@ public class EmailRouteBuilder {
                             out.append("\n");
                         }
                     } catch (IOException e) {
-                        logger.error(RecapCommonConstants.LOG_ERROR, e);
+                        logger.error(ScsbCommonConstants.LOG_ERROR, e);
                     }
                     return out;
                 }
             });
         } catch (Exception e) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION,e);
+            logger.error(ScsbCommonConstants.REQUEST_EXCEPTION,e);
         }
     }
 }

@@ -1,8 +1,8 @@
 package org.recap.service.requestdataload;
 
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.model.jpa.ItemEntity;
 import org.recap.model.jpa.RequestItemEntity;
@@ -67,11 +67,11 @@ public class RequestDataLoadService {
                 continue;
             }
             Map<String,Integer> itemInfo = getItemInfo(requestDataLoadCSVRecord.getBarcode());
-            if(itemInfo.get(RecapConstants.REQUEST_DATA_LOAD_ITEM_ID) != null){
-                itemId = itemInfo.get(RecapConstants.REQUEST_DATA_LOAD_ITEM_ID);
+            if(itemInfo.get(ScsbConstants.REQUEST_DATA_LOAD_ITEM_ID) != null){
+                itemId = itemInfo.get(ScsbConstants.REQUEST_DATA_LOAD_ITEM_ID);
             }
-            if(itemInfo.get(RecapConstants.REQUEST_DATA_LOAD_REQUESTING_INST_ID) != null){
-                requestingInstitutionId = itemInfo.get(RecapConstants.REQUEST_DATA_LOAD_REQUESTING_INST_ID);
+            if(itemInfo.get(ScsbConstants.REQUEST_DATA_LOAD_REQUESTING_INST_ID) != null){
+                requestingInstitutionId = itemInfo.get(ScsbConstants.REQUEST_DATA_LOAD_REQUESTING_INST_ID);
             }
             if(itemId == 0 || requestingInstitutionId == 0){
                 barcodesNotInScsb.add(requestDataLoadCSVRecord.getBarcode());
@@ -86,15 +86,15 @@ public class RequestDataLoadService {
     }
 
     private void prepareRequestItemEntities(List<RequestItemEntity> requestItemEntityList, RequestItemEntity requestItemEntity, RequestDataLoadCSVRecord requestDataLoadCSVRecord, Integer itemId, Integer requestingInstitutionId) throws ParseException {
-        List<RequestItemEntity> requestAlreadyPlacedList = requestItemDetailsRepository.findByitemId(itemId,Arrays.asList(RecapCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, RecapCommonConstants.REQUEST_STATUS_RECALLED, RecapCommonConstants.REQUEST_STATUS_EDD, RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD));
+        List<RequestItemEntity> requestAlreadyPlacedList = requestItemDetailsRepository.findByitemId(itemId,Arrays.asList(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ScsbCommonConstants.REQUEST_STATUS_RECALLED, ScsbCommonConstants.REQUEST_STATUS_EDD, ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD));
         if (CollectionUtils.isEmpty(requestAlreadyPlacedList)) {
             requestItemEntity.setItemId(itemId);
             requestItemEntity.setRequestingInstitutionId(requestingInstitutionId);
-            SimpleDateFormat formatter = new SimpleDateFormat(RecapConstants.REQUEST_DATA_LOAD_DATE_FORMAT);
-            requestItemEntity.setCreatedBy(RecapConstants.REQUEST_DATA_LOAD_CREATED_BY);
+            SimpleDateFormat formatter = new SimpleDateFormat(ScsbConstants.REQUEST_DATA_LOAD_DATE_FORMAT);
+            requestItemEntity.setCreatedBy(ScsbConstants.REQUEST_DATA_LOAD_CREATED_BY);
             setValuesFromOutReportToRequestItemEntity(requestItemEntity, requestDataLoadCSVRecord, formatter);
             requestItemEntity.setRequestStatusId(9);
-            requestItemEntity.setPatronId(RecapConstants.REQUEST_DATA_LOAD_PATRON_ID);
+            requestItemEntity.setPatronId(ScsbConstants.REQUEST_DATA_LOAD_PATRON_ID);
             requestItemEntityList.add(requestItemEntity);
         }
     }
@@ -118,7 +118,7 @@ public class RequestDataLoadService {
     }
 
     private Date getDateFormat(String date) throws ParseException {
-        SimpleDateFormat formatter=new SimpleDateFormat(RecapConstants.REQUEST_DATA_LOAD_DATE_FORMAT);
+        SimpleDateFormat formatter=new SimpleDateFormat(ScsbConstants.REQUEST_DATA_LOAD_DATE_FORMAT);
         if (StringUtils.isNotBlank(date)){
             return formatter.parse(date);
         }
@@ -132,7 +132,7 @@ public class RequestDataLoadService {
         Integer itemId = 0;
         Integer owningInstitutionId = 0;
         Map<String,Integer> itemInfo = new HashMap<>();
-        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(barcode, RecapCommonConstants.NOT_AVAILABLE);
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(barcode, ScsbCommonConstants.NOT_AVAILABLE);
         if(org.apache.commons.collections.CollectionUtils.isNotEmpty(itemEntityList)){
             Integer itemInstitutionId = itemEntityList.get(0).getOwningInstitutionId();
             for(ItemEntity itemEntity : itemEntityList){
@@ -144,16 +144,16 @@ public class RequestDataLoadService {
                     return itemInfo;
                 }
             }
-            itemInfo.put(RecapConstants.REQUEST_DATA_LOAD_ITEM_ID , itemId);
-            itemInfo.put(RecapConstants.REQUEST_DATA_LOAD_REQUESTING_INST_ID , owningInstitutionId);
+            itemInfo.put(ScsbConstants.REQUEST_DATA_LOAD_ITEM_ID , itemId);
+            itemInfo.put(ScsbConstants.REQUEST_DATA_LOAD_REQUESTING_INST_ID , owningInstitutionId);
         }
         return itemInfo;
     }
 
     private Integer getRequestTypeId(String deliveyMethod){
         Integer requestTypeId = 0;
-        if(deliveyMethod.equalsIgnoreCase(RecapConstants.REQUEST_DATA_LOAD_REQUEST_TYPE)){
-            RequestTypeEntity requestTypeEntity = requestTypeDetailsRepository.findByrequestTypeCode(RecapCommonConstants.RETRIEVAL);
+        if(deliveyMethod.equalsIgnoreCase(ScsbConstants.REQUEST_DATA_LOAD_REQUEST_TYPE)){
+            RequestTypeEntity requestTypeEntity = requestTypeDetailsRepository.findByrequestTypeCode(ScsbCommonConstants.RETRIEVAL);
             requestTypeId = requestTypeEntity.getId();
         }
         return requestTypeId;

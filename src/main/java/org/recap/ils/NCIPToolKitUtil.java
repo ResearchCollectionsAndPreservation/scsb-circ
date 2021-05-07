@@ -11,7 +11,7 @@ import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 
 @Slf4j
 public class NCIPToolKitUtil {
@@ -29,7 +29,7 @@ public class NCIPToolKitUtil {
         public static NCIPToolKitUtil getInstance() throws IOException, ToolkitException {
             if (ncipToolkitUtilInstance == null) {
                     ncipToolkitUtilInstance = new NCIPToolKitUtil();
-                    InputStream inputStream = NCIPToolKitUtil.class.getClassLoader().getResourceAsStream(RecapConstants.TOOLKIT_PROP_FILE);
+                    InputStream inputStream = NCIPToolKitUtil.class.getClassLoader().getResourceAsStream(ScsbConstants.TOOLKIT_PROP_FILE);
                     log.info("initializing the NCIP Toolkit Property File...");log.info("initializing the NCIP Toolkit Property File...");
                     Properties properties = new Properties();
                     properties.load(inputStream);

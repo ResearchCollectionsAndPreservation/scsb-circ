@@ -6,8 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.controller.ItemController;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
@@ -46,11 +46,11 @@ public class RequestParamaterValidatorServiceUT{
     @Test
     public void testForValidatingInvalidRequestingInstitutionWithBarcode(){
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
-        itemRequestInformation.setRequestType(RecapConstants.EDD_REQUEST);
+        itemRequestInformation.setRequestType(ScsbConstants.EDD_REQUEST);
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
         itemRequestInformation.setEmailAddress("");
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RECALL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RECALL);
         Mockito.when(institutionDetailsRepository.existsByInstitutionCode(itemRequestInformation.getRequestingInstitution())).thenReturn(true);
         ResponseEntity responseEntity1 = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity1);
@@ -59,7 +59,7 @@ public class RequestParamaterValidatorServiceUT{
 
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("45678915");
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_BORROW_DIRECT);
         itemRequestInformation.setRequestingInstitution("PUL");
         return itemRequestInformation;
     }
@@ -72,13 +72,13 @@ public class RequestParamaterValidatorServiceUT{
         itemBarcodeList.add("33433012968222");
         itemRequestInformation.setItemBarcodes(itemBarcodeList);
         itemRequestInformation.setPatronBarcode("45678915");
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_BORROW_DIRECT);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_BORROW_DIRECT);
         itemRequestInformation.setRequestingInstitution("PUL");
         itemRequestInformation.setEmailAddress("hemalatha.shtcindia.com");
         Mockito.when(institutionDetailsRepository.existsByInstitutionCode(itemRequestInformation.getRequestingInstitution())).thenReturn(true);
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), RecapConstants.INVALID_EMAIL_ADDRESS+"\n");
+        assertEquals(responseEntity.getBody(), ScsbConstants.INVALID_EMAIL_ADDRESS+"\n");
     }
 
     @Test
@@ -95,7 +95,7 @@ public class RequestParamaterValidatorServiceUT{
         Mockito.when(institutionDetailsRepository.existsByInstitutionCode(itemRequestInformation.getRequestingInstitution())).thenReturn(true);
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), RecapConstants.INVALID_REQUEST_TYPE+"\n");
+        assertEquals(responseEntity.getBody(), ScsbConstants.INVALID_REQUEST_TYPE+"\n");
     }
 
     @Test
@@ -106,7 +106,7 @@ public class RequestParamaterValidatorServiceUT{
         itemRequestInformation.setItemBarcodes(itemBarcodeList);
         itemRequestInformation.setPatronBarcode("45678915");
         itemRequestInformation.setChapterTitle("title");
-        itemRequestInformation.setRequestType(RecapConstants.EDD_REQUEST);
+        itemRequestInformation.setRequestType(ScsbConstants.EDD_REQUEST);
         itemRequestInformation.setDeliveryLocation("AC");
         itemRequestInformation.setRequestingInstitution("PUL");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");

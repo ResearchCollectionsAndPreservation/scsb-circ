@@ -3,8 +3,8 @@ package org.recap.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.las.GFALasService;
 import org.recap.mqconsumer.RequestItemQueueConsumer;
 import org.recap.processor.LasHeartBeatCheckPollingProcessor;
@@ -44,7 +44,7 @@ public class OnboardingInstitutionController {
 
     @GetMapping(value = "/createTopicsForNewInstitution")
     public String createTopicsForNewInstitution(@RequestParam String institutionCode) {
-        String responseStatus = RecapCommonConstants.SUCCESS;
+        String responseStatus = ScsbCommonConstants.SUCCESS;
         try {
             String retrievalInstitutionTopic = propertyUtil.getPropertyByInstitutionAndKey(institutionCode, "ils.topic.retrieval.request");
             String eddInstitutionTopic = propertyUtil.getPropertyByInstitutionAndKey(institutionCode, "ils.topic.edd.request");
@@ -78,20 +78,20 @@ public class OnboardingInstitutionController {
             });
         } catch (Exception e) {
             log.error("Failed to create Topics for institution - {} : {}", institutionCode, e);
-            responseStatus = RecapCommonConstants.FAILURE;
+            responseStatus = ScsbCommonConstants.FAILURE;
         }
         return responseStatus;
     }
 
     @GetMapping(value = "/createQueuesForNewInstitution")
     public String createQueuesForNewImsLocation(@RequestParam String imsLocationCode) {
-        String responseStatus = RecapCommonConstants.SUCCESS;
+        String responseStatus = ScsbCommonConstants.SUCCESS;
         try {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(RecapConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX)
-                            .routeId(imsLocationCode + RecapConstants.SCSB_OUTGOING_ROUTE_ID)
+                    from(ScsbConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + ScsbConstants.OUTGOING_QUEUE_SUFFIX)
+                            .routeId(imsLocationCode + ScsbConstants.SCSB_OUTGOING_ROUTE_ID)
                             .log("Message Received in SCSB OUTGOING QUEUE")
                             .bean(applicationContext.getBean(LasHeartBeatCheckPollingProcessor.class), "pollLasHeartBeatResponse");
                 }
@@ -100,8 +100,8 @@ public class OnboardingInstitutionController {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(RecapConstants.LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX)
-                            .routeId(RecapConstants.LAS_OUTGOING_ROUTE_ID)
+                    from(ScsbConstants.LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + ScsbConstants.OUTGOING_QUEUE_SUFFIX)
+                            .routeId(ScsbConstants.LAS_OUTGOING_ROUTE_ID)
                             .log("Message Received in LAS OUTGOING QUEUE for " + imsLocationCode)
                             .bean(applicationContext.getBean(GFALasService.class), "gfaItemRequestProcessor");
 
@@ -109,7 +109,7 @@ public class OnboardingInstitutionController {
             });
         } catch (Exception e) {
             log.error("Failed to create Queues for IMS Location - {} : {}", imsLocationCode, e);
-            responseStatus = RecapCommonConstants.FAILURE;
+            responseStatus = ScsbCommonConstants.FAILURE;
         }
         return responseStatus;
     }

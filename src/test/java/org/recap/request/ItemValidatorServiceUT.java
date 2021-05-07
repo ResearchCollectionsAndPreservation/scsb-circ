@@ -6,8 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.controller.ItemController;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
@@ -82,40 +82,40 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
         ImsLocationEntity imsLocationEntity = getImsLocationEntity();
         Mockito.when(itemController.findByBarcodeIn(itemBarcodes.toString())).thenReturn(Arrays.asList(itemEntity));
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
         ResponseEntity responseEntity = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals("Item Validation ", RecapConstants.INITIAL_LOAD_ITEM_EXISTS,responseEntity.getBody());
+        assertEquals("Item Validation ", ScsbConstants.INITIAL_LOAD_ITEM_EXISTS,responseEntity.getBody());
         requestItemEntity.setId(0);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
         Mockito.when(itemStatusDetailsRepository.findById(itemEntity.getItemAvailabilityStatusId())).thenReturn(Optional.of(itemStatusEntity));
         ResponseEntity responseEntity1 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity1);
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RECALL);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_EDD)).thenReturn(requestItemEntity1);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RECALL);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_EDD)).thenReturn(requestItemEntity1);
         Mockito.when(itemStatusDetailsRepository.findById(itemEntity.getItemAvailabilityStatusId())).thenReturn(Optional.of(itemStatusEntity));
         Mockito.when(imsLocationDetailsRepository.findById(any())).thenReturn(Optional.of(imsLocationEntity));
         ResponseEntity responseEntity2 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity2);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_EDD)).thenReturn(requestItemEntity);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(requestItemEntity1);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_EDD)).thenReturn(requestItemEntity);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(requestItemEntity1);
         Mockito.when(itemStatusDetailsRepository.findById(itemEntity.getItemAvailabilityStatusId())).thenReturn(Optional.of(itemStatusEntity));
         ResponseEntity responseEntity3 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity3);
         itemStatusEntity.setId(1);
-        itemStatusEntity.setStatusDescription(RecapCommonConstants.AVAILABLE);
-        itemStatusEntity.setStatusCode(RecapCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusDescription(ScsbCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusCode(ScsbCommonConstants.AVAILABLE);
         Mockito.when(itemStatusDetailsRepository.findById(itemEntity.getItemAvailabilityStatusId())).thenReturn(Optional.of(itemStatusEntity));
         ResponseEntity responseEntity4 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity4);
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_STATUS_RECALLED);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity1);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_STATUS_RECALLED);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity1);
         ResponseEntity responseEntity5 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity5);
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_EDD);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_EDD);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity);
       //  Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndRecapDeliveryRestrictionLikeEDD(itemEntity.getCustomerCode())).thenReturn(ownerCodeEntity);
         ResponseEntity responseEntity6 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity6);
@@ -133,7 +133,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         ItemEntity itemEntity = getItemEntity();
         OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
         ImsLocationEntity imsLocationEntity = getImsLocationEntity();
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RECALL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RECALL);
         itemValidatorService.itemValidation(itemRequestInformation);
         Mockito.when(itemController.findByBarcodeIn(itemBarcodes.toString())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(any())).thenReturn(ownerCodeEntity);
@@ -143,7 +143,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         itemValidatorService.itemValidation(itemRequestInformation);
         ItemRequestInformation itemRequestInformation1 = getItemRequestInformation(itemBarcodes);
         itemRequestInformation1.setDeliveryLocation("PA");
-        itemRequestInformation1.setRequestType(RecapCommonConstants.REQUEST_TYPE_RECALL);
+        itemRequestInformation1.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RECALL);
         itemValidatorService.itemValidation(itemRequestInformation1);
 //        Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndOwningInstitutionCode(any(),any())).thenReturn(getOwnerCodeEntity());
   //      itemValidatorService.itemValidation(itemRequestInformation1);
@@ -186,7 +186,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(itemBarcodes);
         itemRequestInformation.setDeliveryLocation("PB");
-        itemRequestInformation.setRequestType(RecapCommonConstants.RETRIEVAL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.RETRIEVAL);
         return itemRequestInformation;
     }
 
@@ -216,28 +216,28 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         itemBarcodes.add("1355321");
         OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
         Mockito.when(itemController.findByBarcodeIn(itemBarcodes.toString())).thenReturn(Arrays.asList(itemEntity));
-        itemRequestInformation.setRequestType(RecapCommonConstants.RECALL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.RECALL);
         ResponseEntity responseEntity = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity);
 
-        itemRequestInformation.setRequestType(RecapCommonConstants.RETRIEVAL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.RETRIEVAL);
         itemEntity.setItemAvailabilityStatusId(2);
         ResponseEntity responseEntity1 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity1);
 
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity);
         ResponseEntity responseEntity2 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity2);
 
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity1);
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_STATUS_RECALLED);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity1);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_STATUS_RECALLED);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity);
         ResponseEntity responseEntity3 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity3);
 
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_STATUS_RECALLED);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity1);
-        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), RecapCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity1);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_STATUS_RECALLED);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD)).thenReturn(requestItemEntity1);
+        Mockito.when(requestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemEntity.getBarcode(), ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntity1);
         ResponseEntity responseEntity4 = itemValidatorService.itemValidation(itemRequestInformation);
         assertNotNull(responseEntity4);
 //        Mockito.when(ownerCodeDetailsRepository.findByOwnerCodeAndOwningInstitutionCode(any(),any())).thenReturn(ownerCodeEntity);
@@ -270,8 +270,8 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
     private ItemStatusEntity getItemStatusEntity() {
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setId(2);
-        itemStatusEntity.setStatusCode(RecapCommonConstants.NOT_AVAILABLE);
-        itemStatusEntity.setStatusDescription(RecapCommonConstants.NOT_AVAILABLE);
+        itemStatusEntity.setStatusCode(ScsbCommonConstants.NOT_AVAILABLE);
+        itemStatusEntity.setStatusDescription(ScsbCommonConstants.NOT_AVAILABLE);
         return itemStatusEntity;
     }
 
@@ -284,7 +284,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         itemBarcodes.add("11123");
         itemBarcodes.add("0325");
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
-        itemRequestInformation.setRequestType(RecapCommonConstants.RETRIEVAL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.RETRIEVAL);
         itemRequestInformation.setItemBarcodes(itemBarcodes);
         itemRequestInformation.setDeliveryLocation("PB");
         ResponseEntity responseEntity = itemValidatorService.itemValidation(itemRequestInformation);

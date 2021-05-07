@@ -3,8 +3,8 @@ package org.recap.ils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.ils.model.nypl.*;
 import org.recap.ils.model.nypl.request.*;
 import org.recap.ils.model.nypl.response.*;
@@ -133,7 +133,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
 
     @Override
     public boolean supports(String protocol) {
-        return RecapConstants.REST_PROTOCOL.equalsIgnoreCase(protocol);
+        return ScsbConstants.REST_PROTOCOL.equalsIgnoreCase(protocol);
     }
 
     @Override
@@ -209,11 +209,11 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             ItemResponse itemResponse = responseEntity.getBody();
             itemInformationResponse = getRestApiResponseUtil().buildItemInformationResponse(itemResponse);
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR,httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR,httpException);
             itemInformationResponse.setSuccess(false);
             itemInformationResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR,e);
+            log.error(ScsbCommonConstants.LOG_ERROR,e);
             itemInformationResponse.setSuccess(false);
             itemInformationResponse.setScreenMessage(e.getMessage());
         }
@@ -233,7 +233,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
         log.info("Item barcode {} received for a checkout in {} for patron {}", itemIdentifier, this.institutionCode, patronIdentifier);
         ItemCheckoutResponse itemCheckoutResponse = new ItemCheckoutResponse();
         try {
-            String apiUrl = getRestDataApiUrl() + RecapConstants.REST_CHECKOUT_REQUEST_URL;
+            String apiUrl = getRestDataApiUrl() + ScsbConstants.REST_CHECKOUT_REQUEST_URL;
             CheckoutRequest checkoutRequest = getCheckOutRequest();
             checkoutRequest.setPatronBarcode(patronIdentifier);
             checkoutRequest.setItemBarcode(itemIdentifier);
@@ -266,11 +266,11 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR,httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR,httpException);
             itemCheckoutResponse.setSuccess(false);
             itemCheckoutResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR,e);
+            log.error(ScsbCommonConstants.LOG_ERROR,e);
             itemCheckoutResponse.setSuccess(false);
             itemCheckoutResponse.setScreenMessage(e.getMessage());
         }
@@ -289,7 +289,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
         log.info("Item barcode {} received for a checkin in {} for patron {}", itemRequestInformation.getItemBarcodes().get(0), this.institutionCode, patronIdentifier);
         ItemCheckinResponse itemCheckinResponse = new ItemCheckinResponse();
         try {
-            String apiUrl = getRestDataApiUrl() + RecapConstants.REST_CHECKIN_REQUEST_URL;
+            String apiUrl = getRestDataApiUrl() + ScsbConstants.REST_CHECKIN_REQUEST_URL;
 
             CheckinRequest checkinRequest = getCheckInRequest();
             checkinRequest.setItemBarcode(itemRequestInformation.getItemBarcodes().get(0));
@@ -321,11 +321,11 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR,httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR,httpException);
             itemCheckinResponse.setSuccess(false);
             itemCheckinResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR,e);
+            log.error(ScsbCommonConstants.LOG_ERROR,e);
             itemCheckinResponse.setSuccess(false);
             itemCheckinResponse.setScreenMessage(e.getMessage());
         }
@@ -353,7 +353,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
         log.info("Item barcode {} received for hold request in {} for patron {}", itemIdentifier, this.institutionCode, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         try {
-            String recapHoldApiUrl = getRestDataApiUrl() + RecapConstants.REST_RECAP_HOLD_REQUEST_URL;
+            String recapHoldApiUrl = getRestDataApiUrl() + ScsbConstants.REST_RECAP_HOLD_REQUEST_URL;
             if (StringUtils.isBlank(trackingId)) {
                 trackingId = initiateHoldRequest(itemIdentifier, patronIdentifier, itemInstitutionId, deliveryLocation);
             }
@@ -363,7 +363,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             createHoldRequest.setItemBarcode(itemIdentifier);
             createHoldRequest.setPatronBarcode(patronIdentifier);
             Description description = new Description();
-            String titleIdentifier = title.replace("[" + RecapConstants.REQUEST_USE_RESTRICTIONS + "]", "[" + MessageFormat.format(RecapConstants.REST_NO_RESTRICTIONS, this.institutionCode) + "]");
+            String titleIdentifier = title.replace("[" + ScsbConstants.REQUEST_USE_RESTRICTIONS + "]", "[" + MessageFormat.format(ScsbConstants.REST_NO_RESTRICTIONS, this.institutionCode) + "]");
             log.info("{} title identifier : {} ", this.institutionCode, titleIdentifier);
             description.setTitle(titleIdentifier);
             description.setAuthor(author);
@@ -402,11 +402,11 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR,httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR,httpException);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR,e);
+            log.error(ScsbCommonConstants.LOG_ERROR,e);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(e.getMessage());
         }
@@ -430,7 +430,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
         log.info("Item barcode {} received for a canceling a hold in {} for patron {}", itemIdentifier, this.institutionCode, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         try {
-            String apiUrl = getRestDataApiUrl() + RecapConstants.REST_RECAP_CANCEL_HOLD_REQUEST_URL;
+            String apiUrl = getRestDataApiUrl() + ScsbConstants.REST_RECAP_CANCEL_HOLD_REQUEST_URL;
 
             CancelHoldRequest cancelHoldRequest = getCancelHoldRequest();
             cancelHoldRequest.setTrackingId(trackingId);
@@ -465,11 +465,11 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR,httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR,httpException);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR,e);
+            log.error(ScsbCommonConstants.LOG_ERROR,e);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage(e.getMessage());
         }
@@ -532,13 +532,13 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      */
     private String initiateHoldRequest(String itemIdentifier, String patronIdentifier, String itemInstitutionId, String deliveryLocation) throws Exception {
         String trackingId = null;
-        String nyplHoldApiUrl = getRestDataApiUrl() + RecapConstants.REST_HOLD_REQUEST_URL;
+        String nyplHoldApiUrl = getRestDataApiUrl() + ScsbConstants.REST_HOLD_REQUEST_URL;
         String nyplSource = restApiResponseUtil.getRestApiSourceForInstitution(this.institutionCode, itemInstitutionId);
         NyplHoldRequest nyplHoldRequest = new NyplHoldRequest();
         nyplHoldRequest.setRecord(restApiResponseUtil.getNormalizedItemIdForRestProtocolApi(itemIdentifier));
         nyplHoldRequest.setPatron(getPatronIdByPatronBarcode(patronIdentifier));
         nyplHoldRequest.setNyplSource(nyplSource);
-        nyplHoldRequest.setRecordType(RecapConstants.REST_RECORD_TYPE);
+        nyplHoldRequest.setRecordType(ScsbConstants.REST_RECORD_TYPE);
         nyplHoldRequest.setPickupLocation("");
         nyplHoldRequest.setDeliveryLocation(deliveryLocation);
         nyplHoldRequest.setNumberOfCopies(1);
@@ -580,7 +580,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
      * @throws Exception
      */
     private NyplPatronResponse queryForPatronResponse(String patronIdentifier) throws Exception {
-        String apiUrl = getRestDataApiUrl() + RecapConstants.REST_PATRON_BY_BARCODE_URL + patronIdentifier;
+        String apiUrl = getRestDataApiUrl() + ScsbConstants.REST_PATRON_BY_BARCODE_URL + patronIdentifier;
         log.info("{} patron response url : {}" , this.institutionCode, apiUrl);
         HttpEntity requestEntity = new HttpEntity<>(getHttpHeaders());
         ResponseEntity<NyplPatronResponse> jobResponseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, NyplPatronResponse.class);
@@ -651,11 +651,11 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR,httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR,httpException);
             itemRecallResponse.setSuccess(false);
             itemRecallResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR,e);
+            log.error(ScsbCommonConstants.LOG_ERROR,e);
             itemRecallResponse.setSuccess(false);
             itemRecallResponse.setScreenMessage(e.getMessage());
         }*/
@@ -676,7 +676,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
         log.info("Item barcode {} received for refiling in {} ", itemIdentifier, this.institutionCode);
         ItemRefileResponse itemRefileResponse = new ItemRefileResponse();
         try {
-            String apiUrl = getRestDataApiUrl() + RecapConstants.REST_RECAP_REFILE_REQUEST_URL;
+            String apiUrl = getRestDataApiUrl() + ScsbConstants.REST_RECAP_REFILE_REQUEST_URL;
 
             RefileRequest refileRequest = new RefileRequest();
             refileRequest.setItemBarcode(itemIdentifier);
@@ -708,11 +708,11 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                 }
             }
         } catch (HttpClientErrorException httpException) {
-            log.error(RecapCommonConstants.LOG_ERROR,httpException);
+            log.error(ScsbCommonConstants.LOG_ERROR,httpException);
             itemRefileResponse.setSuccess(false);
             itemRefileResponse.setScreenMessage(httpException.getStatusText());
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR,e);
+            log.error(ScsbCommonConstants.LOG_ERROR,e);
             itemRefileResponse.setSuccess(false);
             itemRefileResponse.setScreenMessage(e.getMessage());
         }

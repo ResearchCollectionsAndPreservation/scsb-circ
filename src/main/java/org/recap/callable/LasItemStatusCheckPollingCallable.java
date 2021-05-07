@@ -1,6 +1,6 @@
 package org.recap.callable;
 
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.las.LASImsLocationConnectorFactory;
 import org.recap.las.model.GFAItemStatus;
 import org.recap.las.model.GFAItemStatusCheckRequest;
@@ -52,7 +52,7 @@ public class LasItemStatusCheckPollingCallable implements Callable {
                 logger.info("LAS Item Status Check Polling");
                 gfaItemStatusCheckResponse = poll();
             }
-            RecapConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS = 0;
+            ScsbConstants.LAS_ITEM_STATUS_REST_SERVICE_STATUS = 0;
         } catch (Exception e) {
             logger.error("", e);
         }

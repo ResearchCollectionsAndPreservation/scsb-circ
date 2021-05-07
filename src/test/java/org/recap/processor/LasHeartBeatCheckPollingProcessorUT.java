@@ -11,8 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.las.AbstractLASImsLocationConnector;
 import org.recap.las.GFALasService;
 import org.recap.las.LASImsLocationConnectorFactory;
@@ -90,7 +90,7 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
         GFALasStatusCheckResponse gfaLasStatusCheckResponse = getGFALasStatusCheckResponse();
         Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
         Mockito.when(abstractLASImsLocationConnector.heartBeatCheck(any(GFALasStatusCheckRequest.class))).thenReturn(gfaLasStatusCheckResponse);
-        Mockito.doThrow(new NullPointerException()).when(producerTemplate).sendBodyAndHeader(RecapConstants.LAS_OUTGOING_QUEUE_PREFIX + itemRequestInformation.getImsLocationCode() + RecapConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
+        Mockito.doThrow(new NullPointerException()).when(producerTemplate).sendBodyAndHeader(ScsbConstants.LAS_OUTGOING_QUEUE_PREFIX + itemRequestInformation.getImsLocationCode() + ScsbConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, itemRequestInformation.getRequestType());
         lasHeartBeatCheckPollingProcessor.pollLasHeartBeatResponse(exchange);
     }
 

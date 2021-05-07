@@ -2,8 +2,8 @@ package org.recap.controller;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.ils.ILSProtocolConnectorFactory;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.BulkRequestInformation;
@@ -92,7 +92,7 @@ public class RequestItemController {
         } catch (Exception e) {
             itemCheckoutResponse.setSuccess(false);
             itemCheckoutResponse.setScreenMessage(e.getMessage());
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemCheckoutResponse;
     }
@@ -122,7 +122,7 @@ public class RequestItemController {
             itemCheckinResponse = new ItemCheckinResponse();
             itemCheckinResponse.setSuccess(false);
             itemCheckinResponse.setScreenMessage(e.getMessage());
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemCheckinResponse;
     }
@@ -153,7 +153,7 @@ public class RequestItemController {
                     itemRequestInformation.getCallNumber());
 
         } catch (Exception e) {
-            logger.info(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            logger.info(ScsbCommonConstants.REQUEST_EXCEPTION, e);
             itemHoldResponse.setSuccess(false);
             itemHoldResponse.setScreenMessage("ILS returned a invalid response");
         }
@@ -198,7 +198,7 @@ public class RequestItemController {
         if (!itemRequestInformation.getItemBarcodes().isEmpty()) {
             itemBarcode = itemRequestInformation.getItemBarcodes().get(0);
             ItemInformationResponse itemInformation = (ItemInformationResponse) itemInformation(itemRequestInformation, itemRequestInformation.getRequestingInstitution());
-            if (itemInformation.getScreenMessage().toUpperCase().contains(RecapConstants.REQUEST_ITEM_BARCODE_NOT_FOUND)) {
+            if (itemInformation.getScreenMessage().toUpperCase().contains(ScsbConstants.REQUEST_ITEM_BARCODE_NOT_FOUND)) {
                 itemCreateBibResponse = (ItemCreateBibResponse) ilsProtocolConnectorFactory.getIlsProtocolConnector(callInst).createBib(itemBarcode, itemRequestInformation.getPatronBarcode(), itemRequestInformation.getRequestingInstitution(), itemRequestInformation.getTitleIdentifier());
             } else {
                 itemCreateBibResponse = new ItemCreateBibResponse();
@@ -312,13 +312,13 @@ public class RequestItemController {
             } else {
                 itemRefileResponse = new ItemRefileResponse();
                 itemRefileResponse.setSuccess(false);
-                itemRefileResponse.setScreenMessage(RecapConstants.REQUEST_ITEM_BARCODE_NOT_FOUND);
+                itemRefileResponse.setScreenMessage(ScsbConstants.REQUEST_ITEM_BARCODE_NOT_FOUND);
             }
         } catch (Exception e) {
             itemRefileResponse = new ItemRefileResponse();
             itemRefileResponse.setSuccess(false);
             itemRefileResponse.setScreenMessage(e.getMessage());
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return itemRefileResponse;
     }

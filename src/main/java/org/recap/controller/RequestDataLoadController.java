@@ -1,8 +1,8 @@
 package org.recap.controller;
 
 import org.apache.camel.CamelContext;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.camel.requestinitialdataload.RequestInitialLoadRouteBuilder;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.util.CommonUtil;
@@ -56,9 +56,9 @@ public class RequestDataLoadController {
                     institution, requestInitialAccessionS3Dir, requestInitialLoadFilepath, requestInitialAccessionErrorFileS3Dir));
         }
         for (String institution : allInstitutionCodeExceptHTC) {
-            camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE+institution);
+            camelContext.getRouteController().startRoute(ScsbConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE+institution);
         }
         logger.info("After Request Initial DataLoad process : {}", camelContext.getRoutes().size());
-        return RecapCommonConstants.SUCCESS;
+        return ScsbCommonConstants.SUCCESS;
     }
 }

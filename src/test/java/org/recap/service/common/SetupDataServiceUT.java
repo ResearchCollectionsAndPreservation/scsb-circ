@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemStatusEntity;
@@ -56,7 +56,7 @@ public class SetupDataServiceUT {
         Map<Integer,String> itemStatusIdCodeMap = setupDataService.getItemStatusIdCodeMap();
         assertNotNull(itemStatusIdCodeMap);
         String itemStatusCode = itemStatusIdCodeMap.get(1);
-        assertEquals(RecapCommonConstants.AVAILABLE,itemStatusCode);
+        assertEquals(ScsbCommonConstants.AVAILABLE,itemStatusCode);
     }
     @Test
     public void getItemStatusIdCodeMapForException(){
@@ -70,7 +70,7 @@ public class SetupDataServiceUT {
         Mockito.when(repositoryService.getItemStatusDetailsRepository().findAll()).thenReturn(Arrays.asList(itemStatusEntity));
         Map<String,Integer> itemStatusCodeIdMap = setupDataService.getItemStatusCodeIdMap();
         assertNotNull(itemStatusCodeIdMap);
-        Integer itemStatusId = itemStatusCodeIdMap.get(RecapCommonConstants.AVAILABLE);
+        Integer itemStatusId = itemStatusCodeIdMap.get(ScsbCommonConstants.AVAILABLE);
         assertEquals("1",itemStatusId.toString());
     }
     @Test
@@ -86,7 +86,7 @@ public class SetupDataServiceUT {
         Map<Integer,String> institutionEntityMap = setupDataService.getInstitutionIdCodeMap();
         assertNotNull(institutionEntityMap);
         String itemStatusCode = institutionEntityMap.get(1);
-        assertEquals(RecapCommonConstants.PRINCETON,itemStatusCode);
+        assertEquals(ScsbCommonConstants.PRINCETON,itemStatusCode);
     }
     @Test
     public void getInstitutionIdCodeMapForException(){
@@ -100,7 +100,7 @@ public class SetupDataServiceUT {
         Mockito.when(repositoryService.getInstitutionDetailsRepository().findAll()).thenReturn(Arrays.asList(institutionEntity));
         Map<String,Integer> institutionEntityMapId = setupDataService.getInstitutionCodeIdMap();
         assertNotNull(institutionEntityMapId);
-        Integer itemStatusId = institutionEntityMapId.get(RecapCommonConstants.PRINCETON);
+        Integer itemStatusId = institutionEntityMapId.get(ScsbCommonConstants.PRINCETON);
         assertEquals("1",itemStatusId.toString());
     }
     @Test

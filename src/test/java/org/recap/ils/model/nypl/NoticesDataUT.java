@@ -21,7 +21,7 @@ public class NoticesDataUT extends BaseTestCaseUT {
         CheckOutItemResponse checkOutItemResponse = new CheckOutItemResponse();
         checkOutItemResponse.setProblem(problem);
         Attributes attributes = new Attributes();
-        attributes.setVersion("RECAP-0.12");
+        attributes.setVersion("SCSB-0.12");
         NoticesData noticesData = new NoticesData();
         noticesData.setAttributes(attributes);
         noticesData.setCheckOutItemResponse(checkOutItemResponse);

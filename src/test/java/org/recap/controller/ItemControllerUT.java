@@ -5,7 +5,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.InstitutionEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -52,7 +52,7 @@ public class ItemControllerUT extends BaseTestCaseUT {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(1);
-        itemEntity.setCatalogingStatus(RecapCommonConstants.COMPLETE_STATUS);
+        itemEntity.setCatalogingStatus(ScsbCommonConstants.COMPLETE_STATUS);
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);
         institutionEntity.setInstitutionCode("PUL");

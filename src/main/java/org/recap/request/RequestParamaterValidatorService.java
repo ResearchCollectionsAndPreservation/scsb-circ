@@ -1,8 +1,8 @@
 package org.recap.request;
 
 
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.controller.ItemController;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
@@ -58,43 +58,43 @@ public class RequestParamaterValidatorService {
         Map<Integer, String> errorMessageMap = new HashMap<>();
         Integer errorCount = 1;
         if (CollectionUtils.isEmpty(itemRequestInformation.getItemBarcodes())) {
-            errorMessageMap.put(errorCount, RecapConstants.ITEM_BARCODE_IS_REQUIRED);
+            errorMessageMap.put(errorCount, ScsbConstants.ITEM_BARCODE_IS_REQUIRED);
             errorCount++;
         }
         if (StringUtils.isEmpty(itemRequestInformation.getRequestingInstitution()) || !institutionDetailsRepository.existsByInstitutionCode(itemRequestInformation.getRequestingInstitution())) {
-            errorMessageMap.put(errorCount, MessageFormat.format(RecapConstants.INVALID_REQUEST_INSTITUTION, String.join(",", institutionDetailsRepository.findAllInstitutionCodeExceptHTC())));
+            errorMessageMap.put(errorCount, MessageFormat.format(ScsbConstants.INVALID_REQUEST_INSTITUTION, String.join(",", institutionDetailsRepository.findAllInstitutionCodeExceptHTC())));
             errorCount++;
         }
         if (!validateEmailAddress(itemRequestInformation.getEmailAddress())) {
-            errorMessageMap.put(errorCount, RecapConstants.INVALID_EMAIL_ADDRESS);
+            errorMessageMap.put(errorCount, ScsbConstants.INVALID_EMAIL_ADDRESS);
             errorCount++;
         }
 
-        if ((itemRequestInformation.getRequestType() == null || itemRequestInformation.getRequestType().trim().length() <= 0) || (!RecapConstants.getRequestTypeList().contains(itemRequestInformation.getRequestType()))) {
-            errorMessageMap.put(errorCount, RecapConstants.INVALID_REQUEST_TYPE);
+        if ((itemRequestInformation.getRequestType() == null || itemRequestInformation.getRequestType().trim().length() <= 0) || (!ScsbConstants.getRequestTypeList().contains(itemRequestInformation.getRequestType()))) {
+            errorMessageMap.put(errorCount, ScsbConstants.INVALID_REQUEST_TYPE);
             errorCount++;
         } else {
-            if (itemRequestInformation.getRequestType().equalsIgnoreCase(RecapConstants.EDD_REQUEST)) {
+            if (itemRequestInformation.getRequestType().equalsIgnoreCase(ScsbConstants.EDD_REQUEST)) {
                 if (!CollectionUtils.isEmpty(itemRequestInformation.getItemBarcodes())) {
                     if (itemController.splitStringAndGetList(itemRequestInformation.getItemBarcodes().toString()).size() > 1) {
-                        errorMessageMap.put(errorCount, RecapConstants.MULTIPLE_ITEMS_NOT_ALLOWED_FOR_EDD);
+                        errorMessageMap.put(errorCount, ScsbConstants.MULTIPLE_ITEMS_NOT_ALLOWED_FOR_EDD);
                         errorCount++;
                     }
                 } else {
-                    errorMessageMap.put(errorCount, RecapConstants.ITEM_BARCODE_IS_REQUIRED);
+                    errorMessageMap.put(errorCount, ScsbConstants.ITEM_BARCODE_IS_REQUIRED);
                     errorCount++;
                 }
                 if (StringUtils.isEmpty(itemRequestInformation.getChapterTitle())) {
-                    errorMessageMap.put(errorCount, RecapConstants.CHAPTER_TITLE_IS_REQUIRED);
+                    errorMessageMap.put(errorCount, ScsbConstants.CHAPTER_TITLE_IS_REQUIRED);
                     errorCount++;
                 }
                 if (itemRequestInformation.getStartPage() == null || itemRequestInformation.getEndPage() == null) {
-                    errorMessageMap.put(errorCount, RecapConstants.START_PAGE_AND_END_PAGE_REQUIRED);
+                    errorMessageMap.put(errorCount, ScsbConstants.START_PAGE_AND_END_PAGE_REQUIRED);
                     errorCount++;
                 }
-            } else if ((itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.REQUEST_TYPE_RECALL) || itemRequestInformation.getRequestType().equalsIgnoreCase(RecapCommonConstants.RETRIEVAL)) &&
+            } else if ((itemRequestInformation.getRequestType().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_RECALL) || itemRequestInformation.getRequestType().equalsIgnoreCase(ScsbCommonConstants.RETRIEVAL)) &&
                  (StringUtils.isEmpty(itemRequestInformation.getDeliveryLocation()))) {
-                    errorMessageMap.put(errorCount, RecapConstants.DELIVERY_LOCATION_REQUIRED);
+                    errorMessageMap.put(errorCount, ScsbConstants.DELIVERY_LOCATION_REQUIRED);
                     errorCount++;
                 }
             }
@@ -110,7 +110,7 @@ public class RequestParamaterValidatorService {
         boolean bSuccess = false;
         try {
             if (!StringUtils.isEmpty(toEmailAddress)) {
-                String regex = RecapCommonConstants.REGEX_FOR_EMAIL_ADDRESS;
+                String regex = ScsbCommonConstants.REGEX_FOR_EMAIL_ADDRESS;
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(toEmailAddress);
                 bSuccess = matcher.matches();
@@ -118,7 +118,7 @@ public class RequestParamaterValidatorService {
                 bSuccess = true;
             }
         } catch (Exception e) {
-            logger.error(RecapCommonConstants.LOG_ERROR,e);
+            logger.error(ScsbCommonConstants.LOG_ERROR,e);
         }
         return bSuccess;
     }
@@ -130,7 +130,7 @@ public class RequestParamaterValidatorService {
      */
     public HttpHeaders getHttpHeaders() {
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add(RecapCommonConstants.RESPONSE_DATE, new Date().toString());
+        responseHeaders.add(ScsbCommonConstants.RESPONSE_DATE, new Date().toString());
         return responseHeaders;
     }
 

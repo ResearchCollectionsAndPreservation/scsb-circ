@@ -2,8 +2,8 @@ package org.recap.request;
 
 import org.apache.camel.ProducerTemplate;
 import org.apache.commons.collections.CollectionUtils;
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.model.jpa.BulkRequestItem;
 import org.recap.model.jpa.BulkRequestItemEntity;
 import org.recap.model.jpa.ItemEntity;
@@ -81,15 +81,15 @@ public class BulkItemRequestService {
             List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemBarcode);
             if (CollectionUtils.isNotEmpty(itemEntities)) {
                 ItemEntity itemEntity = itemEntities.get(0);
-                if (itemEntity.getItemStatusEntity().getStatusCode().equalsIgnoreCase(RecapCommonConstants.NOT_AVAILABLE)) {
-                    exceptionBulkRequestItems.add(buildBulkRequestItem(itemBarcode, itemEntity.getCustomerCode(), RecapConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM));
+                if (itemEntity.getItemStatusEntity().getStatusCode().equalsIgnoreCase(ScsbCommonConstants.NOT_AVAILABLE)) {
+                    exceptionBulkRequestItems.add(buildBulkRequestItem(itemBarcode, itemEntity.getCustomerCode(), ScsbConstants.RETRIEVAL_NOT_FOR_UNAVAILABLE_ITEM));
                 } else if (!itemEntity.getOwningInstitutionId().equals(bulkRequestItemEntity.get().getRequestingInstitutionId())) {
                     exceptionBulkRequestItems.add(buildBulkRequestItem(itemBarcode, itemEntity.getCustomerCode(), "Item doesn't belong to the requesting institution."));
                 } else {
-                    producerTemplate.sendBodyAndHeader(RecapConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE, itemBarcode, RecapCommonConstants.BULK_REQUEST_ID, bulkRequestId);
+                    producerTemplate.sendBodyAndHeader(ScsbConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE, itemBarcode, ScsbCommonConstants.BULK_REQUEST_ID, bulkRequestId);
                 }
             } else {
-                exceptionBulkRequestItems.add(buildBulkRequestItem(itemBarcode, null, RecapConstants.WRONG_ITEM_BARCODE));
+                exceptionBulkRequestItems.add(buildBulkRequestItem(itemBarcode, null, ScsbConstants.WRONG_ITEM_BARCODE));
             }
         }
         for (String itemBarcode : bulkRequestItemBarcodeExcessList) {
@@ -99,7 +99,7 @@ public class BulkItemRequestService {
         bulkRequestItemBarcodeLimitedList.clear();
         bulkRequestItemBarcodeExcessList.clear();
         updateStatusToBarcodes(exceptionBulkRequestItems, bulkRequestId);
-        producerTemplate.sendBodyAndHeader(RecapConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE, RecapConstants.COMPLETE, RecapCommonConstants.BULK_REQUEST_ID, bulkRequestId);
+        producerTemplate.sendBodyAndHeader(ScsbConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE, ScsbConstants.COMPLETE, ScsbCommonConstants.BULK_REQUEST_ID, bulkRequestId);
     }
 
     /**
@@ -110,7 +110,7 @@ public class BulkItemRequestService {
     private void updateStatusToBarcodes(List<BulkRequestItem> exceptionBulkRequestItems, Integer bulkRequestId) {
        Optional<BulkRequestItemEntity> bulkRequestItemEntity = bulkRequestItemDetailsRepository.findById(bulkRequestId);
        if(bulkRequestItemEntity.isPresent()) {
-           if (!RecapConstants.PROCESSED.equals(bulkRequestItemEntity.get().getBulkRequestStatus())) {
+           if (!ScsbConstants.PROCESSED.equals(bulkRequestItemEntity.get().getBulkRequestStatus())) {
                StringBuilder csvFormatDataBuilder = new StringBuilder();
                csvFormatDataBuilder.append("BARCODE,CUSTOMER CODE,REQUEST ID,REQUEST STATUS,STATUS");
                itemRequestServiceUtil.buildCsvFormatData(exceptionBulkRequestItems, csvFormatDataBuilder);

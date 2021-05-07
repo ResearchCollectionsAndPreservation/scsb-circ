@@ -14,7 +14,7 @@ import org.extensiblecatalog.ncip.v2.service.ToAgencyId;
 import org.extensiblecatalog.ncip.v2.service.ValidationException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.ils.NCIPToolKitUtil;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 @Slf4j
-public class RecapNCIP {
+public class ScsbNCIP {
 
     public JSONObject generateNcipProblems(NCIPResponseData responseData) {
         JSONObject returnJson = new JSONObject();
@@ -51,7 +51,7 @@ public class RecapNCIP {
     }
 
     public ApplicationProfileType getApplicationProfileType() {
-        return new ApplicationProfileType(null, RecapConstants.AGENCY_ID_SCSB);
+        return new ApplicationProfileType(null, ScsbConstants.AGENCY_ID_SCSB);
     }
 
     public InitiationHeader getInitiationHeaderwithoutScheme(InitiationHeader initiationHeader, String fromAgency, String toAgency){

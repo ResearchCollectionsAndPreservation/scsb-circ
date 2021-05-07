@@ -2,8 +2,8 @@ package org.recap.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.las.model.TtitemEDDResponse;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
@@ -63,11 +63,11 @@ public class ItemRequestServiceUtil {
         try {
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity requestEntity = new HttpEntity<>(getRestHeaderService().getHttpHeaders());
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + RecapConstants.UPDATE_ITEM_STATUS_SOLR).queryParam(RecapConstants.UPDATE_ITEM_STATUS_SOLR_PARAM_ITEM_ID, itemEntity.getBarcode());
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(scsbSolrClientUrl + ScsbConstants.UPDATE_ITEM_STATUS_SOLR).queryParam(ScsbConstants.UPDATE_ITEM_STATUS_SOLR_PARAM_ITEM_ID, itemEntity.getBarcode());
             ResponseEntity<String> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, String.class);
             logger.info(responseEntity.getBody());
         } catch (Exception e) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
     }
 
@@ -169,7 +169,7 @@ public class ItemRequestServiceUtil {
         String patronId = "";
         GenericPatronEntity genericPatronEntity = genericPatronDetailsRepository.findByRequestingInstitutionCodeAndItemOwningInstitutionCode(requestingInstitution, owningInstitution);
         if(genericPatronEntity != null) {
-            if (RecapCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
+            if (ScsbCommonConstants.REQUEST_TYPE_EDD.equalsIgnoreCase(requestType)) {
                 patronId = genericPatronEntity.getEddGenericPatron();
             } else {
                 patronId = genericPatronEntity.getRetrievalGenericPatron();

@@ -2,8 +2,8 @@ package org.recap.util;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.CollectionGroupDetailsRepository;
 import org.recap.repository.jpa.ImsLocationDetailsRepository;
@@ -76,9 +76,9 @@ public class CommonUtil {
             errorMessage.append(" Holdings Content cannot be empty");
         }
         holdingsEntity.setCreatedDate(currentDate);
-        holdingsEntity.setCreatedBy(RecapConstants.SUBMIT_COLLECTION);
+        holdingsEntity.setCreatedBy(ScsbConstants.SUBMIT_COLLECTION);
         holdingsEntity.setLastUpdatedDate(currentDate);
-        holdingsEntity.setLastUpdatedBy(RecapConstants.SUBMIT_COLLECTION);
+        holdingsEntity.setLastUpdatedBy(ScsbConstants.SUBMIT_COLLECTION);
         Integer owningInstitutionId = bibliographicEntity.getOwningInstitutionId();
         holdingsEntity.setOwningInstitutionId(owningInstitutionId);
         return holdingsEntity;
@@ -113,7 +113,7 @@ public class CommonUtil {
                     itemStatusMap.put(itemStatusEntity.getStatusCode(), itemStatusEntity.getId());
                 }
             } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
+                logger.error(ScsbCommonConstants.LOG_ERROR,e);
             }
         }
         return itemStatusMap;
@@ -134,7 +134,7 @@ public class CommonUtil {
                     collectionGroupMap.put(collectionGroupEntity.getCollectionGroupCode(), collectionGroupEntity.getId());
                 }
             } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
+                logger.error(ScsbCommonConstants.LOG_ERROR,e);
             }
         }
         return collectionGroupMap;
@@ -155,7 +155,7 @@ public class CommonUtil {
                     institutionEntityMap.put(institutionEntity.getInstitutionCode(), institutionEntity.getId());
                 }
             } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR,e);
+                logger.error(ScsbCommonConstants.LOG_ERROR,e);
             }
         }
         return institutionEntityMap;
@@ -168,11 +168,11 @@ public class CommonUtil {
      * @param userName   the user name
      */
     public void rollbackUpdateItemAvailabilityStatus(ItemEntity itemEntity, String userName) {
-        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(RecapCommonConstants.AVAILABLE);
+        ItemStatusEntity itemStatusEntity = itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.AVAILABLE);
         itemEntity.setItemAvailabilityStatusId(itemStatusEntity.getId()); // Available
         itemEntity.setLastUpdatedBy(getUser(userName));
         itemDetailsRepository.save(itemEntity);
-        saveItemChangeLogEntity(itemEntity.getId(), getUser(userName), RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, RecapConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK);
+        saveItemChangeLogEntity(itemEntity.getId(), getUser(userName), ScsbConstants.REQUEST_ITEM_AVAILABILITY_STATUS_UPDATE, ScsbConstants.REQUEST_ITEM_AVAILABILITY_STATUS_DATA_ROLLBACK);
     }
 
     /**

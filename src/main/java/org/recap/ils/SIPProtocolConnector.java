@@ -8,8 +8,8 @@ import com.pkrete.jsip2.messages.responses.*;
 import com.pkrete.jsip2.util.MessageUtil;
 import com.pkrete.jsip2.variables.HoldMode;
 import lombok.extern.slf4j.Slf4j;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.ils.model.response.*;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
@@ -27,7 +27,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
 
     @Override
     public boolean supports(String protocol) {
-        return RecapConstants.SIP2_PROTOCOL.equalsIgnoreCase(protocol);
+        return ScsbConstants.SIP2_PROTOCOL.equalsIgnoreCase(protocol);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
             log.info("Port: {}", getPort());
             connection.connect();
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
         }
         return connection;
     }
@@ -80,11 +80,11 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                 loginPatronStatus = loginResponse.isOk() && response.isValidPatron() && response.isValidPatronPassword();
             }
         } catch (InvalidSIP2ResponseException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
         } catch (InvalidSIP2ResponseValueException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
         }
         return loginPatronStatus;
     }
@@ -100,7 +100,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
             SIP2PatronInformationResponse response = (SIP2PatronInformationResponse) connection.send(request);
             loginPatronStatus = loginResponse.isOk() && response.isValidPatron() && response.isValidPatronPassword();
         } catch (Exception ex) {
-            log.error(RecapCommonConstants.LOG_ERROR, ex);
+            log.error(ScsbCommonConstants.LOG_ERROR, ex);
         } finally {
             connection.close();
         }
@@ -148,23 +148,23 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                 itemInformationResponse.setCurrencyType((sip2ItemInformationResponse.getCurrencyType() != null) ? sip2ItemInformationResponse.getCurrencyType().name() : "");
                 itemInformationResponse.setBibID(sip2ItemInformationResponse.getBibId());
             } else {
-                itemInformationResponse.setScreenMessage(RecapConstants.ILS_LOGIN_FAILED);
+                itemInformationResponse.setScreenMessage(ScsbConstants.ILS_LOGIN_FAILED);
                 itemInformationResponse.setSuccess(false);
                 log.info(itemInformationResponse.getScreenMessage());
             }
         } catch (InvalidSIP2ResponseException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
             itemInformationResponse.setSuccess(false);
-            itemInformationResponse.setScreenMessage(RecapConstants.INVALID_NO_RESPONSE_FROM_ILS);
+            itemInformationResponse.setScreenMessage(ScsbConstants.INVALID_NO_RESPONSE_FROM_ILS);
         } catch (InvalidSIP2ResponseValueException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
             itemInformationResponse.setSuccess(false);
-            itemInformationResponse.setScreenMessage(RecapConstants.SCREEN_MESSAGE_ITEM_BARCODE_NOT_FOUND);
-            itemInformationResponse.setCirculationStatus(RecapConstants.ITEM_BARCODE_NOT_FOUND);
+            itemInformationResponse.setScreenMessage(ScsbConstants.SCREEN_MESSAGE_ITEM_BARCODE_NOT_FOUND);
+            itemInformationResponse.setCirculationStatus(ScsbConstants.ITEM_BARCODE_NOT_FOUND);
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
             itemInformationResponse.setSuccess(false);
-            itemInformationResponse.setScreenMessage("SCSB Exception: {}" + RecapConstants.ILS_CONNECTION_FAILED);
+            itemInformationResponse.setScreenMessage("SCSB Exception: {}" + ScsbConstants.ILS_CONNECTION_FAILED);
         } finally {
             connection.close();
         }
@@ -193,14 +193,14 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                 log.info(patronStatusRequest.getData());
                 patronStatusResponse = (SIP2PatronStatusResponse) connection.send(patronStatusRequest);
             } else {
-                log.info(RecapConstants.ITEM_REQUEST_FAILED);
+                log.info(ScsbConstants.ITEM_REQUEST_FAILED);
             }
         } catch (InvalidSIP2ResponseException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
         } catch (InvalidSIP2ResponseValueException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
         } finally {
             connection.close();
         }
@@ -245,21 +245,21 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
 
                     }
                 } else {
-                    itemCheckoutResponse.setScreenMessage(RecapConstants.ILS_LOGIN_FAILED);
+                    itemCheckoutResponse.setScreenMessage(ScsbConstants.ILS_LOGIN_FAILED);
                     itemCheckoutResponse.setSuccess(false);
                     log.info(itemCheckoutResponse.getScreenMessage());
                 }
             }
         } catch (InvalidSIP2ResponseException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
             itemCheckoutResponse.setScreenMessage(e.getMessage());
             itemCheckoutResponse.setSuccess(false);
         } catch (InvalidSIP2ResponseValueException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
             itemCheckoutResponse.setScreenMessage(e.getMessage());
             itemCheckoutResponse.setSuccess(false);
         } catch (Exception e) {
-            log.error(RecapCommonConstants.LOG_ERROR, e);
+            log.error(ScsbCommonConstants.LOG_ERROR, e);
             itemCheckoutResponse.setScreenMessage(e.getMessage());
             itemCheckoutResponse.setSuccess(false);
         } finally {
@@ -289,7 +289,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                         itemCheckinResponse.setEsipDataOut(checkinResponse.getData());
 
                         if (checkinResponse.isOk()) {
-                            log.info(RecapConstants.CHECK_IN_REQUEST_SUCCESSFUL);
+                            log.info(ScsbConstants.CHECK_IN_REQUEST_SUCCESSFUL);
                             itemCheckinResponse.setItemBarcode(checkinResponse.getItemIdentifier());
                             itemCheckinResponse.setTitleIdentifier(checkinResponse.getTitleIdentifier());
                             itemCheckinResponse.setDueDate(formatFromSipDate(checkinResponse.getDueDate()));
@@ -311,20 +311,20 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                             itemCheckinResponse.setHoldPatronId(checkinResponse.getHoldPatronId());
                             itemCheckinResponse.setHoldPatronName(checkinResponse.getHoldPatronName());
                         } else {
-                            log.info(RecapConstants.CHECK_IN_REQUEST_FAILED);
+                            log.info(ScsbConstants.CHECK_IN_REQUEST_FAILED);
                             log.info("Response -> {}", checkinResponse.getData());
                         }
                         itemCheckinResponse.setScreenMessage((!checkinResponse.getScreenMessage().isEmpty()) ? checkinResponse.getScreenMessage().get(0) : "");
                         itemCheckinResponse.setSuccess(checkinResponse.isOk());
                     }
                 } else {
-                    log.info(RecapConstants.ILS_LOGIN_FAILED);
+                    log.info(ScsbConstants.ILS_LOGIN_FAILED);
                 }
             }
         } catch (InvalidSIP2ResponseException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
         } catch (InvalidSIP2ResponseValueException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
         } finally {
             connection.close();
         }
@@ -361,7 +361,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                         log.info(bibId);
                         SIP2HoldRequest holdRequest = new SIP2HoldRequest(patronIdentifier, itemIdentifier);
                         holdRequest.setHoldMode(holdMode);
-                        holdRequest.setExpirationDate(MessageUtil.createFutureDate(RecapConstants.ESIPEXPIRATION_DATE_DAY, RecapConstants.ESIPEXPIRATION_DATE_MONTH));
+                        holdRequest.setExpirationDate(MessageUtil.createFutureDate(ScsbConstants.ESIPEXPIRATION_DATE_DAY, ScsbConstants.ESIPEXPIRATION_DATE_MONTH));
                         holdRequest.setBibId(bibId);
                         holdRequest.setPickupLocation(pickupLocation);
 
@@ -385,27 +385,27 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                         itemHoldResponse.setAvailable(holdResponse.isAvailable());
                     } else {
                         itemHoldResponse.setSuccess(false);
-                        itemHoldResponse.setScreenMessage(RecapConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
+                        itemHoldResponse.setScreenMessage(ScsbConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
                         log.error(itemHoldResponse.getScreenMessage());
                     }
                 } else {
                     itemHoldResponse.setSuccess(false);
-                    itemHoldResponse.setScreenMessage(RecapConstants.ILS_LOGIN_FAILED);
+                    itemHoldResponse.setScreenMessage(ScsbConstants.ILS_LOGIN_FAILED);
                     log.error(itemHoldResponse.getScreenMessage());
                 }
             } else {
                 itemHoldResponse.setSuccess(false);
-                itemHoldResponse.setScreenMessage(RecapConstants.ILS_CONNECTION_FAILED);
+                itemHoldResponse.setScreenMessage(ScsbConstants.ILS_CONNECTION_FAILED);
                 log.error(itemHoldResponse.getScreenMessage());
             }
         } catch (InvalidSIP2ResponseException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
             holdResponse = new SIP2HoldResponse("");
-            holdResponse.setScreenMessage(Collections.singletonList(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE));
+            holdResponse.setScreenMessage(Collections.singletonList(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE));
         } catch (InvalidSIP2ResponseValueException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
             holdResponse = new SIP2HoldResponse("");
-            holdResponse.setScreenMessage(Collections.singletonList(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE));
+            holdResponse.setScreenMessage(Collections.singletonList(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE));
         } finally {
             connection.close();
         }
@@ -440,25 +440,25 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                         itemCreateBibResponse.setItemId(createBibResponse.getItemIdentifier());
                     } else {
                         itemCreateBibResponse.setSuccess(false);
-                        itemCreateBibResponse.setScreenMessage(RecapConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
+                        itemCreateBibResponse.setScreenMessage(ScsbConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
                         log.error(itemCreateBibResponse.getScreenMessage());
                     }
                 } else {
                     itemCreateBibResponse.setSuccess(false);
-                    itemCreateBibResponse.setScreenMessage(RecapConstants.ILS_LOGIN_FAILED);
+                    itemCreateBibResponse.setScreenMessage(ScsbConstants.ILS_LOGIN_FAILED);
                     log.error(itemCreateBibResponse.getScreenMessage());
                 }
             } else {
                 itemCreateBibResponse.setSuccess(false);
-                itemCreateBibResponse.setScreenMessage(RecapConstants.ILS_CONNECTION_FAILED);
+                itemCreateBibResponse.setScreenMessage(ScsbConstants.ILS_CONNECTION_FAILED);
                 log.error(itemCreateBibResponse.getScreenMessage());
             }
         } catch (InvalidSIP2ResponseException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
             itemCreateBibResponse.setSuccess(false);
             itemCreateBibResponse.setScreenMessage(e.getMessage());
         } catch (Exception e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
             itemCreateBibResponse.setSuccess(false);
             itemCreateBibResponse.setScreenMessage(e.getMessage());
         } finally {
@@ -530,7 +530,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                 }
             } else {
                 patronInformationResponse.setSuccess(true);
-                patronInformationResponse.setScreenMessage(RecapConstants.ILS_CONNECTION_FAILED);
+                patronInformationResponse.setScreenMessage(ScsbConstants.ILS_CONNECTION_FAILED);
             }
         } catch (Exception ex) {
             log.error("", ex);
@@ -568,7 +568,7 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                         SIP2RecallRequest recallRequest = new SIP2RecallRequest(patronIdentifier, itemIdentifier);
                         recallRequest.setHoldMode(HoldMode.ADD);
                         recallRequest.setInstitutionId(institutionId);
-                        recallRequest.setExpirationDate(MessageUtil.createFutureDate(RecapConstants.ESIPEXPIRATION_DATE_DAY, RecapConstants.ESIPEXPIRATION_DATE_MONTH));
+                        recallRequest.setExpirationDate(MessageUtil.createFutureDate(ScsbConstants.ESIPEXPIRATION_DATE_DAY, ScsbConstants.ESIPEXPIRATION_DATE_MONTH));
                         recallRequest.setBibId(bibId);
                         recallRequest.setPickupLocation(pickupLocation);
 
@@ -588,23 +588,23 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
                         itemRecallResponse.setPatronIdentifier(sip2RecallResponse.getPatronIdentifier());
                     } else {
                         itemRecallResponse.setSuccess(false);
-                        itemRecallResponse.setScreenMessage(RecapConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
+                        itemRecallResponse.setScreenMessage(ScsbConstants.PATRON_VALIDATION_FAILED + ((!response.getScreenMessage().isEmpty()) ? response.getScreenMessage().get(0) : ""));
                         log.error(itemRecallResponse.getScreenMessage());
                     }
                 } else {
                     itemRecallResponse.setSuccess(false);
-                    itemRecallResponse.setScreenMessage(RecapConstants.ILS_LOGIN_FAILED);
+                    itemRecallResponse.setScreenMessage(ScsbConstants.ILS_LOGIN_FAILED);
                     log.error(itemRecallResponse.getScreenMessage());
                 }
             } else {
                 itemRecallResponse.setSuccess(false);
-                itemRecallResponse.setScreenMessage(RecapConstants.ILS_CONNECTION_FAILED);
+                itemRecallResponse.setScreenMessage(ScsbConstants.ILS_CONNECTION_FAILED);
                 log.error(itemRecallResponse.getScreenMessage());
             }
         } catch (InvalidSIP2ResponseException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE, e);
         } catch (InvalidSIP2ResponseValueException e) {
-            log.error(RecapConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
+            log.error(ScsbConstants.REQUEST_INVALID_SIP2_RESPONSE_VALUE, e);
         } finally {
             connection.close();
         }
@@ -613,14 +613,14 @@ public class SIPProtocolConnector extends AbstractProtocolConnector {
 
     private String formatFromSipDate(String sipDate) {
         SimpleDateFormat sipFormat = new SimpleDateFormat("yyyyMMdd    HHmmss");
-        SimpleDateFormat requiredFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
+        SimpleDateFormat requiredFormat = new SimpleDateFormat(ScsbConstants.DATE_FORMAT);
         String reformattedStr = "";
         try {
             if (sipDate != null && sipDate.trim().length() > 0) {
                 reformattedStr = requiredFormat.format(sipFormat.parse(sipDate));
             }
         } catch (ParseException e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return reformattedStr;
     }

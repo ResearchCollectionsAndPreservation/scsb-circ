@@ -13,7 +13,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.jpa.ItemRequestInformation;
 
@@ -43,7 +43,7 @@ public class SIPProtocolConnectorUT {
     @Test
     public void supports() {
         SIPProtocolConnector sipProtocolConnector = new SIPProtocolConnector();
-        String protocol = RecapConstants.SIP2_PROTOCOL;
+        String protocol = ScsbConstants.SIP2_PROTOCOL;
         boolean result = sipProtocolConnector.supports(protocol);
         assertTrue(result);
     }

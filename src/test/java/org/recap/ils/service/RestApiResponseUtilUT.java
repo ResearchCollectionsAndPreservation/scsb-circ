@@ -5,7 +5,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.ils.model.nypl.*;
 import org.recap.ils.model.nypl.response.*;
 import org.recap.ils.model.response.*;
@@ -116,7 +116,7 @@ public class RestApiResponseUtilUT extends BaseTestCaseUT {
     public void requiredFormattedDate() {
         String sipDate = "31-01-2020";
         SimpleDateFormat sipFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat requiredFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
+        SimpleDateFormat requiredFormat = new SimpleDateFormat(ScsbConstants.DATE_FORMAT);
         ReflectionTestUtils.invokeMethod(restApiResponseUtil, "requiredFormattedDate", sipDate, sipFormat, requiredFormat);
     }
 

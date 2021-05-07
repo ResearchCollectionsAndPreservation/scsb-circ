@@ -6,10 +6,11 @@ import java.util.List;
 /**
  * Created by premkb on 19/8/16.
  */
-public final class RecapConstants {
+public final class ScsbConstants {
 
     public static final String GFA = "GFA";
-    public  static  final String FAILURE_UPDATE_CGD = "Failure: User is not allowed to update other instituion Item";
+    public static final String RECAP = "RECAP";
+    public static  final String FAILURE_UPDATE_CGD = "Failure: User is not allowed to update other instituion Item";
     public static final String INVALID_REQUEST_INSTITUTION = "Please enter valid Institution {0} for requestingInstitution";
     public static final String INVALID_EMAIL_ADDRESS = "Please enter valid emailAddress";
     public static final String START_PAGE_AND_END_PAGE_REQUIRED = "Start page and end page required.";
@@ -160,7 +161,7 @@ public final class RecapConstants {
     public static final String REQUESTS_STUCK_IN_PENDING = "Requests stuck in pending";
     public static final String NO_PENDING_REQUESTS_FOUND = "There are no pending requests or no new pending request";
 
-    protected static final List<String> REQUEST_TYPE_LIST = Arrays.asList(RecapCommonConstants.RETRIEVAL, RecapCommonConstants.REQUEST_TYPE_EDD, RecapCommonConstants.BORROW_DIRECT, RecapCommonConstants.REQUEST_TYPE_RECALL);
+    protected static final List<String> REQUEST_TYPE_LIST = Arrays.asList(ScsbCommonConstants.RETRIEVAL, ScsbCommonConstants.REQUEST_TYPE_EDD, ScsbCommonConstants.BORROW_DIRECT, ScsbCommonConstants.REQUEST_TYPE_RECALL);
 
     public static final String SUCCESSFULLY_PROCESSED_REQUEST_ITEM = "Successfully Processed Request Item";
     public static final String REQUEST_ITEM_BARCODE_NOT_FOUND = "ITEM BARCODE NOT FOUND.";
@@ -383,7 +384,7 @@ public final class RecapConstants {
 
     public static final String ITEM_STATUS_NOT_AVAILABLE = "Not Available";
 
-    private RecapConstants() {
+    private ScsbConstants() {
     }
 
     public static List<String> getRequestTypeList() {

@@ -1,7 +1,7 @@
 package org.recap.service;
 
 import org.apache.camel.ProducerTemplate;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.model.jpa.PendingRequestEntity;
 import org.recap.model.jpa.RequestItemEntity;
@@ -50,9 +50,9 @@ public class IdentifyPendingRequestService {
         List<RequestItemEntity> requestItemEntitiesInPendingList = new ArrayList<>();
         List<RequestItemEntity> requestItemEntitiesInLASList = new ArrayList<>();
         List<PendingRequestEntity> pendingRequestEntityList = new ArrayList<>();
-        List<RequestItemEntity> requestItemEntitiesInPendingLASList = requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(RecapConstants.REQUEST_STATUS_PENDING, RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
+        List<RequestItemEntity> requestItemEntitiesInPendingLASList = requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(ScsbConstants.REQUEST_STATUS_PENDING, ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
         requestItemEntitiesInPendingLASList.forEach(requestItemEntity -> {
-            if(requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(RecapConstants.REQUEST_STATUS_PENDING)){
+            if(requestItemEntity.getRequestStatusEntity().getRequestStatusCode().equalsIgnoreCase(ScsbConstants.REQUEST_STATUS_PENDING)){
                 if(isRequestExceedsfiveMins(requestItemEntity)){
                     requestItemEntitiesInPendingList.add(requestItemEntity);
                     pendingRequestEntityList.add(getPendingRequestEntityFromRequestEntity(requestItemEntity));
@@ -91,11 +91,11 @@ public class IdentifyPendingRequestService {
         String emailBody = getEmailBodyForPendinglasRequest(requestItemEntitiesInPendingList,requestItemEntitiesInLASList);
         EmailPayLoad emailPayLoad = new EmailPayLoad();
         if(!requestItemEntitiesInPendingList.isEmpty() && !requestItemEntitiesInLASList.isEmpty()){
-            sendEmailNotificationForPendingRequests(emailPayLoad,emailBody, RecapConstants.EMAIL_SUBJECT_FOR_PENDING_AND_LAS_STATUS);
+            sendEmailNotificationForPendingRequests(emailPayLoad,emailBody, ScsbConstants.EMAIL_SUBJECT_FOR_PENDING_AND_LAS_STATUS);
         } else if(!requestItemEntitiesInPendingList.isEmpty() && requestItemEntitiesInLASList.isEmpty()){
-            sendEmailNotificationForPendingRequests(emailPayLoad,emailBody, RecapConstants.EMAIL_SUBJECT_FOR_PENDING_STATUS);
+            sendEmailNotificationForPendingRequests(emailPayLoad,emailBody, ScsbConstants.EMAIL_SUBJECT_FOR_PENDING_STATUS);
         } else if(requestItemEntitiesInPendingList.isEmpty() && !requestItemEntitiesInLASList.isEmpty()){
-            sendEmailNotificationForPendingRequests(emailPayLoad,emailBody, RecapConstants.EMAIL_SUBJECT_FOR_LAS_PENDING_STATUS);
+            sendEmailNotificationForPendingRequests(emailPayLoad,emailBody, ScsbConstants.EMAIL_SUBJECT_FOR_LAS_PENDING_STATUS);
         }
     }
 
@@ -132,7 +132,7 @@ public class IdentifyPendingRequestService {
         emailPayLoad.setMessageDisplay(message);
         emailPayLoad.setTo(pendingRequestEmailTo);
         emailPayLoad.setCc(pendingRequestEmailCc);
-        producerTemplate.sendBodyAndHeader(RecapConstants.EMAIL_Q, emailPayLoad, RecapConstants.EMAIL_BODY_FOR, RecapConstants.EMAIL_HEADER_REQUEST_STATUS_PENDING);
+        producerTemplate.sendBodyAndHeader(ScsbConstants.EMAIL_Q, emailPayLoad, ScsbConstants.EMAIL_BODY_FOR, ScsbConstants.EMAIL_HEADER_REQUEST_STATUS_PENDING);
     }
 
     private long getDifferenceInMinutes(Date createdDate) {

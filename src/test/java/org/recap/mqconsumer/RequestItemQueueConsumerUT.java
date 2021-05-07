@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.RequestInformation;
@@ -244,7 +244,7 @@ public class RequestItemQueueConsumerUT extends BaseTestCaseUT {
     }
     @Test
     public void bulkRequestProcessItemOnMessage() throws Exception{
-        message.setHeader(RecapCommonConstants.BULK_REQUEST_ID,1);
+        message.setHeader(ScsbCommonConstants.BULK_REQUEST_ID,1);
         message.setBody("BULK REQUEST");
         exchange.setIn(message);
         String body = "12345";

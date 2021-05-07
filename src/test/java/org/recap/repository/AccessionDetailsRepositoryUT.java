@@ -2,7 +2,7 @@ package org.recap.repository;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.model.jpa.AccessionEntity;
 import org.recap.repository.jpa.AccessionDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class AccessionDetailsRepositoryUT extends BaseTestCase {
         AccessionEntity accessionEntity = new AccessionEntity();
         accessionEntity.setAccessionRequest("[{\"customerCode\":\"PA\",\"itemBarcode\":\"123\"}]");
         accessionEntity.setCreatedDate(new Date());
-        accessionEntity.setAccessionStatus(RecapConstants.COMPLETE);
+        accessionEntity.setAccessionStatus(ScsbConstants.COMPLETE);
         AccessionEntity savedAccessionEntity = accessionDetailsRepository.save(accessionEntity);
         assertNotNull(savedAccessionEntity);
     }
@@ -35,7 +35,7 @@ public class AccessionDetailsRepositoryUT extends BaseTestCase {
         accessionEntity.setId(1);
         accessionEntity.setAccessionRequest("[{\"customerCode\":\"PA\",\"itemBarcode\":\"123\"}]");
         accessionEntity.setCreatedDate(new Date());
-        accessionEntity.setAccessionStatus(RecapConstants.COMPLETE);
+        accessionEntity.setAccessionStatus(ScsbConstants.COMPLETE);
 
         assertNotNull(accessionEntity.getId());
         assertNotNull(accessionEntity.getAccessionRequest());

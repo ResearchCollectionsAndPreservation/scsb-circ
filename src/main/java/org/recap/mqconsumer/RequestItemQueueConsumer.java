@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.ils.model.response.ItemInformationResponse;
 import org.recap.model.jpa.ItemRequestInformation;
 import org.recap.model.jpa.RequestInformation;
@@ -204,7 +204,7 @@ public class RequestItemQueueConsumer {
      * @throws IOException the io exception
      */
     public void bulkRequestProcessItemOnMessage(@Body String body, Exchange exchange) throws IOException {
-        Integer bulkRequestId = (Integer) exchange.getIn().getHeaders().get(RecapCommonConstants.BULK_REQUEST_ID);
+        Integer bulkRequestId = (Integer) exchange.getIn().getHeaders().get(ScsbCommonConstants.BULK_REQUEST_ID);
         getLogger().info("Bulk item request barcode received for bulk request id -> {} is -> {}", bulkRequestId, body);
         getBulkItemRequestProcessService().processBulkRequestItem(body, bulkRequestId);
     }
@@ -258,8 +258,8 @@ public class RequestItemQueueConsumer {
      * @param body the body
      */
     public void requestTopicOnMessage(@Body String body) {
-        getLogger().info("{} {}", RecapConstants.REQUEST_TOPIC_LISTENING_MESSAGES, getInstitutionCode());
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_TOPIC_PREFIX + getInstitutionCode() + "RequestTopic");
+        getLogger().info("{} {}", ScsbConstants.REQUEST_TOPIC_LISTENING_MESSAGES, getInstitutionCode());
+        setTopicMessageToDb(body, ScsbConstants.REQUEST_ITEM_TOPIC_PREFIX + getInstitutionCode() + "RequestTopic");
     }
 
     /**
@@ -268,8 +268,8 @@ public class RequestItemQueueConsumer {
      * @param body the body
      */
     public void eddTopicOnMessage(@Body String body) {
-        getLogger().info("{} {}", RecapConstants.REQUEST_TOPIC_LISTENING_MESSAGES, getInstitutionCode());
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_TOPIC_PREFIX + getInstitutionCode() + "EDDTopic");
+        getLogger().info("{} {}", ScsbConstants.REQUEST_TOPIC_LISTENING_MESSAGES, getInstitutionCode());
+        setTopicMessageToDb(body, ScsbConstants.REQUEST_ITEM_TOPIC_PREFIX + getInstitutionCode() + "EDDTopic");
     }
 
     /**
@@ -278,8 +278,8 @@ public class RequestItemQueueConsumer {
      * @param body the body
      */
     public void recallTopicOnMessage(@Body String body) {
-        getLogger().info("{} {}", RecapConstants.REQUEST_TOPIC_LISTENING_MESSAGES, getInstitutionCode());
-        setTopicMessageToDb(body, RecapConstants.REQUEST_ITEM_TOPIC_PREFIX + getInstitutionCode() + "RecallTopic");
+        getLogger().info("{} {}", ScsbConstants.REQUEST_TOPIC_LISTENING_MESSAGES, getInstitutionCode());
+        setTopicMessageToDb(body, ScsbConstants.REQUEST_ITEM_TOPIC_PREFIX + getInstitutionCode() + "RecallTopic");
     }
 
     public void scsbOutgoingQOnCompletion(@Body String body) {
@@ -352,7 +352,7 @@ public class RequestItemQueueConsumer {
                     getItemRequestService().updateChangesToDb(itemInformationResponse, operationType);
                 }
             } catch (Exception e) {
-                logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+                logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
             }
         }
     }

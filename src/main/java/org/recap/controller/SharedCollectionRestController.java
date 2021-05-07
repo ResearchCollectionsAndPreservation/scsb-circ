@@ -1,6 +1,6 @@
 package org.recap.controller;
 
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.service.deaccession.DeAccessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class SharedCollectionRestController {
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add(RecapCommonConstants.RESPONSE_DATE, new Date().toString());
+        responseHeaders.add(ScsbCommonConstants.RESPONSE_DATE, new Date().toString());
         return responseHeaders;
     }
 }

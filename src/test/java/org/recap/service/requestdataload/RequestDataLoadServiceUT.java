@@ -5,8 +5,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.ItemDetailsRepository;
@@ -43,8 +43,8 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord(bibliographicEntity);
         Set<String> barcodeSet = new HashSet<>();
         RequestTypeEntity requestTypeEntity = getRequestTypeEntity();
-        Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(requestDataLoadCSVRecord.getBarcode(), RecapCommonConstants.NOT_AVAILABLE)).thenReturn(bibliographicEntity.getItemEntities());
-        Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(RecapCommonConstants.RETRIEVAL)).thenReturn(requestTypeEntity);
+        Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(requestDataLoadCSVRecord.getBarcode(), ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(bibliographicEntity.getItemEntities());
+        Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(ScsbCommonConstants.RETRIEVAL)).thenReturn(requestTypeEntity);
         Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertNotNull(response);
     }
@@ -54,7 +54,7 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord(bibliographicEntity);
         Set<String> barcodeSet = new HashSet<>();
-        Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(requestDataLoadCSVRecord.getBarcode(), RecapCommonConstants.NOT_AVAILABLE)).thenReturn(null);
+        Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(requestDataLoadCSVRecord.getBarcode(), ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(null);
         Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertTrue(response.size() == 1);
     }
@@ -94,7 +94,7 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = new RequestDataLoadCSVRecord();
         requestDataLoadCSVRecord.setBarcode(bibliographicEntity.getItemEntities().get(0).getBarcode());
         requestDataLoadCSVRecord.setCustomerCode("PB");
-        requestDataLoadCSVRecord.setDeliveryMethod(RecapConstants.REQUEST_DATA_LOAD_REQUEST_TYPE);
+        requestDataLoadCSVRecord.setDeliveryMethod(ScsbConstants.REQUEST_DATA_LOAD_REQUEST_TYPE);
         requestDataLoadCSVRecord.setCreatedDate("05/12/2017 00:00:27.124");
         requestDataLoadCSVRecord.setLastUpdatedDate("05/12/2017 00:00:27.124");
         requestDataLoadCSVRecord.setPatronId("0000000");

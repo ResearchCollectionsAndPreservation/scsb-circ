@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.PendingRequestDetailsRespository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
@@ -41,7 +41,7 @@ public class IdentifyPendingRequestServiceUT{
     @Test
     public void testidentifyNonPendingRequest() {
         RequestItemEntity requestItemEntity = getRequestItem();
-        Mockito.when(requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(RecapConstants.REQUEST_STATUS_PENDING, RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(ScsbConstants.REQUEST_STATUS_PENDING, ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
         boolean status = identifyPendingRequestService.identifyPendingRequest();
         assertTrue(status);
     } @Test
@@ -55,7 +55,7 @@ public class IdentifyPendingRequestServiceUT{
         LocalDateTime then = now.minusDays(7);
         Date date = Date.from(then.atZone(ZoneId.systemDefault()).toInstant());
         requestItemEntity.setCreatedDate(date);
-        Mockito.when(requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(RecapConstants.REQUEST_STATUS_PENDING, RecapConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(ScsbConstants.REQUEST_STATUS_PENDING, ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
         boolean status = identifyPendingRequestService.identifyPendingRequest();
         assertTrue(status);
     }

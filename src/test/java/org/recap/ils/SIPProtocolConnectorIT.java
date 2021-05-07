@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.recap.BaseTestCaseUT;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.jpa.ItemRequestInformation;
 
@@ -32,7 +32,7 @@ public class SIPProtocolConnectorIT extends BaseTestCaseUT {
     @Test
     public void supports() {
         SIPProtocolConnector sipProtocolConnector = new SIPProtocolConnector();
-        String protocol = RecapConstants.SIP2_PROTOCOL;
+        String protocol = ScsbConstants.SIP2_PROTOCOL;
         boolean result = sipProtocolConnector.supports(protocol);
         assertTrue(result);
     }

@@ -2,7 +2,7 @@ package org.recap.controller;
 
 import org.junit.Test;
 import org.recap.BaseTestCase;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.ImsLocationDetailsRepository;
@@ -43,7 +43,7 @@ public class RequestItemValidatorControllerIT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("45678915");
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL);
         itemRequestInformation.setDeliveryLocation("PB");
         itemRequestInformation.setItemOwningInstitution("PUL");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
@@ -58,7 +58,7 @@ public class RequestItemValidatorControllerIT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("4567gfdr8915");
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL);
         itemRequestInformation.setDeliveryLocation("PB");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         itemRequestInformation.setItemOwningInstitution("PUL");
@@ -73,7 +73,7 @@ public class RequestItemValidatorControllerIT extends BaseTestCase {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsMultipleItem();
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setPatronBarcode("4567gfdr8915");
-        itemRequestInformation.setRequestType(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL);
+        itemRequestInformation.setRequestType(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL);
         itemRequestInformation.setDeliveryLocation("PB");
         itemRequestInformation.setEmailAddress("hemalatha.s@htcindia.com");
         itemRequestInformation.setItemOwningInstitution("PUL");

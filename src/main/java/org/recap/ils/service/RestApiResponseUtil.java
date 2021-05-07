@@ -3,8 +3,8 @@ package org.recap.ils.service;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.recap.RecapConstants;
-import org.recap.RecapCommonConstants;
+import org.recap.ScsbConstants;
+import org.recap.ScsbCommonConstants;
 import org.recap.ils.model.nypl.CancelHoldData;
 import org.recap.ils.model.nypl.CheckinData;
 import org.recap.ils.model.nypl.CheckoutData;
@@ -100,13 +100,13 @@ public class RestApiResponseUtil {
 
     private String formatFromSipDate(String sipDate) {
         SimpleDateFormat sipFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        SimpleDateFormat requiredFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
+        SimpleDateFormat requiredFormat = new SimpleDateFormat(ScsbConstants.DATE_FORMAT);
         return requiredFormattedDate(sipDate, sipFormat, requiredFormat);
     }
 
     private String formatDueDate(String sipDate) {
         SimpleDateFormat sipFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat requiredFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
+        SimpleDateFormat requiredFormat = new SimpleDateFormat(ScsbConstants.DATE_FORMAT);
         return requiredFormattedDate(sipDate, sipFormat, requiredFormat);
     }
 
@@ -278,13 +278,13 @@ public class RestApiResponseUtil {
      */
     public String getExpirationDateForRest() throws Exception {
         Date expirationDate = DateUtils.addYears(new Date(), 1);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.REST_HOLD_DATE_FORMAT);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScsbConstants.REST_HOLD_DATE_FORMAT);
         return simpleDateFormat.format(expirationDate);
     }
 
     public String expirationDateForRest() throws Exception {
         Date expirationDate = DateUtils.addYears(new Date(), 1);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RecapConstants.DATE_FORMAT);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScsbConstants.DATE_FORMAT);
         return simpleDateFormat.format(expirationDate);
     }
 
@@ -315,7 +315,7 @@ public class RestApiResponseUtil {
                 reformattedStr = requiredFormat.format(sipFormat.parse(sipDate));
             }
         } catch (ParseException e) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return reformattedStr;
     }

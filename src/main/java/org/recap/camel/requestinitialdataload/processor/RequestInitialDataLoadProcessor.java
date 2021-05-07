@@ -3,8 +3,8 @@ package org.recap.camel.requestinitialdataload.processor;
 import com.amazonaws.services.s3.AmazonS3;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
 import org.recap.service.requestdataload.RequestDataLoadService;
 import org.slf4j.Logger;
@@ -68,12 +68,12 @@ public class RequestInitialDataLoadProcessor {
      */
     public void processInput(Exchange exchange) throws ParseException {
         List<RequestDataLoadCSVRecord> requestDataLoadCSVRecordList = (List<RequestDataLoadCSVRecord>)exchange.getIn().getBody();
-        Integer index = (Integer) exchange.getProperty(RecapConstants.CAMEL_SPLIT_INDEX);
+        Integer index = (Integer) exchange.getProperty(ScsbConstants.CAMEL_SPLIT_INDEX);
         logger.info("count from ftp {}", requestDataLoadCSVRecordList.size());
         try {
             Set<String> barcodesNotInScsb = requestDataLoadService.process(requestDataLoadCSVRecordList,barcodeSet);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMMyyyy");
-            Path filePath = Paths.get(requestInitialLoadFilePath+RecapCommonConstants.PATH_SEPARATOR+institutionCode+RecapCommonConstants.PATH_SEPARATOR+ RecapConstants.REQUEST_INITIAL_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
+            Path filePath = Paths.get(requestInitialLoadFilePath+ScsbCommonConstants.PATH_SEPARATOR+institutionCode+ScsbCommonConstants.PATH_SEPARATOR+ ScsbConstants.REQUEST_INITIAL_FILE_NAME+institutionCode+simpleDateFormat.format(new Date())+".csv");
             if (!filePath.toFile().exists()) {
                 Files.createDirectories(filePath.getParent());
                 Files.createFile(filePath);
@@ -81,7 +81,7 @@ public class RequestInitialDataLoadProcessor {
             }
             if(index == 0){
                 Set<String> headerSet = new HashSet<>();
-                headerSet.add(RecapConstants.REQUEST_INITIAL_LOAD_HEADER);
+                headerSet.add(ScsbConstants.REQUEST_INITIAL_LOAD_HEADER);
                 Files.write(filePath,headerSet, StandardOpenOption.APPEND);
             }
 
@@ -90,7 +90,7 @@ public class RequestInitialDataLoadProcessor {
         catch (Exception e){
             barcodeSet.clear();
             totalCount=0;
-            logger.error(RecapCommonConstants.LOG_ERROR,e);
+            logger.error(ScsbCommonConstants.LOG_ERROR,e);
         }
         barcodeSet.clear();
         totalCount = totalCount + requestDataLoadCSVRecordList.size();
@@ -110,13 +110,13 @@ public class RequestInitialDataLoadProcessor {
     }
 
     private void startFileSystemRoutesForAccessionReconciliation(Exchange exchange, Integer index) {
-        if ((boolean)exchange.getProperty(RecapConstants.CAMEL_SPLIT_COMPLETE)){
+        if ((boolean)exchange.getProperty(ScsbConstants.CAMEL_SPLIT_COMPLETE)){
             logger.info("split last index-->{}",index);
             try {
-                    logger.info("{}{}{}",RecapConstants.STARTING, RecapConstants.REQUEST_INITIAL_LOAD_FS_ROUTE, institutionCode);
-                    camelContext.getRouteController().startRoute(RecapConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institutionCode);
+                    logger.info("{}{}{}", ScsbConstants.STARTING, ScsbConstants.REQUEST_INITIAL_LOAD_FS_ROUTE, institutionCode);
+                    camelContext.getRouteController().startRoute(ScsbConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institutionCode);
             } catch (Exception e) {
-                logger.error(RecapCommonConstants.LOG_ERROR, e);
+                logger.error(ScsbCommonConstants.LOG_ERROR, e);
             }
         }
     }

@@ -6,7 +6,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.BindyType;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 import org.recap.camel.requestinitialdataload.processor.RequestInitialDataLoadProcessor;
 import org.recap.camel.route.StartRouteProcessor;
 import org.recap.camel.route.StopRouteProcessor;
@@ -48,43 +48,43 @@ public class RequestInitialLoadRouteBuilder extends RouteBuilder {
         };
 
         from("aws-s3://{{scsbBucketName}}?prefix="+requestInitialAccessionS3Dir + institution + "/{{s3DataFeedFileNamePrefix}}&deleteAfterRead=false&sendEmptyMessageWhenIdle=true&autocloseBody=false&region={{awsRegion}}&accessKey=RAW({{awsAccessKey}})&secretKey=RAW({{awsAccessSecretKey}})")
-                .routeId(RecapConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE+institution)
+                .routeId(ScsbConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE+institution)
                 .noAutoStartup()
                 .choice()
                 .when(gzipFile)
                 .unmarshal()
                 .gzipDeflater()
                 .log(institution+" - Request Initial load S3 Route Unzip Complete")
-                .process(new StartRouteProcessor(RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution))
-                .to(RecapConstants.DIRECT+ RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
+                .process(new StartRouteProcessor(ScsbConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution))
+                .to(ScsbConstants.DIRECT+ ScsbConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
                 .when(body().isNull())
-                .process(new StopRouteProcessor(RecapConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE+institution))
+                .process(new StopRouteProcessor(ScsbConstants.REQUEST_INITIAL_LOAD_FTP_ROUTE+institution))
                 .log("No File To Process "+institution+" Request Initial load")
                 .otherwise()
-                .process(new StartRouteProcessor(RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution))
-                .to(RecapConstants.DIRECT+ RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
+                .process(new StartRouteProcessor(ScsbConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution))
+                .to(ScsbConstants.DIRECT+ ScsbConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
                 .endChoice();
 
-        from(RecapConstants.DIRECT+ RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
-                .routeId(RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
+        from(ScsbConstants.DIRECT+ ScsbConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
+                .routeId(ScsbConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution)
                 .noAutoStartup()
                 .log("Request data load started for "+institution)
                 .split(body().tokenize("\n",1000,true))
                 .unmarshal().bindy(BindyType.Csv, RequestDataLoadCSVRecord.class)
-                .bean(applicationContext.getBean(RequestInitialDataLoadProcessor.class, institution), RecapConstants.PROCESS_INPUT)
+                .bean(applicationContext.getBean(RequestInitialDataLoadProcessor.class, institution), ScsbConstants.PROCESS_INPUT)
                 .end()
                 .onCompletion()
-                .process(new StopRouteProcessor(RecapConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution));
+                .process(new StopRouteProcessor(ScsbConstants.REQUEST_INITIAL_LOAD_DIRECT_ROUTE+institution));
 
 
-        from(RecapConstants.REQUEST_INITIAL_LOAD_FS_FILE+ requestInitialLoadFilepath + "/" + institution +"?delete=true")
-                .routeId(RecapConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institution)
+        from(ScsbConstants.REQUEST_INITIAL_LOAD_FS_FILE+ requestInitialLoadFilepath + "/" + institution +"?delete=true")
+                .routeId(ScsbConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institution)
                 .noAutoStartup()
                 .setHeader(S3Constants.KEY, simple(requestInitialAccessionErrorFileS3Dir + institution + "/InitialRequestLoadBarcodeFail_"+ institution +"_${date:now:yyyyMMdd_HHmmss}.csv"))
-                .to(RecapConstants.SCSB_CAMEL_S3_TO_ENDPOINT)
+                .to(ScsbConstants.SCSB_CAMEL_S3_TO_ENDPOINT)
                 .onCompletion()
-                .bean(applicationContext.getBean(RequestDataLoadEmailService.class, institution), RecapConstants.PROCESS_INPUT)
-                .process(new StopRouteProcessor(RecapConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institution))
+                .bean(applicationContext.getBean(RequestDataLoadEmailService.class, institution), ScsbConstants.PROCESS_INPUT)
+                .process(new StopRouteProcessor(ScsbConstants.REQUEST_INITIAL_LOAD_FS_ROUTE+institution))
                 .log("Request data load completed for "+institution);
     }
 }

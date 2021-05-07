@@ -3,8 +3,8 @@ package org.recap.las;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.las.model.*;
 import org.recap.model.IMSConfigProperties;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
@@ -79,7 +79,7 @@ public class GFALasImsLocationConnector extends AbstractLASImsLocationConnector 
 
             RestTemplate restTemplate = getRestTemplate();
             HttpEntity<HttpHeaders> requestEntity = new HttpEntity<>(new HttpHeaders());
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(this.imsConfigProperties.getLasServerStatusEndpoint()).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(this.imsConfigProperties.getLasServerStatusEndpoint()).queryParam(ScsbConstants.GFA_SERVICE_PARAM, filterParamValue);
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(Integer.parseInt(this.imsConfigProperties.getLasServerResponseTimeoutMillis()));
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(Integer.parseInt(this.imsConfigProperties.getLasServerResponseTimeoutMillis()));
             ResponseEntity<GFALasStatusCheckResponse> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFALasStatusCheckResponse.class);
@@ -88,9 +88,9 @@ public class GFALasImsLocationConnector extends AbstractLASImsLocationConnector 
                 log.info("Las Heart Beat Response at {} : {}", this.imsLocationCode, gfaLasStatusCheckResponse);
             }
         } catch (JsonProcessingException e) {
-            log.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
+            log.error(ScsbConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION + "{}", e.getMessage());
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION + "{}", e.getMessage());
         }
         return gfaLasStatusCheckResponse;
     }
@@ -112,7 +112,7 @@ public class GFALasImsLocationConnector extends AbstractLASImsLocationConnector 
 
             RestTemplate restTemplate = getRestTemplate();
             HttpEntity<HttpHeaders> requestEntity = new HttpEntity<>(new HttpHeaders());
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(this.imsConfigProperties.getLasItemStatusEndpoint()).queryParam(RecapConstants.GFA_SERVICE_PARAM, filterParamValue);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(this.imsConfigProperties.getLasItemStatusEndpoint()).queryParam(ScsbConstants.GFA_SERVICE_PARAM, filterParamValue);
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(Integer.parseInt(this.imsConfigProperties.getLasServerResponseTimeoutMillis()));
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(Integer.parseInt(this.imsConfigProperties.getLasServerResponseTimeoutMillis()));
             ResponseEntity<GFAItemStatusCheckResponse> responseEntity = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity, GFAItemStatusCheckResponse.class);
@@ -121,9 +121,9 @@ public class GFALasImsLocationConnector extends AbstractLASImsLocationConnector 
             }
             log.info("Las Item status check response at {} : {}", this.imsLocationCode, responseEntity.getStatusCode());
         } catch (JsonProcessingException e) {
-            log.error(RecapConstants.REQUEST_PARSE_EXCEPTION, e);
+            log.error(ScsbConstants.REQUEST_PARSE_EXCEPTION, e);
         } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION + "{}", e.getMessage());
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION + "{}", e.getMessage());
         }
         return gfaItemStatusCheckResponse;
     }
@@ -149,15 +149,15 @@ public class GFALasImsLocationConnector extends AbstractLASImsLocationConnector 
                 gfaRetrieveItemResponse.setSuccess(false);
             }
         } catch (HttpServerErrorException | HttpClientErrorException e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
             gfaRetrieveItemResponse = new GFARetrieveItemResponse();
             gfaRetrieveItemResponse.setSuccess(false);
-            gfaRetrieveItemResponse.setScreenMessage(RecapConstants.REQUEST_LAS_EXCEPTION + RecapCommonConstants.LAS_SERVER_NOT_REACHABLE);
+            gfaRetrieveItemResponse.setScreenMessage(ScsbConstants.REQUEST_LAS_EXCEPTION + ScsbCommonConstants.LAS_SERVER_NOT_REACHABLE);
         } catch (Exception e) {
             gfaRetrieveItemResponse = new GFARetrieveItemResponse();
             gfaRetrieveItemResponse.setSuccess(false);
-            gfaRetrieveItemResponse.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            gfaRetrieveItemResponse.setScreenMessage(ScsbConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         log.info("Las Item Retrieval Response at {} : {}", this.imsLocationCode, gfaRetrieveItemResponse);
         return gfaRetrieveItemResponse;
@@ -182,18 +182,18 @@ public class GFALasImsLocationConnector extends AbstractLASImsLocationConnector 
             } else {
                 gfaEddItemResponse = new GFAEddItemResponse();
                 gfaEddItemResponse.setSuccess(false);
-                gfaEddItemResponse.setScreenMessage(RecapConstants.REQUEST_LAS_EXCEPTION + "HTTP Error response from LAS");
+                gfaEddItemResponse.setScreenMessage(ScsbConstants.REQUEST_LAS_EXCEPTION + "HTTP Error response from LAS");
             }
         } catch (HttpServerErrorException | HttpClientErrorException e) {
             gfaEddItemResponse = new GFAEddItemResponse();
             gfaEddItemResponse.setSuccess(false);
-            gfaEddItemResponse.setScreenMessage(RecapConstants.REQUEST_LAS_EXCEPTION + RecapCommonConstants.LAS_SERVER_NOT_REACHABLE);
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            gfaEddItemResponse.setScreenMessage(ScsbConstants.REQUEST_LAS_EXCEPTION + ScsbCommonConstants.LAS_SERVER_NOT_REACHABLE);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         } catch (Exception e) {
             gfaEddItemResponse = new GFAEddItemResponse();
             gfaEddItemResponse.setSuccess(false);
-            gfaEddItemResponse.setScreenMessage(RecapConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            gfaEddItemResponse.setScreenMessage(ScsbConstants.SCSB_REQUEST_EXCEPTION + e.getMessage());
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         log.info("Las Item EDD Response at {} : {}", this.imsLocationCode, gfaEddItemResponse);
         return gfaEddItemResponse;
@@ -220,7 +220,7 @@ public class GFALasImsLocationConnector extends AbstractLASImsLocationConnector 
             log.info("GFA PWD Response at {} : {}", this.imsLocationCode, gfaLasServiceUtil.convertJsonToString(responseEntity.getBody()));
             log.info("GFA PWD item status processed at {}", this.imsLocationCode);
         } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return gfaPwdResponse;
     }
@@ -246,7 +246,7 @@ public class GFALasImsLocationConnector extends AbstractLASImsLocationConnector 
             log.info("GFA PWI Response at {} : {}", this.imsLocationCode, gfaLasServiceUtil.convertJsonToString(responseEntity.getBody()));
             log.info("GFA PWI item status processed at {}", this.imsLocationCode);
         } catch (Exception e) {
-            log.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            log.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
         return gfaPwiResponse;
     }

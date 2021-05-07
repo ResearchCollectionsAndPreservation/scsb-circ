@@ -7,8 +7,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
@@ -54,7 +54,7 @@ public class BulkItemRequestServiceUT {
         bulkRequestItemEntity.setBulkRequestFileName("bulkItemUpload");
         bulkRequestItemEntity.setBulkRequestFileData("BARCODE\tCUSTOMER_CODE\n32101075852275\tPK".getBytes());
         bulkRequestItemEntity.setRequestingInstitutionId(1);
-        bulkRequestItemEntity.setBulkRequestStatus(RecapConstants.PROCESSED);
+        bulkRequestItemEntity.setBulkRequestStatus(ScsbConstants.PROCESSED);
         bulkRequestItemEntity.setCreatedBy("TestUser");
         bulkRequestItemEntity.setCreatedDate(new Date());
         bulkRequestItemEntity.setStopCode("PA");
@@ -76,8 +76,8 @@ public class BulkItemRequestServiceUT {
         bulkItemRequestService.bulkRequestItems(bulkRequestId);
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setId(2);
-        itemStatusEntity.setStatusCode(RecapCommonConstants.AVAILABLE);
-        itemStatusEntity.setStatusDescription(RecapCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusCode(ScsbCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusDescription(ScsbCommonConstants.AVAILABLE);
         itemEntity.setItemStatusEntity(itemStatusEntity);
         bulkItemRequestService.bulkRequestItems(bulkRequestId);
         itemEntity.setOwningInstitutionId(1);
@@ -90,8 +90,8 @@ public class BulkItemRequestServiceUT {
         itemEntity.setOwningInstitutionId(3);
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setId(2);
-        itemStatusEntity.setStatusCode(RecapCommonConstants.AVAILABLE);
-        itemStatusEntity.setStatusDescription(RecapCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusCode(ScsbCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusDescription(ScsbCommonConstants.AVAILABLE);
         itemEntity.setItemStatusEntity(itemStatusEntity);
         BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
         Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
@@ -109,8 +109,8 @@ public class BulkItemRequestServiceUT {
         itemEntity.setOwningInstitutionId(1);
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setId(2);
-        itemStatusEntity.setStatusCode(RecapCommonConstants.AVAILABLE);
-        itemStatusEntity.setStatusDescription(RecapCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusCode(ScsbCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusDescription(ScsbCommonConstants.AVAILABLE);
         itemEntity.setItemStatusEntity(itemStatusEntity);
         BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
         Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
@@ -127,8 +127,8 @@ public class BulkItemRequestServiceUT {
         itemEntity.setOwningInstitutionId(1);
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setId(2);
-        itemStatusEntity.setStatusCode(RecapCommonConstants.AVAILABLE);
-        itemStatusEntity.setStatusDescription(RecapCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusCode(ScsbCommonConstants.AVAILABLE);
+        itemStatusEntity.setStatusDescription(ScsbCommonConstants.AVAILABLE);
         itemEntity.setItemStatusEntity(itemStatusEntity);
         BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
         Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Collections.EMPTY_LIST);
@@ -186,8 +186,8 @@ public class BulkItemRequestServiceUT {
         itemEntity.setOwningInstitutionId(1);
         ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
         itemStatusEntity.setId(2);
-        itemStatusEntity.setStatusCode(RecapCommonConstants.NOT_AVAILABLE);
-        itemStatusEntity.setStatusDescription(RecapCommonConstants.NOT_AVAILABLE);
+        itemStatusEntity.setStatusCode(ScsbCommonConstants.NOT_AVAILABLE);
+        itemStatusEntity.setStatusDescription(ScsbCommonConstants.NOT_AVAILABLE);
         itemEntity.setItemStatusEntity(itemStatusEntity);
         return itemEntity;
     }

@@ -9,12 +9,12 @@ import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.json.JSONObject;
-import org.recap.RecapConstants;
+import org.recap.ScsbConstants;
 
 import java.util.HashMap;
 
 @Slf4j
-public class CancelRequestItem extends RecapNCIP {
+public class CancelRequestItem extends ScsbNCIP {
 
     private String requestIdString;
     private String useridString;
@@ -26,7 +26,7 @@ public class CancelRequestItem extends RecapNCIP {
     private HashMap<String, HashMap<String,String>> itemOptionalFields = new HashMap<>();
 
     public CancelRequestItem() {
-        itemOptionalFields.put(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION, new HashMap<>());
+        itemOptionalFields.put(ScsbConstants.BIBLIOGRAPHIC_DESCRIPTION, new HashMap<>());
     }
 
     public CancelRequestItem setRequestType(String action) {
@@ -73,7 +73,7 @@ public class CancelRequestItem extends RecapNCIP {
 
     // Convenience methods
     public CancelRequestItem setTitle(String title) {
-        this.itemOptionalFields.get(RecapConstants.BIBLIOGRAPHIC_DESCRIPTION).put(RecapConstants.TITLE, title);
+        this.itemOptionalFields.get(ScsbConstants.BIBLIOGRAPHIC_DESCRIPTION).put(ScsbConstants.TITLE, title);
         return this;
     }
 
@@ -119,7 +119,7 @@ public class CancelRequestItem extends RecapNCIP {
         else {
             requestIdentifier.setRequestIdentifierValue(Integer.toString(RandomUtils.nextInt(100000,100000000)));
         }
-        RequestType requestType = new RequestType(null, RecapConstants.HOLD);
+        RequestType requestType = new RequestType(null, ScsbConstants.HOLD);
         UserId userid = new UserId();
         userid.setUserIdentifierValue(patronIdentifier);
         cancelRequestItemInitiationData.setUserId(userid);
@@ -141,8 +141,8 @@ public class CancelRequestItem extends RecapNCIP {
 
         String itemId = cancelRequestItemResponseData.getItemId().getItemIdentifierValue();
         String requestId = cancelRequestItemResponseData.getRequestId().getRequestIdentifierValue();
-        returnJson.put(RecapConstants.ITEM_ID, itemId);
-        returnJson.put(RecapConstants.REQUEST_ID, requestId);
+        returnJson.put(ScsbConstants.ITEM_ID, itemId);
+        returnJson.put(ScsbConstants.REQUEST_ID, requestId);
         return returnJson;
     }
 }

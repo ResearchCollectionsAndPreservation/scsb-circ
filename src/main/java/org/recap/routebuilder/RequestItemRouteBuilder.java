@@ -2,8 +2,8 @@ package org.recap.routebuilder;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.recap.RecapCommonConstants;
-import org.recap.RecapConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.ScsbConstants;
 import org.recap.camel.route.StartRouteProcessor;
 import org.recap.las.GFALasService;
 import org.recap.mqconsumer.RequestItemQueueConsumer;
@@ -42,15 +42,15 @@ public class RequestItemRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(RecapConstants.REQUEST_ITEM_QUEUE)
-                        .routeId(RecapConstants.REQUEST_ITEM_QUEUE_ROUTEID)
+                    from(ScsbConstants.REQUEST_ITEM_QUEUE)
+                        .routeId(ScsbConstants.REQUEST_ITEM_QUEUE_ROUTEID)
                         .threads(30,50)
                         .choice()
-                            .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL))
+                            .when(header(ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL))
                                 .bean(new RequestItemQueueConsumer(itemRequestService), "requestItemOnMessage")
-                            .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_EDD))
+                            .when(header(ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(ScsbCommonConstants.REQUEST_TYPE_EDD))
                                 .bean(new RequestItemQueueConsumer(itemEDDRequestService), "requestItemEDDOnMessage")
-                            .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_RECALL))
+                            .when(header(ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(ScsbCommonConstants.REQUEST_TYPE_RECALL))
                                 .bean(new RequestItemQueueConsumer(itemRequestService), "requestItemRecallOnMessage");
                 }
             });
@@ -59,8 +59,8 @@ public class RequestItemRouteBuilder {
                 camelContext.addRoutes(new RouteBuilder() {
                     @Override
                     public void configure() throws Exception {
-                        from(RecapConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX)
-                                .routeId(imsLocationCode + RecapConstants.SCSB_OUTGOING_ROUTE_ID)
+                        from(ScsbConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + ScsbConstants.OUTGOING_QUEUE_SUFFIX)
+                                .routeId(imsLocationCode + ScsbConstants.SCSB_OUTGOING_ROUTE_ID)
                                 .log("Message Received in SCSB OUTGOING QUEUE for " + imsLocationCode)
                                 .bean(applicationContext.getBean(LasHeartBeatCheckPollingProcessor.class), "pollLasHeartBeatResponse");
                     }
@@ -69,8 +69,8 @@ public class RequestItemRouteBuilder {
                 camelContext.addRoutes(new RouteBuilder() {
                     @Override
                     public void configure() throws Exception {
-                        from(RecapConstants.LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + RecapConstants.OUTGOING_QUEUE_SUFFIX)
-                                .routeId(imsLocationCode + RecapConstants.LAS_OUTGOING_ROUTE_ID)
+                        from(ScsbConstants.LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + ScsbConstants.OUTGOING_QUEUE_SUFFIX)
+                                .routeId(imsLocationCode + ScsbConstants.LAS_OUTGOING_ROUTE_ID)
                                 .log("Message Received in LAS OUTGOING QUEUE for " + imsLocationCode)
                                 .bean(applicationContext.getBean(GFALasService.class), "gfaItemRequestProcessor");
 
@@ -81,16 +81,16 @@ public class RequestItemRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(RecapConstants.LAS_INCOMING_QUEUE)
-                        .routeId(RecapConstants.LAS_INCOMING_ROUTE_ID)
+                    from(ScsbConstants.LAS_INCOMING_QUEUE)
+                        .routeId(ScsbConstants.LAS_INCOMING_ROUTE_ID)
                         .choice()
-                        .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_RETRIEVAL))
+                        .when(header(ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL))
                         .bean(new RequestItemQueueConsumer(itemRequestService), "lasResponseRetrievalOnMessage")
-                        .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapCommonConstants.REQUEST_TYPE_EDD))
+                        .when(header(ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(ScsbCommonConstants.REQUEST_TYPE_EDD))
                         .bean(new RequestItemQueueConsumer(itemRequestService), "lasResponseEDDOnMessage")
-                        .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapConstants.REQUEST_TYPE_PW_INDIRECT))
+                        .when(header(ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(ScsbConstants.REQUEST_TYPE_PW_INDIRECT))
                         .bean(new RequestItemQueueConsumer(itemRequestService), "lasResponsePWIOnMessage")
-                        .when(header(RecapCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(RecapConstants.REQUEST_TYPE_PW_DIRECT))
+                        .when(header(ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER).isEqualTo(ScsbConstants.REQUEST_TYPE_PW_DIRECT))
                         .bean(new RequestItemQueueConsumer(itemRequestService), "lasResponsePWDOnMessage");
                 }
             });
@@ -98,8 +98,8 @@ public class RequestItemRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(RecapCommonConstants.BULK_REQUEST_ITEM_QUEUE)
-                            .routeId(RecapConstants.BULK_REQUEST_ITEM_QUEUE_ROUTEID)
+                    from(ScsbCommonConstants.BULK_REQUEST_ITEM_QUEUE)
+                            .routeId(ScsbConstants.BULK_REQUEST_ITEM_QUEUE_ROUTEID)
                             .bean(new RequestItemQueueConsumer(bulkItemRequestService), "bulkRequestItemOnMessage");
                 }
             });
@@ -107,8 +107,8 @@ public class RequestItemRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(RecapConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE + RecapConstants.ASYNC_CONCURRENT_CONSUMERS + bulkRequestConsumerCount)
-                            .routeId(RecapConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE_ROUTEID)
+                    from(ScsbConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE + ScsbConstants.ASYNC_CONCURRENT_CONSUMERS + bulkRequestConsumerCount)
+                            .routeId(ScsbConstants.BULK_REQUEST_ITEM_PROCESSING_QUEUE_ROUTEID)
                             .bean(new RequestItemQueueConsumer(bulkItemRequestProcessService), "bulkRequestProcessItemOnMessage");
                 }
             });
@@ -116,15 +116,15 @@ public class RequestItemRouteBuilder {
             camelContext.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    from(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE)
-                            .routeId(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID)
+                    from(ScsbConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE)
+                            .routeId(ScsbConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID)
                             .noAutoStartup()
                             .choice()
                                 .when(body().isNull())
                                     .log("No Requests To Process")
                                 .otherwise()
                                     .log("Start Route 1")
-                                    .process(new StartRouteProcessor(RecapConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID))
+                                    .process(new StartRouteProcessor(ScsbConstants.REQUEST_ITEM_LAS_STATUS_CHECK_QUEUE_ROUTEID))
                                     .bean(new RequestItemQueueConsumer(itemRequestService), "requestItemLasStatusCheckOnMessage")
                             .endChoice();
                 }
@@ -163,7 +163,7 @@ public class RequestItemRouteBuilder {
             }
 
         } catch (Exception e) {
-            logger.error(RecapCommonConstants.REQUEST_EXCEPTION, e);
+            logger.error(ScsbCommonConstants.REQUEST_EXCEPTION, e);
         }
 
     }

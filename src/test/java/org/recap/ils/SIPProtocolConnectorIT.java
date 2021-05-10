@@ -127,16 +127,6 @@ public class SIPProtocolConnectorIT extends BaseTestCaseUT {
         sipProtocolConnector.lookupUser(institutionId, patronIdentifier);
     }
 
-    private ILSConfigProperties getIlsConfigProperties() {
-        ILSConfigProperties ilsConfigProperties = new ILSConfigProperties();
-        ilsConfigProperties.setHost("libserv86.princeton.edu");
-        ilsConfigProperties.setPort(7031);
-        ilsConfigProperties.setOperatorUserId("htcsc1");
-        ilsConfigProperties.setOperatorPassword("MdlW@419r&");
-        ilsConfigProperties.setOperatorLocation("htcsc");
-        return ilsConfigProperties;
-    }
-
     @Test
     public void checkOutItem() {
         String itemIdentifier = "1456883";
@@ -365,4 +355,13 @@ public class SIPProtocolConnectorIT extends BaseTestCaseUT {
         return itemRequestInformation;
     }
 
+    private ILSConfigProperties getIlsConfigProperties() {
+        ILSConfigProperties ilsConfigProperties = new ILSConfigProperties();
+        ilsConfigProperties.setHost("libserv86.princeton.edu");
+        ilsConfigProperties.setPort(7031);
+        ilsConfigProperties.setOperatorUserId("test");
+        ilsConfigProperties.setOperatorPassword("test");
+        ilsConfigProperties.setOperatorLocation("test");
+        return ilsConfigProperties;
+    }
 }

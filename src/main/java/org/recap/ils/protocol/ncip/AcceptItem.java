@@ -5,17 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.extensiblecatalog.ncip.v2.service.AcceptItemInitiationData;
-import org.extensiblecatalog.ncip.v2.service.AcceptItemResponseData;
-import org.extensiblecatalog.ncip.v2.service.BibliographicDescription;
-import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
-import org.extensiblecatalog.ncip.v2.service.ItemDescription;
-import org.extensiblecatalog.ncip.v2.service.ItemId;
-import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.PickupLocation;
-import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.service.RequestedActionType;
-import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.*;
 import org.json.JSONObject;
 import org.recap.ScsbConstants;
 
@@ -146,10 +136,11 @@ public class AcceptItem extends ScsbNCIP {
         return this.itemOptionalFields.get(ScsbConstants.ITEM_DESCRIPTION).get(ScsbConstants.CALL_NUMBER);
     }
 
-    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String title, String author, String itemPickupLocation, String callNumber, String ncipAgencyId, String ncipScheme)  {
+    public AcceptItemInitiationData getAcceptItemInitiationData(String itemIdentifier, Integer requestId, String patronIdentifier, String title, String author, String itemPickupLocation, String callNumber, String ncipAgencyId, String ncipScheme, String itemAgencyId)  {
         AcceptItemInitiationData acceptItemInitationData = new AcceptItemInitiationData();
         InitiationHeader initiationHeader = new InitiationHeader();
-        initiationHeader = getInitiationHeaderwithScheme(initiationHeader, ncipScheme, ScsbConstants.AGENCY_ID_SCSB, ncipAgencyId);
+        initiationHeader = getInitiationHeaderwithoutProfile(initiationHeader, ncipScheme, itemAgencyId, ncipAgencyId);
+        initiationHeader.setApplicationProfileType(new ApplicationProfileType(null,itemAgencyId));
         acceptItemInitationData.setInitiationHeader(initiationHeader);
         RequestId requestIdentifier = new RequestId();
         if(requestId != null) {

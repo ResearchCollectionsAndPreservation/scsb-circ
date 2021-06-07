@@ -400,7 +400,7 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
                 itemHoldResponse.setSuccess(Boolean.TRUE);
             }
             else {
-                itemHoldResponse = acceptItem(itemIdentifier, requestId, patronIdentifier, itemInstitutionId, pickupLocation, title, author, callNumber);
+                itemHoldResponse = acceptItem(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, pickupLocation, title, author, callNumber);
             }
         return itemHoldResponse;
     }
@@ -660,15 +660,27 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
         return  itemLookUpInformationResponse;
     }
 
-    private ItemHoldResponse acceptItem(String itemIdentifier, Integer requestId, String patronIdentifier, String itemInstitutionId,  String pickupLocation, String title, String author, String callNumber) {
+    private ItemHoldResponse acceptItem(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId,  String pickupLocation, String title, String author, String callNumber) {
         AcceptItem acceptItem = new AcceptItem();
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
         String responseString = null;
+        String itemAgencyId = null;
         JSONObject responseObject;
         try {
             NCIPToolKitUtil ncipToolkitUtil = NCIPToolKitUtil.getInstance();
             CloseableHttpClient client = buildCloseableHttpClient();
-            AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, title, author, pickupLocation,callNumber, getNcipAgencyId(), getNcipScheme());
+            AcceptItemInitiationData acceptItemInitiationData = new AcceptItemInitiationData();
+                    List<ItemEntity> itemEntities = itemDetailsRepository.findByBarcode(itemIdentifier);
+            ItemEntity itemEntity = !itemEntities.isEmpty() ? itemEntities.get(0) : null;
+            String useRestrictions = itemEntity != null ? itemEntity.getUseRestrictions() : null;
+            if(useRestrictions != null) {
+                itemAgencyId = propertyUtil.getPropertyByInstitutionAndKey(callInstitutionId, PropertyKeyConstants.ILS.ILS_RESTRICTED_ACCEPT_ITEM_AGENCY_ID);
+                acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, title, author, pickupLocation, callNumber, getNcipAgencyId(), getNcipScheme(), itemAgencyId);
+            }
+            else {
+                itemAgencyId = propertyUtil.getPropertyByInstitutionAndKey(callInstitutionId, PropertyKeyConstants.ILS.ILS_UNRESTRICTED_ACCEPT_ITEM_AGENCY_ID);
+                acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, title, author, pickupLocation, callNumber, getNcipAgencyId(), getNcipScheme(), itemAgencyId);
+            }
             String requestBody = acceptItem.getRequestBody(ncipToolkitUtil, acceptItemInitiationData);
             HttpUriRequest request = getHttpRequest(requestBody);
             HttpResponse response = client.execute(request);

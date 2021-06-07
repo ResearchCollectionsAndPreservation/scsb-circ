@@ -2,7 +2,6 @@ package org.recap.request.service;
 
 import org.apache.camel.ProducerTemplate;
 import org.recap.PropertyKeyConstants;
-import org.recap.ScsbCommonConstants;
 import org.recap.ScsbConstants;
 import org.recap.camel.EmailPayLoad;
 import org.recap.util.PropertyUtil;

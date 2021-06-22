@@ -4,14 +4,18 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.recap.BaseTestCaseUT;
 import org.recap.ScsbCommonConstants;
 import org.recap.ScsbConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
+import org.recap.ims.service.GFALasService;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.ItemDetailsRepository;
+import org.recap.repository.jpa.ItemStatusDetailsRepository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
+import org.recap.util.CommonUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
@@ -19,6 +23,7 @@ import java.util.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 
 /**
  * Created by hemalathas on 21/7/17.
@@ -29,7 +34,16 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
     RequestDataLoadService requestDataLoadService;
 
     @Mock
+    ItemStatusDetailsRepository itemStatusDetailsRepository;
+
+    @Mock
     private ItemDetailsRepository itemDetailsRepository;
+
+    @Mock
+    GFALasService gfaLasService;
+
+    @Mock
+    CommonUtil commonUtil;
 
     @Mock
     private RequestTypeDetailsRepository requestTypeDetailsRepository;
@@ -43,9 +57,32 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord(bibliographicEntity);
         Set<String> barcodeSet = new HashSet<>();
         RequestTypeEntity requestTypeEntity = getRequestTypeEntity();
-        Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(requestDataLoadCSVRecord.getBarcode(), ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(bibliographicEntity.getItemEntities());
+        ItemEntity itemEntity = bibliographicEntity.getItemEntities().get(0);
+        ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
+        imsLocationEntity.setImsLocationCode("HD");
+        itemEntity.setImsLocationEntity(imsLocationEntity);
+        Mockito.when(itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(getItemStatusEntity());
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn("Test");
+        Mockito.when(gfaLasService.getGfaItemStatusInUpperCase(any())).thenReturn("test");
+        Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), anyBoolean())).thenReturn(Boolean.FALSE);
+        ReflectionTestUtils.setField(requestDataLoadService,"requestInitialLoadGfaCheck",Boolean.TRUE);
         Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(ScsbCommonConstants.RETRIEVAL)).thenReturn(requestTypeEntity);
-        Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
+        Map<String,Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
+        assertNotNull(response);
+    }
+
+    @Test
+    public void testRequestDataServiceItemNotAvailable() throws Exception {
+        BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
+        RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord(bibliographicEntity);
+        Set<String> barcodeSet = new HashSet<>();
+        RequestTypeEntity requestTypeEntity = getRequestTypeEntity();
+        ItemEntity itemEntity = bibliographicEntity.getItemEntities().get(0);
+        Mockito.when(itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(getItemStatusEntity());
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(ScsbCommonConstants.RETRIEVAL)).thenReturn(requestTypeEntity);
+        Map<String,Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertNotNull(response);
     }
 
@@ -54,9 +91,9 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord(bibliographicEntity);
         Set<String> barcodeSet = new HashSet<>();
-        Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(requestDataLoadCSVRecord.getBarcode(), ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(null);
-        Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
-        assertTrue(response.size() == 1);
+        Mockito.when(itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(getItemStatusEntity());
+        Map<String,Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
+        assertTrue(response.size() == 3);
     }
 
     @Test
@@ -65,7 +102,8 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord(bibliographicEntity);
         Set<String> barcodeSet = new HashSet<>();
         barcodeSet.add("41234213");
-        Set<String> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
+        Mockito.when(itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(getItemStatusEntity());
+        Map<String,Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertNotNull(response);
     }
 
@@ -81,13 +119,30 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         BibliographicEntity bibliographicEntity = saveBibSingleHoldingsSingleItem();
         ItemEntity itemEntity = bibliographicEntity.getItemEntities().get(0);
         itemEntity.setOwningInstitutionId(5);
+        ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
+        imsLocationEntity.setImsLocationCode("HD");
+        itemEntity.setImsLocationEntity(imsLocationEntity);
         ItemEntity itemEntity2 = new ItemEntity();
         itemEntity2.setOwningInstitutionId(4);
+        itemEntity2.setItemStatusEntity(getItemStatusEntity());
         List<ItemEntity> itemEntityList = new ArrayList<>();
-        itemEntityList.add(itemEntity2);
         itemEntityList.add(itemEntity);
-        Mockito.when(itemDetailsRepository.findByBarcodeAndItemStatusEntity_StatusCode(any(), any())).thenReturn(itemEntityList);
-        ReflectionTestUtils.invokeMethod(requestDataLoadService, "getItemInfo", barcode);
+        itemEntityList.add(itemEntity2);
+        ItemStatusEntity itemStatusEntity = getItemStatusEntity();
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(itemEntityList);
+        Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn("Test");
+        Mockito.when(gfaLasService.getGfaItemStatusInUpperCase(any())).thenReturn("test");
+        Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), anyBoolean())).thenReturn(Boolean.TRUE);
+        ReflectionTestUtils.setField(requestDataLoadService,"requestInitialLoadGfaCheck",Boolean.TRUE);
+        ReflectionTestUtils.invokeMethod(requestDataLoadService, "getItemInfo", barcode,itemStatusEntity);
+    }
+
+    private ItemStatusEntity getItemStatusEntity() {
+        ItemStatusEntity itemStatusEntity = new ItemStatusEntity();
+        itemStatusEntity.setId(1);
+        itemStatusEntity.setStatusCode(ScsbConstants.ITEM_STATUS_AVAILABLE);
+        itemStatusEntity.setStatusDescription(ScsbConstants.ITEM_STATUS_AVAILABLE);
+        return itemStatusEntity;
     }
 
     private RequestDataLoadCSVRecord getRequestDataLoadCSVRecord(BibliographicEntity bibliographicEntity) {
@@ -142,8 +197,8 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         itemEntity.setCreatedBy("tst");
         itemEntity.setLastUpdatedBy("tst");
         itemEntity.setItemAvailabilityStatusId(2);
+        itemEntity.setItemStatusEntity(getItemStatusEntity());
         itemEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
-
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
 

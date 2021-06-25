@@ -61,7 +61,7 @@ public final class ScsbConstants {
 
     //Permissions
     public static final String ROLE_SUPER_ADMIN = "Super Admin";
-    public static final String ROLE_RECAP = "ReCAP";
+    public static final String ROLE_RECAP = "Repository";
     public static final Boolean BOOLEAN_TRUE = true;
     public static final Boolean BOOLEAN_FALSE = false;
 

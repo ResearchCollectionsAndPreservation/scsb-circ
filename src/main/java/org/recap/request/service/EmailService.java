@@ -41,7 +41,7 @@ public class EmailService {
         emailPayLoad.setItemBarcode(itemBarcode);
         emailPayLoad.setMessageDisplay(messageDisplay);
         emailPayLoad.setPatronBarcode(patronBarcode);
-        emailPayLoad.setSubject(subject + itemBarcode);
+        emailPayLoad.setSubject(subject + " " + itemBarcode);
         producer.sendBodyAndHeader(ScsbConstants.EMAIL_Q, emailPayLoad, ScsbConstants.EMAIL_BODY_FOR, ScsbConstants.REQUEST_RECALL_MAIL_QUEUE);
     }
 
@@ -53,7 +53,7 @@ public class EmailService {
         emailPayLoad.setItemBarcode(itemBarcode);
         emailPayLoad.setMessageDisplay(messageDisplay);
         emailPayLoad.setPatronBarcode(patronBarcode);
-        emailPayLoad.setSubject(subject + itemBarcode);
+        emailPayLoad.setSubject(subject + " " + itemBarcode);
         producer.sendBodyAndHeader(ScsbConstants.EMAIL_Q, emailPayLoad, ScsbConstants.EMAIL_BODY_FOR, ScsbConstants.REQUEST_LAS_STATUS_MAIL_QUEUE);
     }
 

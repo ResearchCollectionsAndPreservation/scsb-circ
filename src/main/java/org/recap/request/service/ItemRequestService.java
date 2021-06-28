@@ -189,12 +189,10 @@ public class ItemRequestService {
                 DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(itemRequestInfo.getDeliveryLocation(), institutionEntity.getId(), 'Y');
 
                 DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(institutionEntity.getId(), deliveryCodeEntity.getId(), itemEntity.getImsLocationEntity().getId());
-                if(deliveryCodeTranslationEntity != null && deliveryCodeTranslationEntity.getImsLocationDeliveryCode() != null) {
-                    logger.info(" Translation Code >>>> {} "  , deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
-
+                if (deliveryCodeTranslationEntity != null && deliveryCodeTranslationEntity.getImsLocationDeliveryCode() != null) {
+                    logger.info("Translation Code >>>> {} "  , deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
                     itemRequestInfo.setTranslatedDeliveryLocation(deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
-                }
-                else {
+                } else {
                     itemResponseInformation.setScreenMessage(ScsbConstants.REQUEST_SCSB_EXCEPTION + ScsbConstants.INVALID_TRANSLATED_CODE);
                     itemResponseInformation.setSuccess(false);
                 }
@@ -502,6 +500,17 @@ public class ItemRequestService {
         }
         else {
             itemRequestInfo.setRequestType(ScsbCommonConstants.RETRIEVAL);
+            if (null == requestItemEntity.getBulkRequestItemEntity()) {
+                InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(itemRequestInfo.getRequestingInstitution());
+                DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(requestItemEntity.getStopCode(), institutionEntity.getId(), 'Y');
+                DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(institutionEntity.getId(), deliveryCodeEntity.getId(), itemEntity.getImsLocationEntity().getId());
+                if (deliveryCodeTranslationEntity != null && deliveryCodeTranslationEntity.getImsLocationDeliveryCode() != null) {
+                    logger.info("Translation Code >>>> {} "  , deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
+                    itemRequestInfo.setTranslatedDeliveryLocation(deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
+                }
+            } else {
+                itemRequestInfo.setTranslatedDeliveryLocation(requestItemEntity.getStopCode());
+            }
         }
         itemRequestInfo.setRequestNotes(requestItemEntity.getNotes());
         itemRequestInfo.setRequestId(requestItemEntity.getId());

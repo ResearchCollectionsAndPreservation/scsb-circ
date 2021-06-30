@@ -436,6 +436,18 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         gfaLasService.startPolling(barcode,imsLocationCode);
     }
     @Test
+    public void getGfaItemStatusInUpperCase(){
+        String gfaItemStatus = "test:test";
+        String result = gfaLasService.getGfaItemStatusInUpperCase(gfaItemStatus);
+        assertNotNull(result);
+    }
+    @Test
+    public void getGfaItemStatus(){
+        String gfaItemStatus = "test";
+        String result = gfaLasService.getGfaItemStatusInUpperCase(gfaItemStatus);
+        assertNotNull(result);
+    }
+    @Test
     public void buildRequestInfoAndReplaceToLAS(){
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode())).thenReturn("HD");

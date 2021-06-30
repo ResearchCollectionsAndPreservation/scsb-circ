@@ -165,9 +165,9 @@ public class AcceptItem extends ScsbNCIP {
         itemOptFields.setItemDescription(itemDescription);
         PickupLocation pickupLocation = new PickupLocation(itemPickupLocation);
 
-        Calendar cal = new GregorianCalendar();
-        Date dueDate = DateUtils.addYears(new Date(), 1);
-        cal.setTime(dueDate);
+      //  Calendar cal = new GregorianCalendar();
+       /* Date dueDate = DateUtils.addYears(new Date(), 1);
+        cal.setTime(dueDate);*/
 
         acceptItemInitationData.setItemId(itemId);
         acceptItemInitationData.setPickupLocation(pickupLocation);
@@ -176,7 +176,7 @@ public class AcceptItem extends ScsbNCIP {
         acceptItemInitationData.setRequestId(requestIdentifier);
         acceptItemInitationData.setRequestedActionType(requestActionType);
         acceptItemInitationData.setItemOptionalFields(itemOptFields);
-        acceptItemInitationData.setDateForReturn((GregorianCalendar) cal);
+     //   acceptItemInitationData.setDateForReturn((GregorianCalendar) cal);
 
         return acceptItemInitationData;
 

@@ -490,6 +490,8 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemResponseInformation = new ItemInformationResponse();
         itemResponseInformation.setRequestTypeForScheduledOnWO(true);
         itemResponseInformation.setSuccess(true);
+        DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = getDeliveryCodeTranslationEntity();
+        DeliveryCodeEntity deliveryCodeEntity = getDeliveryCodeEntity();
         List<String> requestItemStatusList = Arrays.asList(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ScsbCommonConstants.REQUEST_STATUS_EDD, ScsbCommonConstants.REQUEST_STATUS_CANCELED, ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(anyString(), anyString())).thenReturn("FALSE");
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(Arrays.asList(requestItemEntity));
@@ -499,6 +501,9 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         requestItemEntityRecalled.setRequestingInstitutionId(3);
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntityRecalled);
         Mockito.when(mockedGfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemResponseInformation);
+        Mockito.when(institutionDetailsRepository.findByInstitutionCode(anyString())).thenReturn(createRequestItem().getInstitutionEntity());
+        Mockito.when(deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(any(), any(), anyChar())).thenReturn(deliveryCodeEntity);
+        Mockito.when(deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(any(),any(),any())).thenReturn(deliveryCodeTranslationEntity);
         ItemRefileResponse response = mockedItemRequestService.reFileItem(itemRefileRequest, itemRefileResponse);
         assertNotNull(response);
     }
@@ -515,10 +520,13 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         requestItemEntity.setRequestTypeEntity(requestTypeEntity);
         ItemEntity itemEntity = requestItemEntity.getItemEntity();
         itemEntity.setItemAvailabilityStatusId(2);
+        itemEntity.setImsLocationEntity(getImsLocationEntity());
         String itemBarcode = itemEntity.getBarcode();
         ItemInformationResponse itemResponseInformation = new ItemInformationResponse();
         itemResponseInformation.setRequestTypeForScheduledOnWO(true);
         itemResponseInformation.setSuccess(true);
+        DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = getDeliveryCodeTranslationEntity();
+        DeliveryCodeEntity deliveryCodeEntity = getDeliveryCodeEntity();
         List<String> requestItemStatusList = Arrays.asList(ScsbCommonConstants.REQUEST_STATUS_RETRIEVAL_ORDER_PLACED, ScsbCommonConstants.REQUEST_STATUS_EDD, ScsbCommonConstants.REQUEST_STATUS_CANCELED, ScsbCommonConstants.REQUEST_STATUS_INITIAL_LOAD);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(anyString(), anyString())).thenReturn("FALSE");
         Mockito.when(mockedRequestItemDetailsRepository.findByIdsAndStatusCodes(itemRefileRequest.getRequestIds(), requestItemStatusList)).thenReturn(Arrays.asList(requestItemEntity));
@@ -527,6 +535,9 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         requestItemEntityRecalled.setRequestingInstitutionId(3);
         Mockito.when(mockedRequestItemDetailsRepository.findByItemBarcodeAndRequestStaCode(itemBarcode, ScsbCommonConstants.REQUEST_STATUS_RECALLED)).thenReturn(requestItemEntityRecalled);
         Mockito.when(mockedGfaLasService.executeRetrieveOrder(any(), any())).thenReturn(itemResponseInformation);
+        Mockito.when(institutionDetailsRepository.findByInstitutionCode(anyString())).thenReturn(createRequestItem().getInstitutionEntity());
+        Mockito.when(deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(any(), any(), anyChar())).thenReturn(deliveryCodeEntity);
+        Mockito.when(deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(any(),any(), any())).thenReturn(deliveryCodeTranslationEntity);
         ItemRefileResponse response = mockedItemRequestService.reFileItem(itemRefileRequest, itemRefileResponse);
         assertNotNull(response);
     }

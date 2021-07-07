@@ -386,16 +386,22 @@ public class ItemRequestService {
                                 //Checkout for EDD patron
                                 itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(itemRequestInfo.getRequestingInstitution() ,itemRequestInfo.getItemOwningInstitution(), ScsbCommonConstants.REQUEST_TYPE_EDD));
                                 requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
-                            }else {
-                                itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(requestItemEntityRecalled.getInstitutionEntity().getInstitutionCode(), requestItemEntityRecalled.getItemEntity().getInstitutionEntity().getInstitutionCode(), ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL));
+                            } else {
+                                if (!requestItemEntityRecalled.getInstitutionEntity().getInstitutionCode().equalsIgnoreCase(requestItemEntityRecalled.getItemEntity().getInstitutionEntity().getInstitutionCode())) {
+                                    itemRequestInfo.setPatronBarcode(itemRequestServiceUtil.getPatronIdBorrowingInstitution(requestItemEntityRecalled.getInstitutionEntity().getInstitutionCode(), requestItemEntityRecalled.getItemEntity().getInstitutionEntity().getInstitutionCode(), ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL));
+                                } else {
+                                    itemRequestInfo.setPatronBarcode(requestItemEntityRecalled.getPatronId());
+                                }
                                 requestItemController.checkoutItem(itemRequestInfo, itemRequestInfo.getItemOwningInstitution());
                             }
+                            itemRequestInfo.setRequestingInstitution(requestItemEntityRecalled.getInstitutionEntity().getInstitutionCode());
                             setItemRequestInfoForRequest(itemEntity, itemRequestInfo, requestItemEntityRecalled);
                             ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
                             // Put back the Recall order to LAS. On success from LAS, recall order is updated to retrieval.
                             itemRequestInfo.setImsLocationCode(itemEntity.getImsLocationEntity().getImsLocationCode());
                             updateScsbAndGfa(itemRequestInfo, itemInformationResponse, itemEntity);
                             itemRefileResponse.setSuccess(true);
+                            itemRequestInfo.setRequestingInstitution(requestItemEntity.getInstitutionEntity().getInstitutionCode());
                         }
                     }
                     logger.info("Refile Request Id = {} Refile Barcode = {}", requestItemEntity.getId(), itemBarcode);
@@ -501,7 +507,7 @@ public class ItemRequestService {
         else {
             itemRequestInfo.setRequestType(ScsbCommonConstants.RETRIEVAL);
             if (null == requestItemEntity.getBulkRequestItemEntity()) {
-                InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(itemRequestInfo.getRequestingInstitution());
+                InstitutionEntity institutionEntity = institutionDetailsRepository.findByInstitutionCode(requestItemEntity.getInstitutionEntity().getInstitutionCode());
                 DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(requestItemEntity.getStopCode(), institutionEntity.getId(), 'Y');
                 DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(institutionEntity.getId(), deliveryCodeEntity.getId(), itemEntity.getImsLocationEntity().getId());
                 if (deliveryCodeTranslationEntity != null && deliveryCodeTranslationEntity.getImsLocationDeliveryCode() != null) {
@@ -1098,7 +1104,12 @@ public class ItemRequestService {
 
     private String getPickupLocation(Integer institutionId, String deliveryLocation) {
         DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(deliveryLocation, institutionId, 'Y');
-        return deliveryCodeEntity.getPickupLocation();
+        if (deliveryCodeEntity != null) {
+            return deliveryCodeEntity.getPickupLocation() != null ? deliveryCodeEntity.getPickupLocation() : "";
+        }
+        else {
+            return "";
+       }
     }
 
     /**

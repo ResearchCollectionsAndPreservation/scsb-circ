@@ -58,7 +58,7 @@ public class LookupUser extends ScsbNCIP {
 
         gatherName(lookupUserResponse,returnJsonName);
         gatherPhysicalAddress(lookupUserResponse);
-        returnJson.put("name",returnJsonName.get("firstName")+" "+returnJsonName.get("lastName"));
+      //  returnJson.put("name",returnJsonName.get("firstName") != null ? returnJsonName.get("firstName") : "" +" "+returnJsonName.get("lastName") != null ? returnJsonName.get("lastName"):"");
         returnJson.put("userId", getUserIdString(lookupUserResponse));
         returnJson.put("privileges", getPrivileges(lookupUserResponse));
         returnJson.put("electronicAddresses", gatherElectronicAddress(lookupUserResponse));

@@ -336,8 +336,6 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         String ownerCode = "PA";
         Integer institution = Integer.valueOf(1);
         ItemRequestInformation itemRequestInformation = getItemRequestInformation(Arrays.asList("2456744"));
-        OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
-//        Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(any())).thenReturn(ownerCodeEntity);
         Mockito.when(deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(any(), any(), anyChar())).thenReturn(getDeliveryCodeEntity());
         itemValidatorService.checkDeliveryLocation(ownerCode,institution, itemRequestInformation);
         itemValidatorService.checkDeliveryLocation(ownerCode,institution, itemRequestInformation);
@@ -349,9 +347,7 @@ public class ItemValidatorServiceUT extends BaseTestCaseUT {
         Integer institution = Integer.valueOf(1);
         ItemRequestInformation itemRequestInformation = getItemRequestInformation(Arrays.asList("2456744"));
         itemRequestInformation.setRequestingInstitution("3");
-        OwnerCodeEntity ownerCodeEntity = getOwnerCodeEntity();
         Mockito.when(deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(any(), any(), anyChar())).thenReturn(getDeliveryCodeEntity());
-//        Mockito.when(ownerCodeDetailsRepository.findByOwnerCode(any())).thenReturn(ownerCodeEntity);
         itemValidatorService.checkDeliveryLocation(ownerCode, institution, itemRequestInformation);
     }
     @Test

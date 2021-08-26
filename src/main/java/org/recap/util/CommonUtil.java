@@ -293,6 +293,17 @@ public class CommonUtil {
         return StringUtils.startsWithAny(imsItemStatus, imsItemStatusCodes.split(","));
     }
 
+    /**
+     * Checks if the IMS item status is requestable but not retrievable (In first scan)
+     * @param imsLocationCode IMS Location Code
+     * @param imsItemStatus IMS Item Status
+     * @return boolean
+     */
+    public boolean checkIfImsItemStatusIsRequestableNotRetrievable(String imsLocationCode, String imsItemStatus) {
+        String imsItemStatusCodes = propertyUtil.getPropertyByImsLocationAndKey(imsLocationCode, PropertyKeyConstants.IMS.IMS_REQUESTABLE_NOT_RETRIEVABLE_ITEM_STATUS_CODES);
+        return StringUtils.isNotBlank(imsItemStatusCodes) && StringUtils.startsWithAny(imsItemStatus, imsItemStatusCodes.split(","));
+    }
+
     public ItemRequestInformation getItemRequestInformation(ItemEntity itemEntity) {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Collections.singletonList(itemEntity.getBarcode()));

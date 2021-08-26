@@ -439,7 +439,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
         Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
-        Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn(ScsbConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER);
+        Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn("SCH ON REFILE WO:");
         Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
         ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
     }

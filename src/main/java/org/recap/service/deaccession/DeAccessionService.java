@@ -364,10 +364,10 @@ public class DeAccessionService {
                                 gfaItemStatus = gfaItemStatus.toUpperCase();
                                 gfaItemStatus = gfaItemStatus.contains(":") ? gfaItemStatus.substring(0, gfaItemStatus.indexOf(':') + 1) : gfaItemStatus;
                                 logger.info("GFA Item Status after trimming : {}", gfaItemStatus);
-                                if ((StringUtils.isNotBlank(gfaItemStatus) && ScsbConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.equals(gfaItemStatus))) {
+                                if ((StringUtils.isNotBlank(gfaItemStatus) && commonUtil.checkIfImsItemStatusIsRequestableNotRetrievable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus))) {
                                     deAccessionDBResponseEntities.add(prepareFailureResponse(itemBarcode, deAccessionItem.getDeliveryLocation(), "Cannot Deaccession as Item is awaiting for Refile.Please try again later or contact ReCAP staff for further assistance.", itemEntity));
                                 }
-                                else if ((StringUtils.isNotBlank(gfaItemStatus) && !ScsbConstants.GFA_STATUS_NOT_ON_FILE.equalsIgnoreCase(gfaItemStatus))
+                                else if (StringUtils.isNotBlank(gfaItemStatus)
                                         && ((ScsbCommonConstants.AVAILABLE.equals(scsbItemStatus) && commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus, true))
                                         || (ScsbCommonConstants.NOT_AVAILABLE.equals(scsbItemStatus) && commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemEntity.getImsLocationEntity().getImsLocationCode(), gfaItemStatus, false)))) {
                                     barcodeAndStopCodeMap.put(itemBarcode.trim(), deAccessionItem.getDeliveryLocation());

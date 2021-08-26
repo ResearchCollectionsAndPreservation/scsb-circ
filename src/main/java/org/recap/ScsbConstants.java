@@ -176,8 +176,6 @@ public final class ScsbConstants {
 
     public static final String GFA_SERVICE_PARAM = "filter";
 
-    public static final String GFA_STATUS_NOT_ON_FILE = "NOT ON FILE";
-    public static final String GFA_STATUS_SCH_ON_REFILE_WORK_ORDER = "SCH ON REFILE WO:";
     public static final String CANNOT_REFILE_FIRST_SCAN_REQUEST ="Cannot place recall for requests placed on first scan LAS status";
     public static final String REQUESTS_STUCK_IN_PENDING = "Requests stuck in pending";
     public static final String NO_PENDING_REQUESTS_FOUND = "There are no pending requests or no new pending request";

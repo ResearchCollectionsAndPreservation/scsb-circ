@@ -154,20 +154,20 @@ public class GFALasService {
                 if (StringUtils.isBlank(itemRequestInfo.getImsLocationCode())) {
                     itemResponseInformation.setSuccess(false);
                     itemResponseInformation.setScreenMessage(ScsbConstants.REQUEST_SCSB_EXCEPTION + ScsbConstants.IMS_LOCATION_CODE_BLANK_ERROR);
+                } else if (commonUtil.checkIfImsItemStatusIsRequestableNotRetrievable(itemRequestInfo.getImsLocationCode(), gfaOnlyStatus)) {
+                    log.info("Request Received while GFA status is Sch on Refile WO");
+                    itemResponseInformation.setRequestTypeForScheduledOnWO(true);
+                    itemResponseInformation.setSuccess(true);
+                    itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
                 } else if (commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(itemRequestInfo.getImsLocationCode(), gfaOnlyStatus, true)) {
                     if (itemRequestInfo.getRequestType().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_RETRIEVAL)) {
                         itemResponseInformation = callItemRetrievable(itemRequestInfo, itemResponseInformation);
                     } else if (itemRequestInfo.getRequestType().equalsIgnoreCase(ScsbCommonConstants.REQUEST_TYPE_EDD)) {
                         itemResponseInformation = callItemEDDRetrievable(itemRequestInfo, itemResponseInformation);
                     }
-                } else if (ScsbConstants.GFA_STATUS_SCH_ON_REFILE_WORK_ORDER.toLowerCase().contains(gfaOnlyStatus.toLowerCase())) {
-                    log.info("Request Received while GFA status is Sch on Refile WO");
-                    itemResponseInformation.setRequestTypeForScheduledOnWO(true);
-                    itemResponseInformation.setSuccess(true);
-                    itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ORDER_SUCCESSFUL);
                 } else {
                     itemResponseInformation.setSuccess(false);
-                    itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ITEM_NOT_AVAILABLE);
+                    itemResponseInformation.setScreenMessage(ScsbConstants.GFA_RETRIVAL_ITEM_NOT_AVAILABLE + " (" + itemStatus + ")");
                 }
             } else {
                 lasPolling(itemRequestInfo, itemResponseInformation);
@@ -516,13 +516,13 @@ public class GFALasService {
             ItemRequestInformation itemRequestInformation = itemRequestService.getItemRequestInformationByRequestEntity(requestItemEntity, requestItemEntity.getItemEntity());
             String itemStatus = callGfaItemStatus(requestItemEntity.getItemEntity().getBarcode());
             String imsLocationCode = commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode());
-            if (commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(imsLocationCode, itemStatus, true)) {
-                producerTemplate.sendBodyAndHeader(ScsbConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + ScsbConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
-            } else if (StringUtils.isNotBlank(itemStatus)) {
+            if (commonUtil.checkIfImsItemStatusIsRequestableNotRetrievable(imsLocationCode, itemStatus)) {
                 RequestStatusEntity requestStatusEntity = requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbConstants.LAS_REFILE_REQUEST_PLACED);
                 requestItemEntity.setRequestStatusEntity(requestStatusEntity);
                 requestItemEntity.setRequestStatusId(requestStatusEntity.getId());
                 requestItemDetailsRepository.save(requestItemEntity);
+            } else if (commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(imsLocationCode, itemStatus, true)) {
+                producerTemplate.sendBodyAndHeader(ScsbConstants.SCSB_LAS_OUTGOING_QUEUE_PREFIX + imsLocationCode + ScsbConstants.OUTGOING_QUEUE_SUFFIX, itemRequestInformation, ScsbCommonConstants.REQUEST_TYPE_QUEUE_HEADER, requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
             }
         } catch (Exception exception) {
             log.error(ScsbCommonConstants.REQUEST_EXCEPTION, exception);

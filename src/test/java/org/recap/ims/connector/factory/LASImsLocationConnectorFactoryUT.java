@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
 import org.recap.ims.connector.AbstractLASImsLocationConnector;
-import org.recap.ims.connector.factory.LASImsLocationConnectorFactory;
 import org.recap.model.IMSConfigProperties;
 import org.recap.util.PropertyUtil;
 
@@ -35,7 +34,7 @@ public class LASImsLocationConnectorFactoryUT extends BaseTestCaseUT {
     @Test
     public void getLasImsLocationConnector(){
         imsLocationConnectors.add(abstractLASImsLocationConnector);
-        lasImsLocationConnectorFactory = new LASImsLocationConnectorFactory(imsLocationConnectors,propertyUtil);
+        lasImsLocationConnectorFactory = new LASImsLocationConnectorFactory();
         Mockito.when(propertyUtil.getIMSConfigProperties(any())).thenReturn(imsConfigProperties);
         Mockito.when(abstractLASImsLocationConnector.supports("HD")).thenReturn(true);
         lasImsLocationConnectorFactory.getLasImsLocationConnector("HD");

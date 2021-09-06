@@ -11,7 +11,9 @@ import org.apache.camel.support.DefaultExchange;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.*;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCaseUT;
 import org.recap.ScsbCommonConstants;
 import org.recap.ScsbConstants;
@@ -50,6 +52,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class GFALasServiceUT extends BaseTestCaseUT{
 
     @InjectMocks

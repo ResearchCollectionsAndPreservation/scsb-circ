@@ -1,6 +1,7 @@
 package org.recap.ims.connector.factory;
 
 import org.recap.ims.connector.AbstractLASImsLocationConnector;
+import org.recap.ims.connector.GFALasImsLocationConnector;
 import org.recap.model.IMSConfigProperties;
 import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,25 +15,14 @@ import java.util.List;
 @Component
 public class LASImsLocationConnectorFactory extends BaseLASImsLocationConnectorFactory {
 
-    private final List<AbstractLASImsLocationConnector> imsLocationConnectors;
-    private final PropertyUtil propertyUtil;
-
     @Autowired
-    public LASImsLocationConnectorFactory(List<AbstractLASImsLocationConnector> imsLocationConnectors, PropertyUtil propertyUtil) {
-        this.imsLocationConnectors = imsLocationConnectors;
-        this.propertyUtil = propertyUtil;
-    }
+    private PropertyUtil propertyUtil;
 
     @Override
     public AbstractLASImsLocationConnector getLasImsLocationConnector(String imsLocationCode) {
-        IMSConfigProperties imsConfigProperties = propertyUtil.getIMSConfigProperties(imsLocationCode);
-        AbstractLASImsLocationConnector connector = imsLocationConnectors
-                .stream()
-                .filter(service -> service.supports(imsLocationCode))
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+        GFALasImsLocationConnector connector = new GFALasImsLocationConnector();
         connector.setImsLocationCode(imsLocationCode);
-        connector.setImsConfigProperties(imsConfigProperties);
+        connector.setImsConfigProperties(propertyUtil.getIMSConfigProperties(imsLocationCode));
         return connector;
     }
 }

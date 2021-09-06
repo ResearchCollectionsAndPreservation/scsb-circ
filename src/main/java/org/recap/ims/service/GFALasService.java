@@ -138,6 +138,7 @@ public class GFALasService {
             List<GFAItemStatus> gfaItemStatuses = new ArrayList<>();
             gfaItemStatuses.add(gfaItemStatus001);
             gfaItemStatusCheckRequest.setItemStatus(gfaItemStatuses);
+            log.info("Before Item Status Check - Request Type: {} Barcode: {} IMS Location: {}", itemRequestInfo.getRequestType(), gfaItemStatus001.getItemBarCode(), itemRequestInfo.getImsLocationCode());
             gfaItemStatusCheckResponse = lasImsLocationConnectorFactory.getLasImsLocationConnector(itemRequestInfo.getImsLocationCode()).itemStatusCheck(gfaItemStatusCheckRequest);
             if (gfaItemStatusCheckResponse != null
                     && gfaItemStatusCheckResponse.getDsitem() != null
@@ -149,7 +150,7 @@ public class GFALasService {
                 } else {
                     gfaOnlyStatus = itemStatus.toUpperCase();
                 }
-                log.info("Item status check before executing {} Order. Status received : {}", itemRequestInfo.getRequestType(), gfaOnlyStatus);
+                log.info("After Item Status Check, before executing - Request Type: {} Barcode: {} IMS Location: {} Status received : {}", itemRequestInfo.getRequestType(), gfaItemStatus001.getItemBarCode(), itemRequestInfo.getImsLocationCode(), gfaOnlyStatus);
                 // Call Retrieval Order
                 if (StringUtils.isBlank(itemRequestInfo.getImsLocationCode())) {
                     itemResponseInformation.setSuccess(false);

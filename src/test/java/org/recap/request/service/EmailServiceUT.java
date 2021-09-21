@@ -5,13 +5,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.recap.PropertyKeyConstants;
 import org.recap.ScsbConstants;
 import org.recap.ScsbCommonConstants;
 import org.recap.request.service.EmailService;
 import org.recap.util.PropertyUtil;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by sudhishk on 19/1/17.
@@ -37,5 +40,18 @@ public class EmailServiceUT {
         emailService.sendEmail("", "PULTST54323", "RECAP","Message", "45678912", ScsbConstants.DELETED_MAIL_TO,"");
         emailService.sendEmail("", "PULTST54323", "RECAP","Message", "45678912", "","");
         emailService.sendBulkRequestEmail("12","TestFirstBulkRequest","TestFirstBulkRequest","PROCESSED","Test","");
+    }
+
+    @Test
+    public void sendLASExceptionEmail(){
+        String customerCode = "PA";
+        String itemBarcode = "243533";
+        String messageDisplay = "success";
+        String patronBarcode = "3456784";
+        String toInstitution = "PUL";
+        String subject = "test";
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn("test@gmail.com");
+        emailService.sendLASExceptionEmail(customerCode,itemBarcode,messageDisplay,patronBarcode,toInstitution,subject);
+
     }
 }

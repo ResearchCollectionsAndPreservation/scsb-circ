@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.recap.BaseTestCaseUT;
+import org.recap.PropertyKeyConstants;
 import org.recap.ScsbCommonConstants;
 import org.recap.ScsbConstants;
 import org.recap.controller.RequestItemController;
@@ -460,6 +461,40 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
         ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
     }
+    @Test
+    public void checkGfaItemStatusItemCancelled() {
+        List<DeAccessionItem> deAccessionItems = new ArrayList<>();
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
+        deAccessionItems.add(deAccessionItem);
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setCatalogingStatus(ScsbCommonConstants.COMPLETE_STATUS);
+        itemEntity.getItemStatusEntity().setStatusCode(ScsbCommonConstants.REQUEST_STATUS_CANCELED);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn(ScsbConstants.ILS_CONNECTION_FAILED);
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+    }
+
+    @Test
+    public void checkGfaItemStatusIms() {
+        List<DeAccessionItem> deAccessionItems = new ArrayList<>();
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
+        deAccessionItems.add(deAccessionItem);
+        ItemEntity itemEntity = getItemEntity();
+        itemEntity.setCatalogingStatus(ScsbCommonConstants.COMPLETE_STATUS);
+        itemEntity.getItemStatusEntity().setStatusCode(ScsbCommonConstants.REQUEST_STATUS_CANCELED);
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        Map<String, String> barcodeAndStopCodeMap = new HashMap<>();
+        Mockito.when(commonUtil.checkIfImsItemStatusIsRequestableNotRetrievable(any(), any())).thenReturn(Boolean.TRUE);
+        Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn(ScsbConstants.ILS_CONNECTION_FAILED);
+        Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
+        ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
+    }
 
     @Test
     public void checkGfaItemStatusBlankStatus() {
@@ -515,6 +550,23 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         deAccessionDBResponseEntity.setItemStatus(ScsbCommonConstants.AVAILABLE);
         deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
         String username = "test";
+        Mockito.when(institutionDetailsRepository.findByInstitutionCode(deAccessionDBResponseEntity.getInstitutionCode())).thenReturn(getItemEntity().getInstitutionEntity());
+        Mockito.when(deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(any(), any(), anyChar())).thenReturn(getDeliveryCodeEntity());
+        Mockito.when(imsLocationDetailsRepository.findByImsLocationCode(deAccessionDBResponseEntity.getImsLocationCode())).thenReturn(getImsLocationEntity());
+        Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
+        Mockito.when(abstractLASImsLocationConnector.gfaPermanentWithdrawalDirect(any())).thenReturn(null);
+        Mockito.when(deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(any(), any(), any())).thenReturn(getDeliveryCodeTranslationEntity());
+        ReflectionTestUtils.invokeMethod(deAccessionService, "callGfaDeaccessionService", deAccessionDBResponseEntities, username);
+    }
+
+    @Test
+    public void callGfaDeaccessionServiceException() {
+        List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
+        DeAccessionDBResponseEntity deAccessionDBResponseEntity = getDeAccessionDBResponseEntity();
+        deAccessionDBResponseEntity.setItemStatus(ScsbCommonConstants.AVAILABLE);
+        deAccessionDBResponseEntities.add(deAccessionDBResponseEntity);
+        String username = "test";
+        Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenThrow(new NullPointerException());
         Mockito.when(institutionDetailsRepository.findByInstitutionCode(deAccessionDBResponseEntity.getInstitutionCode())).thenReturn(getItemEntity().getInstitutionEntity());
         Mockito.when(deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(any(), any(), anyChar())).thenReturn(getDeliveryCodeEntity());
         Mockito.when(imsLocationDetailsRepository.findByImsLocationCode(deAccessionDBResponseEntity.getImsLocationCode())).thenReturn(getImsLocationEntity());
@@ -596,6 +648,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
 
     @Test
     public void removeDeaccessionItems(){
+        DeAccessionItem deAccessionItem = getDeAccessionItem();
         List<DeAccessionItem> removeDeaccessionItems = new ArrayList<>();
         removeDeaccessionItems.add(getDeAccessionItem());
         DeAccessionRequest deAccessionRequest = new DeAccessionRequest();

@@ -13,6 +13,7 @@ import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 
@@ -99,6 +100,27 @@ public class CommonUtilUT extends BaseTestCaseUT {
     }
 
     @Test
+    public void addItemAndReportEntitiesWithoutProcessHoldings() {
+        List<ItemEntity> itemEntities = new ArrayList<>();
+        List<ReportEntity> reportEntities = new ArrayList<>();
+        boolean processHoldings = false;
+        HoldingsEntity holdingsEntity = getHoldingsEntity();
+        Map<String, Object> itemMap = new HashMap<>();
+        itemMap.put("itemEntity", getBibliographicEntity().getItemEntities().get(0));
+        commonUtil.addItemAndReportEntities(itemEntities, reportEntities, processHoldings, holdingsEntity, itemMap);
+    }
+    @Test
+    public void addItemAndReportEntitiesWithoutHoldingsEntity() {
+        List<ItemEntity> itemEntities = new ArrayList<>();
+        List<ReportEntity> reportEntities = new ArrayList<>();
+        boolean processHoldings = false;
+        HoldingsEntity holdingsEntity = new HoldingsEntity();
+        Map<String, Object> itemMap = new HashMap<>();
+        itemMap.put("itemEntity", getBibliographicEntity().getItemEntities().get(0));
+        commonUtil.addItemAndReportEntities(itemEntities, reportEntities, processHoldings, holdingsEntity, itemMap);
+    }
+
+    @Test
     public void rollbackUpdateItemAvailabilityStatus() {
         ItemEntity itemEntity = getBibliographicEntity().getItemEntities().get(0);
         String userName = "Test";
@@ -108,7 +130,18 @@ public class CommonUtilUT extends BaseTestCaseUT {
 
     @Test
     public void getFTPPropertiesMap() {
-        commonUtil.getFTPPropertiesMap();
+        Map<String, String> map = commonUtil.getFTPPropertiesMap();
+        assertNotNull(map);
+    }
+
+    @Test
+    public void getFTPPropertiesMapAvailable() {
+        Map<String, String> ftpPropertiesMap = new HashMap<>();
+        ftpPropertiesMap.put("Value","Test");
+        ReflectionTestUtils.setField(commonUtil,"ftpPropertiesMap" ,ftpPropertiesMap);
+        Map<String, String> map = commonUtil.getFTPPropertiesMap();
+        assertNotNull(map);
+        assertEquals(ftpPropertiesMap,map);
     }
 
     @Test
@@ -122,6 +155,34 @@ public class CommonUtilUT extends BaseTestCaseUT {
         commonUtil.getInstitutionEntityMap();
         CommonUtil commonUtil = new CommonUtil();
         commonUtil.getItemStatusMap();
+    }
+
+    @Test
+    public void getItemStatusMapWithItemStatus() {
+        Map<String, Integer> itemStatusMap = new HashMap<>();
+        itemStatusMap.put("AVAILABLE",1);
+        ReflectionTestUtils.setField(commonUtil,"itemStatusMap",itemStatusMap);
+        Map<String, Integer> map = commonUtil.getItemStatusMap();
+        assertNotNull(map);
+        assertEquals(itemStatusMap,map);
+    }
+    @Test
+    public void getCollectionGroupMapAvailable() {
+        Map<String, Integer> collectionGroupMap = new HashMap<>();
+        collectionGroupMap.put("SHARED",1);
+        ReflectionTestUtils.setField(commonUtil,"collectionGroupMap",collectionGroupMap);
+        Map<String, Integer> map = commonUtil.getCollectionGroupMap();
+        assertNotNull(map);
+        assertEquals(collectionGroupMap,map);
+    }
+    @Test
+    public void getInstitutionEntityMapAvailable() {
+        Map<String, Integer> institutionEntityMap = new HashMap<>();
+        institutionEntityMap.put("PUL",1);
+        ReflectionTestUtils.setField(commonUtil,"institutionEntityMap",institutionEntityMap);
+        Map<String, Integer> map = commonUtil.getInstitutionEntityMap();
+        assertNotNull(map);
+        assertEquals(institutionEntityMap,map);
     }
 
     @Test
@@ -209,6 +270,24 @@ public class CommonUtilUT extends BaseTestCaseUT {
     }
 
     @Test
+    public void getImsLocationCodeByItemBarcodeWithoutItemEntity() {
+        String itemBarcode = "32959";
+        Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Collections.EMPTY_LIST);
+        String imsLocationCode = commonUtil.getImsLocationCodeByItemBarcode(itemBarcode);
+        assertNull(imsLocationCode);
+    }
+
+    @Test
+    public void getImsLocationCodeByItemBarcodeWithoutImsLocation() {
+        String itemBarcode = "32959";
+        ItemEntity itemEntity = getBibliographicEntity().getItemEntities().get(0);
+        itemEntity.setImsLocationEntity(null);
+        Mockito.when(itemDetailsRepository.findByBarcode(itemBarcode)).thenReturn(Arrays.asList(itemEntity));
+        String imsLocationCode = commonUtil.getImsLocationCodeByItemBarcode(itemBarcode);
+        assertNull(imsLocationCode);
+    }
+
+    @Test
     public void checkIfImsItemStatusIsRequestableNotRetrievable(){
         String imsLocationCode = "HD";
         String imsItemStatus = "IN";
@@ -216,6 +295,15 @@ public class CommonUtilUT extends BaseTestCaseUT {
         Boolean result = commonUtil.checkIfImsItemStatusIsRequestableNotRetrievable(imsLocationCode,imsItemStatus);
         assertFalse(result);
 
+    }
+
+    @Test
+    public void checkIfImsItemIsNotOnFile(){
+        String imsLocationCode = "HD";
+        String imsItemStatus = "IN";
+        Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn("test");
+        Boolean result = commonUtil.checkIfImsItemIsNotOnFile(imsLocationCode,imsItemStatus);
+        assertFalse(result);
     }
 
     /*@Test
@@ -230,6 +318,12 @@ public class CommonUtilUT extends BaseTestCaseUT {
     public void getBarcodesList() {
         List<ItemEntity> itemEntities = getBibliographicEntity().getItemEntities();
         List<String> itemBarcodes = commonUtil.getBarcodesList(itemEntities);
+        assertNotNull(itemBarcodes);
+    }
+
+    @Test
+    public void getBarcodesListWithoutItemEntities() {
+        List<String> itemBarcodes = commonUtil.getBarcodesList(Collections.EMPTY_LIST);
         assertNotNull(itemBarcodes);
     }
     @Test

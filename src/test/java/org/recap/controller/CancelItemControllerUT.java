@@ -5,6 +5,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
+import org.recap.PropertyKeyConstants;
 import org.recap.ScsbCommonConstants;
 import org.recap.ScsbConstants;
 import org.recap.model.request.ItemRequestInformation;
@@ -19,6 +20,7 @@ import org.recap.request.service.ItemRequestService;
 import org.recap.util.CommonUtil;
 import org.recap.request.util.ItemRequestServiceUtil;
 import org.recap.util.PropertyUtil;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -124,6 +126,34 @@ public class CancelItemControllerUT extends BaseTestCaseUT {
         Mockito.when(requestItemDetailsRepository.findById(16)).thenReturn(Optional.of(requestItemEntity));
         cancelRequestResponse = cancelItemController.cancelRequest(requestItemEntity.getId());
         assertNotNull(cancelRequestResponse);
+    }
+
+    @Test
+    public void processCancelRequest() throws Exception {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        ItemInformationResponse itemInformationResponse = getItemInformationResponse();
+        itemInformationResponse.setHoldQueueLength("0");
+        RequestItemEntity requestItemEntity = createRequestItem();
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), PropertyKeyConstants.ILS.ILS_CHECKEDOUT_CIRCULATION_STATUS)).thenReturn(null);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(createRequestItem().getRequestStatusEntity());
+        Mockito.when(requestItemDetailsRepository.save(requestItemEntity)).thenReturn(createRequestItem());
+        Mockito.when(itemRequestService.getEmailService()).thenReturn(emailService);
+        Mockito.doNothing().when(itemRequestService).saveItemChangeLogEntity(any(), any(), any(), any());
+        Mockito.doNothing().when(emailService).sendEmail(any(),any(),any(),any(),any(), any(),any());
+        ReflectionTestUtils.invokeMethod(cancelItemController,"processCancelRequest",itemRequestInformation,itemInformationResponse,requestItemEntity);
+    }
+
+    @Test
+    public void processRecall() throws Exception {
+        ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
+        ItemInformationResponse itemInformationResponse = getItemInformationResponse();
+        itemInformationResponse.setHoldQueueLength("0");
+        RequestItemEntity requestItemEntity = createRequestItem();
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(itemRequestInformation.getRequestingInstitution(), PropertyKeyConstants.ILS.ILS_CHECKEDOUT_CIRCULATION_STATUS)).thenReturn(null);
+        Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(createRequestItem().getRequestStatusEntity());
+        Mockito.when(requestItemDetailsRepository.save(requestItemEntity)).thenReturn(createRequestItem());
+        Mockito.doNothing().when(itemRequestService).saveItemChangeLogEntity(any(), any(), any(), any());
+        ReflectionTestUtils.invokeMethod(cancelItemController,"processRecall",itemRequestInformation,itemInformationResponse,requestItemEntity);
     }
     private ItemInformationResponse getItemInformationResponse() {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();

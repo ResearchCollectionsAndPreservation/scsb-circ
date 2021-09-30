@@ -54,7 +54,9 @@ import org.recap.model.AbstractResponseItem;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -73,6 +75,7 @@ import java.util.Map;
 @Service
 @Slf4j
 @RefreshScope
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
     private String ncipRequest = "NCIP2 request sent: ";

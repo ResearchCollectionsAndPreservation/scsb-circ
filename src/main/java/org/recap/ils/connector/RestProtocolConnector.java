@@ -16,6 +16,8 @@ import org.recap.model.response.*;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.ils.protocol.rest.processor.RestProtocolJobResponsePollingProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -27,6 +29,7 @@ import java.util.List;
 
 @Service
 @Slf4j
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RestProtocolConnector extends AbstractProtocolConnector {
     
     @Autowired

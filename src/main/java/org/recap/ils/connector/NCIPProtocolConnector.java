@@ -54,7 +54,9 @@ import org.recap.model.AbstractResponseItem;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -73,6 +75,7 @@ import java.util.Map;
 @Service
 @Slf4j
 @RefreshScope
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
     private String ncipRequest = "NCIP2 request sent: ";
@@ -396,12 +399,18 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
     public Object placeHold(String itemIdentifier, Integer requestId, String patronIdentifier, String callInstitutionId, String itemInstitutionId, String expirationDate, String bibId, String pickupLocation, String trackingId, String title, String author, String callNumber) {
         log.info("Item barcode {} received for hold request in " + callInstitutionId + " for patron {}", itemIdentifier, patronIdentifier);
         ItemHoldResponse itemHoldResponse = new ItemHoldResponse();
-        if (callInstitutionId.equalsIgnoreCase(itemInstitutionId)) {
+        PatronInformationResponse patronInformationResponse = (PatronInformationResponse) lookupPatron(patronIdentifier);
+        if(patronInformationResponse.isSuccess()) {
+            if (callInstitutionId.equalsIgnoreCase(itemInstitutionId)) {
                 itemHoldResponse.setSuccess(Boolean.TRUE);
-            }
-            else {
+            } else {
                 itemHoldResponse = acceptItem(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, pickupLocation, title, author, callNumber);
             }
+        }
+        else {
+            itemHoldResponse.setSuccess(Boolean.FALSE);
+            itemHoldResponse.setScreenMessage(patronInformationResponse.getScreenMessage());
+        }
         return itemHoldResponse;
     }
 
@@ -529,15 +538,13 @@ public class NCIPProtocolConnector extends AbstractProtocolConnector {
 
                 return patronInformationResponse;
             } else {
-                patronInformationResponse.setPatronName(responseObject.getString("name"));
+                patronInformationResponse.setPatronName(lookupUserResponseData.getUserOptionalFields().getNameInformation().getPersonalNameInformation().getStructuredPersonalUserName().getGivenName()
+                + lookupUserResponseData.getUserOptionalFields().getNameInformation().getPersonalNameInformation().getStructuredPersonalUserName().getSurname()
+                );
                 patronInformationResponse.setSuccess(Boolean.TRUE);
                 patronInformationResponse.setScreenMessage(ScsbCommonConstants.SUCCESS);
-                patronInformationResponse.setHomeAddress(lookupUserResponseData.getUserOptionalFields().getUserAddressInformation(0).getPhysicalAddress().getStructuredAddress().getStreet().concat(",").concat(
-                        lookupUserResponseData.getUserOptionalFields().getUserAddressInformation(0).getPhysicalAddress().getStructuredAddress().getLocality()).concat(",").
-                        concat(lookupUserResponseData.getUserOptionalFields().getUserAddressInformation(0).getPhysicalAddress().getStructuredAddress().getRegion().concat(",").
-                                concat(lookupUserResponseData.getUserOptionalFields().getUserAddressInformation(0).getPhysicalAddress().getStructuredAddress().getPostalCode())));
-
-                patronInformationResponse.setEmail(lookupUserResponseData.getUserOptionalFields().getUserAddressInformation(1).getElectronicAddress().getElectronicAddressData());
+                patronInformationResponse.setEmail((!lookupUserResponseData.getUserOptionalFields().getUserAddressInformations().isEmpty() && lookupUserResponseData.getUserOptionalFields().getUserAddressInformations().size() > 1)
+                        ? lookupUserResponseData.getUserOptionalFields().getUserAddressInformation(1).getElectronicAddress().getElectronicAddressData():"");
                 patronInformationResponse.setPatronIdentifier(patronIdentifier);
                 log.info("patronInformation Response >>> " + lookupUserResponseData);
                 log.info("patronInformation Response message >>> " + patronInformationResponse.getScreenMessage());

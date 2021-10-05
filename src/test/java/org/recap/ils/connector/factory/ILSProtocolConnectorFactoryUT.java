@@ -34,7 +34,7 @@ public class ILSProtocolConnectorFactoryUT extends BaseTestCaseUT {
         String institution = "PUL";
         ILSConfigProperties ilsConfigProperties = new ILSConfigProperties();
         ilsConfigProperties.setProtocol("NCIP");
-        ILSProtocolConnectorFactory ilsProtocolConnectorFactory = new ILSProtocolConnectorFactory(Arrays.asList(abstractProtocolConnector),propertyUtil);
+        ILSProtocolConnectorFactory ilsProtocolConnectorFactory = new ILSProtocolConnectorFactory();
         Mockito.when(propertyUtil.getILSConfigProperties(any())).thenReturn(ilsConfigProperties);
         Mockito.when(abstractProtocolConnector.supports("NCIP")).thenReturn(true);
         AbstractProtocolConnector abstractProtocolConnector = ilsProtocolConnectorFactory.getIlsProtocolConnector(institution);

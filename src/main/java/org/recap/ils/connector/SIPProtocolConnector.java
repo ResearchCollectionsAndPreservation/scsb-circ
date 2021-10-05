@@ -14,6 +14,8 @@ import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.response.*;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -23,6 +25,7 @@ import java.util.List;
 
 @Service
 @Slf4j
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SIPProtocolConnector extends AbstractProtocolConnector {
 
     @Override

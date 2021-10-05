@@ -2,12 +2,9 @@ package org.recap.ims.connector.factory;
 
 import org.recap.ims.connector.AbstractLASImsLocationConnector;
 import org.recap.ims.connector.GFALasImsLocationConnector;
-import org.recap.model.IMSConfigProperties;
 import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * Created by rajeshbabuk on 20/Jan/2021

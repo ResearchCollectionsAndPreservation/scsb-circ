@@ -16,7 +16,7 @@ import org.recap.ScsbConstants;
 @Slf4j
 public class NCIPToolKitUtil {
 
-        private static NCIPToolKitUtil ncipToolkitUtilInstance;
+        private static NCIPToolKitUtil ncipToolkitUtilInstance = new NCIPToolKitUtil();
         public Translator translator;
         public ServiceContext serviceContext;
 

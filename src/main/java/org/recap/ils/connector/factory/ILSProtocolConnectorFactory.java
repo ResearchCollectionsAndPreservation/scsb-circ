@@ -9,7 +9,9 @@ import org.recap.ils.connector.SIPProtocolConnector;
 import org.recap.model.ILSConfigProperties;
 import org.recap.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -17,6 +19,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ILSProtocolConnectorFactory extends BaseILSProtocolConnectorFactory {
 
     @Autowired
@@ -29,15 +32,16 @@ public class ILSProtocolConnectorFactory extends BaseILSProtocolConnectorFactory
 
     public AbstractProtocolConnector getIlsProtocolConnector(String institution) {
         AbstractProtocolConnector connector = null;
-        ILSConfigProperties ilsConfigProperties = propertyUtil.getILSConfigProperties(institution);
-        String protocol = ilsConfigProperties.getProtocol();
         if (protocolConnectorsMap.containsKey(institution)) {
+            ILSConfigProperties ilsConfigProperties = propertyUtil.getILSConfigProperties(institution);
             connector = protocolConnectorsMap.get(institution);
             if (connector != null){
                 connector.setInstitution(institution);
                 connector.setIlsConfigProperties(ilsConfigProperties);
             }
         } else {
+            ILSConfigProperties ilsConfigProperties = propertyUtil.getILSConfigProperties(institution);
+            String protocol = ilsConfigProperties.getProtocol();
             if (ScsbConstants.SIP2_PROTOCOL.equalsIgnoreCase(protocol)) {
                 connector = applicationContext.getBean(SIPProtocolConnector.class);
             } else if (ScsbConstants.REST_PROTOCOL.equalsIgnoreCase(protocol)) {

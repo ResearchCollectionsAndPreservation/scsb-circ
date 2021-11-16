@@ -13,10 +13,10 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "source",
+        "nyplSource",
         "bibIds",
         "id",
-        "type",
+        "nyplType",
         "updatedDate",
         "createdDate",
         "deletedDate",
@@ -32,14 +32,14 @@ import java.util.List;
 @Getter
 @Setter
 public class ItemData {
-    @JsonProperty("source")
-    private String source;
+    @JsonProperty("nyplSource")
+    private String nyplSource;
     @JsonProperty("bibIds")
     private List<String> bibIds = null;
     @JsonProperty("id")
     private String id;
-    @JsonProperty("type")
-    private String type;
+    @JsonProperty("nyplType")
+    private String nyplType;
     @JsonProperty("updatedDate")
     private String updatedDate;
     @JsonProperty("createdDate")

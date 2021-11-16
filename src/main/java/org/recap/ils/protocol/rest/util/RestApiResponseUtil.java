@@ -83,7 +83,7 @@ public class RestApiResponseUtil {
         itemInformationResponse.setBibIds(itemData.getBibIds());
         itemInformationResponse.setCallNumber((String) itemData.getCallNumber());
         itemInformationResponse.setItemType((String) itemData.getItemType());
-        itemInformationResponse.setSource(itemData.getSource());
+        itemInformationResponse.setSource(itemData.getNyplSource());
         itemInformationResponse.setUpdatedDate(formatFromSipDate(itemData.getUpdatedDate()));
         itemInformationResponse.setCreatedDate(formatFromSipDate(itemData.getCreatedDate()));
         itemInformationResponse.setDeletedDate(formatFromSipDate((String) itemData.getDeletedDate()));

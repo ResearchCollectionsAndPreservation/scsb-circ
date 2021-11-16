@@ -17,7 +17,7 @@ public class RestHoldRequestUT {
         restHoldRequest.setPatron("test");
         restHoldRequest.setRecordType("test");
         restHoldRequest.setRecord("test");
-        restHoldRequest.setSource("test");
+        restHoldRequest.setNyplSource("test");
         restHoldRequest.setPickupLocation("PB");
         restHoldRequest.setNumberOfCopies(1);
         restHoldRequest.setNeededBy("test");
@@ -27,7 +27,7 @@ public class RestHoldRequestUT {
         assertNotNull(restHoldRequest.getDeliveryLocation());
         assertNotNull(restHoldRequest.getRecordType());
         assertNotNull(restHoldRequest.getRecord());
-        assertNotNull(restHoldRequest.getSource());
+        assertNotNull(restHoldRequest.getNyplSource());
         assertNotNull(restHoldRequest.getPickupLocation());
         assertNotNull(restHoldRequest.getNumberOfCopies());
         assertNotNull(restHoldRequest.getNeededBy());

@@ -680,7 +680,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         RestHoldRequest restHoldRequest = new RestHoldRequest();
         restHoldRequest.setRecord("records");
         restHoldRequest.setPatron("1");
-        restHoldRequest.setSource("initiateRestHoldRequest");
+        restHoldRequest.setNyplSource("initiateRestHoldRequest");
         restHoldRequest.setRecordType(ScsbConstants.REST_RECORD_TYPE);
         restHoldRequest.setPickupLocation("");
         restHoldRequest.setDeliveryLocation(deliveryLocation);
@@ -771,7 +771,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         restHoldData.setCreatedDate("2017-03-30");
         restHoldData.setRecordType("test");
         restHoldData.setRecord("test");
-        restHoldData.setSource("test");
+        restHoldData.setNyplSource("test");
         restHoldData.setPickupLocation("test");
         restHoldData.setNeededBy("test");
         restHoldData.setNumberOfCopies(1);
@@ -805,7 +805,7 @@ public class RestProtocolConnectorUT extends BaseTestCaseUT {
         RestHoldRequest restHoldRequest = new RestHoldRequest();
         restHoldRequest.setRecord("scsb");
         restHoldRequest.setPatron("1");
-        restHoldRequest.setSource("scsb");
+        restHoldRequest.setNyplSource("scsb");
         restHoldRequest.setRecordType(ScsbConstants.REST_RECORD_TYPE);
         restHoldRequest.setPickupLocation("");
         restHoldRequest.setDeliveryLocation("");

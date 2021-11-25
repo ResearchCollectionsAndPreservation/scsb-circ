@@ -15,10 +15,10 @@ public class ItemDataUT extends BaseTestCaseUT {
 
         ItemData itemData = new ItemData();
         itemData.setId("1");
-        itemData.setType("34");
+        itemData.setNyplType("34");
         itemData.setCreatedDate(new Date().toString());
         assertNotNull(itemData.getId());
-        assertNotNull(itemData.getType());
+        assertNotNull(itemData.getNyplType());
         assertNotNull(itemData.getCreatedDate());
     }
 }

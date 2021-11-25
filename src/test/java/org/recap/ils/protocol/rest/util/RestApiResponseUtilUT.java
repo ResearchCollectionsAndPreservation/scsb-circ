@@ -224,10 +224,10 @@ public class RestApiResponseUtilUT extends BaseTestCaseUT {
 
     private ItemData getItemData() {
         ItemData itemData = new ItemData();
-        itemData.setSource("test");
+        itemData.setNyplSource("test");
         itemData.setBibIds(Arrays.asList("123"));
         itemData.setId("468");
-        itemData.setType("test");
+        itemData.setNyplType("test");
         itemData.setUpdatedDate(new Date().toString());
         itemData.setDeletedDate(new Date().toString());
         itemData.setDeleted(true);

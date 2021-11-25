@@ -20,7 +20,7 @@ public class RestHoldDataUT extends BaseTestCaseUT {
         restHoldData.setPatron("test");
         restHoldData.setRecordType("test");
         restHoldData.setRecord("test");
-        restHoldData.setSource("test");
+        restHoldData.setNyplSource("test");
         restHoldData.setPickupLocation("PB");
         restHoldData.setNumberOfCopies(1);
         restHoldData.setNeededBy("test");
@@ -34,7 +34,7 @@ public class RestHoldDataUT extends BaseTestCaseUT {
         assertNotNull(restHoldData.getPatron());
         assertNotNull(restHoldData.getRecordType());
         assertNotNull(restHoldData.getRecord());
-        assertNotNull(restHoldData.getSource());
+        assertNotNull(restHoldData.getNyplSource());
         assertNotNull(restHoldData.getPickupLocation());
         assertNotNull(restHoldData.getNumberOfCopies());
         assertNotNull(restHoldData.getNeededBy());

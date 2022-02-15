@@ -9,7 +9,7 @@ import org.springframework.test.context.TestPropertySource;
 
 
 @TestPropertySource("classpath:application.properties")
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class BaseTestCaseUT {
 
     @Before

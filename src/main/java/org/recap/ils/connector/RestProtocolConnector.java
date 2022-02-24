@@ -207,9 +207,9 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             headers.set("Authorization", authorization);
 
             HttpEntity requestEntity = getHttpEntity(headers);
-            ResponseEntity<ItemResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.GET, requestEntity, ItemResponse.class);
-            ItemResponse itemResponse = responseEntity.getBody();
-            itemInformationResponse = getRestApiResponseUtil().buildItemInformationResponse(itemResponse);
+            ResponseEntity<ItemInformationResponse> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, ItemInformationResponse.class);
+            ItemInformationResponse itemInformationResponse1 = responseEntity.getBody();
+            itemInformationResponse = getRestApiResponseUtil().buildItemInformationResponse(itemInformationResponse1);
         } catch (HttpClientErrorException httpException) {
             log.error(ScsbCommonConstants.LOG_ERROR,httpException);
             itemInformationResponse.setSuccess(false);
@@ -219,7 +219,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             itemInformationResponse.setSuccess(false);
             itemInformationResponse.setScreenMessage(e.getMessage());
         }
-        return itemInformationResponse;
+                  return itemInformationResponse;
     }
 
     /**
@@ -600,7 +600,14 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
     }
 
     @Override
-    public AbstractResponseItem lookupPatron(String patronIdentifier) {
+    public AbstractResponseItem lookupPatron(String patronIdentifier)
+    {
+//        try {
+//            getPatronIdByPatronBarcode(patronIdentifier);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println("lookupparton");
         return null;
     }
 
@@ -618,9 +625,9 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
     @Override
     public AbstractResponseItem recallItem(String itemIdentifier, String patronIdentifier, String institutionId, String expirationDate, String bibId, String pickupLocation) {
         log.info("Item barcode {} received for a recall request in REST protocol using Institution for patron {}", itemIdentifier, patronIdentifier);
-       /* ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
+        ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         try {
-            String apiUrl = getRestDataApiUrl() + RecapConstants.NYPL_RECAP_RECALL_REQUEST_URL;
+            String apiUrl = getRestDataApiUrl() + ScsbConstants.REST_RECAP_RECALL_REQUEST_URL;
 
             RecallRequest recallRequest = new RecallRequest();
             recallRequest.setOwningInstitutionId(restApiResponseUtil.getItemOwningInstitutionByItemBarcode(itemIdentifier));
@@ -629,14 +636,14 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             HttpEntity<RecallRequest> requestEntity = new HttpEntity(recallRequest, getHttpHeaders());
             ResponseEntity<RecallResponse> responseEntity = getRestTemplate().exchange(apiUrl, HttpMethod.POST, requestEntity, RecallResponse.class);
             RecallResponse recallResponse = responseEntity.getBody();
-            itemRecallResponse = getNyplApiResponseUtil().buildItemRecallResponse(recallResponse);
+            itemRecallResponse = getRestApiResponseUtil().buildItemRecallResponse(recallResponse);
             RecallData recallData = recallResponse.getData();
             if (null != recallData) {
                 String jobId = recallData.getJobId();
                 itemRecallResponse.setJobId(jobId);
                 log.info("Initiated recall request on NYPL");
                 log.info("Nypl recall request job id -> {}" , jobId);
-                JobResponse jobResponse = getRestProtocolJobResponsePollingProcessor().pollNyplRequestItemJobResponse(itemRecallResponse.getJobId());
+                JobResponse jobResponse = getRestProtocolJobResponsePollingProcessor().pollRestApiRequestItemJobResponse(itemRecallResponse.getJobId(),institutionCode);
                 String statusMessage = jobResponse.getStatusMessage();
                 itemRecallResponse.setScreenMessage(statusMessage);
                 JobData jobData = jobResponse.getData();
@@ -660,10 +667,10 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
             log.error(ScsbCommonConstants.LOG_ERROR,e);
             itemRecallResponse.setSuccess(false);
             itemRecallResponse.setScreenMessage(e.getMessage());
-        }*/
-        ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
+        }
+       /* ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         itemRecallResponse.setSuccess(true);
-        itemRecallResponse.setScreenMessage("Success");
+        itemRecallResponse.setScreenMessage(" Recall Success");*/
         return itemRecallResponse;
     }
 

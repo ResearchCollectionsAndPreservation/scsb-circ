@@ -75,9 +75,9 @@ public class RestApiResponseUtil {
      * @param itemResponse the item response
      * @return the item information response
      */
-    public ItemInformationResponse buildItemInformationResponse(ItemResponse itemResponse) {
+    public ItemInformationResponse buildItemInformationResponse(ItemInformationResponse itemResponse) {
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
-        ItemData itemData = itemResponse.getItemData();
+ /*       ItemData itemData = itemResponse.getItemData();
         itemInformationResponse.setItemBarcode((String) itemData.getBarcode());
         itemInformationResponse.setBibID(itemData.getBibIds().get(0));
         itemInformationResponse.setBibIds(itemData.getBibIds());
@@ -94,7 +94,24 @@ public class RestApiResponseUtil {
         }
         if (null != itemData.getLocation()) {
             itemInformationResponse.setCurrentLocation((String) ((LinkedHashMap) itemData.getLocation()).get("name"));
+        }*/
+        itemInformationResponse.setItemBarcode((String) itemResponse.getItemBarcode());
+       /* itemInformationResponse.setBibID(itemResponse.getBibIds().get(0));
+        itemInformationResponse.setBibIds(itemResponse.getBibIds());*/
+        itemInformationResponse.setCallNumber((String) itemResponse.getCallNumber());
+        itemInformationResponse.setItemType((String) itemResponse.getFeeType());
+        itemInformationResponse.setSource(itemResponse.getCurrentLocation());
+        itemInformationResponse.setUpdatedDate(formatFromSipDate(itemResponse.getDueDate()));
+        itemInformationResponse.setCreatedDate(formatFromSipDate(itemResponse.getRecallDate()));
+        itemInformationResponse.setDeletedDate(formatFromSipDate((String) itemResponse.getHoldPickupDate()));
+       itemInformationResponse.setDeleted(itemResponse.isDeleted() );
+      /*  if (null != itemResponse.getCirculationStatus()) {
+            itemInformationResponse.setDueDate(formatDueDate((String) ((LinkedHashMap) itemResponse.getCirculationStatus()).get("dueDate")));
+            itemInformationResponse.setCirculationStatus((String) ((LinkedHashMap) itemResponse.getCirculationStatus()).get("display"));
         }
+        if (null != itemResponse.getCurrentLocation()) {
+            itemInformationResponse.setCurrentLocation((String) ((LinkedHashMap) itemResponse.getCurrentLocation()).get("name"));
+        }*/
         itemInformationResponse.setSuccess(true);
         return itemInformationResponse;
     }

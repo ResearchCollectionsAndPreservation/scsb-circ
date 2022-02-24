@@ -52,4 +52,5 @@ public class ItemInformationResponse extends AbstractResponseItem {
     private String eddSuccessResponseScreenMsg;
     private String eddFailureResponseScreenMsg;
     private String imsLocationCode;
+    private String itemBarcode;
 }

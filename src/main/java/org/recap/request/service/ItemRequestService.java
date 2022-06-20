@@ -1360,7 +1360,14 @@ public class ItemRequestService {
         itemRequestInformation.setItemOwningInstitution(itemEntity.getInstitutionEntity().getInstitutionCode());
         itemRequestInformation.setRequestType(requestItemEntity.getRequestTypeEntity().getRequestTypeCode());
         itemRequestInformation.setDeliveryLocation(requestItemEntity.getStopCode());
-        itemRequestInformation.setTranslatedDeliveryLocation(requestItemEntity.getStopCode());
+        if(!requestItemEntity.getStopCode().trim().isEmpty()) {
+            DeliveryCodeEntity deliveryCodeEntity = deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(requestItemEntity.getStopCode(), requestItemEntity.getInstitutionEntity().getId(), 'Y');
+            DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = deliveryCodeTranslationDetailsRepository.findByRequestingInstitutionandImsLocation(requestItemEntity.getInstitutionEntity().getId(), deliveryCodeEntity.getId(), itemEntity.getImsLocationEntity().getId());
+            itemRequestInformation.setTranslatedDeliveryLocation(deliveryCodeTranslationEntity.getImsLocationDeliveryCode());
+        }
+        else {
+            itemRequestInformation.setTranslatedDeliveryLocation(requestItemEntity.getStopCode());
+        }
         String imsLocationCode = commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode());
         itemRequestInformation.setImsLocationCode(imsLocationCode);
 

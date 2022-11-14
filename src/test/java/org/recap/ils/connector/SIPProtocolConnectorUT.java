@@ -66,13 +66,84 @@ public class SIPProtocolConnectorUT {
     public void lookupItem() throws Exception {
         String itemIdentifier = "2133566";
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2ItemInformationResponse sip2ItemInformationResponse = getSIP2ItemInformationResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
+        sip2PatronInformationResponse.setValidPatron(true);
+        sip2PatronInformationResponse.setValidPatronPassword(true);
         SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
         loginResponse.setOk(true);
         PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
         PowerMockito.when(sipProtocolConnector, "getSocketConnection").thenReturn(sip2SocketConnection);
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2ItemInformationRequest.class))).thenReturn(sip2ItemInformationResponse);
+        assertTrue(loginResponse.isOk());
+        sipProtocolConnector.lookupItem(itemIdentifier);
+
+    }
+
+    @Test
+    public void lookupItem1() throws Exception {
+        String itemIdentifier = "2133566";
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2ItemInformationResponse sip2ItemInformationResponse = getSIP2ItemInformationResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
+        sip2PatronInformationResponse.setValidPatron(false);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(false);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        PowerMockito.when(sipProtocolConnector, "getSocketConnection").thenReturn(sip2SocketConnection);
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(false);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2ItemInformationRequest.class))).thenReturn(sip2ItemInformationResponse);
+        //assertTrue(loginResponse.isOk());
+        sipProtocolConnector.lookupItem(itemIdentifier);
+
+    }
+
+    @Test
+    public void lookupItem2() throws Exception {
+        String itemIdentifier = "2133566";
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2ItemInformationResponse sip2ItemInformationResponse = getSIP2ItemInformationResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
+        sip2PatronInformationResponse.setValidPatron(false);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(false);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        PowerMockito.when(sipProtocolConnector, "getSocketConnection").thenReturn(sip2SocketConnection);
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2ItemInformationRequest.class))).thenReturn(sip2ItemInformationResponse);
+//        assertTrue(loginResponse.isOk());
+        sipProtocolConnector.lookupItem(itemIdentifier);
+
+    }
+
+
+    @Test
+    public void lookupItem3() throws Exception {
+        String itemIdentifier = "2133566";
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2ItemInformationResponse sip2ItemInformationResponse = getSIP2ItemInformationResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
+        sip2PatronInformationResponse.setValidPatron(false);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(true);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        PowerMockito.when(sipProtocolConnector, "getSocketConnection").thenReturn(sip2SocketConnection);
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
         Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2ItemInformationRequest.class))).thenReturn(sip2ItemInformationResponse);
         assertTrue(loginResponse.isOk());
@@ -86,10 +157,13 @@ public class SIPProtocolConnectorUT {
         String patronIdentifier = "123456";
         Integer requestId = 2;
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2ACSStatusResponse sip2ACSStatusResponse = getSIP2ACSStatusResponse();
         SIP2CheckoutResponse sip2CheckoutResponse = getSIP2CheckoutResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
+        sip2PatronInformationResponse.setValidPatron(true);
+        sip2PatronInformationResponse.setValidPatronPassword(true);
         SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
         loginResponse.setOk(true);
         PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
@@ -102,11 +176,36 @@ public class SIPProtocolConnectorUT {
     }
 
     @Test
+    public void checkOutItemelse() throws Exception {
+        String itemIdentifier = "1456883";
+        String patronIdentifier = "123456";
+        Integer requestId = 2;
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2ACSStatusResponse sip2ACSStatusResponse = getSIP2ACSStatusResponse();
+        SIP2CheckoutResponse sip2CheckoutResponse = getSIP2CheckoutResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
+        sip2PatronInformationResponse.setValidPatron(true);
+        sip2PatronInformationResponse.setValidPatronPassword(true);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(true);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        Mockito.doReturn(Boolean.TRUE).when(sipProtocolConnector).jSIPLogin(any(), any());
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(false);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2SCStatusRequest.class))).thenReturn(sip2ACSStatusResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2CheckoutRequest.class))).thenReturn(sip2CheckoutResponse);
+        sipProtocolConnector.checkOutItem(itemIdentifier, requestId, patronIdentifier);
+    }
+
+
+    @Test
     public void checkInItem() throws Exception {
         String itemIdentifier = "1456883";
         String patronIdentifier = "123456";
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2ACSStatusResponse sip2ACSStatusResponse = getSIP2ACSStatusResponse();
         SIP2CheckinResponse sip2CheckinResponse = getSIP2CheckinResponse();
@@ -135,7 +234,7 @@ public class SIPProtocolConnectorUT {
         String callNumber = "54956";
         Integer requestId = 2;
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
         sip2PatronInformationResponse.setValidPatron(true);
@@ -151,8 +250,9 @@ public class SIPProtocolConnectorUT {
         sipProtocolConnector.placeHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
     }
 
+
     @Test
-    public void placeHoldelse() throws Exception {
+    public void placeHoldelse11() throws Exception {
         String itemIdentifier = "223467";
         String patronIdentifier = "2234567";
         String callInstitutionId = "2";
@@ -166,7 +266,37 @@ public class SIPProtocolConnectorUT {
         String callNumber = "54956";
         Integer requestId = 2;
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
+        sip2PatronInformationResponse.setValidPatron(true);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2HoldResponse sip2HoldResponse = getSIP2HoldResponse();
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(false);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(false);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2HoldRequest.class))).thenReturn(sip2HoldResponse);
+        sipProtocolConnector.placeHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
+    }
+    @Test
+    public void placeHoldelse1() throws Exception {
+        String itemIdentifier = "223467";
+        String patronIdentifier = "2234567";
+        String callInstitutionId = "2";
+        String itemInstitutionId = "2";
+        String expirationDate = new Date().toString();
+        String bibId = "357221";
+        String pickupLocation = "CA";
+        String trackingId = "67878890";
+        String title = "Y90223";
+        String author = "john";
+        String callNumber = "54956";
+        Integer requestId = 2;
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
         sip2PatronInformationResponse.setValidPatron(false);
@@ -175,7 +305,7 @@ public class SIPProtocolConnectorUT {
         SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
         loginResponse.setOk(false);
         PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
-        Mockito.when(sip2SocketConnection.connect()).thenReturn(false);
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
         Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2HoldRequest.class))).thenReturn(sip2HoldResponse);
@@ -193,7 +323,7 @@ public class SIPProtocolConnectorUT {
         String pickupLocation = "CA";
         String trackingId = "67878890";
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
         sip2PatronInformationResponse.setValidPatron(true);
@@ -216,7 +346,7 @@ public class SIPProtocolConnectorUT {
         String institutionId = "2";
         String titleIdentifier = "245";
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2CreateBibResponse sip2CreateBibResponse = getSIP2CreateBibResponse();
         SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
@@ -239,7 +369,7 @@ public class SIPProtocolConnectorUT {
         String institutionId = "2";
         String titleIdentifier = "245";
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2CreateBibResponse sip2CreateBibResponse = getSIP2CreateBibResponse();
         SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
@@ -256,12 +386,60 @@ public class SIPProtocolConnectorUT {
     }
 
     @Test
+    public void createBibelse2() throws Exception {
+        String itemIdentifier = "223467";
+        String patronIdentifier = "2234567";
+        String institutionId = "2";
+        String titleIdentifier = "245";
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2CreateBibResponse sip2CreateBibResponse = getSIP2CreateBibResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
+        sip2PatronInformationResponse.setValidPatron(false);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(false);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2CreateBibRequest.class))).thenReturn(sip2CreateBibResponse);
+        sipProtocolConnector.createBib(itemIdentifier, patronIdentifier, institutionId, titleIdentifier);
+    }
+
+    @Test
+    public void createBibelse3() throws Exception {
+        String itemIdentifier = "223467";
+        String patronIdentifier = "2234567";
+        String institutionId = "2";
+        String titleIdentifier = "245";
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2CreateBibResponse sip2CreateBibResponse = getSIP2CreateBibResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
+        sip2PatronInformationResponse.setValidPatron(false);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(true);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2CreateBibRequest.class))).thenReturn(sip2CreateBibResponse);
+        sipProtocolConnector.createBib(itemIdentifier, patronIdentifier, institutionId, titleIdentifier);
+    }
+
+    @Test
     public void lookupPatron() throws Exception {
         String patronIdentifier = "132456";
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2PatronInformationResponse sip2PatronInformationResponse = getSIP2PatronInformationResponse();
+        sip2PatronInformationResponse.setValidPatron(true);
+        sip2PatronInformationResponse.setValidPatronPassword(true);
         SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
         loginResponse.setOk(true);
         PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
@@ -270,6 +448,26 @@ public class SIPProtocolConnectorUT {
         Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
         sipProtocolConnector.lookupPatron(patronIdentifier);
     }
+
+    @Test
+    public void lookupPatronelse() throws Exception {
+        String patronIdentifier = "132456";
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2PatronInformationResponse sip2PatronInformationResponse = getSIP2PatronInformationResponse();
+        sip2PatronInformationResponse.setValidPatron(true);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(false);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
+        sipProtocolConnector.lookupPatron(patronIdentifier);
+    }
+
+
 
     @Test
     public void recallItem() throws Exception {
@@ -281,14 +479,122 @@ public class SIPProtocolConnectorUT {
         String pickupLocation = "CA";
 
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("TEST");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2RecallResponse sip2RecallResponse = getSIP2RecallResponse();
         SIP2PatronInformationResponse sip2PatronInformationResponse = getSIP2PatronInformationResponse();
+        sip2PatronInformationResponse.setValidPatron(true);
+        sip2PatronInformationResponse.setValidPatronPassword(true);
         SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
         loginResponse.setOk(true);
         PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
         Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2RecallRequest.class))).thenReturn(sip2RecallResponse);
+        sipProtocolConnector.recallItem(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation);
+    }
+
+    @Test
+    public void recallItem1() throws Exception {
+        String itemIdentifier = "223467";
+        String patronIdentifier = "2234567";
+        String institutionId = "2";
+        String expirationDate = new Date().toString();
+        String bibId = "357221";
+        String pickupLocation = "CA";
+
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2RecallResponse sip2RecallResponse = getSIP2RecallResponse();
+
+        SIP2PatronInformationResponse sip2PatronInformationResponse = getSIP2PatronInformationResponse();
+        sip2PatronInformationResponse.setValidPatron(false);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(true);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2RecallRequest.class))).thenReturn(sip2RecallResponse);
+        sipProtocolConnector.recallItem(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation);
+    }
+
+    @Test
+    public void recallItem2() throws Exception {
+        String itemIdentifier = "223467";
+        String patronIdentifier = "2234567";
+        String institutionId = "2";
+        String expirationDate = new Date().toString();
+        String bibId = "357221";
+        String pickupLocation = "CA";
+
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2RecallResponse sip2RecallResponse = getSIP2RecallResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = getSIP2PatronInformationResponse();
+        sip2PatronInformationResponse.setValidPatron(true);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(false);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2RecallRequest.class))).thenReturn(sip2RecallResponse);
+        sipProtocolConnector.recallItem(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation);
+    }
+
+
+    @Test
+    public void recallItem3() throws Exception {
+        String itemIdentifier = "223467";
+        String patronIdentifier = "2234567";
+        String institutionId = "2";
+        String expirationDate = new Date().toString();
+        String bibId = "357221";
+        String pickupLocation = "CA";
+
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2RecallResponse sip2RecallResponse = getSIP2RecallResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = getSIP2PatronInformationResponse();
+        sip2PatronInformationResponse.setValidPatron(false);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(true);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(true);
+        Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
+        Mockito.when(sip2SocketConnection.send(any(SIP2RecallRequest.class))).thenReturn(sip2RecallResponse);
+        sipProtocolConnector.recallItem(itemIdentifier, patronIdentifier, institutionId, expirationDate, bibId, pickupLocation);
+    }
+
+    @Test
+    public void recallItem4() throws Exception {
+        String itemIdentifier = "223467";
+        String patronIdentifier = "2234567";
+        String institutionId = "2";
+        String expirationDate = new Date().toString();
+        String bibId = "357221";
+        String pickupLocation = "CA";
+
+        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
+        sipProtocolConnector.setInstitution("TEST");
+        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
+        SIP2RecallResponse sip2RecallResponse = getSIP2RecallResponse();
+        SIP2PatronInformationResponse sip2PatronInformationResponse = getSIP2PatronInformationResponse();
+        sip2PatronInformationResponse.setValidPatron(true);
+        sip2PatronInformationResponse.setValidPatronPassword(false);
+        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+        loginResponse.setOk(false);
+        PowerMockito.doReturn(sip2SocketConnection).when(sipProtocolConnector, "getSocketConnection");
+        Mockito.when(sip2SocketConnection.connect()).thenReturn(false);
         Mockito.when(sip2SocketConnection.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2PatronInformationRequest.class))).thenReturn(sip2PatronInformationResponse);
         Mockito.when(sip2SocketConnection.send(any(SIP2RecallRequest.class))).thenReturn(sip2RecallResponse);
@@ -442,8 +748,8 @@ public class SIPProtocolConnectorUT {
     private ItemRequestInformation getItemRequestInformation() {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Collections.singletonList("123456"));
-        itemRequestInformation.setItemOwningInstitution("CUL");
-        itemRequestInformation.setRequestingInstitution("CUL");
+        itemRequestInformation.setItemOwningInstitution("Test");
+        itemRequestInformation.setRequestingInstitution("Test");
         itemRequestInformation.setRequestType("RETRIEVAL");
         return itemRequestInformation;
     }
@@ -454,7 +760,7 @@ public class SIPProtocolConnectorUT {
         String itemIdentifier = "1456883";
         String patronIdentifier = "123456";
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("Test");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2ACSStatusResponse sip2ACSStatusResponse = getSIP2ACSStatusResponse();
         SIP2CheckoutResponse sip2CheckoutResponse = getSIP2CheckoutResponse();
@@ -474,7 +780,7 @@ public class SIPProtocolConnectorUT {
         String patronIdentifier = "1234567";
         String institutionId = "123455";
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("Test");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2ItemInformationResponse sip2ItemInformationResponse = getSIP2ItemInformationResponse();
         SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
@@ -494,7 +800,7 @@ public class SIPProtocolConnectorUT {
         String patronIdentifier = "1234567";
         SIP2SocketConnection connection = new SIP2SocketConnection("test", 1200);
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("CUL");
+        sipProtocolConnector.setInstitution("Test");
         sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
         SIP2RecallResponse sip2RecallResponse = getSIP2RecallResponse();
         SIP2PatronInformationResponse sip2PatronInformationResponse = getSIP2PatronInformationResponse();

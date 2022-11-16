@@ -356,12 +356,12 @@ public class CommonUtil {
     }
 
     public String formatRequest(String requestBody){
-        String tempRequest = requestBody.replaceAll("</", "RECAP_123");
+        String tempRequest = requestBody.replaceAll("</", ScsbConstants.REPLACE_STRING);
         tempRequest = replaceStringCharacters(tempRequest);
-        tempRequest = tempRequest.replaceAll("RECAP_123", "</ns1:");
-        tempRequest = tempRequest.replaceAll("xmlns:ns2","xmlns:ns1");
-        tempRequest = tempRequest.replaceAll("ns2:version","ns1:version");
-        tempRequest = tempRequest.replaceAll("ns2:Scheme","ns1:Scheme");
+        tempRequest = tempRequest.replaceAll(ScsbConstants.REPLACE_STRING, "</ns1:");
+        tempRequest = tempRequest.replaceAll(ScsbConstants.REGEX_VERSION,ScsbConstants.VERSION);
+        tempRequest = tempRequest.replaceAll(ScsbConstants.REGEX_SCHEME,ScsbConstants.SCHEME);
+        tempRequest = tempRequest.replaceAll(ScsbConstants.REGEX_XMLNS,ScsbConstants.XMLNS);
         return tempRequest;
     }
 

@@ -460,5 +460,14 @@ public final class ScsbConstants {
     public static final String ILS_SOURCE_FOR_ITEM = "ils.source.for.item.";
     public static final String SOLR_SEARCH_ERROR = "Solr Search Error";
 
+    public static final String REPLACE_STRING = "NfOBQ0";
+    public static final String REGEX_VERSION = "ns"+"[0-9]"+":version";
+    public static final String REGEX_SCHEME = "ns"+"[0-9]"+":Scheme";
+    public static final String REGEX_XMLNS = "xmlns:ns"+"[0-9]";
+
+    public static final String VERSION = "ns1:version";
+    public static final String SCHEME = "ns1:Scheme";
+    public static final String XMLNS = "xmlns:ns1";
+
 
 }

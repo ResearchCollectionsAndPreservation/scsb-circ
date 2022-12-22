@@ -44,7 +44,6 @@ public class ItemRequestInformation implements Serializable {
     private String pickupLocation;
     private String eddNotes;
     private String imsLocationCode;
-    private Integer id;
 
     /**
      * Is owning institution item boolean.

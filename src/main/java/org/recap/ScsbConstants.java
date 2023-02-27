@@ -468,6 +468,6 @@ public final class ScsbConstants {
     public static final String VERSION = "ns1:version";
     public static final String SCHEME = "ns1:Scheme";
     public static final String XMLNS = "xmlns:ns1";
-
+    public static final String SQL_EXCEPTION = "Exception captured at Database level while creating request.";
 
 }

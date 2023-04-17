@@ -114,10 +114,10 @@ public class CancelRequestItem extends ScsbNCIP {
         cancelRequestItemInitiationData.setInitiationHeader(initiationHeader);
         RequestId requestIdentifier = new RequestId();
         if(requestId != null) {
-            requestIdentifier.setRequestIdentifierValue(requestId.toString());
+            requestIdentifier.setRequestIdentifierValue(ScsbConstants.NCIP_REQUEST_ID_PREFIX + requestId);
         }
         else {
-            requestIdentifier.setRequestIdentifierValue(Integer.toString(RandomUtils.nextInt(100000,100000000)));
+            requestIdentifier.setRequestIdentifierValue(ScsbConstants.NCIP_REQUEST_ID_PREFIX + RandomUtils.nextInt(100000,100000000));
         }
         RequestType requestType = new RequestType(null, ScsbConstants.HOLD);
         UserId userid = new UserId();

@@ -31,10 +31,10 @@ public class CheckoutItem extends ScsbNCIP {
             itemId.setItemIdentifierValue(itemIdentifier);
             RequestId requestIdentifier = new RequestId();
             if(requestId != null) {
-                requestIdentifier.setRequestIdentifierValue(requestId.toString());
+                requestIdentifier.setRequestIdentifierValue(ScsbConstants.NCIP_REQUEST_ID_PREFIX+requestId);
             }
             else {
-                requestIdentifier.setRequestIdentifierValue((Integer.toString(RandomUtils.nextInt(100000,100000000))));
+                requestIdentifier.setRequestIdentifierValue(ScsbConstants.NCIP_REQUEST_ID_PREFIX+(RandomUtils.nextInt(100000,100000000)));
             }
 
             Calendar cal = new GregorianCalendar();

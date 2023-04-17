@@ -141,10 +141,10 @@ public class AcceptItem extends ScsbNCIP {
         acceptItemInitationData.setInitiationHeader(initiationHeader);
         RequestId requestIdentifier = new RequestId();
         if(requestId != null) {
-            requestIdentifier.setRequestIdentifierValue(requestId.toString());
+            requestIdentifier.setRequestIdentifierValue(ScsbConstants.NCIP_REQUEST_ID_PREFIX + requestId);
         }
         else {
-            requestIdentifier.setRequestIdentifierValue(Integer.toString(RandomUtils.nextInt(100000,100000000)));
+            requestIdentifier.setRequestIdentifierValue(ScsbConstants.NCIP_REQUEST_ID_PREFIX + RandomUtils.nextInt(100000,100000000));
         }
         RequestedActionType requestActionType = new RequestedActionType(null, "Hold For Pickup");
         UserId userid = new UserId();

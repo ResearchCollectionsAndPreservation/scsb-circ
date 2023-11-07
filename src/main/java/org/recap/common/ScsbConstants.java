@@ -15,6 +15,8 @@ public final class ScsbConstants {
     public static  final String FAILURE_UPDATE_CGD = "Failure: User is not allowed to update other instituion Item";
     public static final String INVALID_REQUEST_INSTITUTION = "Please enter valid Institution {0} for requestingInstitution";
     public static final String INVALID_EMAIL_ADDRESS = "Please enter valid emailAddress";
+    public static final Integer PATRON_BARCODE_MAX_LENGTH = 45;
+    public static final String INVALID_PATRON_BARCODE = "Invalid Patron Barcode";
     public static final String START_PAGE_AND_END_PAGE_REQUIRED = "Start page and end page required.";
     public static final String DELIVERY_LOCATION_REQUIRED = "Delivery Location is required for request type Recall/hold/retrieval";
     public static final String INVALID_REQUEST_TYPE = "Please enter the valid request type";

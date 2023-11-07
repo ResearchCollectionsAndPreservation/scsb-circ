@@ -73,6 +73,10 @@ public class RequestParamaterValidatorService {
             errorMessageMap.put(errorCount, ScsbConstants.INVALID_EMAIL_ADDRESS);
             errorCount++;
         }
+        if (itemRequestInformation.getPatronBarcode().length() > ScsbConstants.PATRON_BARCODE_MAX_LENGTH.intValue()) {
+            errorMessageMap.put(errorCount, ScsbConstants.INVALID_PATRON_BARCODE);
+            errorCount++;
+        }
 
         if ((itemRequestInformation.getRequestType() == null || itemRequestInformation.getRequestType().trim().length() <= 0) || (!ScsbConstants.getRequestTypeList().contains(itemRequestInformation.getRequestType()))) {
             errorMessageMap.put(errorCount, ScsbConstants.INVALID_REQUEST_TYPE);

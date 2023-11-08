@@ -472,5 +472,7 @@ public final class ScsbConstants {
     public static final String XMLNS = "xmlns:ns1";
     public static final String SQL_EXCEPTION = "Exception captured at Database level while creating request.";
     public static final String NCIP_REQUEST_ID_PREFIX = "SCSB-";
+    public static final String INVALID_PATRON_CODE = "Invalid Patron Barcode";
+    public static final Integer PATRON_CODE_MAX_LENGTH = 45;
 
 }

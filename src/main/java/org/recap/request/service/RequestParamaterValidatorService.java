@@ -61,6 +61,10 @@ public class RequestParamaterValidatorService {
         ResponseEntity responseEntity = null;
         Map<Integer, String> errorMessageMap = new HashMap<>();
         Integer errorCount = 1;
+        if (itemRequestInformation != null && itemRequestInformation.getPatronBarcode() != null && !StringUtils.isEmpty(itemRequestInformation.getPatronBarcode()) && itemRequestInformation.getPatronBarcode().length() > ScsbConstants.PATRON_CODE_MAX_LENGTH) {
+            errorMessageMap.put(errorCount, ScsbConstants.INVALID_PATRON_CODE);
+            errorCount++;
+        }
         if (CollectionUtils.isEmpty(itemRequestInformation.getItemBarcodes())) {
             errorMessageMap.put(errorCount, ScsbConstants.ITEM_BARCODE_IS_REQUIRED);
             errorCount++;

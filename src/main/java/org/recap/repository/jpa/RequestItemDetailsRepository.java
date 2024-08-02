@@ -40,7 +40,7 @@ public interface RequestItemDetailsRepository extends BaseRepository<RequestItem
     Page<RequestItemEntity> findByItemBarcode(Pageable pageable, @Param("itemBarcode") String itemBarcode);
 
     @Query(value = "select request from RequestItemEntity request inner join request.requestStatusEntity as rse where rse.requestStatusCode = :requestStatusCode")
-    List<RequestItemEntity> findByRequestStatusCode(@Param("requestStatusCode") List<String> requestStatusCode);
+    List<RequestItemEntity> findByRequestStatusCode(@Param("requestStatusCode") String requestStatusCode);
 
     @Query(value = "select request from RequestItemEntity request inner join request.requestStatusEntity as rse where request.id in(?1) and rse.requestStatusCode in(?2)")
     List<RequestItemEntity> findByIdsAndStatusCodes(@Param("itemBarcode") List<Integer> requestIds, @Param("requestStatusCode") List<String> requestStatusCodes);

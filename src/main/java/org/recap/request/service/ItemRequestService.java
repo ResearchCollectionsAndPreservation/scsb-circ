@@ -1187,13 +1187,13 @@ public class ItemRequestService {
             String requestStatus = replaceRequest.getRequestStatus();
             if (StringUtils.isNotBlank(requestStatus)) {
                 if (ScsbConstants.REQUEST_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
-                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(ScsbConstants.REQUEST_STATUS_PENDING));
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_PENDING);
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING.equalsIgnoreCase(requestStatus)) {
-                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING));
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
                     resultMap = buildRequestInfoAndReplaceToLAS(requestItemEntities);
                 } else if (ScsbConstants.REQUEST_STATUS_EXCEPTION.equalsIgnoreCase(requestStatus)) {
-                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(ScsbConstants.REQUEST_STATUS_EXCEPTION));
+                    List<RequestItemEntity> requestItemEntities = requestItemDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_EXCEPTION);
                     resultMap = buildRequestInfoAndReplaceToSCSB(requestItemEntities);
                 } else {
                     resultMap.put(ScsbCommonConstants.INVALID_REQUEST, ScsbConstants.REQUEST_STATUS_INVALID);

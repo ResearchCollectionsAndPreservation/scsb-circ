@@ -917,7 +917,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         ReplaceRequest replaceRequest = new ReplaceRequest();
         replaceRequest.setRequestStatus(ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING);
         String replaceRequestByType = ScsbCommonConstants.REQUEST_STATUS;
-        Mockito.when(mockedRequestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING))).thenReturn(Arrays.asList(getRequestItemEntity()));
+        Mockito.when(mockedRequestItemDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING)).thenReturn(Arrays.asList(getRequestItemEntity()));
         ReflectionTestUtils.invokeMethod(mockedItemRequestService, "replaceRequestToLASQueueByType", replaceRequest,replaceRequestByType);
     }
 
@@ -1327,7 +1327,7 @@ public class ItemRequestServiceUT extends BaseTestCaseUT {
         RequestItemEntity requestItemEntity = createRequestItem();
         Map<String, String> result = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result);
-        Mockito.when(mockedRequestItemDetailsRepository.findByRequestStatusCode(Collections.singletonList(ScsbConstants.REQUEST_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
+        Mockito.when(mockedRequestItemDetailsRepository.findByRequestStatusCode(ScsbConstants.REQUEST_STATUS_PENDING)).thenReturn(Arrays.asList(requestItemEntity));
         Mockito.when(mockedGfaLasService.buildRequestInfoAndReplaceToLAS(any())).thenReturn(ScsbCommonConstants.SUCCESS);
         Map<String, String> result1 = mockedItemRequestService.replaceRequestsToLASQueue(replaceRequest);
         assertNotNull(result1);

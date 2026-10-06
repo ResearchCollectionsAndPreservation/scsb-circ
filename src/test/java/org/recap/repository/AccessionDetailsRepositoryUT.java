@@ -1,6 +1,6 @@
 package org.recap.repository;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCase;
 import org.recap.common.ScsbConstants;
 import org.recap.model.jpa.AccessionEntity;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by rajeshbabuk on 9/5/17.
@@ -30,7 +30,7 @@ public class AccessionDetailsRepositoryUT extends BaseTestCase {
     }
 
     @Test
-    public void testAccessionEntity(){
+    public void testAccessionEntity() {
         AccessionEntity accessionEntity = new AccessionEntity();
         accessionEntity.setId(1);
         accessionEntity.setAccessionRequest("[{\"customerCode\":\"PA\",\"itemBarcode\":\"123\"}]");

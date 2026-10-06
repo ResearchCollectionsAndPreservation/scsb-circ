@@ -1,30 +1,28 @@
 package org.recap.request.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.recap.BaseTestCaseUT;
 import org.recap.ScsbCommonConstants;
 import org.recap.common.ScsbConstants;
 import org.recap.model.jpa.*;
-import org.recap.model.response.ItemInformationResponse;
 import org.recap.model.request.ItemRequestInformation;
+import org.recap.model.response.ItemInformationResponse;
 import org.recap.repository.jpa.*;
 import org.recap.util.CommonUtil;
 import org.recap.util.SecurityUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyChar;
 
@@ -32,6 +30,8 @@ import static org.mockito.ArgumentMatchers.anyChar;
  * Created by hemalathas on 21/2/17.
  */
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ItemRequestDBServiceUT extends BaseTestCaseUT {
 
     @InjectMocks
@@ -65,20 +65,17 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
     CommonUtil commonUtil;
 
 
-    @Before
-    public void setUp(){
-        MockitoAnnotations.initMocks(this);
-    }
+    // MockitoExtension will initialize mocks; no explicit init required
     @Test
-    public void updateRecapRequestItem(){
+    public void updateRecapRequestItem() {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         itemRequestInformation.setRequestId(1);
         ItemEntity itemEntity = getItemEntity();
-        String requestStatusCode = "REFILED" ;
+        String requestStatusCode = "REFILED";
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
         RequestTypeEntity requestTypeEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestTypeEntity();
         RequestItemEntity requestItemEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0);
-        BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity() ;
+        BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
         Mockito.when(commonUtil.getUser(itemRequestInformation.getUsername())).thenReturn("userName");
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(requestStatusCode)).thenReturn(requestStatusEntity);
         Mockito.when(institutionDetailsRepository.findByInstitutionCode(itemRequestInformation.getRequestingInstitution())).thenReturn(itemEntity.getInstitutionEntity());
@@ -160,8 +157,9 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestItem(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
     }
+
     @Test
-    public void updateRecapRequestItemWithSuccessItemResponseForRecall(){
+    public void updateRecapRequestItemWithSuccessItemResponseForRecall() {
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         itemInformationResponse.setRequestType("RECALL");
         itemInformationResponse.setEmailAddress("test@gmail.com");
@@ -177,8 +175,9 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestItem(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
     }
+
     @Test
-    public void updateRecapRequestItemWithSuccessItemResponseForEDD(){
+    public void updateRecapRequestItemWithSuccessItemResponseForEDD() {
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         itemInformationResponse.setRequestType("EDD");
         itemInformationResponse.setEmailAddress("test@gmail.com");
@@ -194,8 +193,9 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestItem(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
     }
+
     @Test
-    public void updateRecapRequestItemWithSuccessItemResponseForRetrieval(){
+    public void updateRecapRequestItemWithSuccessItemResponseForRetrieval() {
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         itemInformationResponse.setRequestType("RETRIEVAL");
         itemInformationResponse.setEmailAddress("test@gmail.com");
@@ -252,8 +252,9 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestStatus(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
     }
+
     @Test
-    public void updateRecapRequestStatusForRecall(){
+    public void updateRecapRequestStatusForRecall() {
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         RequestItemEntity requestItemEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0);
         RequestTypeEntity requestTypeEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestTypeEntity();
@@ -265,8 +266,9 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestStatus(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
     }
+
     @Test
-    public void updateRecapRequestStatusForEDD(){
+    public void updateRecapRequestStatusForEDD() {
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         RequestItemEntity requestItemEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0);
         RequestStatusEntity requestStatusEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0).getRequestStatusEntity();
@@ -275,8 +277,9 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestStatus(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
     }
+
     @Test
-    public void updateRecapRequestStatus(){
+    public void updateRecapRequestStatus() {
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         itemInformationResponse.setSuccess(false);
         itemInformationResponse.setBulk(true);
@@ -290,7 +293,7 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void updateRecapRequestStatusIsBulk(){
+    public void updateRecapRequestStatusIsBulk() {
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         itemInformationResponse.setSuccess(false);
         RequestItemEntity requestItemEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0);
@@ -298,6 +301,7 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInformationResponse1 = itemRequestDBService.updateRecapRequestStatus(itemInformationResponse);
         assertNotNull(itemInformationResponse1);
     }
+
     @Test
     public void updateItemAvailabilityStatus() {
         List<ItemEntity> itemEntities = new ArrayList<>();
@@ -319,11 +323,12 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
     public void rollbackAfterGFA() {
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
         RequestItemEntity requestItemEntity = getBulkRequestItemEntity().getRequestItemEntities().get(0);
-        Mockito.when(deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(any(),any(),anyChar())).thenReturn(getDeliveryCodeEntity());
+        Mockito.when(deliveryCodeDetailsRepository.findByDeliveryCodeAndOwningInstitutionIdAndActive(any(), any(), anyChar())).thenReturn(getDeliveryCodeEntity());
         Mockito.when(requestItemDetailsRepository.findById(itemInformationResponse.getRequestId())).thenReturn(Optional.of(requestItemEntity));
         ItemRequestInformation itemRequestInformation = itemRequestDBService.rollbackAfterGFA(itemInformationResponse);
         assertNotNull(itemRequestInformation);
     }
+
     private ItemInformationResponse getItemInformationResponse() {
         ItemInformationResponse itemInformationResponse = new ItemInformationResponse();
         itemInformationResponse.setBibID("1");
@@ -334,7 +339,7 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         return itemInformationResponse;
     }
 
-    private RequestItemEntity getRequestItemEntity(){
+    private RequestItemEntity getRequestItemEntity() {
         RequestItemEntity requestItemEntity = new RequestItemEntity();
         requestItemEntity.setItemId(1);
         requestItemEntity.setRequestingInstitutionId(1);
@@ -349,7 +354,8 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         requestItemEntity.setBulkRequestItemEntity(getBulkRequestItemEntity());
         return requestItemEntity;
     }
-    private BulkRequestItemEntity getBulkRequestItemEntity(){
+
+    private BulkRequestItemEntity getBulkRequestItemEntity() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);
         institutionEntity.setInstitutionCode("PUL");
@@ -359,7 +365,7 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         requestTypeEntity.setRequestTypeCode("EDD");
         requestTypeEntity.setRequestTypeDesc("EDD");
         ItemEntity itemEntity = getItemEntity();
-        RequestStatusEntity requestStatusEntity =  new RequestStatusEntity();
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
         requestStatusEntity.setId(1);
         requestStatusEntity.setRequestStatusCode("RETRIEVAL_ORDER_PLACED");
         requestStatusEntity.setRequestStatusDescription("RETRIEVAL ORDER PLACED");
@@ -384,7 +390,8 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
         requestItemEntity.setBulkRequestItemEntity(bulkRequestItemEntity);
         return bulkRequestItemEntity;
     }
-    private  ItemRequestInformation getItemRequestInformation(){
+
+    private ItemRequestInformation getItemRequestInformation() {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setExpirationDate("09-21-2012 11:20:12");
         itemRequestInformation.setRequestingInstitution("NYPL");
@@ -396,7 +403,8 @@ public class ItemRequestDBServiceUT extends BaseTestCaseUT {
 
         return itemRequestInformation;
     }
-    private ItemEntity getItemEntity(){
+
+    private ItemEntity getItemEntity() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);
         institutionEntity.setInstitutionName("PUL");

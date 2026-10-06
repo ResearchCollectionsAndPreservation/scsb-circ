@@ -4,9 +4,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.junit.jupiter.api.Test;
 
 public class StartRouteProcessorUT {
     @Test

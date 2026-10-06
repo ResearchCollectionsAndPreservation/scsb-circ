@@ -2,16 +2,15 @@ package org.recap.ils.protocol.ncip;
 
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.recap.BaseTestCaseUT;
-import org.recap.ils.protocol.ncip.CheckoutItem;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CheckoutItemUT extends BaseTestCaseUT {
 
@@ -35,7 +34,7 @@ public class CheckoutItemUT extends BaseTestCaseUT {
 
     @Test
     public void getCheckOutItemInitiationDataWithoutRequestId() {
-        CheckOutItemInitiationData data = checkoutItem.getCheckOutItemInitiationData(null,null,null,null);
+        CheckOutItemInitiationData data = checkoutItem.getCheckOutItemInitiationData(null, null, null, null);
         assertNotNull(data);
     }
 

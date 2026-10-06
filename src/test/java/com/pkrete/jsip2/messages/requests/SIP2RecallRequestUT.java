@@ -2,20 +2,13 @@ package com.pkrete.jsip2.messages.requests;
 
 import com.pkrete.jsip2.variables.HoldMode;
 import com.pkrete.jsip2.variables.HoldType;
-import org.apache.camel.spi.AsEndpointUri;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
-import org.recap.BaseTestCase;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SIP2RecallRequestUT{
-
+public class SIP2RecallRequestUT {
 
 
     @Test

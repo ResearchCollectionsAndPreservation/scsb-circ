@@ -1,19 +1,17 @@
 package org.recap.model.jpa;
 
-import org.junit.Test;
-import org.recap.model.jpa.InstitutionEntity;
-import org.recap.model.jpa.OwnerCodeEntity;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by hemalathas on 14/3/17.
  */
-public class OwnerCodeEntityUT{
+public class OwnerCodeEntityUT {
 
     @Test
-    public void testCustomerCode(){
+    public void testCustomerCode() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);
         institutionEntity.setInstitutionCode("UC");

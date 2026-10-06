@@ -1,17 +1,16 @@
 package org.recap.ils.protocol.rest.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
-import org.recap.ils.protocol.rest.model.ItemData;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ItemDataUT extends BaseTestCaseUT {
 
     @Test
-    public void getItemData(){
+    public void getItemData() {
 
         ItemData itemData = new ItemData();
         itemData.setId("1");

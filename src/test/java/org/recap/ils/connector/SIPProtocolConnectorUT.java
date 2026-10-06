@@ -3,29 +3,27 @@ package org.recap.ils.connector;
 import com.pkrete.jsip2.connection.SIP2SocketConnection;
 import com.pkrete.jsip2.messages.responses.*;
 import com.pkrete.jsip2.variables.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.recap.common.ScsbConstants;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.util.PropertyUtil;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-@RunWith(MockitoJUnitRunner.class)
-@PrepareForTest(SIPProtocolConnector.class)
-@PowerMockIgnore("com.sun.org.apache.xerces.*")
+@ExtendWith({SpringExtension.class})
 public class SIPProtocolConnectorUT {
+
 
     @Mock
     SIPProtocolConnector sipProtocolConnector;
@@ -40,9 +38,9 @@ public class SIPProtocolConnectorUT {
     ILSConfigProperties ilsConfigProperties;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        sipProtocolConnector = PowerMockito.spy(new SIPProtocolConnector());
+        sipProtocolConnector = new SIPProtocolConnector();
         getIlsConfigProperties();
     }
 
@@ -233,6 +231,7 @@ public class SIPProtocolConnectorUT {
         ReflectionTestUtils.invokeMethod(sipProtocolConnector, "getSocketConnection");
         sipProtocolConnector.placeHold(itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, expirationDate, bibId, pickupLocation, trackingId, title, author, callNumber);
     }
+
     @Test
     public void placeHoldelse1() throws Exception {
         String itemIdentifier = "223467";
@@ -388,7 +387,6 @@ public class SIPProtocolConnectorUT {
         ReflectionTestUtils.invokeMethod(sipProtocolConnector, "getSocketConnection");
         sipProtocolConnector.lookupPatron(patronIdentifier);
     }
-
 
 
     @Test
@@ -688,8 +686,7 @@ public class SIPProtocolConnectorUT {
     }
 
     @Test
-    public void jSIPLogin() throws Exception
-    {
+    public void jSIPLogin() throws Exception {
         String patronIdentifier = "1234567";
         SIP2SocketConnection connection = new SIP2SocketConnection("test", 1200);
         ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
@@ -700,9 +697,8 @@ public class SIPProtocolConnectorUT {
         SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
         loginResponse.setOk(true);
         ReflectionTestUtils.invokeMethod(sipProtocolConnector, "getSocketConnection");
-        sipProtocolConnector.jSIPLogin(connection,patronIdentifier);
+        sipProtocolConnector.jSIPLogin(connection, patronIdentifier);
     }
-
 
 
 }

@@ -1,13 +1,12 @@
 package org.recap.ils.protocol.rest.model.request;
 
-import org.junit.Test;
-import org.recap.ils.protocol.rest.model.request.CancelHoldRequest;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CancelHoldRequestUT {
     @Test
-    public void getCancelHoldRequest(){
+    public void getCancelHoldRequest() {
         CancelHoldRequest cancelHoldRequest = new CancelHoldRequest();
         cancelHoldRequest.setItemBarcode("123456");
         cancelHoldRequest.setOwningInstitutionId("1");

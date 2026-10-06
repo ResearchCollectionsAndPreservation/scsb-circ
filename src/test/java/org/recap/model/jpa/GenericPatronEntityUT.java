@@ -1,15 +1,15 @@
 package org.recap.model.jpa;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GenericPatronEntityUT {
 
     @Test
-    public void getGenericPatronEntity(){
+    public void getGenericPatronEntity() {
         GenericPatronEntity genericPatronEntity = new GenericPatronEntity();
         genericPatronEntity.setGenericPatronId(1);
         genericPatronEntity.setRetrievalGenericPatron("173623e34");

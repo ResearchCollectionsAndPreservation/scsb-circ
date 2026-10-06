@@ -1,8 +1,7 @@
 package org.recap.repository;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCase;
-import org.recap.BaseTestCaseUT;
 import org.recap.model.jpa.*;
 
 import java.util.Arrays;

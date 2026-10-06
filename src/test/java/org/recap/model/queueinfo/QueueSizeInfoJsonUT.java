@@ -1,9 +1,9 @@
 package org.recap.model.queueinfo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class QueueSizeInfoJsonUT extends BaseTestCaseUT {
     @Test

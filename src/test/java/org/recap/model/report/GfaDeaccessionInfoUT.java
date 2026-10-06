@@ -1,16 +1,16 @@
 package org.recap.model.report;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GfaDeaccessionInfoUT {
 
     @Test
-    public void getGfaDeaccessionInfo(){
+    public void getGfaDeaccessionInfo() {
         GfaDeaccessionInfo gfaDeaccessionInfo = new GfaDeaccessionInfo();
         GfaDeaccessionInfo gfaDeaccessionInfo1 = new GfaDeaccessionInfo();
         gfaDeaccessionInfo.setDeAccessionDBResponseEntities(Arrays.asList(new DeAccessionDBResponseEntity()));

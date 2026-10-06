@@ -9,35 +9,41 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spi.RouteController;
 import org.apache.camel.support.DefaultExchange;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.*;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.recap.BaseTestCaseUT;
 import org.recap.ScsbCommonConstants;
 import org.recap.common.ScsbConstants;
-import org.recap.model.request.ItemRequestInformation;
-import org.recap.model.response.ItemInformationResponse;
 import org.recap.ims.connector.AbstractLASImsLocationConnector;
-import org.recap.ims.util.GFALasServiceUtil;
 import org.recap.ims.connector.factory.LASImsLocationConnectorFactory;
 import org.recap.ims.model.*;
+import org.recap.ims.processor.LasItemStatusCheckPollingProcessor;
+import org.recap.ims.util.GFALasServiceUtil;
 import org.recap.model.gfa.Dsitem;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
 import org.recap.model.gfa.ScsbLasItemStatusCheckModel;
 import org.recap.model.gfa.Ttitem;
 import org.recap.model.jpa.*;
-import org.recap.ims.processor.LasItemStatusCheckPollingProcessor;
+import org.recap.model.request.ItemRequestInformation;
+import org.recap.model.response.ItemInformationResponse;
 import org.recap.model.search.SearchResultRow;
 import org.recap.repository.jpa.*;
 import org.recap.request.service.ItemRequestService;
-import org.recap.util.CommonUtil;
 import org.recap.request.util.ItemRequestServiceUtil;
+import org.recap.util.CommonUtil;
 import org.recap.util.PropertyUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -48,12 +54,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
-public class GFALasServiceUT extends BaseTestCaseUT{
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.LENIENT)
+public class GFALasServiceUT extends BaseTestCaseUT {
 
     @InjectMocks
     @Spy
@@ -116,15 +123,15 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     @Mock
     private PropertyUtil propertyUtil;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        // MockitoExtension will initialize mocks; no explicit init required
         Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
     }
 
     @Test
-    public void isUseQueueLasCall(){
+    public void isUseQueueLasCall() {
         String imsLocationCode = "test";
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn(Boolean.TRUE.toString());
         gfaLasService.isUseQueueLasCall(imsLocationCode);
@@ -182,6 +189,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemInformationResponse response = gfaLasService.executeRetrieveOrder(itemRequestInfo, itemInformationResponse);
         assertNotNull(response);
     }
+
     @Test
     public void executeRetrieveOrderGFAItemStatusSCHONREFILEWOWithoutUseQueueLasCall() throws Exception {
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
@@ -301,6 +309,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemInformationResponse response = gfaLasService.gfaItemRequestProcessor(ex);
         assertNotNull(response);
     }
+
     @Test
     public void gfaItemRequestProcessorForRetrivealWithFailureResponse() {
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
@@ -313,6 +322,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemInformationResponse response = gfaLasService.gfaItemRequestProcessor(ex);
         assertNotNull(response);
     }
+
     @Test
     public void gfaItemRequestProcessorRetrivealException() {
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
@@ -336,6 +346,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemInformationResponse response = gfaLasService.gfaItemRequestProcessor(ex);
         assertNotNull(response);
     }
+
     @Test
     public void gfaItemRequestProcessorForEDDException() {
         ItemRequestInformation itemRequestInfo = new ItemRequestInformation();
@@ -346,6 +357,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         ItemInformationResponse response = gfaLasService.gfaItemRequestProcessor(ex);
         assertNotNull(response);
     }
+
     @Test
     public void gfaItemRequestProcessorForEDDWithFailureResponse() {
         ItemRequestInformation itemRequestInfo = getItemRequestInformation();
@@ -361,10 +373,10 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     }
 
     @Test
-    public void callItemEDDRetrievable(){
+    public void callItemEDDRetrievable() {
         ItemRequestInformation itemRequestInformation = null;
         ItemInformationResponse itemInformationResponse = getItemInformationResponse();
-        ItemInformationResponse response= gfaLasService.callItemEDDRetrievable(itemRequestInformation,itemInformationResponse);
+        ItemInformationResponse response = gfaLasService.callItemEDDRetrievable(itemRequestInformation, itemInformationResponse);
         assertNotNull(response);
     }
 
@@ -431,43 +443,49 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         Mockito.when(lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(any(), any(), any())).thenReturn(gfaItemStatusCheckResponse);
         gfaLasService.startPolling(barcode, imsLocationCode);
     }
+
     @Test
-    public void startPollingException(){
+    public void startPollingException() {
         String barcode = "135621";
         String imsLocationCode = "PUL";
-        Mockito.doThrow(new NullPointerException()).when(lasItemStatusCheckPollingProcessor).pollLasItemStatusJobResponse(any(),any(),any());
-        gfaLasService.startPolling(barcode,imsLocationCode);
+        Mockito.doThrow(new NullPointerException()).when(lasItemStatusCheckPollingProcessor).pollLasItemStatusJobResponse(any(), any(), any());
+        gfaLasService.startPolling(barcode, imsLocationCode);
     }
+
     @Test
-    public void getGfaItemStatusInUpperCase(){
+    public void getGfaItemStatusInUpperCase() {
         String gfaItemStatus = "test:test";
         String result = gfaLasService.getGfaItemStatusInUpperCase(gfaItemStatus);
         assertNotNull(result);
     }
+
     @Test
-    public void getGfaItemStatus(){
+    public void getGfaItemStatus() {
         String gfaItemStatus = "test";
         String result = gfaLasService.getGfaItemStatusInUpperCase(gfaItemStatus);
         assertNotNull(result);
     }
+
     @Test
-    public void buildRequestInfoAndReplaceToLAS(){
+    public void buildRequestInfoAndReplaceToLAS() {
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode())).thenReturn("HD");
         Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), anyBoolean())).thenReturn(Boolean.TRUE);
         String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
         assertNotNull(result);
     }
+
     @Test
-    public void buildRequestInfoAndReplaceToLASException(){
+    public void buildRequestInfoAndReplaceToLASException() {
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(requestItemEntity.getItemEntity().getBarcode())).thenReturn("HD");
         Mockito.doThrow(new NullPointerException()).when(commonUtil).checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), anyBoolean());
         String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
         assertNotNull(result);
     }
+
     @Test
-    public void buildRequestInfoAndReplaceToLASForRETRIEVAL(){
+    public void buildRequestInfoAndReplaceToLASForRETRIEVAL() {
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         requestItemEntity.getRequestTypeEntity().setRequestTypeCode("RETRIEVAL");
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
@@ -478,8 +496,9 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
         assertNotNull(result);
     }
+
     @Test
-    public void buildRequestInfoAndReplaceToLASForRETRIEVALAvailable(){
+    public void buildRequestInfoAndReplaceToLASForRETRIEVALAvailable() {
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         requestItemEntity.getRequestTypeEntity().setRequestTypeCode("RETRIEVAL");
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
@@ -490,9 +509,10 @@ public class GFALasServiceUT extends BaseTestCaseUT{
         String result = gfaLasService.buildRequestInfoAndReplaceToLAS(requestItemEntity);
         assertNotNull(result);
     }
+
     @Test
-    public void callGfaItemStatus(){
-        String itemBarcode ="1346673";
+    public void callGfaItemStatus() {
+        String itemBarcode = "1346673";
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGfaItemStatusCheckResponse();
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any())).thenReturn(gfaItemStatusCheckResponse);
         Mockito.when(commonUtil.getImsLocationCodeByItemBarcode(any())).thenReturn("test");
@@ -501,7 +521,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     }
 
     @Test
-    public void getGFAItemStatusCheckResponseByBarcodesAndImsLocationList(){
+    public void getGFAItemStatusCheckResponseByBarcodesAndImsLocationList() {
         List<ScsbLasItemStatusCheckModel> itemsStatusCheckModel = new ArrayList<>();
         ScsbLasItemStatusCheckModel scsbLasItemStatusCheckModel = new ScsbLasItemStatusCheckModel();
         scsbLasItemStatusCheckModel.setItemStatus("Complete");
@@ -513,25 +533,27 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     }
 
     @Test
-    public void buildGFAEddItemRequest(){
+    public void buildGFAEddItemRequest() {
         RequestItemEntity requestItemEntity = getRequestItemEntity();
         SearchResultRow searchResultRow = new SearchResultRow();
         searchResultRow.setAuthor("test");
         searchResultRow.setTitle("TEST");
         Mockito.doNothing().when(itemRequestServiceUtil).setEddInfoToGfaRequest(any(), any());
         Mockito.when(itemRequestService.searchRecords(any())).thenReturn(searchResultRow);
-        ReflectionTestUtils.invokeMethod(gfaLasService,"buildGFAEddItemRequest",requestItemEntity);
-    }
-    @Test
-    public void buildGFARetrieveItemRequest(){
-        RequestItemEntity requestItemEntity = getRequestItemEntity();
-        ReflectionTestUtils.invokeMethod(gfaLasService,"buildGFARetrieveItemRequest",requestItemEntity);
+        ReflectionTestUtils.invokeMethod(gfaLasService, "buildGFAEddItemRequest", requestItemEntity);
     }
 
     @Test
-    public void checkGetters(){
+    public void buildGFARetrieveItemRequest() {
+        RequestItemEntity requestItemEntity = getRequestItemEntity();
+        ReflectionTestUtils.invokeMethod(gfaLasService, "buildGFARetrieveItemRequest", requestItemEntity);
+    }
+
+    @Test
+    public void checkGetters() {
         gfaLasService.getRestTemplate();
     }
+
     private GFAPwiRequest getGFAPwiRequest() {
         GFAPwiRequest gfaPwiRequest = new GFAPwiRequest();
         GFAPwiDsItemRequest gfaPwiDsItemRequest = new GFAPwiDsItemRequest();
@@ -544,7 +566,7 @@ public class GFALasServiceUT extends BaseTestCaseUT{
     }
 
     private GFAPwiResponse getGfaPwiResponse() {
-        GFAPwiResponse gfaPwiResponse  = new GFAPwiResponse();
+        GFAPwiResponse gfaPwiResponse = new GFAPwiResponse();
         GFAPwiDsItemResponse gfaPwiDsItemResponse = new GFAPwiDsItemResponse();
         GFAPwiTtItemResponse gfaPwiTtItemResponse = new GFAPwiTtItemResponse();
         gfaPwiTtItemResponse.setCustomerCode("CA");

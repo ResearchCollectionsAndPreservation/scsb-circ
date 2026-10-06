@@ -2,21 +2,26 @@ package org.recap.ils.protocol.ncip;
 
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 public class RequestItemTest {
 
     @Spy
@@ -71,17 +76,17 @@ public class RequestItemTest {
     public void getRequestItemInitiationData_populatesFields_usingSpyForHeaderHelper() {
         RequestItem requestItem = spy(new RequestItem());
 
-        String itemIdentifier   = "ITEM-123";
-        Integer requestId       = 42;
-        String patronId         = "PATRON-999";
+        String itemIdentifier = "ITEM-123";
+        Integer requestId = 42;
+        String patronId = "PATRON-999";
         String owningInstItemId = "OWN-ABC";
-        String title            = "Some Title";
-        String author           = "Some Author";
-        String pickup           = "MAIN-CIRC";
-        String callNumber       = "QA10";
-        String ncipAgencyId     = "REQ-AGENCY";
-        String ncipScheme       = "Test";
-        String itemAgencyId     = "OWN-AGENCY";
+        String title = "Some Title";
+        String author = "Some Author";
+        String pickup = "MAIN-CIRC";
+        String callNumber = "QA10";
+        String ncipAgencyId = "REQ-AGENCY";
+        String ncipScheme = "Test";
+        String itemAgencyId = "OWN-AGENCY";
 
         InitiationHeader stubHeader = new InitiationHeader();
         doReturn(stubHeader)
@@ -95,35 +100,35 @@ public class RequestItemTest {
         try (MockedConstruction<RequestScopeType> scopeMock =
                      mockConstruction(RequestScopeType.class,
                              (mock, ctx) -> {
-                                 doReturn("Item").when(mock).toString();
+                                 lenient().doReturn("Item").when(mock).toString();
                                  doReturn("Item").when(mock).getValue();
                              });
              MockedConstruction<RequestType> typeMock =
                      mockConstruction(RequestType.class,
                              (mock, ctx) -> {
-                                 doReturn("Page").when(mock).toString();
+                                 lenient().doReturn("Page").when(mock).toString();
                                  doReturn("Page").when(mock).getValue();
                              });
              MockedConstruction<PickupLocation> pickupMock =
                      mockConstruction(PickupLocation.class,
                              (mock, ctx) -> {
-                                 doReturn(pickup).when(mock).toString();
+                                 lenient().doReturn(pickup).when(mock).toString();
                                  doReturn(pickup).when(mock).getValue();
                              });
              MockedConstruction<BibliographicId> bibIdMock =
                      mockConstruction(BibliographicId.class,
                              (mock, ctx) -> {
                                  BibliographicRecordId recId = mock(BibliographicRecordId.class);
-                                 doReturn("").when(recId).getBibliographicRecordIdentifier();
-                                 doNothing().when(recId).setBibliographicRecordIdentifier(any());
-                                 doReturn(recId).when(mock).getBibliographicRecordId();
-                                 doNothing().when(mock).setBibliographicRecordId(any());
+                                 lenient().doReturn("").when(recId).getBibliographicRecordIdentifier();
+                                 lenient().doNothing().when(recId).setBibliographicRecordIdentifier(any());
+                                 lenient().doReturn(recId).when(mock).getBibliographicRecordId();
+                                 lenient().doNothing().when(mock).setBibliographicRecordId(any());
                              });
              MockedConstruction<BibliographicRecordId> bibRecordIdMock =
                      mockConstruction(BibliographicRecordId.class,
                              (mock, ctx) -> {
-                                 doReturn("").when(mock).getBibliographicRecordIdentifier();
-                                 doNothing().when(mock).setBibliographicRecordIdentifier(any());
+                                 lenient().doReturn("").when(mock).getBibliographicRecordIdentifier();
+                                 lenient().doNothing().when(mock).setBibliographicRecordIdentifier(any());
                              })) {
 
             RequestItemInitiationData data = requestItem.getRequestItemInitiationData(

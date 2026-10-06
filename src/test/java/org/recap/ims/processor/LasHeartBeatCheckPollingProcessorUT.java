@@ -5,8 +5,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -14,12 +14,12 @@ import org.recap.BaseTestCaseUT;
 import org.recap.ScsbCommonConstants;
 import org.recap.common.ScsbConstants;
 import org.recap.ims.connector.AbstractLASImsLocationConnector;
-import org.recap.ims.service.GFALasService;
 import org.recap.ims.connector.factory.LASImsLocationConnectorFactory;
 import org.recap.ims.model.GFALasStatusCheckRequest;
 import org.recap.ims.model.GFALasStatusCheckResponse;
 import org.recap.ims.model.GFALasStatusDsItem;
 import org.recap.ims.model.GFALasStatusTtItem;
+import org.recap.ims.service.GFALasService;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.request.util.ItemRequestServiceUtil;
 import org.recap.util.PropertyUtil;
@@ -51,7 +51,7 @@ public class LasHeartBeatCheckPollingProcessorUT extends BaseTestCaseUT {
     @Mock
     AbstractLASImsLocationConnector abstractLASImsLocationConnector;
 
-    @Before
+    @BeforeEach
     public void setup() {
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn("1000");
     }

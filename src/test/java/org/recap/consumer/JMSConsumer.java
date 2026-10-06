@@ -1,26 +1,17 @@
 package org.recap.consumer;
 
+import jakarta.jms.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import jakarta.jms.Connection;
-import jakarta.jms.ConnectionFactory;
-import jakarta.jms.JMSException;
-import jakarta.jms.Message;
-import jakarta.jms.MessageConsumer;
-import jakarta.jms.MessageListener;
-import jakarta.jms.Queue;
-import jakarta.jms.Session;
-import jakarta.jms.TextMessage;
-import jakarta.jms.Topic;
 
 /**
  * Created by sudhishk on 17/1/17.
  */
 @Slf4j
 public class JMSConsumer implements MessageListener {
-
 
 
     private static String topicName = "PUL.RequestT";

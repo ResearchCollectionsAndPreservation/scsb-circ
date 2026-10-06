@@ -1,17 +1,17 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 import java.sql.Time;
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GFAPwdTtItemResponseUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFAPwdTtItemResponse(){
+    public void getGFAPwdTtItemResponse() {
         GFAPwdTtItemResponse gfaPwdTtItemResponse = new GFAPwdTtItemResponse();
         GFAPwdTtItemResponse gfaPwdTtItemResponse1 = new GFAPwdTtItemResponse();
         gfaPwdTtItemResponse.setCustomerCode("PB");

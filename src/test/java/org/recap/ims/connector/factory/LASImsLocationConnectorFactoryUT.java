@@ -1,6 +1,6 @@
 package org.recap.ims.connector.factory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -13,8 +13,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 
 
@@ -35,10 +34,10 @@ public class LASImsLocationConnectorFactoryUT extends BaseTestCaseUT {
 
 
     @Test
-    public void getLasImsLocationConnector(){
+    public void getLasImsLocationConnector() {
         imsLocationConnectors.add(abstractLASImsLocationConnector);
         lasImsLocationConnectorFactory = new LASImsLocationConnectorFactory();
-        ReflectionTestUtils.setField(lasImsLocationConnectorFactory,"propertyUtil",propertyUtil);
+        ReflectionTestUtils.setField(lasImsLocationConnectorFactory, "propertyUtil", propertyUtil);
         Mockito.when(propertyUtil.getIMSConfigProperties(any())).thenReturn(imsConfigProperties);
         //Mockito.when(abstractLASImsLocationConnector.supports("HD")).thenReturn(true);
         AbstractLASImsLocationConnector abstractLASImsLocationConnector = lasImsLocationConnectorFactory.getLasImsLocationConnector("HD");

@@ -1,14 +1,13 @@
 package org.recap.ils.protocol.rest.model.request;
 
-import org.junit.Test;
-import org.recap.ils.protocol.rest.model.request.RecallRequest;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RecallRequestUT {
 
     @Test
-    public void getRecallRequest(){
+    public void getRecallRequest() {
         RecallRequest recallRequest = new RecallRequest();
         recallRequest.setItemBarcode("234567");
         recallRequest.setOwningInstitutionId("1");

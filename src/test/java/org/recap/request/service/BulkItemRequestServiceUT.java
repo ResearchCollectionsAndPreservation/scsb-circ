@@ -1,20 +1,20 @@
 package org.recap.request.service;
 
 import org.apache.camel.ProducerTemplate;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.recap.ScsbCommonConstants;
 import org.recap.common.ScsbConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.request.util.ItemRequestServiceUtil;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
@@ -22,10 +22,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 public class BulkItemRequestServiceUT {
     @InjectMocks
     BulkItemRequestService bulkItemRequestService;
@@ -43,7 +43,7 @@ public class BulkItemRequestServiceUT {
     private ProducerTemplate producerTemplate;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ReflectionTestUtils.setField(bulkItemRequestService, "bulkRequestItemCountLimit", 5000);
     }
@@ -67,8 +67,9 @@ public class BulkItemRequestServiceUT {
         }
         assertTrue(true);
     }
+
     @Test
-    public void bulkRequestItems(){
+    public void bulkRequestItems() {
         int bulkRequestId = 1;
         ItemEntity itemEntity = getItemEntity();
         BulkRequestItemEntity bulkRequestItemEntity = getBulkRequestItemEntity();
@@ -84,8 +85,9 @@ public class BulkItemRequestServiceUT {
         itemEntity.setOwningInstitutionId(1);
         bulkItemRequestService.bulkRequestItems(bulkRequestId);
     }
+
     @Test
-    public void bulkRequestItemsForDifferentOwingInstId(){
+    public void bulkRequestItemsForDifferentOwingInstId() {
         int bulkRequestId = 1;
         ItemEntity itemEntity = getItemEntity();
         itemEntity.setOwningInstitutionId(3);
@@ -149,7 +151,8 @@ public class BulkItemRequestServiceUT {
         ReflectionTestUtils.setField(bulkItemRequestService, "bulkRequestItemCountLimit", 0);
         bulkItemRequestService.bulkRequestItems(bulkRequestId);
     }
-    private BulkRequestItemEntity getBulkRequestItemEntity(){
+
+    private BulkRequestItemEntity getBulkRequestItemEntity() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("PUL");
         institutionEntity.setInstitutionName("PUL");
@@ -157,7 +160,7 @@ public class BulkItemRequestServiceUT {
         requestTypeEntity.setRequestTypeCode("EDD");
         requestTypeEntity.setRequestTypeDesc("EDD");
         ItemEntity itemEntity = getItemEntity();
-        RequestStatusEntity requestStatusEntity =  new RequestStatusEntity();
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
         requestStatusEntity.setRequestStatusCode("RETRIEVAL_ORDER_PLACED");
         requestStatusEntity.setRequestStatusDescription("RETRIEVAL ORDER PLACED");
         RequestItemEntity requestItemEntity = new RequestItemEntity();
@@ -180,7 +183,8 @@ public class BulkItemRequestServiceUT {
         bulkRequestItemEntity.setRequestItemEntities(Arrays.asList(requestItemEntity));
         return bulkRequestItemEntity;
     }
-    private ItemEntity getItemEntity(){
+
+    private ItemEntity getItemEntity() {
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setBarcode("123456");
         itemEntity.setCustomerCode("PA");

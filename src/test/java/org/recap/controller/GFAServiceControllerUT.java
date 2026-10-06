@@ -1,6 +1,6 @@
 package org.recap.controller;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -11,7 +11,7 @@ import org.recap.model.gfa.ScsbLasItemStatusCheckModel;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GFAServiceControllerUT extends BaseTestCaseUT {
 
@@ -22,7 +22,7 @@ public class GFAServiceControllerUT extends BaseTestCaseUT {
     private GFALasService gfaLasService;
 
     @Test
-    public void itemStatusCheck(){
+    public void itemStatusCheck() {
         String itemBarcode = "3455632";
         Mockito.when(gfaLasService.callGfaItemStatus(itemBarcode)).thenReturn("IN");
         String gfaItemStatusValue = gfaServiceController.itemStatusCheck(itemBarcode);
@@ -30,7 +30,7 @@ public class GFAServiceControllerUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void multipleItemsStatusCheck(){
+    public void multipleItemsStatusCheck() {
         List<ScsbLasItemStatusCheckModel> itemsStatusCheckModel = new ArrayList<>();
         ScsbLasItemStatusCheckModel scsbLasItemStatusCheckModel = new ScsbLasItemStatusCheckModel();
         scsbLasItemStatusCheckModel.setItemStatus("Complete");

@@ -1,17 +1,15 @@
 package org.recap.ils.protocol.rest.model.request;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.ils.protocol.rest.model.Description;
-import org.recap.ils.protocol.rest.model.request.CreateHoldRequest;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CreateHoldRequestUT {
 
     @Test
-    public  void getCreateHoldRequest(){
-        CreateHoldRequest createHoldRequest= new CreateHoldRequest();
+    public void getCreateHoldRequest() {
+        CreateHoldRequest createHoldRequest = new CreateHoldRequest();
         createHoldRequest.setDescription(new Description());
         createHoldRequest.setItemBarcode("123456");
         createHoldRequest.setOwningInstitutionId("1");

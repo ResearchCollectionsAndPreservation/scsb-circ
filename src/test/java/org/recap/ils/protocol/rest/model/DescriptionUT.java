@@ -1,14 +1,13 @@
 package org.recap.ils.protocol.rest.model;
 
-import org.junit.Test;
-import org.recap.ils.protocol.rest.model.Description;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class DescriptionUT {
 
     @Test
-    public void getDescription(){
+    public void getDescription() {
         Description description = new Description();
         description.setTitle("test");
         description.setAuthor("test");

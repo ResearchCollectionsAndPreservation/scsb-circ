@@ -1,22 +1,22 @@
 package org.recap.request.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
 import org.recap.common.ScsbConstants;
 import org.recap.controller.RequestItemController;
+import org.recap.ims.service.GFALasService;
+import org.recap.model.jpa.*;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.response.ItemCheckoutResponse;
 import org.recap.model.response.ItemInformationResponse;
-import org.recap.ims.service.GFALasService;
-import org.recap.model.jpa.*;
 import org.recap.repository.jpa.BulkRequestItemDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
-import org.recap.util.CommonUtil;
 import org.recap.request.util.ItemRequestServiceUtil;
+import org.recap.util.CommonUtil;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -50,7 +50,7 @@ public class BulkItemRequestProcessServiceUT extends BaseTestCaseUT {
     @Mock
     private CommonUtil commonUtil;
 
-    @Before
+    @BeforeEach
     public void setup() {
     }
 

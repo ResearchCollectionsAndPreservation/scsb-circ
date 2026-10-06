@@ -1,7 +1,7 @@
 package org.recap.util;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.recap.BaseTestCaseUT;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -17,7 +17,7 @@ public class SecurityUtilUT extends BaseTestCaseUT {
 
     private String testKey = "testkey";
 
-    @Before
+    @BeforeEach
     public void setup() {
         ReflectionTestUtils.setField(securityUtil, "encryptionSecretKey", testKey);
     }

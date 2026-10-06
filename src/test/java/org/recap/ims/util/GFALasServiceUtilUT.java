@@ -2,17 +2,16 @@ package org.recap.ims.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.recap.BaseTestCaseUT;
 import org.recap.ims.model.*;
-import org.recap.ims.util.GFALasServiceUtil;
 import org.recap.model.gfa.Ttitem;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GFALasServiceUtilUT extends BaseTestCaseUT {
 

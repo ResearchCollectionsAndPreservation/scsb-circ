@@ -1,6 +1,6 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 import org.recap.model.gfa.Ttitem;
 
@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class RetrieveItemUT extends BaseTestCaseUT {
 
     @Test
-    public void getRetrieveItem(){
+    public void getRetrieveItem() {
         RetrieveItem retrieveItem = new RetrieveItem();
         RetrieveItem retrieveItem1 = new RetrieveItem();
         retrieveItem.setTtitem(Arrays.asList(new Ttitem()));

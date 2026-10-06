@@ -2,24 +2,22 @@ package org.recap.controller;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.spi.RouteController;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.recap.BaseTestCase;
 import org.recap.BaseTestCaseUT;
 import org.recap.model.ILSConfigProperties;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.util.CommonUtil;
 import org.recap.util.PropertyUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RequestDataLoadControllerUT extends BaseTestCaseUT {
 
@@ -45,7 +43,7 @@ public class RequestDataLoadControllerUT extends BaseTestCaseUT {
     InstitutionDetailsRepository institutionDetailsRepository;
 
     @Test
-    public void startAccessionReconcilation() throws Exception{
+    public void startAccessionReconcilation() throws Exception {
 
         String pul = "{\"PUL:\":\"PUL\"}";
         String cul = "{\"CUL:\":\"CUL\"}";
@@ -57,11 +55,11 @@ public class RequestDataLoadControllerUT extends BaseTestCaseUT {
         ILSConfigProperties ilsConfigProperties = new ILSConfigProperties();
         Mockito.when(commonUtil.findAllInstitutionCodesExceptSupportInstitution()).thenReturn(institutionCodeList);
         for (String institution : institutionCodeList) {
-           // Mockito.when(propertyUtil.getILSConfigProperties(institution)).thenReturn(ilsConfigProperties);
+            // Mockito.when(propertyUtil.getILSConfigProperties(institution)).thenReturn(ilsConfigProperties);
         }
         Mockito.when(camelContext.getRouteController()).thenReturn(routeController);
         String result = requestDataLoadController.startAccessionReconciliation();
         assertNotNull(result);
-        assertEquals("Success",result);
+        assertEquals("Success", result);
     }
 }

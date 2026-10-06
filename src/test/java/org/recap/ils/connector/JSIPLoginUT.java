@@ -1,27 +1,30 @@
 package org.recap.ils.connector;
 
 import com.pkrete.jsip2.connection.SIP2SocketConnection;
+import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseException;
+import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
 import com.pkrete.jsip2.messages.requests.SIP2LoginRequest;
 import com.pkrete.jsip2.messages.requests.SIP2PatronInformationRequest;
 import com.pkrete.jsip2.messages.responses.SIP2LoginResponse;
 import com.pkrete.jsip2.messages.responses.SIP2PatronInformationResponse;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.recap.model.ILSConfigProperties;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseException;
-import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
-
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class JSIPLoginUT {
 
     @InjectMocks
@@ -35,7 +38,6 @@ public class JSIPLoginUT {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
 
         // Setup operator credentials required for SIPProtocolConnector instance
         sipProtocolConnector.setInstitution("testInstitution");

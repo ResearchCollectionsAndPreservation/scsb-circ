@@ -1,12 +1,12 @@
 package org.recap.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.recap.BaseTestCaseUT;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ActiveMqQueuesInfoUT extends BaseTestCaseUT {
     @InjectMocks
@@ -17,7 +17,7 @@ public class ActiveMqQueuesInfoUT extends BaseTestCaseUT {
     String serviceUrl = "http://test:8161";
     String activemqCredentials = "admin:admin";
 
-    @Before
+    @BeforeEach
     public void setup() {
         ReflectionTestUtils.setField(activeMqQueuesInfo, "activeMqApiUrl", activeMqApiUrl);
         ReflectionTestUtils.setField(activeMqQueuesInfo, "searchAttribute", searchAttribute);

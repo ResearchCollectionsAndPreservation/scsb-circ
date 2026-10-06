@@ -1,24 +1,24 @@
 package org.recap.model.jpa;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class HoldingsEntityUT {
 
     @Test
-    public  void getHoldingsEntity(){
+    public void getHoldingsEntity() {
 
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);
         institutionEntity.setInstitutionCode("UC");
         institutionEntity.setInstitutionName("University of Chicago");
         assertNotNull(institutionEntity);
-        List<BibliographicEntity> bibliographicEntities =  new ArrayList<>();
+        List<BibliographicEntity> bibliographicEntities = new ArrayList<>();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setInstitutionEntity(institutionEntity);
         bibliographicEntities.add(bibliographicEntity);

@@ -1,13 +1,13 @@
 package org.recap.service.common;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.recap.ScsbCommonConstants;
 import org.recap.model.jpa.CollectionGroupEntity;
 import org.recap.model.jpa.InstitutionEntity;
@@ -15,18 +15,21 @@ import org.recap.model.jpa.ItemStatusEntity;
 import org.recap.repository.jpa.CollectionGroupDetailsRepository;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.repository.jpa.ItemStatusDetailsRepository;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by premkb on 18/6/17.
  */
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class SetupDataServiceUT {
 
     @InjectMocks
@@ -44,81 +47,87 @@ public class SetupDataServiceUT {
     @Mock
     CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
-    @Before
-    public  void setup(){
-        MockitoAnnotations.initMocks(this);
-    }
+    // MockitoExtension will initialize mocks; no explicit init required
     @Test
-    public void getItemStatusIdCodeMap(){
+    public void getItemStatusIdCodeMap() {
         ItemStatusEntity itemStatusEntity = getItemStatusEntity();
         Mockito.when(repositoryService.getItemStatusDetailsRepository()).thenReturn(itemStatusDetailsRepository);
         Mockito.when(repositoryService.getItemStatusDetailsRepository().findAll()).thenReturn(Arrays.asList(itemStatusEntity));
-        Map<Integer,String> itemStatusIdCodeMap = setupDataService.getItemStatusIdCodeMap();
+        Map<Integer, String> itemStatusIdCodeMap = setupDataService.getItemStatusIdCodeMap();
         assertNotNull(itemStatusIdCodeMap);
         String itemStatusCode = itemStatusIdCodeMap.get(1);
-        assertEquals(ScsbCommonConstants.AVAILABLE,itemStatusCode);
+        assertEquals(ScsbCommonConstants.AVAILABLE, itemStatusCode);
     }
+
     @Test
-    public void getItemStatusIdCodeMapForException(){
-        Map<Integer,String> itemStatusIdCodeMap = setupDataService.getItemStatusIdCodeMap();
+    public void getItemStatusIdCodeMapForException() {
+        Map<Integer, String> itemStatusIdCodeMap = setupDataService.getItemStatusIdCodeMap();
         assertNotNull(itemStatusIdCodeMap);
     }
+
     @Test
-    public void getItemStatusCodeIdMap(){
+    public void getItemStatusCodeIdMap() {
         ItemStatusEntity itemStatusEntity = getItemStatusEntity();
         Mockito.when(repositoryService.getItemStatusDetailsRepository()).thenReturn(itemStatusDetailsRepository);
         Mockito.when(repositoryService.getItemStatusDetailsRepository().findAll()).thenReturn(Arrays.asList(itemStatusEntity));
-        Map<String,Integer> itemStatusCodeIdMap = setupDataService.getItemStatusCodeIdMap();
+        Map<String, Integer> itemStatusCodeIdMap = setupDataService.getItemStatusCodeIdMap();
         assertNotNull(itemStatusCodeIdMap);
         Integer itemStatusId = itemStatusCodeIdMap.get(ScsbCommonConstants.AVAILABLE);
-        assertEquals("1",itemStatusId.toString());
+        assertEquals("1", itemStatusId.toString());
     }
+
     @Test
-    public void getItemStatusCodeIdMapForException(){
-        Map<String,Integer> itemStatusCodeIdMap = setupDataService.getItemStatusCodeIdMap();
+    public void getItemStatusCodeIdMapForException() {
+        Map<String, Integer> itemStatusCodeIdMap = setupDataService.getItemStatusCodeIdMap();
         assertNotNull(itemStatusCodeIdMap);
     }
+
     @Test
-    public void getInstitutionIdCodeMap(){
+    public void getInstitutionIdCodeMap() {
         InstitutionEntity institutionEntity = getInstitutionEntity();
         Mockito.when(repositoryService.getInstitutionDetailsRepository()).thenReturn(mockInstitutionDetailsRepository);
         Mockito.when(repositoryService.getInstitutionDetailsRepository().findAll()).thenReturn(Arrays.asList(institutionEntity));
-        Map<Integer,String> institutionEntityMap = setupDataService.getInstitutionIdCodeMap();
+        Map<Integer, String> institutionEntityMap = setupDataService.getInstitutionIdCodeMap();
         assertNotNull(institutionEntityMap);
         String itemStatusCode = institutionEntityMap.get(1);
-        assertEquals(ScsbCommonConstants.PRINCETON,itemStatusCode);
+        assertEquals(ScsbCommonConstants.PRINCETON, itemStatusCode);
     }
+
     @Test
-    public void getInstitutionIdCodeMapForException(){
-        Map<Integer,String> institutionEntityMap = setupDataService.getInstitutionIdCodeMap();
+    public void getInstitutionIdCodeMapForException() {
+        Map<Integer, String> institutionEntityMap = setupDataService.getInstitutionIdCodeMap();
         assertNotNull(institutionEntityMap);
     }
+
     @Test
-    public void getInstitutionCodeIdMap(){
+    public void getInstitutionCodeIdMap() {
         InstitutionEntity institutionEntity = getInstitutionEntity();
         Mockito.when(repositoryService.getInstitutionDetailsRepository()).thenReturn(mockInstitutionDetailsRepository);
         Mockito.when(repositoryService.getInstitutionDetailsRepository().findAll()).thenReturn(Arrays.asList(institutionEntity));
-        Map<String,Integer> institutionEntityMapId = setupDataService.getInstitutionCodeIdMap();
+        Map<String, Integer> institutionEntityMapId = setupDataService.getInstitutionCodeIdMap();
         assertNotNull(institutionEntityMapId);
         Integer itemStatusId = institutionEntityMapId.get(ScsbCommonConstants.PRINCETON);
-        assertEquals("1",itemStatusId.toString());
+        assertEquals("1", itemStatusId.toString());
     }
+
     @Test
-    public void getInstitutionCodeIdMapForException(){
-        Map<String,Integer> institutionEntityMapId = setupDataService.getInstitutionCodeIdMap();
+    public void getInstitutionCodeIdMapForException() {
+        Map<String, Integer> institutionEntityMapId = setupDataService.getInstitutionCodeIdMap();
         assertNotNull(institutionEntityMapId);
     }
+
     @Test
-    public void getCollectionGroupMap(){
+    public void getCollectionGroupMap() {
         CollectionGroupEntity collectionGroupEntity = getCollectionGroupEntity();
         Mockito.when(repositoryService.getCollectionGroupDetailsRepository()).thenReturn(collectionGroupDetailsRepository);
         Mockito.when(repositoryService.getCollectionGroupDetailsRepository().findAll()).thenReturn(Arrays.asList(collectionGroupEntity));
-        Map<String,Integer> collectionGroupMap = setupDataService.getCollectionGroupMap();
+        Map<String, Integer> collectionGroupMap = setupDataService.getCollectionGroupMap();
         assertNotNull(collectionGroupMap);
     }
+
     @Test
-    public void getCollectionGroupMapForException(){
-        Map<String,Integer> collectionGroupMap = setupDataService.getCollectionGroupMap();
+    public void getCollectionGroupMapForException() {
+        Map<String, Integer> collectionGroupMap = setupDataService.getCollectionGroupMap();
         assertNotNull(collectionGroupMap);
     }
 
@@ -138,6 +147,7 @@ public class SetupDataServiceUT {
         itemStatusEntity.setStatusDescription("SUCCESS");
         return itemStatusEntity;
     }
+
     private InstitutionEntity getInstitutionEntity() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);

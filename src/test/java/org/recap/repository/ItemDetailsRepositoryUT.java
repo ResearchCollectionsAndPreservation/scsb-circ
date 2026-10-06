@@ -1,25 +1,19 @@
 package org.recap.repository;
 
-import org.junit.Test;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCase;
 import org.recap.controller.ItemController;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.ItemEntity;
-import org.recap.repository.jpa.BibliographicDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by hemalathas on 16/11/16.
@@ -51,22 +45,22 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
     }
 
     @Test
-    public void testFindByAvailableStatusId(){
+    public void testFindByAvailableStatusId() {
         List<ItemEntity> itemEntityList = new ArrayList<>();
-        long itemCount = itemDetailsRepository.getNotAvailableItemsCount(1,Arrays.asList(1,9,2,5),2);
-        System.out.println("Total Records : {}"+ itemCount);
+        long itemCount = itemDetailsRepository.getNotAvailableItemsCount(1, Arrays.asList(1, 9, 2, 5), 2);
+        System.out.println("Total Records : {}" + itemCount);
         int totalPagesCount = (int) (itemCount / 100);
         System.out.println("Total Pages : {}" + totalPagesCount);
-        for(int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
+        for (int pageNum = 0; pageNum < totalPagesCount + 1; pageNum++) {
             long from = pageNum * Long.valueOf(100);
-            itemEntityList =  itemDetailsRepository.getNotAvailableItems(1,Arrays.asList(1,9,2,5),0,100,2);
+            itemEntityList = itemDetailsRepository.getNotAvailableItems(1, Arrays.asList(1, 9, 2, 5), 0, 100, 2);
         }
         assertNotNull(itemEntityList);
     }
 
     @Test
-    public void testFindNotAvailableitems(){
-        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndNotAvailable("AD00004588",2);
+    public void testFindNotAvailableitems() {
+        List<ItemEntity> itemEntityList = itemDetailsRepository.findByBarcodeAndNotAvailable("AD00004588", 2);
         assertNotNull(itemEntityList);
     }
 
@@ -115,7 +109,6 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity1, itemEntity2));
-
 
 
         assertNotNull(bibliographicEntity);
@@ -186,7 +179,6 @@ public class ItemDetailsRepositoryUT extends BaseTestCase {
 
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity1, itemEntity2, itemEntity3));
-
 
 
         assertNotNull(bibliographicEntity);

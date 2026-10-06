@@ -1,15 +1,14 @@
 package org.recap.model.request;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
-import org.recap.model.request.ItemRequestInformation;
 
 import java.util.Arrays;
 
 public class ItemRequestInformationUT extends BaseTestCaseUT {
 
     @Test
-    public void getItemRequestInformation(){
+    public void getItemRequestInformation() {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         ItemRequestInformation itemRequestInformation1 = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Arrays.asList("123"));

@@ -1,20 +1,19 @@
 package org.recap.ils.protocol.rest.model.response;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 import org.recap.ils.protocol.rest.model.CheckinData;
 import org.recap.ils.protocol.rest.model.DebugInfo;
-import org.recap.ils.protocol.rest.model.response.CheckinResponse;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 public class CheckinResponseUT extends BaseTestCaseUT {
 
     @Test
-    public void testCheckinResponse(){
+    public void testCheckinResponse() {
         CheckinResponse checkinResponse = getCheckinResponse();
         assertNotNull(checkinResponse.getCount());
         assertNotNull(checkinResponse.getStatusCode());

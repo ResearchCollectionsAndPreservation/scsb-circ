@@ -1,18 +1,17 @@
 package org.recap.ils.protocol.rest.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.recap.BaseTestCaseUT;
 import org.recap.ils.protocol.rest.model.response.CancelHoldResponse;
-import org.recap.ils.protocol.rest.service.RestOauthTokenApiService;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 
 public class RestOauthTokenApiServiceUT extends BaseTestCaseUT {

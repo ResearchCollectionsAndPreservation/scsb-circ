@@ -1,28 +1,29 @@
 package org.recap.controller;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.service.common.SetupDataService;
 import org.recap.service.deaccession.DeAccessionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Created by premkb on 26/12/16.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 public class SharedCollectionRestControllerUT {
 
     @InjectMocks
@@ -42,11 +43,12 @@ public class SharedCollectionRestControllerUT {
         deAccessionItem.setDeliveryLocation("PB");
         deAccessionRequest.setDeAccessionItems(Arrays.asList(deAccessionItem));
         Map<String, String> map = new HashMap<>();
-        map.put("Institution","PUL");
+        map.put("Institution", "PUL");
         Mockito.when(deAccessionService.deAccession(deAccessionRequest)).thenReturn(map);
         ResponseEntity result = sharedCollectionRestController.deAccession(deAccessionRequest);
         assertNotNull(result);
     }
+
     @Test
     public void deAccessionNull() throws Exception {
         DeAccessionRequest deAccessionRequest = new DeAccessionRequest();

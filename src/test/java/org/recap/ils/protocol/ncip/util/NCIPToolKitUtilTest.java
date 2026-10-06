@@ -1,15 +1,18 @@
 package org.recap.ils.protocol.ncip.util;
 
-import org.extensiblecatalog.ncip.v2.common.*;
+import org.extensiblecatalog.ncip.v2.common.ServiceValidator;
+import org.extensiblecatalog.ncip.v2.common.ServiceValidatorFactory;
+import org.extensiblecatalog.ncip.v2.common.Translator;
+import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ToolkitException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.common.ScsbConstants;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,15 +22,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith({SpringExtension.class})
 public class NCIPToolKitUtilTest {
 
-    @Before
-    @After
+    @BeforeEach
+    @AfterEach
     public void resetSingleton() throws Exception {
         Field field = NCIPToolKitUtil.class.getDeclaredField("ncipToolkitUtilInstance");
         field.setAccessible(true);
@@ -76,9 +80,9 @@ public class NCIPToolKitUtilTest {
 
     @Test
     public void getInstance_whenNull_initialisesAndReturnsSingleton() throws Exception {
-        ServiceContext   mockCtx        = mock(ServiceContext.class);
-        Translator       mockTranslator = mock(Translator.class);
-        ServiceValidator mockValidator  = buildMockValidator(mockCtx);
+        ServiceContext mockCtx = mock(ServiceContext.class);
+        Translator mockTranslator = mock(Translator.class);
+        ServiceValidator mockValidator = buildMockValidator(mockCtx);
 
         try (MockedStatic<ServiceValidatorFactory> svf =
                      mockStatic(ServiceValidatorFactory.class);
@@ -97,8 +101,8 @@ public class NCIPToolKitUtilTest {
                 NCIPToolKitUtil result = NCIPToolKitUtil.getInstance();
 
                 assertNotNull(result);
-                assertSame(mockCtx,        result.serviceContext);
-                assertSame(mockTranslator,  result.translator);
+                assertSame(mockCtx, result.serviceContext);
+                assertSame(mockTranslator, result.translator);
                 assertSame(result, NCIPToolKitUtil.getInstance());
             } finally {
                 Thread.currentThread().setContextClassLoader(original);
@@ -126,7 +130,7 @@ public class NCIPToolKitUtilTest {
                 invokeInitViaReflection();
                 fail("Expected RuntimeException for empty properties");
             } catch (RuntimeException e) {
-                    e.printStackTrace();
+                e.printStackTrace();
             } finally {
                 Thread.currentThread().setContextClassLoader(original);
             }
@@ -166,7 +170,8 @@ public class NCIPToolKitUtilTest {
                      mockStatic(TranslatorFactory.class)) {
 
             InputStream broken = new InputStream() {
-                @Override public int read() throws IOException {
+                @Override
+                public int read() throws IOException {
                     throw new IOException("Simulated read failure");
                 }
             };
@@ -215,7 +220,7 @@ public class NCIPToolKitUtilTest {
         assertNotNull(NCIPToolKitUtil.class.getName());
     }
 
-     private ClassLoader buildClassLoaderWithProperties(InputStream stream) {
+    private ClassLoader buildClassLoaderWithProperties(InputStream stream) {
         ClassLoader parent = NCIPToolKitUtil.class.getClassLoader();
         return new ClassLoader(parent) {
             @Override
@@ -239,8 +244,8 @@ public class NCIPToolKitUtilTest {
         } catch (java.lang.reflect.InvocationTargetException ite) {
             Throwable cause = ite.getCause();
             if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-            if (cause instanceof IOException)       throw (IOException)       cause;
-            if (cause instanceof ToolkitException)  throw (ToolkitException)  cause;
+            if (cause instanceof IOException) throw (IOException) cause;
+            if (cause instanceof ToolkitException) throw (ToolkitException) cause;
             throw new RuntimeException(cause);
         }
     }

@@ -1,7 +1,7 @@
 package org.recap.ils.protocol.rest.processor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -10,14 +10,13 @@ import org.recap.PropertyKeyConstants;
 import org.recap.ils.connector.RestProtocolConnector;
 import org.recap.ils.protocol.rest.model.JobData;
 import org.recap.ils.protocol.rest.model.response.JobResponse;
-import org.recap.ils.protocol.rest.processor.RestProtocolJobResponsePollingProcessor;
 import org.recap.ils.protocol.rest.util.RestApiResponseUtil;
 import org.recap.util.PropertyUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 
 public class RestProtocolJobResponsePollingProcessorUT extends BaseTestCaseUT {
@@ -34,8 +33,8 @@ public class RestProtocolJobResponsePollingProcessorUT extends BaseTestCaseUT {
     @Mock
     PropertyUtil propertyUtil;
 
-    @Before
-    public void setup(){
+    @BeforeEach
+    public void setup() {
         ReflectionTestUtils.setField(restProtocolJobResponsePollingProcessor, "pollingMaxTimeOut", 30);
         ReflectionTestUtils.setField(restProtocolJobResponsePollingProcessor, "pollingTimeInterval", 1000);
     }
@@ -43,60 +42,65 @@ public class RestProtocolJobResponsePollingProcessorUT extends BaseTestCaseUT {
     @Test
     public void pollRestApiRequestItemJobResponse() throws Exception {
         String jobId = "1";
-        String institution ="NYPL";
+        String institution = "NYPL";
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_MAX_TIMEOUT)).thenReturn("30");
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_TIME_INTERVAL)).thenReturn("1000");
         JobResponse jobResponse = getJobResponse();
         Mockito.when(restProtocolConnector.queryForJob(any())).thenReturn(jobResponse);
         Mockito.when(restApiResponseUtil.getJobStatusMessage(any())).thenReturn("Success");
-        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId,institution);
+        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId, institution);
         assertNotNull(response);
     }
+
     @Test
     public void pollRestApiRequestItemJobResponseNullPointerException() throws Exception {
         String jobId = "1";
-        String institution ="NYPL";
+        String institution = "NYPL";
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_MAX_TIMEOUT)).thenReturn("30");
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_TIME_INTERVAL)).thenReturn("1000");
         JobResponse jobResponse = getJobResponse();
         Mockito.when(restProtocolConnector.queryForJob(any())).thenReturn(jobResponse);
         Mockito.doThrow(new NullPointerException()).when(restApiResponseUtil).getJobStatusMessage(any());
-        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId,institution);
+        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId, institution);
         assertNotNull(response);
     }
+
     @Test
     public void pollRestApiRequestItemJobResponseTimeoutException() throws Exception {
         String jobId = "1";
-        String institution ="NYPL";
+        String institution = "NYPL";
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_MAX_TIMEOUT)).thenReturn("30");
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_TIME_INTERVAL)).thenReturn("1000");
         JobResponse jobResponse = getJobResponse();
         Mockito.when(restProtocolConnector.queryForJob(any())).thenReturn(jobResponse);
         Mockito.doThrow(new TimeoutException()).when(restApiResponseUtil).getJobStatusMessage(any());
-        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId,institution);
+        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId, institution);
         assertNotNull(response);
     }
+
     @Test
     public void pollRestApiRequestItemJobResponseInterruptedException() throws Exception {
         String jobId = "1";
-        String institution ="NYPL";
+        String institution = "NYPL";
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_MAX_TIMEOUT)).thenReturn("30");
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_TIME_INTERVAL)).thenReturn("1000");
         JobResponse jobResponse = getJobResponse();
         Mockito.when(restProtocolConnector.queryForJob(any())).thenReturn(jobResponse);
         Mockito.doThrow(new InterruptedException()).when(restApiResponseUtil).getJobStatusMessage(any());
-        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId,institution);
+        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId, institution);
         assertNotNull(response);
     }
+
     @Test
     public void pollRestApiRequestItemJobResponseExecutionException() throws Exception {
         String jobId = "1";
-        String institution ="NYPL";
+        String institution = "NYPL";
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_MAX_TIMEOUT)).thenReturn("30");
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_REST_POLLING_TIME_INTERVAL)).thenReturn("1000");
-        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId,institution);
+        JobResponse response = restProtocolJobResponsePollingProcessor.pollRestApiRequestItemJobResponse(jobId, institution);
         assertNotNull(response);
     }
+
     private JobResponse getJobResponse() {
         JobResponse jobResponse = new JobResponse();
         JobData jobData = new JobData();

@@ -1,14 +1,14 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GFAEddItemResponseUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFAEddItemResponse(){
+    public void getGFAEddItemResponse() {
         GFAEddItemResponse gfaEddItemResponse = new GFAEddItemResponse();
         GFAEddItemResponse gfaEddItemResponse1 = new GFAEddItemResponse();
         gfaEddItemResponse.setDsitem(new RetrieveItemEDDRequest());

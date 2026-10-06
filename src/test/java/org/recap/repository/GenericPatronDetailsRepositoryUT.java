@@ -1,12 +1,9 @@
 package org.recap.repository;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCase;
-import org.recap.model.jpa.GenericPatronEntity;
 import org.recap.repository.jpa.GenericPatronDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.Assert.assertNotNull;
 
 public class GenericPatronDetailsRepositoryUT extends BaseTestCase {
 

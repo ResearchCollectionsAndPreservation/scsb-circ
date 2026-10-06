@@ -2,16 +2,15 @@ package org.recap.ils.protocol.ncip;
 
 import org.extensiblecatalog.ncip.v2.service.*;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.recap.BaseTestCaseUT;
-import org.recap.ils.protocol.ncip.AcceptItem;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AcceptItemUT extends BaseTestCaseUT {
 
@@ -157,7 +156,7 @@ public class AcceptItemUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void  getAcceptItemInitiationData(){
+    public void getAcceptItemInitiationData() {
         String itemIdentifier = "634476876";
         Integer requestId = 1;
         String patronIdentifier = "879098";
@@ -168,11 +167,12 @@ public class AcceptItemUT extends BaseTestCaseUT {
         String ncipAgencyId = "677899";
         String ncipScheme = "test";
         String itemAgencyId = "78990";
-        AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier,requestId,patronIdentifier,title,author,itemPickupLocation,callNumber,ncipAgencyId,ncipScheme,itemAgencyId);
+        AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, title, author, itemPickupLocation, callNumber, ncipAgencyId, ncipScheme, itemAgencyId);
         assertNotNull(acceptItemInitiationData);
     }
+
     @Test
-    public void  getAcceptItemInitiationDataWithout(){
+    public void getAcceptItemInitiationDataWithout() {
         String itemIdentifier = "634476876";
         Integer requestId = null;
         String patronIdentifier = "879098";
@@ -183,7 +183,7 @@ public class AcceptItemUT extends BaseTestCaseUT {
         String ncipAgencyId = "677899";
         String ncipScheme = "test";
         String itemAgencyId = "78990";
-        AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier,requestId,patronIdentifier,title,author,itemPickupLocation,callNumber,ncipAgencyId,ncipScheme,itemAgencyId);
+        AcceptItemInitiationData acceptItemInitiationData = acceptItem.getAcceptItemInitiationData(itemIdentifier, requestId, patronIdentifier, title, author, itemPickupLocation, callNumber, ncipAgencyId, ncipScheme, itemAgencyId);
         assertNotNull(acceptItemInitiationData);
     }
 

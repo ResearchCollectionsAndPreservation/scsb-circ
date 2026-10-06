@@ -1,6 +1,6 @@
 package org.recap.ils.protocol.rest.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,7 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 
 public class RestApiResponseUtilUT extends BaseTestCaseUT {

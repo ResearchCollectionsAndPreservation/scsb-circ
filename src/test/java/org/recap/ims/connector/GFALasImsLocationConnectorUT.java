@@ -2,7 +2,7 @@ package org.recap.ims.connector;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -24,8 +24,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 
 public class GFALasImsLocationConnectorUT extends BaseTestCaseUT {
@@ -360,6 +360,7 @@ public class GFALasImsLocationConnectorUT extends BaseTestCaseUT {
         GFAPwdResponse response = gfaLasImsLocationConnector.gfaPermanentWithdrawalDirect(gfaPwdRequest);
         assertNotNull(response);
     }
+
     @Test
     public void gfaPermanentWithdrawlDirectException() {
         GFAPwdRequest gfaPwdRequest = getGfaPwdRequest();
@@ -385,11 +386,13 @@ public class GFALasImsLocationConnectorUT extends BaseTestCaseUT {
         GFAPwiResponse response = gfaLasImsLocationConnector.gfaPermanentWithdrawalInDirect(gfaPwiRequest);
         assertNotNull(response);
     }
+
     @Test
     public void gfaPermanentWithdrawlInDirectException() {
         GFAPwiRequest gfaPwiRequest = getGFAPwiRequest();
         gfaLasImsLocationConnector.gfaPermanentWithdrawalInDirect(gfaPwiRequest);
     }
+
     private GFALasStatusCheckRequest getGfaLasStatusCheckRequest() {
         GFALasStatusCheckRequest gfaLasStatusCheckRequest = new GFALasStatusCheckRequest();
         GFALasStatus gfaLasStatus = new GFALasStatus();
@@ -567,7 +570,7 @@ public class GFALasImsLocationConnectorUT extends BaseTestCaseUT {
     }
 
     private GFAPwiResponse getGfaPwiResponse() {
-        GFAPwiResponse gfaPwiResponse  = new GFAPwiResponse();
+        GFAPwiResponse gfaPwiResponse = new GFAPwiResponse();
         GFAPwiDsItemResponse gfaPwiDsItemResponse = new GFAPwiDsItemResponse();
         GFAPwiTtItemResponse gfaPwiTtItemResponse = new GFAPwiTtItemResponse();
         gfaPwiTtItemResponse.setCustomerCode("CA");

@@ -1,15 +1,16 @@
 package org.recap.repository;
 
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.OwnerCodeEntity;
 import org.recap.repository.jpa.OwnerCodeDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Ignore
+@Disabled
 public class OwnerCodeDetailsRepositoryUT extends BaseTestCase {
 
     @Autowired

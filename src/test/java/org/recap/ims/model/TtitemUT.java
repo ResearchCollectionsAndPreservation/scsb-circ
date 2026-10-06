@@ -1,16 +1,16 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.model.gfa.Ttitem;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TtitemUT {
 
     @Test
-    public void getTtitem(){
+    public void getTtitem() {
         Ttitem ttitem = new Ttitem();
         Ttitem ttitem1 = new Ttitem();
         ttitem.setArticleAuthor("test");

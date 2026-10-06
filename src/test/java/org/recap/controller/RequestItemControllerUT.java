@@ -1,7 +1,7 @@
 package org.recap.controller;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -12,9 +12,9 @@ import org.recap.ils.connector.factory.ILSProtocolConnectorFactory;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.BulkRequestInformation;
 import org.recap.model.ItemRefileRequest;
-import org.recap.model.response.*;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.request.ReplaceRequest;
+import org.recap.model.response.*;
 import org.recap.request.service.ItemRequestService;
 import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
@@ -25,14 +25,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by hemalathas on 11/11/16.
  */
 public class RequestItemControllerUT extends BaseTestCaseUT {
-
 
 
     @InjectMocks
@@ -328,7 +327,7 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         ItemRecallResponse itemRecallResponse = new ItemRecallResponse();
         itemRecallResponse.setSuccess(true);
         Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any())).thenReturn(abstractProtocolConnector);
-        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).recallItem(any(),any(),any(),any(),any(),any())).thenReturn(itemRecallResponse);
+        Mockito.when(ilsProtocolConnectorFactory.getIlsProtocolConnector(any()).recallItem(any(), any(), any(), any(), any(), any())).thenReturn(itemRecallResponse);
         AbstractResponseItem abstractResponseItem = mockedRequestItemController.recallItem(itemRequestInformation, callInstitition);
         assertNotNull(abstractResponseItem);
     }

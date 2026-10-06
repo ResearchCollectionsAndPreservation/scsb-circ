@@ -1,14 +1,14 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GFAPwiTtItemRequestUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFAPwiTtItemRequest(){
+    public void getGFAPwiTtItemRequest() {
         GFAPwiTtItemRequest gfaPwiTtItemRequest = new GFAPwiTtItemRequest();
         GFAPwiTtItemRequest gfaPwiTtItemRequest1 = new GFAPwiTtItemRequest();
         gfaPwiTtItemRequest.setItemBarcode("2356");

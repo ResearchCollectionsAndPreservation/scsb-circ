@@ -4,20 +4,20 @@ import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.extensiblecatalog.ncip.v2.service.*;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.recap.BaseTestCaseUT;
 import org.recap.ils.protocol.ncip.CheckinItem;
 import org.recap.ils.protocol.rest.model.BibLookupData;
 import org.recap.ils.protocol.rest.model.ItemLookupData;
 import org.recap.ils.protocol.rest.model.response.ItemLookupResponse;
-import org.recap.model.jpa.ItemEntity;
-import org.recap.model.response.ItemLookUpInformationResponse;
 import org.recap.ils.protocol.rest.util.RestApiResponseUtil;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
+import org.recap.model.jpa.ItemEntity;
 import org.recap.model.request.ItemRequestInformation;
+import org.recap.model.response.ItemLookUpInformationResponse;
 import org.recap.model.response.PatronInformationResponse;
 import org.recap.repository.jpa.ItemDetailsRepository;
 import org.recap.util.PropertyUtil;
@@ -32,7 +32,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
@@ -97,7 +97,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void checkGetters(){
+    public void checkGetters() {
         ncipProtocolConnector.getNcipScheme();
         ncipProtocolConnector.getEndPointUrl();
         ncipProtocolConnector.getRestTemplate();
@@ -151,6 +151,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         AbstractResponseItem abstractResponseItem = ncipProtocolConnector.lookupItem("13245676");
         assertNotNull(abstractResponseItem);
     }
+
     @Test
     public void checkOutItemHttpClientErrorException() throws IOException {
         String itemIdentifier = "23456";
@@ -166,11 +167,11 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         String itemIdentifier = "1456883";
         String patronIdentifier = "123456";
         getMockedResponse();
-        ReflectionTestUtils.setField(ncipProtocolConnector,"institutionCode","PUL");
+        ReflectionTestUtils.setField(ncipProtocolConnector, "institutionCode", "PUL");
         Mockito.when(statusLine.getStatusCode()).thenReturn(200);
         Mockito.when(itemDetailsRepository.findByBarcode(itemIdentifier)).thenReturn(Arrays.asList(getItemEntity()));
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), anyString())).thenReturn("TRUE");
-        Mockito.when(propertyUtil.getPropertyByInstitutionAndLocationAndKey(any(), any(),anyString())).thenReturn("test");
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndLocationAndKey(any(), any(), anyString())).thenReturn("test");
         Mockito.doReturn(getCheckInItemResponseData()).when(ncipProtocolConnector).getCheckinResponse(any(), any());
         Object result = ncipProtocolConnector.checkInItem(getItemRequestInformation(), patronIdentifier);
         assertNotNull(result);
@@ -201,7 +202,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         itemRequestInformation.setRequestType("EDD");
         getMockedResponse();
-        ReflectionTestUtils.setField(ncipProtocolConnector,"institutionCode","CUL");
+        ReflectionTestUtils.setField(ncipProtocolConnector, "institutionCode", "CUL");
         Mockito.when(statusLine.getStatusCode()).thenReturn(200);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), anyString())).thenReturn("TRUE");
         Mockito.when(itemDetailsRepository.findByBarcode(itemIdentifier)).thenReturn(Arrays.asList(getItemEntity()));
@@ -221,7 +222,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         checkInItemResponseData.setProblems(Collections.EMPTY_LIST);
 
         getMockedResponse();
-        ReflectionTestUtils.setField(ncipProtocolConnector,"institutionCode","CUL");
+        ReflectionTestUtils.setField(ncipProtocolConnector, "institutionCode", "CUL");
         Mockito.when(statusLine.getStatusCode()).thenReturn(200);
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), anyString())).thenReturn("TRUE");
         Mockito.when(itemDetailsRepository.findByBarcode(itemIdentifier)).thenReturn(Arrays.asList(getItemEntity()));
@@ -256,8 +257,8 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         String callNumber = "54956";
         getMockedResponse();
         Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(getItemEntity()));
-        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(),any())).thenReturn("1");
-        ReflectionTestUtils.invokeMethod(ncipProtocolConnector,"acceptItem",itemIdentifier,requestId,patronIdentifier,callInstitutionId,itemInstitutionId,pickupLocation,title,author,callNumber);
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn("1");
+        ReflectionTestUtils.invokeMethod(ncipProtocolConnector, "acceptItem", itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, pickupLocation, title, author, callNumber);
     }
 
     @Test
@@ -276,8 +277,8 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         getMockedResponse();
         Mockito.when(statusLine.getStatusCode()).thenReturn(400);
         Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
-        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(),any())).thenReturn("1");
-        ReflectionTestUtils.invokeMethod(ncipProtocolConnector,"acceptItem",itemIdentifier,requestId,patronIdentifier,callInstitutionId,itemInstitutionId,pickupLocation,title,author,callNumber);
+        Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn("1");
+        ReflectionTestUtils.invokeMethod(ncipProtocolConnector, "acceptItem", itemIdentifier, requestId, patronIdentifier, callInstitutionId, itemInstitutionId, pickupLocation, title, author, callNumber);
     }
 
     @Test
@@ -345,8 +346,8 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void getParamsMap(){
-        Map<String, String> map = ncipProtocolConnector.getParamsMap("1","1","1");
+    public void getParamsMap() {
+        Map<String, String> map = ncipProtocolConnector.getParamsMap("1", "1", "1");
         assertNotNull(map);
     }
 
@@ -467,7 +468,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void buildResponse(){
+    public void buildResponse() {
         ItemLookupResponse itemLookupResponse = getItemLookupResponse();
         ItemLookUpInformationResponse response = ncipProtocolConnector.buildResponse(itemLookupResponse);
         assertNotNull(response);
@@ -525,6 +526,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         itemRequestInformation.setRequestType("RETRIEVAL");
         return itemRequestInformation;
     }
+
     private CheckInItemResponseData getCheckInItemResponseData() {
         CheckInItemResponseData checkInItemResponseData = new CheckInItemResponseData();
         ItemId itemId = new ItemId();
@@ -548,7 +550,7 @@ public class NCIPProtocolConnectorUT extends BaseTestCaseUT {
         return problem;
     }
 
-    private ItemEntity getItemEntity(){
+    private ItemEntity getItemEntity() {
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setBarcode("123456");
         itemEntity.setCustomerCode("PA");

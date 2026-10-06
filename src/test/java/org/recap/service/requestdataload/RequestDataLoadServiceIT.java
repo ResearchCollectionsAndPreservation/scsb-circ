@@ -1,9 +1,9 @@
 package org.recap.service.requestdataload;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCase;
-import org.recap.common.ScsbConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
+import org.recap.common.ScsbConstants;
 import org.recap.model.jpa.BibliographicEntity;
 import org.recap.model.jpa.HoldingsEntity;
 import org.recap.model.jpa.InstitutionEntity;
@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by hemalathas on 21/7/17.
  */
-public class RequestDataLoadServiceIT extends BaseTestCase{
+public class RequestDataLoadServiceIT extends BaseTestCase {
 
     @Autowired
     RequestDataLoadService requestDataLoadService;
@@ -36,7 +36,7 @@ public class RequestDataLoadServiceIT extends BaseTestCase{
         requestDataLoadCSVRecord.setEmail("test@email.com");
         Set<String> barcodeSet = new HashSet<>();
 
-        Map<String,Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord),barcodeSet);
+        Map<String, Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertTrue(response.size() == 3);
 
     }

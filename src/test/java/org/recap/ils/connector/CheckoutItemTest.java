@@ -3,31 +3,33 @@ package org.recap.ils.connector;
 import com.pkrete.jsip2.connection.SIP2SocketConnection;
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseException;
 import com.pkrete.jsip2.messages.requests.SIP2CheckoutRequest;
-import com.pkrete.jsip2.messages.requests.SIP2SCStatusRequest;
 import com.pkrete.jsip2.messages.requests.SIP2LoginRequest;
-import com.pkrete.jsip2.messages.responses.*;
+import com.pkrete.jsip2.messages.requests.SIP2SCStatusRequest;
+import com.pkrete.jsip2.messages.responses.SIP2ACSStatusResponse;
+import com.pkrete.jsip2.messages.responses.SIP2CheckoutResponse;
+import com.pkrete.jsip2.messages.responses.SIP2LoginResponse;
 import com.pkrete.jsip2.variables.SupportedMessages;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedConstruction;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.response.ItemCheckoutResponse;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith({SpringExtension.class})
 public class CheckoutItemTest {
 
     private SIPProtocolConnector sipProtocolConnector;
     private ILSConfigProperties mockIlsConfig;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sipProtocolConnector = new SIPProtocolConnector();
         sipProtocolConnector.setInstitution("testInstitution");

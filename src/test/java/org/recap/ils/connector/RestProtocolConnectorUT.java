@@ -1,6 +1,6 @@
 package org.recap.ils.connector;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -12,18 +12,14 @@ import org.recap.ils.protocol.rest.model.request.CancelHoldRequest;
 import org.recap.ils.protocol.rest.model.request.CheckinRequest;
 import org.recap.ils.protocol.rest.model.request.CheckoutRequest;
 import org.recap.ils.protocol.rest.model.request.CreateHoldRequest;
-import org.recap.model.response.ItemCheckinResponse;
-import org.recap.model.response.ItemCheckoutResponse;
-import org.recap.model.response.ItemHoldResponse;
-import org.recap.model.response.ItemInformationResponse;
 import org.recap.ils.protocol.rest.model.response.*;
-import org.recap.ils.protocol.rest.util.RestApiResponseUtil;
+import org.recap.ils.protocol.rest.processor.RestProtocolJobResponsePollingProcessor;
 import org.recap.ils.protocol.rest.service.RestOauthTokenApiService;
+import org.recap.ils.protocol.rest.util.RestApiResponseUtil;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
-import org.recap.model.response.ItemRefileResponse;
 import org.recap.model.request.ItemRequestInformation;
-import org.recap.ils.protocol.rest.processor.RestProtocolJobResponsePollingProcessor;
+import org.recap.model.response.*;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -32,7 +28,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 

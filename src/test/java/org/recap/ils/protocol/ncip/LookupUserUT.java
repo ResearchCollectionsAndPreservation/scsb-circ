@@ -1,35 +1,16 @@
 package org.recap.ils.protocol.ncip;
 
-import org.extensiblecatalog.ncip.v2.service.AgencyUserPrivilegeType;
-import org.extensiblecatalog.ncip.v2.service.ElectronicAddress;
-import org.extensiblecatalog.ncip.v2.service.ElectronicAddressType;
-import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
-import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
-import org.extensiblecatalog.ncip.v2.service.NameInformation;
-import org.extensiblecatalog.ncip.v2.service.PersonalNameInformation;
-import org.extensiblecatalog.ncip.v2.service.PhysicalAddress;
-import org.extensiblecatalog.ncip.v2.service.PhysicalAddressType;
-import org.extensiblecatalog.ncip.v2.service.Problem;
-import org.extensiblecatalog.ncip.v2.service.ProblemType;
-import org.extensiblecatalog.ncip.v2.service.StructuredAddress;
-import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
-import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
-import org.extensiblecatalog.ncip.v2.service.UserId;
-import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.UserPrivilege;
-import org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatus;
-import org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatusType;
+import org.extensiblecatalog.ncip.v2.service.*;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.recap.BaseTestCaseUT;
-import org.recap.ils.protocol.ncip.LookupUser;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class LookupUserUT extends BaseTestCaseUT {
 

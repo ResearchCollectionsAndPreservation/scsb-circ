@@ -1,16 +1,15 @@
 package org.recap.ils.protocol.rest.model;
 
-import org.junit.Test;
-import org.recap.ils.protocol.rest.model.CheckoutData;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CheckoutDataUT {
 
     @Test
-    public  void getCheckoutData(){
+    public void getCheckoutData() {
         CheckoutData checkoutData = new CheckoutData();
         checkoutData.setCreatedDate(new Date().toString());
         checkoutData.setId(1);

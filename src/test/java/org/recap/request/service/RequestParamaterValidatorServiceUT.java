@@ -1,11 +1,11 @@
 package org.recap.request.service;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.recap.ScsbCommonConstants;
 import org.recap.common.ScsbConstants;
 import org.recap.controller.ItemController;
@@ -14,20 +14,19 @@ import org.recap.model.request.ItemRequestInformation;
 import org.recap.repository.jpa.InstitutionDetailsRepository;
 import org.recap.util.CommonUtil;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by hemalathas on 3/11/16.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RequestParamaterValidatorServiceUT{
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
+public class RequestParamaterValidatorServiceUT {
 
     @InjectMocks
     RequestParamaterValidatorService requestParamaterValidatorService;
@@ -42,15 +41,16 @@ public class RequestParamaterValidatorServiceUT{
     InstitutionDetailsRepository institutionDetailsRepository;
 
     @Test
-    public void testForValidatingInvalidRequestingInstitution(){
+    public void testForValidatingInvalidRequestingInstitution() {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         itemRequestInformation.setEmailAddress("test@email.com");
         Mockito.when(institutionDetailsRepository.existsByInstitutionCode(itemRequestInformation.getRequestingInstitution())).thenReturn(true);
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
     }
+
     @Test
-    public void testForValidatingInvalidRequestingInstitutionWithBarcode(){
+    public void testForValidatingInvalidRequestingInstitutionWithBarcode() {
         ItemRequestInformation itemRequestInformation = getItemRequestInformation();
         InstitutionEntity institutionEntity = getInstitutionEntity();
         itemRequestInformation.setRequestType(ScsbConstants.EDD_REQUEST);
@@ -63,6 +63,7 @@ public class RequestParamaterValidatorServiceUT{
         ResponseEntity responseEntity1 = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity1);
     }
+
     private ItemRequestInformation getItemRequestInformation() {
 
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
@@ -73,7 +74,7 @@ public class RequestParamaterValidatorServiceUT{
     }
 
     @Test
-    public void testForValidatingInvalidEmailAddress(){
+    public void testForValidatingInvalidEmailAddress() {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         List<String> itemBarcodeList = new ArrayList<>();
         itemBarcodeList.add("33433014514719");
@@ -86,11 +87,11 @@ public class RequestParamaterValidatorServiceUT{
         Mockito.when(institutionDetailsRepository.existsByInstitutionCode(itemRequestInformation.getRequestingInstitution())).thenReturn(true);
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), ScsbConstants.INVALID_EMAIL_ADDRESS+"\n");
+        assertEquals(responseEntity.getBody(), ScsbConstants.INVALID_EMAIL_ADDRESS + "\n");
     }
 
     @Test
-    public void testForValidatingInvalidRequestType(){
+    public void testForValidatingInvalidRequestType() {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         List<String> itemBarcodeList = new ArrayList<>();
         itemBarcodeList.add("33433014514719");
@@ -103,11 +104,11 @@ public class RequestParamaterValidatorServiceUT{
         Mockito.when(institutionDetailsRepository.existsByInstitutionCode(itemRequestInformation.getRequestingInstitution())).thenReturn(true);
         ResponseEntity responseEntity = requestParamaterValidatorService.validateItemRequestParameters(itemRequestInformation);
         assertNotNull(responseEntity);
-        assertEquals(responseEntity.getBody(), ScsbConstants.INVALID_REQUEST_TYPE+"\n");
+        assertEquals(responseEntity.getBody(), ScsbConstants.INVALID_REQUEST_TYPE + "\n");
     }
 
     @Test
-    public void testForValidatingEDDRequestType(){
+    public void testForValidatingEDDRequestType() {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         List<String> itemBarcodeList = new ArrayList<>();
         itemBarcodeList.add("33433014514719");

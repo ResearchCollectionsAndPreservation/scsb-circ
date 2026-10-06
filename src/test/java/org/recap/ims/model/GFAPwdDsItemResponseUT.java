@@ -1,16 +1,16 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GFAPwdDsItemResponseUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFAPwdDsItemResponse(){
+    public void getGFAPwdDsItemResponse() {
         GFAPwdDsItemResponse gfaPwdDsItemResponse = new GFAPwdDsItemResponse();
         GFAPwdDsItemResponse gfaPwdDsItemResponse1 = new GFAPwdDsItemResponse();
         gfaPwdDsItemResponse.setTtitem(Arrays.asList(new GFAPwdTtItemResponse()));

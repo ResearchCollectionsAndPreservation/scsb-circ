@@ -1,17 +1,18 @@
 package org.recap.service;
 
 import org.apache.camel.ProducerTemplate;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.recap.common.ScsbConstants;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.PendingRequestDetailsRespository;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,10 +20,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
-public class IdentifyPendingRequestServiceUT{
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
+public class IdentifyPendingRequestServiceUT {
     @InjectMocks
     IdentifyPendingRequestService identifyPendingRequestService;
 
@@ -44,7 +45,9 @@ public class IdentifyPendingRequestServiceUT{
         Mockito.when(requestItemDetailsRepository.findPendingAndLASReqNotNotified(Arrays.asList(ScsbConstants.REQUEST_STATUS_PENDING, ScsbConstants.REQUEST_STATUS_LAS_ITEM_STATUS_PENDING))).thenReturn(Arrays.asList(requestItemEntity));
         boolean status = identifyPendingRequestService.identifyPendingRequest();
         assertTrue(status);
-    } @Test
+    }
+
+    @Test
     public void testidentifyPendingRequest() {
         RequestItemEntity requestItemEntity = getRequestItem();
         RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
@@ -59,6 +62,7 @@ public class IdentifyPendingRequestServiceUT{
         boolean status = identifyPendingRequestService.identifyPendingRequest();
         assertTrue(status);
     }
+
     public RequestItemEntity getRequestItem() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setId(1);
@@ -86,7 +90,7 @@ public class IdentifyPendingRequestServiceUT{
         requestTypeEntity.setRequestTypeCode("EDD");
         requestTypeEntity.setRequestTypeDesc("EDD");
         ItemEntity itemEntity = getItemEntity();
-        RequestStatusEntity requestStatusEntity =  new RequestStatusEntity();
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
         requestStatusEntity.setRequestStatusCode("REQUEST_PLACED");
         requestStatusEntity.setRequestStatusDescription("REQUEST PLACED");
 

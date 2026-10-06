@@ -1,23 +1,23 @@
 package org.recap.request.service;
 
 import org.apache.camel.ProducerTemplate;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.recap.common.ScsbConstants;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.recap.ScsbCommonConstants;
+import org.recap.common.ScsbConstants;
 import org.recap.util.PropertyUtil;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by sudhishk on 19/1/17.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 public class EmailServiceUT {
 
     @InjectMocks
@@ -31,17 +31,17 @@ public class EmailServiceUT {
 
     @Test
     public void testRecalEmail() {
-        emailService.sendEmail(ScsbCommonConstants.NYPL, "NYPLTST67891", "RECAP", "A history of the Burmah Oil Company", "NoPatron", ScsbCommonConstants.NYPL,"");
-        emailService.sendEmail(ScsbCommonConstants.COLUMBIA, "CULTST42345", "RECAP", "Changing contours of Asian agriculture", "RECAPTST01", ScsbCommonConstants.COLUMBIA,"");
-        emailService.sendEmail(ScsbCommonConstants.PRINCETON, "PULTST54323", "RECAP","1863 laws of war", "45678912", ScsbCommonConstants.PRINCETON,"");
-        emailService.sendEmail(ScsbCommonConstants.PRINCETON, "PULTST54323", "RECAP","Message", "45678912", ScsbConstants.GFA,"");
-        emailService.sendEmail("", "PULTST54323", "RECAP","Message", "45678912", ScsbConstants.DELETED_MAIL_TO,"");
-        emailService.sendEmail("", "PULTST54323", "RECAP","Message", "45678912", "","");
-        emailService.sendBulkRequestEmail("12","TestFirstBulkRequest","TestFirstBulkRequest","PROCESSED","Test","");
+        emailService.sendEmail(ScsbCommonConstants.NYPL, "NYPLTST67891", "RECAP", "A history of the Burmah Oil Company", "NoPatron", ScsbCommonConstants.NYPL, "");
+        emailService.sendEmail(ScsbCommonConstants.COLUMBIA, "CULTST42345", "RECAP", "Changing contours of Asian agriculture", "RECAPTST01", ScsbCommonConstants.COLUMBIA, "");
+        emailService.sendEmail(ScsbCommonConstants.PRINCETON, "PULTST54323", "RECAP", "1863 laws of war", "45678912", ScsbCommonConstants.PRINCETON, "");
+        emailService.sendEmail(ScsbCommonConstants.PRINCETON, "PULTST54323", "RECAP", "Message", "45678912", ScsbConstants.GFA, "");
+        emailService.sendEmail("", "PULTST54323", "RECAP", "Message", "45678912", ScsbConstants.DELETED_MAIL_TO, "");
+        emailService.sendEmail("", "PULTST54323", "RECAP", "Message", "45678912", "", "");
+        emailService.sendBulkRequestEmail("12", "TestFirstBulkRequest", "TestFirstBulkRequest", "PROCESSED", "Test", "");
     }
 
     @Test
-    public void sendLASExceptionEmail(){
+    public void sendLASExceptionEmail() {
         String customerCode = "PA";
         String itemBarcode = "243533";
         String messageDisplay = "success";
@@ -49,7 +49,7 @@ public class EmailServiceUT {
         String toInstitution = "PUL";
         String subject = "test";
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn("test@gmail.com");
-        emailService.sendLASExceptionEmail(customerCode,itemBarcode,messageDisplay,patronBarcode,toInstitution,subject);
+        emailService.sendLASExceptionEmail(customerCode, itemBarcode, messageDisplay, patronBarcode, toInstitution, subject);
 
     }
 }

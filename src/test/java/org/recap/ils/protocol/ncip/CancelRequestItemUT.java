@@ -1,15 +1,14 @@
 package org.recap.ils.protocol.ncip;
 
 import org.extensiblecatalog.ncip.v2.service.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.recap.BaseTestCaseUT;
-import org.recap.ils.protocol.ncip.CancelRequestItem;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CancelRequestItemUT extends BaseTestCaseUT {
 
@@ -55,26 +54,25 @@ public class CancelRequestItemUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void  getCancelRequestItemInitiationData()
-    {
+    public void getCancelRequestItemInitiationData() {
         Integer requestId = 1;
         String patronIdentifier = "1021011";
         String ncipAgencyId = "19";
         String ncipScheme = "test";
-        cancelRequestItem.getCancelRequestItemInitiationData(requestId,patronIdentifier,ncipAgencyId,ncipScheme);
+        cancelRequestItem.getCancelRequestItemInitiationData(requestId, patronIdentifier, ncipAgencyId, ncipScheme);
 
     }
 
     @Test
-    public void  getCancelRequestItemInitiationDatareqID_null()
-    {
+    public void getCancelRequestItemInitiationDatareqID_null() {
         Integer requestId = null;
         String patronIdentifier = "1021011";
         String ncipAgencyId = "19";
         String ncipScheme = "test";
-        cancelRequestItem.getCancelRequestItemInitiationData(requestId,patronIdentifier,ncipAgencyId,ncipScheme);
+        cancelRequestItem.getCancelRequestItemInitiationData(requestId, patronIdentifier, ncipAgencyId, ncipScheme);
 
     }
+
     private CancelRequestItemResponseData getCancelRequestItemResponseData() {
         CancelRequestItemResponseData cancelRequestItemResponseData = new CancelRequestItemResponseData();
         ItemId itemId = new ItemId();

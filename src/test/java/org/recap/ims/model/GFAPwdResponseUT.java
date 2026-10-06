@@ -1,12 +1,12 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 public class GFAPwdResponseUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFAPwdResponse(){
+    public void getGFAPwdResponse() {
         GFAPwdResponse gfaPwdResponse = new GFAPwdResponse();
         GFAPwdResponse gfaPwdResponse1 = new GFAPwdResponse();
         gfaPwdResponse.setDsitem(new GFAPwdDsItemResponse());

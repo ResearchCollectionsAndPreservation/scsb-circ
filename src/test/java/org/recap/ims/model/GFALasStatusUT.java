@@ -1,11 +1,11 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 public class GFALasStatusUT extends BaseTestCaseUT {
     @Test
-    public void getGFALasStatus(){
+    public void getGFALasStatus() {
         GFALasStatus gfaLasStatus = new GFALasStatus();
         GFALasStatus gfaLasStatus1 = new GFALasStatus();
         gfaLasStatus.setImsLocationCode("1");

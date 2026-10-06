@@ -1,6 +1,6 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class GFAPwiDsItemRequestUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFAPwiDsItemRequest(){
+    public void getGFAPwiDsItemRequest() {
 
         GFAPwiDsItemRequest gfaPwiDsItemRequest = new GFAPwiDsItemRequest();
         GFAPwiDsItemRequest gfaPwiDsItemRequest1 = new GFAPwiDsItemRequest();

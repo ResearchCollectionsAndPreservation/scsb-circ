@@ -1,21 +1,16 @@
 package org.recap.ils.protocol.ncip;
 
-import org.extensiblecatalog.ncip.v2.service.ItemId;
-import org.extensiblecatalog.ncip.v2.service.Problem;
-import org.extensiblecatalog.ncip.v2.service.ProblemType;
-import org.extensiblecatalog.ncip.v2.service.RecallItemResponseData;
-import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.*;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
-import org.recap.BaseTestCaseUT;
-import org.recap.ils.protocol.ncip.RecallItem;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RecallItemUT extends BaseTestCaseUT {
 

@@ -1,13 +1,13 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
 
 public class RetrieveItemEDDRequestUT extends BaseTestCaseUT {
     @Test
-    public void getRetrieveItemEDDRequest(){
+    public void getRetrieveItemEDDRequest() {
         RetrieveItemEDDRequest retrieveItemEDDRequest = new RetrieveItemEDDRequest();
         RetrieveItemEDDRequest retrieveItemEDDRequest1 = new RetrieveItemEDDRequest();
         retrieveItemEDDRequest.setTtitem(Arrays.asList(new TtitemEDDResponse()));

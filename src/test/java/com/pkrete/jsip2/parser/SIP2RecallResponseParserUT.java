@@ -3,9 +3,9 @@ package com.pkrete.jsip2.parser;
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseException;
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
 import com.pkrete.jsip2.messages.SIP2MessageResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SIP2RecallResponseParserUT {
     @Test
@@ -22,6 +22,7 @@ public class SIP2RecallResponseParserUT {
         }
         assertNotNull(SIP2MessageResponse);
     }
+
     @Test
     public void testParseException() {
         SIP2MessageResponse SIP2MessageResponse = null;

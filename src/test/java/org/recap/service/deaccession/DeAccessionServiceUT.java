@@ -1,35 +1,34 @@
 package org.recap.service.deaccession;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCaseUT;
 import org.recap.ScsbCommonConstants;
 import org.recap.common.ScsbConstants;
 import org.recap.controller.RequestItemController;
-import org.recap.model.request.ItemRequestInformation;
-import org.recap.model.response.ItemHoldResponse;
-import org.recap.model.response.ItemInformationResponse;
 import org.recap.ims.connector.AbstractLASImsLocationConnector;
-import org.recap.ims.service.GFALasService;
 import org.recap.ims.connector.factory.LASImsLocationConnectorFactory;
 import org.recap.ims.model.*;
+import org.recap.ims.service.GFALasService;
 import org.recap.model.deaccession.DeAccessionDBResponseEntity;
 import org.recap.model.deaccession.DeAccessionItem;
 import org.recap.model.deaccession.DeAccessionRequest;
 import org.recap.model.jpa.*;
+import org.recap.model.request.ItemRequestInformation;
+import org.recap.model.response.ItemHoldResponse;
+import org.recap.model.response.ItemInformationResponse;
 import org.recap.repository.jpa.*;
+import org.recap.request.util.ItemRequestServiceUtil;
 import org.recap.service.RestHeaderService;
 import org.recap.util.CommonUtil;
-import org.recap.request.util.ItemRequestServiceUtil;
 import org.recap.util.PropertyUtil;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
@@ -37,7 +36,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +44,7 @@ import static org.mockito.Mockito.when;
  * Created by angelind on 10/11/16.
  */
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith({SpringExtension.class})
 public class DeAccessionServiceUT extends BaseTestCaseUT {
 
     @InjectMocks
@@ -121,7 +120,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
     @Mock
     UserDetailRepository userDetailRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
         Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), anyBoolean())).thenReturn(Boolean.TRUE);
     }
@@ -465,6 +464,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
         ReflectionTestUtils.invokeMethod(deAccessionService, "checkGfaItemStatus", deAccessionItems, deAccessionDBResponseEntities, barcodeAndStopCodeMap);
     }
+
     @Test
     public void checkGfaItemStatusItemCancelled() {
         List<DeAccessionItem> deAccessionItems = new ArrayList<>();
@@ -651,7 +651,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void removeDeaccessionItems(){
+    public void removeDeaccessionItems() {
         DeAccessionItem deAccessionItem = getDeAccessionItem();
         List<DeAccessionItem> removeDeaccessionItems = new ArrayList<>();
         removeDeaccessionItems.add(getDeAccessionItem());
@@ -659,28 +659,28 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         List<DeAccessionItem> removeDeaccessionItemsList = new ArrayList<>();
         removeDeaccessionItemsList.add(getDeAccessionItem());
         Map<String, String> resultMap = new HashMap<>();
-        ReflectionTestUtils.invokeMethod(deAccessionService,"removeDeaccessionItems",removeDeaccessionItems,deAccessionRequest,removeDeaccessionItemsList,resultMap);
+        ReflectionTestUtils.invokeMethod(deAccessionService, "removeDeaccessionItems", removeDeaccessionItems, deAccessionRequest, removeDeaccessionItemsList, resultMap);
     }
 
     @Test
-    public void getDeliveryLocation(){
+    public void getDeliveryLocation() {
         DeAccessionRequest deAccessionRequest = new DeAccessionRequest();
         deAccessionRequest.setDeAccessionItems(Arrays.asList(getDeAccessionItem()));
         List<DeAccessionItem> removeDeaccessionItems = new ArrayList<>();
         removeDeaccessionItems.add(getDeAccessionItem());
         String barCode = "123456";
-        ReflectionTestUtils.invokeMethod(deAccessionService,"getDeliveryLcation",barCode,deAccessionRequest,removeDeaccessionItems);
+        ReflectionTestUtils.invokeMethod(deAccessionService, "getDeliveryLcation", barCode, deAccessionRequest, removeDeaccessionItems);
     }
 
     @Test
-    public void validateUserRoles(){
+    public void validateUserRoles() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add(ScsbConstants.ROLE_RECAP);
-        ReflectionTestUtils.invokeMethod(deAccessionService,"validateUserRoles",userRoles);
+        ReflectionTestUtils.invokeMethod(deAccessionService, "validateUserRoles", userRoles);
     }
 
     @Test
-    public void validateBarcodesWithUserName(){
+    public void validateBarcodesWithUserName() {
         String userName = "test";
         List<DeAccessionDBResponseEntity> deAccessionDBResponseEntities = new ArrayList<>();
         deAccessionDBResponseEntities.add(getDeAccessionDBResponseEntity());
@@ -697,7 +697,8 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         Mockito.when(commonUtil.findAllInstitutionsExceptSupportInstitution()).thenReturn(Arrays.asList(getItemEntity().getInstitutionEntity()));
         try {
             ReflectionTestUtils.invokeMethod(deAccessionService, "validateBarcodesWithUserName", deAccessionRequest, userName, deAccessionDBResponseEntities, removeDeaccessionItems, resultMap);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     @Test
@@ -899,11 +900,11 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void populateDeAccessionDBResponseEntity(){
+    public void populateDeAccessionDBResponseEntity() {
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setBibliographicEntities(Arrays.asList(getBibliographicEntity()));
         DeAccessionDBResponseEntity deAccessionDBResponseEntity = new DeAccessionDBResponseEntity();
-        ReflectionTestUtils.invokeMethod(deAccessionService,"populateDeAccessionDBResponseEntity",itemEntity,deAccessionDBResponseEntity);
+        ReflectionTestUtils.invokeMethod(deAccessionService, "populateDeAccessionDBResponseEntity", itemEntity, deAccessionDBResponseEntity);
     }
 
     @Test
@@ -1122,6 +1123,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         gfaPwiResponse.setDsitem(gfaPwiDsItemResponse);
         return gfaPwiResponse;
     }
+
     private DeliveryCodeEntity getDeliveryCodeEntity() {
         DeliveryCodeEntity deliveryCodeEntity = new DeliveryCodeEntity();
         deliveryCodeEntity.setId(1);
@@ -1132,6 +1134,7 @@ public class DeAccessionServiceUT extends BaseTestCaseUT {
         deliveryCodeEntity.setActive('Y');
         return deliveryCodeEntity;
     }
+
     private DeliveryCodeTranslationEntity getDeliveryCodeTranslationEntity() {
         DeliveryCodeTranslationEntity deliveryCodeTranslationEntity = new DeliveryCodeTranslationEntity();
         deliveryCodeTranslationEntity.setId(1);

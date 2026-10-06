@@ -1,7 +1,7 @@
 package org.recap.util;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -9,15 +9,15 @@ import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCaseUT;
 import org.recap.PropertyKeyConstants;
 import org.recap.ScsbCommonConstants;
-import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.jpa.*;
+import org.recap.model.request.ItemRequestInformation;
 import org.recap.repository.jpa.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 public class CommonUtilUT extends BaseTestCaseUT {
@@ -48,7 +48,7 @@ public class CommonUtilUT extends BaseTestCaseUT {
     @Value("${scsb.support.institution}")
     private String supportInstitution;
 
-   @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
     }
@@ -109,6 +109,7 @@ public class CommonUtilUT extends BaseTestCaseUT {
         itemMap.put("itemEntity", getBibliographicEntity().getItemEntities().get(0));
         commonUtil.addItemAndReportEntities(itemEntities, reportEntities, processHoldings, holdingsEntity, itemMap);
     }
+
     @Test
     public void addItemAndReportEntitiesWithoutHoldingsEntity() {
         List<ItemEntity> itemEntities = new ArrayList<>();
@@ -137,11 +138,11 @@ public class CommonUtilUT extends BaseTestCaseUT {
     @Test
     public void getFTPPropertiesMapAvailable() {
         Map<String, String> ftpPropertiesMap = new HashMap<>();
-        ftpPropertiesMap.put("Value","Test");
-        ReflectionTestUtils.setField(commonUtil,"ftpPropertiesMap" ,ftpPropertiesMap);
+        ftpPropertiesMap.put("Value", "Test");
+        ReflectionTestUtils.setField(commonUtil, "ftpPropertiesMap", ftpPropertiesMap);
         Map<String, String> map = commonUtil.getFTPPropertiesMap();
         assertNotNull(map);
-        assertEquals(ftpPropertiesMap,map);
+        assertEquals(ftpPropertiesMap, map);
     }
 
     @Test
@@ -160,29 +161,31 @@ public class CommonUtilUT extends BaseTestCaseUT {
     @Test
     public void getItemStatusMapWithItemStatus() {
         Map<String, Integer> itemStatusMap = new HashMap<>();
-        itemStatusMap.put("AVAILABLE",1);
-        ReflectionTestUtils.setField(commonUtil,"itemStatusMap",itemStatusMap);
+        itemStatusMap.put("AVAILABLE", 1);
+        ReflectionTestUtils.setField(commonUtil, "itemStatusMap", itemStatusMap);
         Map<String, Integer> map = commonUtil.getItemStatusMap();
         assertNotNull(map);
-        assertEquals(itemStatusMap,map);
+        assertEquals(itemStatusMap, map);
     }
+
     @Test
     public void getCollectionGroupMapAvailable() {
         Map<String, Integer> collectionGroupMap = new HashMap<>();
-        collectionGroupMap.put("SHARED",1);
-        ReflectionTestUtils.setField(commonUtil,"collectionGroupMap",collectionGroupMap);
+        collectionGroupMap.put("SHARED", 1);
+        ReflectionTestUtils.setField(commonUtil, "collectionGroupMap", collectionGroupMap);
         Map<String, Integer> map = commonUtil.getCollectionGroupMap();
         assertNotNull(map);
-        assertEquals(collectionGroupMap,map);
+        assertEquals(collectionGroupMap, map);
     }
+
     @Test
     public void getInstitutionEntityMapAvailable() {
         Map<String, Integer> institutionEntityMap = new HashMap<>();
-        institutionEntityMap.put("PUL",1);
-        ReflectionTestUtils.setField(commonUtil,"institutionEntityMap",institutionEntityMap);
+        institutionEntityMap.put("PUL", 1);
+        ReflectionTestUtils.setField(commonUtil, "institutionEntityMap", institutionEntityMap);
         Map<String, Integer> map = commonUtil.getInstitutionEntityMap();
         assertNotNull(map);
-        assertEquals(institutionEntityMap,map);
+        assertEquals(institutionEntityMap, map);
     }
 
     @Test
@@ -288,21 +291,21 @@ public class CommonUtilUT extends BaseTestCaseUT {
     }
 
     @Test
-    public void checkIfImsItemStatusIsRequestableNotRetrievable(){
+    public void checkIfImsItemStatusIsRequestableNotRetrievable() {
         String imsLocationCode = "HD";
         String imsItemStatus = "IN";
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn("test");
-        Boolean result = commonUtil.checkIfImsItemStatusIsRequestableNotRetrievable(imsLocationCode,imsItemStatus);
+        Boolean result = commonUtil.checkIfImsItemStatusIsRequestableNotRetrievable(imsLocationCode, imsItemStatus);
         assertFalse(result);
 
     }
 
     @Test
-    public void checkIfImsItemIsNotOnFile(){
+    public void checkIfImsItemIsNotOnFile() {
         String imsLocationCode = "HD";
         String imsItemStatus = "IN";
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn("test");
-        Boolean result = commonUtil.checkIfImsItemIsNotOnFile(imsLocationCode,imsItemStatus);
+        Boolean result = commonUtil.checkIfImsItemIsNotOnFile(imsLocationCode, imsItemStatus);
         assertFalse(result);
     }
 
@@ -326,8 +329,9 @@ public class CommonUtilUT extends BaseTestCaseUT {
         List<String> itemBarcodes = commonUtil.getBarcodesList(Collections.EMPTY_LIST);
         assertNotNull(itemBarcodes);
     }
+
     @Test
-    public void getItemRequestInformation(){
+    public void getItemRequestInformation() {
         ItemEntity itemEntity = getBibliographicEntity().getItemEntities().get(0);
         ItemRequestInformation itemRequestInformation = commonUtil.getItemRequestInformation(itemEntity);
         assertNotNull(itemRequestInformation);

@@ -1,8 +1,8 @@
 package org.recap.ils.connector;
 
 import com.pkrete.jsip2.connection.SIP2SocketConnection;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.recap.BaseTestCase;
 import org.recap.PropertyKeyConstants;
@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
@@ -129,11 +129,11 @@ public class SIPProtocolConnectorIT extends BaseTestCase {
 
     private ILSConfigProperties getIlsConfigProperties(String institution) {
         ILSConfigProperties ilsConfigProperties = new ILSConfigProperties();
-        ilsConfigProperties.setHost(propertyUtil.getPropertyByInstitutionAndKey(institution,PropertyKeyConstants.ILS.ILS_SERVER));
+        ilsConfigProperties.setHost(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_SERVER));
         ilsConfigProperties.setPort(7031);
-        ilsConfigProperties.setOperatorUserId(propertyUtil.getPropertyByInstitutionAndKey(institution,PropertyKeyConstants.ILS.ILS_SERVER_OPERATOR_USER_ID));
-        ilsConfigProperties.setOperatorPassword(propertyUtil.getPropertyByInstitutionAndKey(institution,PropertyKeyConstants.ILS.ILS_SERVER_OPERATOR_PASSWORD));
-        ilsConfigProperties.setOperatorLocation(propertyUtil.getPropertyByInstitutionAndKey(institution,PropertyKeyConstants.ILS.ILS_SERVER_OPERATOR_LOCATION));
+        ilsConfigProperties.setOperatorUserId(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_SERVER_OPERATOR_USER_ID));
+        ilsConfigProperties.setOperatorPassword(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_SERVER_OPERATOR_PASSWORD));
+        ilsConfigProperties.setOperatorLocation(propertyUtil.getPropertyByInstitutionAndKey(institution, PropertyKeyConstants.ILS.ILS_SERVER_OPERATOR_LOCATION));
         return ilsConfigProperties;
     }
 
@@ -357,8 +357,8 @@ public class SIPProtocolConnectorIT extends BaseTestCase {
     }
 
     @Test
-    public void formatFromSipDateException(){
-        ReflectionTestUtils.invokeMethod(sipProtocolConnector,"formatFromSipDate","TEst");
+    public void formatFromSipDateException() {
+        ReflectionTestUtils.invokeMethod(sipProtocolConnector, "formatFromSipDate", "TEst");
     }
 
     private ItemRequestInformation getItemRequestInformation() {

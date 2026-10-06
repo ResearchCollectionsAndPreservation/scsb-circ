@@ -8,29 +8,29 @@ import com.pkrete.jsip2.messages.requests.SIP2PatronInformationRequest;
 import com.pkrete.jsip2.messages.responses.SIP2LoginResponse;
 import com.pkrete.jsip2.messages.responses.SIP2PatronInformationResponse;
 import com.pkrete.jsip2.variables.PatronStatus;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedConstruction;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.common.ScsbConstants;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.response.PatronInformationResponse;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith({SpringExtension.class})
 public class SIPProtocolConnectorLookupPatronTest {
 
     private SIPProtocolConnector sipProtocolConnector;
     private ILSConfigProperties mockIlsConfig;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sipProtocolConnector = new SIPProtocolConnector();
         sipProtocolConnector.setInstitution("testInstitution");
@@ -101,7 +101,7 @@ public class SIPProtocolConnectorLookupPatronTest {
                     when(mockConn.connect()).thenReturn(true);
                     when(mockConn.send(any())).thenAnswer(invocation -> {
                         Object req = invocation.getArgument(0);
-                        if (req instanceof SIP2LoginRequest)             return loginResponse;
+                        if (req instanceof SIP2LoginRequest) return loginResponse;
                         if (req instanceof SIP2PatronInformationRequest) return patronResp;
                         return null;
                     });
@@ -113,23 +113,23 @@ public class SIPProtocolConnectorLookupPatronTest {
 
             assertNotNull(resp);
             assertTrue(resp.isSuccess());
-            assertEquals("John Doe",         resp.getPatronName());
-            assertEquals("PATRON-001",        resp.getPatronIdentifier());
-            assertEquals("john@example.com",  resp.getEmail());
-            assertEquals("19900101",          resp.getBirthDate());
-            assertEquals("555-1234",          resp.getPhone());
-            assertEquals("MAIN",              resp.getPermanentLocation());
-            assertEquals("PICKUP-1",          resp.getPickupLocation());
-            assertEquals("50.00",             resp.getFeeLimit());
-            assertEquals("0.00",              resp.getFeeAmount());
-            assertEquals("123 Main St",       resp.getHomeAddress());
+            assertEquals("John Doe", resp.getPatronName());
+            assertEquals("PATRON-001", resp.getPatronIdentifier());
+            assertEquals("john@example.com", resp.getEmail());
+            assertEquals("19900101", resp.getBirthDate());
+            assertEquals("555-1234", resp.getPhone());
+            assertEquals("MAIN", resp.getPermanentLocation());
+            assertEquals("PICKUP-1", resp.getPickupLocation());
+            assertEquals("50.00", resp.getFeeLimit());
+            assertEquals("0.00", resp.getFeeAmount());
+            assertEquals("123 Main St", resp.getHomeAddress());
             assertNotNull(resp.getItems());
-            assertEquals("PAC",              resp.getPacAccessType());
-            assertEquals("GROUP-A",          resp.getPatronGroup());
-            assertEquals("FACULTY",          resp.getPatronType());
-            assertEquals("STATUS-OK",        resp.getStatus());
+            assertEquals("PAC", resp.getPacAccessType());
+            assertEquals("GROUP-A", resp.getPatronGroup());
+            assertEquals("FACULTY", resp.getPatronType());
+            assertEquals("STATUS-OK", resp.getStatus());
             assertNotNull(resp.getEsipDataIn());
-            assertEquals("ESIP-PATRON-OUT",  resp.getEsipDataOut());
+            assertEquals("ESIP-PATRON-OUT", resp.getEsipDataOut());
 
             SIP2SocketConnection constructed = mocked.constructed().get(0);
             verify(constructed, atLeast(2)).send(any());
@@ -152,7 +152,7 @@ public class SIPProtocolConnectorLookupPatronTest {
                     when(mockConn.connect()).thenReturn(true);
                     when(mockConn.send(any())).thenAnswer(invocation -> {
                         Object req = invocation.getArgument(0);
-                        if (req instanceof SIP2LoginRequest)             return loginResponse;
+                        if (req instanceof SIP2LoginRequest) return loginResponse;
                         if (req instanceof SIP2PatronInformationRequest) return patronResp;
                         return null;
                     });
@@ -183,7 +183,7 @@ public class SIPProtocolConnectorLookupPatronTest {
                     when(mockConn.connect()).thenReturn(true);
                     when(mockConn.send(any())).thenAnswer(invocation -> {
                         Object req = invocation.getArgument(0);
-                        if (req instanceof SIP2LoginRequest)             return loginResponse;
+                        if (req instanceof SIP2LoginRequest) return loginResponse;
                         if (req instanceof SIP2PatronInformationRequest) return patronResp;
                         return null;
                     });

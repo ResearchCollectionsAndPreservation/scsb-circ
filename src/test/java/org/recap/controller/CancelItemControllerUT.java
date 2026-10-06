@@ -1,6 +1,6 @@
 package org.recap.controller;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -8,17 +8,17 @@ import org.recap.BaseTestCaseUT;
 import org.recap.PropertyKeyConstants;
 import org.recap.ScsbCommonConstants;
 import org.recap.common.ScsbConstants;
+import org.recap.model.CancelRequestResponse;
+import org.recap.model.jpa.*;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.response.ItemHoldResponse;
 import org.recap.model.response.ItemInformationResponse;
-import org.recap.model.CancelRequestResponse;
-import org.recap.model.jpa.*;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.request.service.EmailService;
 import org.recap.request.service.ItemRequestService;
-import org.recap.util.CommonUtil;
 import org.recap.request.util.ItemRequestServiceUtil;
+import org.recap.util.CommonUtil;
 import org.recap.util.PropertyUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 
 /**
@@ -80,12 +80,12 @@ public class CancelItemControllerUT extends BaseTestCaseUT {
         Mockito.when(propertyUtil.getPropertyByInstitutionAndKey(any(), any())).thenReturn(itemInformationResponse.getCirculationStatus());
         Mockito.when(requestItemController.cancelHoldItem(any(), any())).thenReturn(itemHoldResponse);
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(requestItemEntity.getRequestStatusEntity());
-        Mockito.doNothing().when(emailService).sendEmail(any(),any(),any(),any(),any(), any(),any());
+        Mockito.doNothing().when(emailService).sendEmail(any(), any(), any(), any(), any(), any(), any());
         Mockito.doNothing().when(commonUtil).rollbackUpdateItemAvailabilityStatus(requestItemEntity.getItemEntity(), ScsbConstants.GUEST_USER);
         Mockito.doNothing().when(itemRequestServiceUtil).updateSolrIndex(requestItemEntity.getItemEntity());
         cancelRequestResponse = cancelItemController.cancelRequest(requestItemEntity.getId());
         assertNotNull(cancelRequestResponse);
-        RequestStatusEntity requestStatusEntity =  new RequestStatusEntity();
+        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
         requestStatusEntity.setRequestStatusCode("RETRIEVAL_ORDER_PLACED");
         requestStatusEntity.setRequestStatusDescription("RETRIEVAL_ORDER_PLACED");
         requestItemEntity.setRequestStatusEntity(requestStatusEntity);
@@ -117,6 +117,7 @@ public class CancelItemControllerUT extends BaseTestCaseUT {
         assertNotNull(cancelRequestResponse);
 
     }
+
     @Test
     public void testCancelRequestException() throws Exception {
         RequestItemEntity requestItemEntity = createRequestItem();
@@ -139,8 +140,8 @@ public class CancelItemControllerUT extends BaseTestCaseUT {
         Mockito.when(requestItemDetailsRepository.save(requestItemEntity)).thenReturn(createRequestItem());
         Mockito.when(itemRequestService.getEmailService()).thenReturn(emailService);
         Mockito.doNothing().when(itemRequestService).saveItemChangeLogEntity(any(), any(), any(), any());
-        Mockito.doNothing().when(emailService).sendEmail(any(),any(),any(),any(),any(), any(),any());
-        ReflectionTestUtils.invokeMethod(cancelItemController,"processCancelRequest",itemRequestInformation,itemInformationResponse,requestItemEntity);
+        Mockito.doNothing().when(emailService).sendEmail(any(), any(), any(), any(), any(), any(), any());
+        ReflectionTestUtils.invokeMethod(cancelItemController, "processCancelRequest", itemRequestInformation, itemInformationResponse, requestItemEntity);
     }
 
     @Test
@@ -153,8 +154,9 @@ public class CancelItemControllerUT extends BaseTestCaseUT {
         Mockito.when(requestItemStatusDetailsRepository.findByRequestStatusCode(ScsbCommonConstants.REQUEST_STATUS_CANCELED)).thenReturn(createRequestItem().getRequestStatusEntity());
         Mockito.when(requestItemDetailsRepository.save(requestItemEntity)).thenReturn(createRequestItem());
         Mockito.doNothing().when(itemRequestService).saveItemChangeLogEntity(any(), any(), any(), any());
-        ReflectionTestUtils.invokeMethod(cancelItemController,"processRecall",itemRequestInformation,itemInformationResponse,requestItemEntity);
+        ReflectionTestUtils.invokeMethod(cancelItemController, "processRecall", itemRequestInformation, itemInformationResponse, requestItemEntity);
     }
+
     private ItemInformationResponse getItemInformationResponse() {
         ItemRequestInformation itemRequestInformation = new ItemRequestInformation();
         itemRequestInformation.setItemBarcodes(Arrays.asList("32101074849843"));

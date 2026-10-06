@@ -1,14 +1,11 @@
 package org.recap.model.jpa;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
-import org.recap.model.jpa.*;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
-
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by hemalathas on 20/3/17.

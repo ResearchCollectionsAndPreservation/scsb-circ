@@ -1,23 +1,21 @@
 package org.recap.request.service;
 
 import org.apache.camel.Exchange;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.BaseTestCaseUT;
 import org.recap.PropertyKeyConstants;
 import org.recap.ScsbCommonConstants;
 import org.recap.common.ScsbConstants;
 import org.recap.controller.RequestItemController;
 import org.recap.controller.RequestItemValidatorController;
+import org.recap.ims.service.GFALasService;
+import org.recap.model.jpa.*;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.response.ItemCheckoutResponse;
 import org.recap.model.response.ItemInformationResponse;
-import org.recap.ims.service.GFALasService;
-import org.recap.model.jpa.*;
 import org.recap.model.search.SearchResultRow;
 import org.recap.repository.jpa.GenericPatronDetailsRepository;
 import org.recap.repository.jpa.ItemDetailsRepository;
@@ -33,16 +31,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by hemalathas on 17/2/17.
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
-public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
 
+public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
 
 
     @InjectMocks
@@ -79,7 +76,6 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
     private GFALasService gfaLasService;
 
 
-
     @Test
     public void testEddRequestItem() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
@@ -102,7 +98,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         Mockito.when(itemRequestService.searchRecords(any())).thenReturn(searchResultRow);
         itemEDDRequestService.getRequestTypeDetailsRepository();
         Mockito.when(itemRequestService.removeDiacritical(searchResultRow.getTitle().replaceAll("[^\\x00-\\x7F]", "?"))).thenReturn("Title Of the Book");
-        Mockito.when(itemRequestService.updateRecapRequestItem(any(), any(),any())).thenReturn(1);
+        Mockito.when(itemRequestService.updateRecapRequestItem(any(), any(), any())).thenReturn(1);
         Mockito.when(itemRequestService.searchRecords(itemEntity)).thenReturn(getSearchResultRowList());
         Mockito.when(itemRequestService.updateItemAvailabilityStatus(List.of(itemEntity), itemRequestInfo.getUsername())).thenReturn(true);
         Mockito.when(itemRequestService.getGfaLasService()).thenReturn(gfaLasService);
@@ -125,6 +121,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInfoResponse2 = itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange);
         assertNotNull(itemInfoResponse2);
     }
+
     @Test
     public void testEddRequestItemInnerException() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
@@ -161,6 +158,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInfoResponse = itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange);
         assertNotNull(itemInfoResponse);
     }
+
     @Test
     public void testEddRequestItemWithFailureResponse() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();
@@ -191,6 +189,7 @@ public class ItemEDDRequestServiceUT extends BaseTestCaseUT {
         ItemInformationResponse itemInfoResponse = itemEDDRequestService.eddRequestItem(itemRequestInfo, exchange);
         assertNotNull(itemInfoResponse);
     }
+
     @Test
     public void testEddRequestItemWithFailureResponseInnerException() throws Exception {
         SearchResultRow searchResultRow = new SearchResultRow();

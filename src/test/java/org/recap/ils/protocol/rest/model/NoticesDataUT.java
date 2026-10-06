@@ -1,15 +1,11 @@
 package org.recap.ils.protocol.rest.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
-import org.recap.ils.protocol.rest.model.Attributes;
-import org.recap.ils.protocol.rest.model.CheckOutItemResponse;
-import org.recap.ils.protocol.rest.model.NoticesData;
-import org.recap.ils.protocol.rest.model.Problem;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by hemalathas on 3/4/17.

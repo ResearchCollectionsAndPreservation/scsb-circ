@@ -3,8 +3,8 @@ package org.recap.ims.processor;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spi.RouteController;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -12,12 +12,12 @@ import org.recap.BaseTestCaseUT;
 import org.recap.ims.connector.AbstractLASImsLocationConnector;
 import org.recap.ims.connector.factory.LASImsLocationConnectorFactory;
 import org.recap.ims.model.GFAItemStatusCheckRequest;
+import org.recap.ims.service.GFALasService;
 import org.recap.model.gfa.Dsitem;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
 import org.recap.model.gfa.Ttitem;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
-import org.recap.ims.service.GFALasService;
 import org.recap.request.util.ItemRequestServiceUtil;
 import org.recap.util.PropertyUtil;
 
@@ -57,25 +57,26 @@ public class LasItemStatusCheckPollingProcessorUT extends BaseTestCaseUT {
     @Mock
     AbstractLASImsLocationConnector abstractLASImsLocationConnector;
 
-    @Before
-    public void setup(){
+    @BeforeEach
+    public void setup() {
         Mockito.when(propertyUtil.getPropertyByImsLocationAndKey(any(), any())).thenReturn("1000");
     }
 
     @Test
-    public void pollLasItemStatusJobResponse(){
-        String barcode ="123456";
+    public void pollLasItemStatusJobResponse() {
+        String barcode = "123456";
         CamelContext ctx = new DefaultCamelContext();
         String imsLocationCode = "test";
         ctx.setRouteController(routeController);
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = getGFAItemStatusCheckResponse();
         Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
-        lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode,imsLocationCode,ctx);
+        lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode, imsLocationCode, ctx);
     }
+
     @Test
     public void pollLasItemStatusJobResponseException() throws Exception {
-        String barcode ="123456";
+        String barcode = "123456";
         String imsLocationCode = "test";
         CamelContext ctx = new DefaultCamelContext();
         ctx.setRouteController(routeController);
@@ -83,11 +84,12 @@ public class LasItemStatusCheckPollingProcessorUT extends BaseTestCaseUT {
         Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
         Mockito.doThrow(new NullPointerException()).when(routeController).startRoute(any());
-        lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode,imsLocationCode,ctx);
+        lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode, imsLocationCode, ctx);
     }
+
     @Test
     public void pollLasItemStatusJobResponseInterruptedException() throws Exception {
-        String barcode ="123456";
+        String barcode = "123456";
         String imsLocationCode = "test";
         CamelContext ctx = new DefaultCamelContext();
         ctx.setRouteController(routeController);
@@ -95,14 +97,16 @@ public class LasItemStatusCheckPollingProcessorUT extends BaseTestCaseUT {
         Mockito.when(lasImsLocationConnectorFactory.getLasImsLocationConnector(any())).thenReturn(abstractLASImsLocationConnector);
         Mockito.when(abstractLASImsLocationConnector.itemStatusCheck(any(GFAItemStatusCheckRequest.class))).thenReturn(gfaItemStatusCheckResponse);
         Mockito.doThrow(new InterruptedException()).when(routeController).startRoute(any());
-        lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode,imsLocationCode,ctx);
+        lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode, imsLocationCode, ctx);
     }
+
     @Test
-    public void pollLasItemStatusJobResponseExecutionException(){
-        String barcode ="123456";
+    public void pollLasItemStatusJobResponseExecutionException() {
+        String barcode = "123456";
         String imsLocationCode = "test";
-        lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode,imsLocationCode,camelContext);
+        lasItemStatusCheckPollingProcessor.pollLasItemStatusJobResponse(barcode, imsLocationCode, camelContext);
     }
+
     private GFAItemStatusCheckResponse getGFAItemStatusCheckResponse() {
         GFAItemStatusCheckResponse gfaItemStatusCheckResponse = new GFAItemStatusCheckResponse();
         Dsitem dsitem = new Dsitem();

@@ -1,9 +1,8 @@
 package org.recap.ils.protocol.rest.model;
 
-import org.junit.Test;
-import org.recap.ils.protocol.rest.model.RestHoldRequest;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by hemalathas on 3/4/17.
@@ -12,7 +11,7 @@ public class RestHoldRequestUT {
 
 
     @Test
-    public void testRestHoldRequest(){
+    public void testRestHoldRequest() {
         RestHoldRequest restHoldRequest = new RestHoldRequest();
         restHoldRequest.setPatron("test");
         restHoldRequest.setRecordType("test");

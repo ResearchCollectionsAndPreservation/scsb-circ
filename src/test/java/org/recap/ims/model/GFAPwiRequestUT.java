@@ -1,12 +1,12 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 public class GFAPwiRequestUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFAPwiRequest(){
+    public void getGFAPwiRequest() {
         GFAPwiRequest gfaPwiRequest = new GFAPwiRequest();
         GFAPwiRequest gfaPwiRequest1 = new GFAPwiRequest();
         gfaPwiRequest.setDsitem(new GFAPwiDsItemRequest());

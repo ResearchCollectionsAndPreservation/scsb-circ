@@ -1,13 +1,12 @@
 package org.recap.ils.protocol.rest.model.response;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 import org.recap.ils.protocol.rest.model.DebugInfo;
-import org.recap.ils.protocol.rest.model.response.CheckoutResponse;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CheckoutResponseUT extends BaseTestCaseUT {
 

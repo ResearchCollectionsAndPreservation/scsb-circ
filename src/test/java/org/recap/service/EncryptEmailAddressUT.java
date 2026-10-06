@@ -1,38 +1,39 @@
 package org.recap.service;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.recap.ScsbCircApplication;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.RequestItemDetailsRepository;
 import org.recap.repository.jpa.RequestItemStatusDetailsRepository;
 import org.recap.repository.jpa.RequestTypeDetailsRepository;
 import org.recap.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.*;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by akulak on 20/9/17.
  */
-@RunWith(MockitoJUnitRunner.class)
+@SpringBootTest(classes = ScsbCircApplication.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 public class EncryptEmailAddressUT {
 
-   @InjectMocks
+    @InjectMocks
     EncryptEmailAddressService mockedEncryptEmailAddressService;
 
     @Mock
     RequestItemDetailsRepository mockedRequestItemDetailsRepository;
-
-    @Mock
-    Pageable pageable;
 
     @Mock
     SecurityUtil mockedSecurityUtil;
@@ -54,45 +55,46 @@ public class EncryptEmailAddressUT {
     @Autowired
     SecurityUtil securityUtil;
 
-
     @Test
     public void checkEmailAddressEncryption() {
-         try {
-             RequestItemEntity requestItem = createRequestItem();
-             String encryptedValue = securityUtil.getEncryptedValue("test@gmail.com");
-             encryptEmailAddressService.encryptEmailAddress();
-             System.out.println(requestItem.getId());
-             RequestItemEntity requestItemEntity = requestItemDetailsRepository.findById(requestItem.getId()).orElse(null);
-             String decryptedValue = securityUtil.getDecryptedValue(encryptedValue);
-         }
-         catch (Exception e){
-             e.printStackTrace();
-         }
+        try {
+            RequestItemEntity requestItem = createRequestItem();
+            requestItem = requestItemDetailsRepository.save(requestItem);
+            String encryptedValue = securityUtil.getEncryptedValue("test@gmail.com");
+            encryptEmailAddressService.encryptEmailAddress();
+            RequestItemEntity requestItemEntity = requestItemDetailsRepository.findById(requestItem.getId()).orElse(null);
+            String decryptedValue = securityUtil.getDecryptedValue(encryptedValue);
+            assertNotNull(requestItemEntity);
+            assertEquals("test@gmail.com", decryptedValue);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
     @Test
-    public void encryptEmailAddress(){
+    public void encryptEmailAddress() {
         Mockito.when(mockedRequestItemDetailsRepository.count()).thenReturn(10L);
         List<RequestItemEntity> requestItemEntityListToSave = new ArrayList<>();
         RequestItemEntity requestItemEntity = createRequestItem();
         requestItemEntityListToSave.add(requestItemEntity);
-        Pageable pageable = PageRequest.of(0,1000, Sort.Direction.ASC,REQUEST_ID);
+        Pageable pageable = PageRequest.of(0, 1000, Sort.Direction.ASC, REQUEST_ID);
         Page<RequestItemEntity> page = new PageImpl<>(requestItemEntityListToSave);
         Mockito.when(mockedRequestItemDetailsRepository.findAll(pageable)).thenReturn(page);
         Mockito.when(mockedSecurityUtil.getEncryptedValue(requestItemEntity.getEmailId())).thenReturn("test@gmail.com");
         Mockito.when(mockedRequestItemDetailsRepository.saveAll(requestItemEntityListToSave)).thenReturn(requestItemEntityListToSave);
         String encryptEmailAddress = mockedEncryptEmailAddressService.encryptEmailAddress();
         assertNotNull(encryptEmailAddress);
-
     }
+
     @Test
-    public void encryptEmailAddressException(){
+    public void encryptEmailAddressException() {
         Mockito.when(mockedRequestItemDetailsRepository.count()).thenReturn(10L);
         RequestItemEntity requestItemEntity = createRequestItem();
         String encryptEmailAddress = mockedEncryptEmailAddressService.encryptEmailAddress();
         assertNotNull(encryptEmailAddress);
     }
 
-    private RequestItemEntity createRequestItem(){
+    private RequestItemEntity createRequestItem() {
         InstitutionEntity institutionEntity = new InstitutionEntity();
         institutionEntity.setInstitutionCode("PUL");
         institutionEntity.setInstitutionName("PUL");
@@ -114,7 +116,6 @@ public class EncryptEmailAddressUT {
         requestItemEntity.setPatronId("1");
         requestItemEntity.setCreatedDate(new Date());
         requestItemEntity.setRequestExpirationDate(new Date());
-        requestItemEntity.setRequestExpirationDate(new Date());
         requestItemEntity.setRequestStatusId(3);
         requestItemEntity.setCreatedBy("test");
         requestItemEntity.setEmailId("test@gmail.com");
@@ -122,7 +123,7 @@ public class EncryptEmailAddressUT {
         return requestItemEntity;
     }
 
-    private BibliographicEntity saveBibSingleHoldingsSingleItem(){
+    private BibliographicEntity saveBibSingleHoldingsSingleItem() {
         Random random = new Random();
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setContent("mock Content".getBytes());
@@ -159,6 +160,5 @@ public class EncryptEmailAddressUT {
         bibliographicEntity.setHoldingsEntities(Arrays.asList(holdingsEntity));
         bibliographicEntity.setItemEntities(Arrays.asList(itemEntity));
         return bibliographicEntity;
-
     }
 }

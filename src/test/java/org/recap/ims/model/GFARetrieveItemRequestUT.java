@@ -1,12 +1,12 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 public class GFARetrieveItemRequestUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFARetrieveItemRequest(){
+    public void getGFARetrieveItemRequest() {
         GFARetrieveItemRequest gfaRetrieveItemRequest = new GFARetrieveItemRequest();
         GFARetrieveItemRequest gfaRetrieveItemRequest1 = new GFARetrieveItemRequest();
         gfaRetrieveItemRequest.setDsitem(new RetrieveItemRequest());

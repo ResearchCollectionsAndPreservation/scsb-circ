@@ -1,13 +1,9 @@
 package org.recap.ils.protocol.ncip;
 
-import org.extensiblecatalog.ncip.v2.service.CheckInItemResponseData;
-import org.extensiblecatalog.ncip.v2.service.ItemId;
-import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
-import org.extensiblecatalog.ncip.v2.service.Problem;
-import org.extensiblecatalog.ncip.v2.service.ProblemType;
+import org.extensiblecatalog.ncip.v2.service.*;
 import org.json.JSONObject;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.recap.BaseTestCaseUT;
@@ -16,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CheckInItemUT extends BaseTestCaseUT {
 

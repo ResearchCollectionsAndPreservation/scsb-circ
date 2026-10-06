@@ -1,13 +1,13 @@
 package org.recap.service.requestdataload;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
 import org.recap.ScsbCommonConstants;
-import org.recap.common.ScsbConstants;
 import org.recap.camel.requestinitialdataload.RequestDataLoadCSVRecord;
+import org.recap.common.ScsbConstants;
 import org.recap.ims.service.GFALasService;
 import org.recap.model.jpa.*;
 import org.recap.repository.jpa.ItemDetailsRepository;
@@ -19,8 +19,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 
@@ -65,9 +65,9 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn("Test");
         Mockito.when(gfaLasService.getGfaItemStatusInUpperCase(any())).thenReturn("test");
         Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), anyBoolean())).thenReturn(Boolean.FALSE);
-        ReflectionTestUtils.setField(requestDataLoadService,"requestInitialLoadGfaCheck",Boolean.TRUE);
+        ReflectionTestUtils.setField(requestDataLoadService, "requestInitialLoadGfaCheck", Boolean.TRUE);
         Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(ScsbCommonConstants.RETRIEVAL)).thenReturn(requestTypeEntity);
-        Map<String,Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
+        Map<String, Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertNotNull(response);
     }
 
@@ -81,7 +81,7 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         Mockito.when(itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(getItemStatusEntity());
         Mockito.when(itemDetailsRepository.findByBarcode(any())).thenReturn(Arrays.asList(itemEntity));
         Mockito.when(requestTypeDetailsRepository.findByrequestTypeCode(ScsbCommonConstants.RETRIEVAL)).thenReturn(requestTypeEntity);
-        Map<String,Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
+        Map<String, Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertNotNull(response);
     }
 
@@ -91,7 +91,7 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         RequestDataLoadCSVRecord requestDataLoadCSVRecord = getRequestDataLoadCSVRecord(bibliographicEntity);
         Set<String> barcodeSet = new HashSet<>();
         Mockito.when(itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(getItemStatusEntity());
-        Map<String,Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
+        Map<String, Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertTrue(response.size() == 3);
     }
 
@@ -102,7 +102,7 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         Set<String> barcodeSet = new HashSet<>();
         barcodeSet.add("41234213");
         Mockito.when(itemStatusDetailsRepository.findByStatusCode(ScsbCommonConstants.NOT_AVAILABLE)).thenReturn(getItemStatusEntity());
-        Map<String,Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
+        Map<String, Object> response = requestDataLoadService.process(Arrays.asList(requestDataLoadCSVRecord), barcodeSet);
         assertNotNull(response);
     }
 
@@ -132,8 +132,8 @@ public class RequestDataLoadServiceUT extends BaseTestCaseUT {
         Mockito.when(gfaLasService.callGfaItemStatus(any())).thenReturn("Test");
         Mockito.when(gfaLasService.getGfaItemStatusInUpperCase(any())).thenReturn("test");
         Mockito.when(commonUtil.checkIfImsItemStatusIsAvailableOrNotAvailable(any(), any(), anyBoolean())).thenReturn(Boolean.TRUE);
-        ReflectionTestUtils.setField(requestDataLoadService,"requestInitialLoadGfaCheck",Boolean.TRUE);
-        ReflectionTestUtils.invokeMethod(requestDataLoadService, "getItemInfo", barcode,itemStatusEntity);
+        ReflectionTestUtils.setField(requestDataLoadService, "requestInitialLoadGfaCheck", Boolean.TRUE);
+        ReflectionTestUtils.invokeMethod(requestDataLoadService, "getItemInfo", barcode, itemStatusEntity);
     }
 
     private ItemStatusEntity getItemStatusEntity() {

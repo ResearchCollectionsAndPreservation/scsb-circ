@@ -1,22 +1,22 @@
 package org.recap.consumer;
 
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.recap.BaseTestCaseUT;
 import jakarta.jms.*;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.recap.BaseTestCaseUT;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by sudhishk on 12/1/17.
  */
 @Slf4j
 public class TopicConsumerUT extends BaseTestCaseUT {
-
 
 
     private final String topicName = "PUL.RequestT";

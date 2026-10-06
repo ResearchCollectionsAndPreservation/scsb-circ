@@ -1,6 +1,6 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class GFALasStatusDsItemUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFALasStatusDsItem(){
+    public void getGFALasStatusDsItem() {
         GFALasStatusDsItem gfaLasStatusDsItem = new GFALasStatusDsItem();
         GFALasStatusDsItem gfaLasStatusDsItem1 = new GFALasStatusDsItem();
         gfaLasStatusDsItem.setTtitem(Arrays.asList(new GFALasStatusTtItem()));

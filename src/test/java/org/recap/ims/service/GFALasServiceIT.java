@@ -2,12 +2,11 @@ package org.recap.ims.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.ims.model.*;
 import org.recap.model.IMSConfigProperties;
 import org.recap.model.gfa.GFAItemStatusCheckResponse;
@@ -18,6 +17,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,12 +25,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by rajeshbabuk on 25/Nov/2020
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith({SpringExtension.class})
 @Slf4j
 
 public class GFALasServiceIT {
@@ -43,7 +43,7 @@ public class GFALasServiceIT {
 
     private IMSConfigProperties imsConfigProperties;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         List<ImsLocationEntity> imsLocationEntities = imsLocationDetailsRepository.findAll();
@@ -105,7 +105,8 @@ public class GFALasServiceIT {
             log.info("GFA LAS Status Response: {}", response);
 
             assertNotNull(response);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     @Test
@@ -137,7 +138,8 @@ public class GFALasServiceIT {
             log.info("GFA Retrieve Item Response: {}", response);
 
             assertNotNull(response);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     @Test
@@ -179,6 +181,7 @@ public class GFALasServiceIT {
             log.info("GFA EDD Retrieve Item Response: {}", response);
 
             assertNotNull(response);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 }

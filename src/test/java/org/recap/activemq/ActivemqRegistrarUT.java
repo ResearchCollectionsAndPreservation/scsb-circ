@@ -1,13 +1,12 @@
 package org.recap.activemq;
 
+import jakarta.jms.JMSException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
-import jakarta.jms.JMSException;
-
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ActivemqRegistrarUT extends BaseTestCaseUT {
 

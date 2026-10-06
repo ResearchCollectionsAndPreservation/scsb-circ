@@ -1,6 +1,6 @@
 package org.recap.repository;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCase;
 import org.recap.common.ScsbConstants;
 import org.recap.model.jpa.BulkRequestItemEntity;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by rajeshbabuk on 10/10/17.
@@ -40,7 +40,7 @@ public class BulkRequestItemDetailsRepositoryUT extends BaseTestCase {
     }
 
     @Test
-    public void testBulkRequestItemEntity(){
+    public void testBulkRequestItemEntity() {
         BulkRequestItemEntity bulkRequestItemEntity = new BulkRequestItemEntity();
         bulkRequestItemEntity.setId(1);
         bulkRequestItemEntity.setBulkRequestName("TestFirstBulkRequest");

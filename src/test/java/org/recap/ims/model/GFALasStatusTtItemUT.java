@@ -1,14 +1,14 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GFALasStatusTtItemUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFALasStatusTtItem(){
+    public void getGFALasStatusTtItem() {
         GFALasStatusTtItem gfaLasStatusTtItem = new GFALasStatusTtItem();
         GFALasStatusTtItem gfaLasStatusTtItem1 = new GFALasStatusTtItem();
         gfaLasStatusTtItem.setScreenMessage("Success");

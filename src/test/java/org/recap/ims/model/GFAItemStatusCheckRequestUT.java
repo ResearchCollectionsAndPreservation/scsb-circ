@@ -1,6 +1,6 @@
 package org.recap.ims.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class GFAItemStatusCheckRequestUT extends BaseTestCaseUT {
 
     @Test
-    public void getGFAItemStatusCheckRequest(){
+    public void getGFAItemStatusCheckRequest() {
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest = new GFAItemStatusCheckRequest();
         GFAItemStatusCheckRequest gfaItemStatusCheckRequest1 = new GFAItemStatusCheckRequest();
         gfaItemStatusCheckRequest.setItemStatus(Arrays.asList(new GFAItemStatus()));

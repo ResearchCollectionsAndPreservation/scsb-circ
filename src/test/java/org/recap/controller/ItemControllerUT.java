@@ -1,6 +1,6 @@
 package org.recap.controller;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 
 public class ItemControllerUT extends BaseTestCaseUT {
@@ -28,17 +28,18 @@ public class ItemControllerUT extends BaseTestCaseUT {
     ItemDetailsRepository itemDetailsRepository;
 
     @Test
-    public void findByBarcodeIn(){
+    public void findByBarcodeIn() {
         List<ItemEntity> itemEntities = new ArrayList<>();
         ItemEntity itemEntity = getItemEntity();
         itemEntities.add(itemEntity);
-        String barcodes ="244467";
+        String barcodes = "244467";
         ItemController itemController = new ItemController(itemDetailsRepository);
         Mockito.when(itemDetailsRepository.findByBarcodeInAndComplete(any(), Mockito.anyBoolean())).thenReturn(itemEntities);
         List<ItemEntity> itemEntityList = itemController.findByBarcodeIn(barcodes);
         assertNotNull(itemEntityList);
     }
-    private ItemEntity getItemEntity(){
+
+    private ItemEntity getItemEntity() {
         ItemEntity itemEntity = new ItemEntity();
         itemEntity.setLastUpdatedDate(new Date());
         itemEntity.setOwningInstitutionItemId("1");
@@ -62,6 +63,7 @@ public class ItemControllerUT extends BaseTestCaseUT {
         itemEntity.setBibliographicEntities(Arrays.asList(bibliographicEntity));
         return itemEntity;
     }
+
     private BibliographicEntity getBibliographicEntity() {
         BibliographicEntity bibliographicEntity = new BibliographicEntity();
         bibliographicEntity.setId(1);

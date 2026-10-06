@@ -1,15 +1,15 @@
 package org.recap.model.jpa;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PendingRequestEntityUT {
 
     @Test
-    public  void getPendingRequest(){
+    public void getPendingRequest() {
         PendingRequestEntity pendingRequestEntity = new PendingRequestEntity();
         pendingRequestEntity.setId(1);
         pendingRequestEntity.setItemEntity(new ItemEntity());

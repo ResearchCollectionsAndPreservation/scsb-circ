@@ -1,10 +1,10 @@
 package org.recap.controller;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class EncryptEmailAddressIT extends BaseTestCase {
 
@@ -12,7 +12,7 @@ public class EncryptEmailAddressIT extends BaseTestCase {
     EncryptEmailAddress encryptEmailAddress;
 
     @Test
-    public void startEncryptEmailAddress(){
+    public void startEncryptEmailAddress() {
         String result = encryptEmailAddress.startEncryptEmailAddress();
         assertNotNull(result);
     }

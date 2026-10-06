@@ -7,27 +7,27 @@ import com.pkrete.jsip2.messages.requests.SIP2ItemInformationRequest;
 import com.pkrete.jsip2.messages.requests.SIP2LoginRequest;
 import com.pkrete.jsip2.messages.responses.SIP2ItemInformationResponse;
 import com.pkrete.jsip2.messages.responses.SIP2LoginResponse;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedConstruction;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.ILSConfigProperties;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith({SpringExtension.class})
 public class LookupItemTest {
 
     private SIPProtocolConnector sipProtocolConnector;
     private ILSConfigProperties mockILSConfigProperties;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sipProtocolConnector = new SIPProtocolConnector();
         sipProtocolConnector.setInstitution("testInstitution");
@@ -104,7 +104,7 @@ public class LookupItemTest {
             AbstractResponseItem result = sipProtocolConnector.lookupItem("barcode-xyz");
 
             assertNotNull(result);
-            assertFalse("Expected success false when login fails", result.isSuccess());
+            assertFalse(result.isSuccess(), "Expected success false when login fails");
             assertEquals("Login Failed", result.getScreenMessage());
 
             assertEquals(1, mocked.constructed().size());
@@ -128,7 +128,7 @@ public class LookupItemTest {
             AbstractResponseItem result = sipProtocolConnector.lookupItem("barcode-exc");
 
             assertNotNull(result);
-            assertFalse("Expected success false on InvalidSIP2ResponseException", result.isSuccess());
+            assertFalse(result.isSuccess(), "Expected success false on InvalidSIP2ResponseException");
             assertEquals(org.recap.common.ScsbConstants.INVALID_NO_RESPONSE_FROM_ILS, result.getScreenMessage());
 
             assertEquals(1, mocked.constructed().size());
@@ -150,7 +150,7 @@ public class LookupItemTest {
             AbstractResponseItem result = sipProtocolConnector.lookupItem("barcode-exc2");
 
             assertNotNull(result);
-            assertFalse("Expected success false on InvalidSIP2ResponseValueException", result.isSuccess());
+            assertFalse(result.isSuccess(), "Expected success false on InvalidSIP2ResponseValueException");
             assertEquals(org.recap.common.ScsbConstants.SCREEN_MESSAGE_ITEM_BARCODE_NOT_FOUND, result.getScreenMessage());
 
             assertEquals(1, mocked.constructed().size());
@@ -177,7 +177,7 @@ public class LookupItemTest {
             AbstractResponseItem result = sipProtocolConnector.lookupItem("any-barcode");
 
             assertNotNull(result);
-            assertFalse("Expected success false when connection fails", result.isSuccess());
+            assertFalse(result.isSuccess(), "Expected success false when connection fails");
             assertEquals(org.recap.common.ScsbConstants.ILS_LOGIN_FAILED, result.getScreenMessage());
 
             assertEquals(1, mocked.constructed().size());

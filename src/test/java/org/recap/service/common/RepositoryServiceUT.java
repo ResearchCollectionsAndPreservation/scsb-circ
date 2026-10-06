@@ -1,12 +1,12 @@
 package org.recap.service.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.recap.BaseTestCaseUT;
 import org.recap.repository.jpa.*;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RepositoryServiceUT extends BaseTestCaseUT {
 
@@ -35,37 +35,43 @@ public class RepositoryServiceUT extends BaseTestCaseUT {
     private CollectionGroupDetailsRepository collectionGroupDetailsRepository;
 
     @Test
-    public void getBibliographicDetailsRepository(){
+    public void getBibliographicDetailsRepository() {
         BibliographicDetailsRepository bibliographicDetailsRepository = repositoryService.getBibliographicDetailsRepository();
         assertNotNull(bibliographicDetailsRepository);
     }
+
     @Test
-    public void getItemDetailsRepository(){
+    public void getItemDetailsRepository() {
         ItemDetailsRepository itemDetailsRepository = repositoryService.getItemDetailsRepository();
         assertNotNull(itemDetailsRepository);
     }
+
     @Test
-    public void getReportDetailRepository(){
+    public void getReportDetailRepository() {
         ReportDetailRepository reportDetailRepository = repositoryService.getReportDetailRepository();
         assertNotNull(reportDetailRepository);
     }
+
     @Test
-    public void getItemStatusDetailsRepository(){
+    public void getItemStatusDetailsRepository() {
         ItemStatusDetailsRepository itemStatusDetailsRepository = repositoryService.getItemStatusDetailsRepository();
         assertNotNull(itemStatusDetailsRepository);
     }
+
     @Test
-    public void getInstitutionDetailsRepository(){
+    public void getInstitutionDetailsRepository() {
         InstitutionDetailsRepository institutionDetailsRepository = repositoryService.getInstitutionDetailsRepository();
         assertNotNull(institutionDetailsRepository);
     }
+
     @Test
-    public void getItemChangeLogDetailsRepository(){
+    public void getItemChangeLogDetailsRepository() {
         ItemChangeLogDetailsRepository itemChangeLogDetailsRepository = repositoryService.getItemChangeLogDetailsRepository();
         assertNotNull(itemChangeLogDetailsRepository);
     }
+
     @Test
-    public void getCollectionGroupDetailsRepository(){
+    public void getCollectionGroupDetailsRepository() {
         CollectionGroupDetailsRepository collectionGroupDetailsRepository = repositoryService.getCollectionGroupDetailsRepository();
         assertNotNull(collectionGroupDetailsRepository);
     }

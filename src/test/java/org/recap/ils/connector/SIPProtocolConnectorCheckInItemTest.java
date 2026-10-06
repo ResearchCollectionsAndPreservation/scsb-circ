@@ -6,33 +6,35 @@ import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseValueException;
 import com.pkrete.jsip2.messages.requests.SIP2CheckinRequest;
 import com.pkrete.jsip2.messages.requests.SIP2LoginRequest;
 import com.pkrete.jsip2.messages.requests.SIP2SCStatusRequest;
-import com.pkrete.jsip2.messages.responses.*;
+import com.pkrete.jsip2.messages.responses.SIP2ACSStatusResponse;
+import com.pkrete.jsip2.messages.responses.SIP2CheckinResponse;
+import com.pkrete.jsip2.messages.responses.SIP2LoginResponse;
 import com.pkrete.jsip2.variables.MediaType;
 import com.pkrete.jsip2.variables.SupportedMessages;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedConstruction;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.response.ItemCheckinResponse;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith({SpringExtension.class})
 public class SIPProtocolConnectorCheckInItemTest {
 
     private SIPProtocolConnector sipProtocolConnector;
     private ILSConfigProperties mockIlsConfig;
     private ItemRequestInformation itemRequestInformation;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sipProtocolConnector = new SIPProtocolConnector();
         sipProtocolConnector.setInstitution("testInstitution");
@@ -96,9 +98,9 @@ public class SIPProtocolConnectorCheckInItemTest {
                     when(mockConn.connect()).thenReturn(true);
                     when(mockConn.send(any())).thenAnswer(invocation -> {
                         Object req = invocation.getArgument(0);
-                        if (req instanceof SIP2LoginRequest)   return loginResponse;
+                        if (req instanceof SIP2LoginRequest) return loginResponse;
                         if (req instanceof SIP2SCStatusRequest) return acsStatusResponse;
-                        if (req instanceof SIP2CheckinRequest)  return checkinResponse;
+                        if (req instanceof SIP2CheckinRequest) return checkinResponse;
                         return null;
                     });
                     when(mockConn.close()).thenReturn(true);
@@ -109,24 +111,24 @@ public class SIPProtocolConnectorCheckInItemTest {
 
             assertNotNull(resp);
             assertTrue(resp.isSuccess());
-            assertEquals("BARCODE-001",  resp.getItemBarcode());
-            assertEquals("TITLE-001",    resp.getTitleIdentifier());
+            assertEquals("BARCODE-001", resp.getItemBarcode());
+            assertEquals("TITLE-001", resp.getTitleIdentifier());
             assertTrue(resp.isResensitize());
             assertTrue(resp.isAlert());
             assertFalse(resp.isMagneticMedia());
-            assertEquals("INST-001",     resp.getInstitutionID());
-            assertEquals("INST-001",     resp.getItemOwningInstitution());
-            assertEquals("PATRON-001",   resp.getPatronIdentifier());
-            assertEquals("OTHER",        resp.getMediaType());
-            assertEquals("BIB-001",      resp.getBibId());
-            assertEquals("PERM-LOC",     resp.getPermanentLocation());
-            assertEquals("COL-CODE",     resp.getCollectionCode());
-            assertEquals("BIN-1",        resp.getSortBin());
-            assertEquals("QA99",         resp.getCallNumber());
-            assertEquals("DEST-LOC",     resp.getDestinationLocation());
-            assertEquals("HOLD",         resp.getAlertType());
+            assertEquals("INST-001", resp.getInstitutionID());
+            assertEquals("INST-001", resp.getItemOwningInstitution());
+            assertEquals("PATRON-001", resp.getPatronIdentifier());
+            assertEquals("OTHER", resp.getMediaType());
+            assertEquals("BIB-001", resp.getBibId());
+            assertEquals("PERM-LOC", resp.getPermanentLocation());
+            assertEquals("COL-CODE", resp.getCollectionCode());
+            assertEquals("BIN-1", resp.getSortBin());
+            assertEquals("QA99", resp.getCallNumber());
+            assertEquals("DEST-LOC", resp.getDestinationLocation());
+            assertEquals("HOLD", resp.getAlertType());
             assertEquals("HOLD-PAT-001", resp.getHoldPatronId());
-            assertEquals("Hold Patron",  resp.getHoldPatronName());
+            assertEquals("Hold Patron", resp.getHoldPatronName());
             assertEquals("Check-in successful", resp.getScreenMessage());
             assertNotNull(resp.getEsipDataIn());
             assertEquals("ESIP-OUT-DATA", resp.getEsipDataOut());
@@ -177,9 +179,9 @@ public class SIPProtocolConnectorCheckInItemTest {
                     when(mockConn.connect()).thenReturn(true);
                     when(mockConn.send(any())).thenAnswer(invocation -> {
                         Object req = invocation.getArgument(0);
-                        if (req instanceof SIP2LoginRequest)    return loginResponse;
+                        if (req instanceof SIP2LoginRequest) return loginResponse;
                         if (req instanceof SIP2SCStatusRequest) return acsStatusResponse;
-                        if (req instanceof SIP2CheckinRequest)  return checkinResponse;
+                        if (req instanceof SIP2CheckinRequest) return checkinResponse;
                         return null;
                     });
                     when(mockConn.close()).thenReturn(true);
@@ -217,9 +219,9 @@ public class SIPProtocolConnectorCheckInItemTest {
                     when(mockConn.connect()).thenReturn(true);
                     when(mockConn.send(any())).thenAnswer(invocation -> {
                         Object req = invocation.getArgument(0);
-                        if (req instanceof SIP2LoginRequest)    return loginResponse;
+                        if (req instanceof SIP2LoginRequest) return loginResponse;
                         if (req instanceof SIP2SCStatusRequest) return acsStatusResponse;
-                        if (req instanceof SIP2CheckinRequest)  return checkinResponse;
+                        if (req instanceof SIP2CheckinRequest) return checkinResponse;
                         return null;
                     });
                     when(mockConn.close()).thenReturn(true);
@@ -251,7 +253,7 @@ public class SIPProtocolConnectorCheckInItemTest {
                     when(mockConn.connect()).thenReturn(true);
                     when(mockConn.send(any())).thenAnswer(invocation -> {
                         Object req = invocation.getArgument(0);
-                        if (req instanceof SIP2LoginRequest)    return loginResponse;
+                        if (req instanceof SIP2LoginRequest) return loginResponse;
                         if (req instanceof SIP2SCStatusRequest) return acsStatusResponse;
                         return null;
                     });

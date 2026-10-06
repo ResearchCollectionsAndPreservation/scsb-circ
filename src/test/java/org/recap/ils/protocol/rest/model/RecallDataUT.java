@@ -1,17 +1,16 @@
 package org.recap.ils.protocol.rest.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
-import org.recap.ils.protocol.rest.model.RecallData;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RecallDataUT extends BaseTestCaseUT {
 
     @Test
-    public void getRecallData(){
+    public void getRecallData() {
         RecallData recallData = new RecallData();
         recallData.setId(1);
         recallData.setUpdatedDate(new Date().toString());

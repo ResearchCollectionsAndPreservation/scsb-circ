@@ -1,9 +1,8 @@
 package com.pkrete.jsip2.messages.requests;
 
-import org.junit.Test;
-import org.recap.BaseTestCase;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SIP2CreateBibRequestUT {
 
@@ -13,6 +12,7 @@ public class SIP2CreateBibRequestUT {
         String result = sip2CreateBibRequest.getData();
         assertNotNull(result);
     }
+
     @Test
     public void testgetData2() {
         SIP2CreateBibRequest sip2CreateBibRequest = new SIP2CreateBibRequest("test", "test", "test");

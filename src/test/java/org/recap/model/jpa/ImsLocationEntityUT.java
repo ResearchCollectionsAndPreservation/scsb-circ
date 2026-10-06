@@ -1,17 +1,17 @@
 package org.recap.model.jpa;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCaseUT;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ImsLocationEntityUT extends BaseTestCaseUT {
 
     @Test
-    public void getImsLocationEntity(){
+    public void getImsLocationEntity() {
         ImsLocationEntity imsLocationEntity = new ImsLocationEntity();
         imsLocationEntity.setImsLocationName("test");
         imsLocationEntity.setId(1);

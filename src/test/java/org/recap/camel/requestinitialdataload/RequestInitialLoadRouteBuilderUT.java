@@ -1,6 +1,6 @@
 package org.recap.camel.requestinitialdataload;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.recap.BaseTestCaseUT;

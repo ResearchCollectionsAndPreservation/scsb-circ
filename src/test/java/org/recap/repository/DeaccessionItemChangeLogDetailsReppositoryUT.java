@@ -1,6 +1,6 @@
 package org.recap.repository;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.recap.BaseTestCase;
 import org.recap.model.jpa.DeaccessionItemChangeLog;
 import org.recap.repository.jpa.DeaccesionItemChangeLogDetailsRepository;
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by akulak on 1/3/18 .
@@ -19,7 +19,7 @@ public class DeaccessionItemChangeLogDetailsReppositoryUT extends BaseTestCase {
     private DeaccesionItemChangeLogDetailsRepository deaccesionItemChangeLogDetailsRepository;
 
     @Test
-    public void saveDeaccessionItemChangeLog(){
+    public void saveDeaccessionItemChangeLog() {
         DeaccessionItemChangeLog deaccessionItemChangeLog = getDeaccessionItemChangeLog();
         DeaccessionItemChangeLog saveddeaccessionItemChangeLog = deaccesionItemChangeLogDetailsRepository.save(deaccessionItemChangeLog);
         assertNotNull(saveddeaccessionItemChangeLog);

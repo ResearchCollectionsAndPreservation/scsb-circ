@@ -394,7 +394,7 @@ public class RestProtocolConnector extends AbstractProtocolConnector {
                         itemHoldResponse.setSuccess(jobData.getSuccess());
                         log.info("Hold Finished -> {}" , jobData.getFinished());
                         log.info("Hold Success -> {}" , jobData.getSuccess());
-                        log.info(statusMessage);
+                        log.info("statusMessage --> {}", statusMessage);
                     } else {
                         itemHoldResponse.setSuccess(false);
                         log.info("Hold Finished -> " + false);

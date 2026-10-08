@@ -165,6 +165,7 @@ public final class ScsbConstants {
     public static final String REQUEST_STATUS_PROCESSING = "PROCESSING";
     public static final String REQUEST_STATUS_LAS_ITEM_STATUS_PENDING = "LAS_ITEM_STATUS_PENDING";
     public static final String LAS_REFILE_REQUEST_PLACED = "LAS_REFILE_REQUEST_PLACED";
+    public static final String SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE = "Scsb Persistence Service is Unavailable.";
 
     public static final String REST_HOLD_DATE_FORMAT = "yyyy-MM-dd";
     public static final String REST_RECORD_TYPE = "i";
@@ -408,6 +409,12 @@ public final class ScsbConstants {
     public static final String BULK_REQUEST_ID_TEXT = "Bulk Request Id : ";
 
     public static final String ITEM_STATUS_NOT_AVAILABLE = "Not Available";
+
+    public static final String ITEM_BARCDE_DOESNOT_EXIST = "Item Barcode doesn't exist in SCSB database.";
+
+    public static final String REQUEST_DOESNOT_EXIST = "Request does not exist for Item Barcode in SCSB database.";
+
+    public static final String EXCEPTION = "exception->";
 
     private ScsbConstants() {
     }

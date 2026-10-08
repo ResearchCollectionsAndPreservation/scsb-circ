@@ -116,4 +116,8 @@ public interface RequestItemDetailsRepository extends BaseRepository<RequestItem
 
     @Query(value =  "SELECT request FROM RequestItemEntity as request inner join request.requestStatusEntity as rse WHERE rse.requestStatusCode in :pendingLASStatusList AND request.id not in (select requestId from PendingRequestEntity)")
     List<RequestItemEntity> findPendingAndLASReqNotNotified(@Param("pendingLASStatusList")List<String> pendingLASStatusList);
+
+    @Query(value = "select request from RequestItemEntity request inner join request.itemEntity item where item.barcode in :itemBarcodes order by item.id, request.createdDate desc")
+    List<RequestItemEntity> findRequestStatusByItemBarcodes(@Param("itemBarcodes")List<String> itemBarcodes);
+
 }

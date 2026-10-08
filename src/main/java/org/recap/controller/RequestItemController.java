@@ -10,6 +10,7 @@ import org.recap.ils.connector.factory.ILSProtocolConnectorFactory;
 import org.recap.model.AbstractResponseItem;
 import org.recap.model.BulkRequestInformation;
 import org.recap.model.ItemRefileRequest;
+import org.recap.model.request.RequestStatusRequest;
 import org.recap.model.response.ItemCheckinResponse;
 import org.recap.model.response.ItemCheckoutResponse;
 import org.recap.model.response.ItemCreateBibResponse;
@@ -18,9 +19,13 @@ import org.recap.model.response.ItemInformationResponse;
 import org.recap.model.response.ItemRecallResponse;
 import org.recap.model.response.PatronInformationResponse;
 import org.recap.model.response.ItemRefileResponse;
+import  org.recap.model.response.RequestStatusResponse;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.request.ReplaceRequest;
 import org.recap.request.service.ItemRequestService;
+import org.recap.service.RestHeaderService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +34,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,6 +63,9 @@ public class RequestItemController {
     @Autowired
     private PropertyUtil propertyUtil;
 
+    @Autowired
+    private RestHeaderService restHeaderService;
+
     /**
      * Gets ItemRequestService object.
      *
@@ -69,6 +82,10 @@ public class RequestItemController {
      */
     public ILSProtocolConnectorFactory getIlsProtocolConnectorFactory() {
         return ilsProtocolConnectorFactory;
+    }
+
+    public RestHeaderService getRestHeaderService(){
+        return restHeaderService;
     }
 
     /**
@@ -391,4 +408,28 @@ public class RequestItemController {
         }
         return (StringUtils.isBlank(itemRequestInformation.getPickupLocation())) ? getPickupLocation(callInstitution) : itemRequestInformation.getPickupLocation();
     }
+
+    @PostMapping(value = "/requestStatus", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity requestStatus(@RequestBody RequestStatusRequest requestStatusRequest) {
+        log.info("Inside requestStatus >>>>>>> ");
+        List<RequestStatusResponse> requestStatusResponses = new ArrayList<>();
+        ResponseEntity responseEntity;
+        try {
+            requestStatusResponses = getItemRequestService().getItemRequestStatusByBarcode(requestStatusRequest.getBarcodes());
+        } catch (Exception exception) {
+            responseEntity = new ResponseEntity(org.recap.common.ScsbConstants.SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE, getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
+            log.error(org.recap.common.ScsbConstants.EXCEPTION, exception);
+            return responseEntity;
+        }
+        responseEntity = new ResponseEntity(requestStatusResponses, getHttpHeaders(), HttpStatus.OK);
+        return responseEntity;
+    }
+
+    private HttpHeaders getHttpHeaders() {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add(ScsbCommonConstants.RESPONSE_DATE, new Date().toString());
+        return responseHeaders;
+    }
+
 }

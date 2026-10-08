@@ -30,6 +30,8 @@ public class ActivemqRegistrar {
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(defaultBrokerURL);
         ActiveMQComponent activeMQComponent = new ActiveMQComponent();
         activeMQComponent.setConnectionFactory(connectionFactory);
+        activeMQComponent.setObjectMessageEnabled(true);
+        activeMQComponent.setDeserializationFilter("org.apache.camel.support.ObjectHelper;java.util.*;org.recap.model.*");
         activeMQComponent.setTrustAllPackages(true);
         camelContext.addComponent(ScsbCommonConstants.SCSB_ACTIVEMQ_COMPONENT_NAME, activeMQComponent);
     }

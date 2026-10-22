@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.recap.BaseTestCaseUT;
 import org.recap.PropertyKeyConstants;
+import org.recap.ScsbCommonConstants;
+import org.recap.common.ScsbConstants;
 import org.recap.ils.connector.AbstractProtocolConnector;
 import org.recap.ils.connector.factory.ILSProtocolConnectorFactory;
 import org.recap.model.AbstractResponseItem;
@@ -14,15 +16,21 @@ import org.recap.model.BulkRequestInformation;
 import org.recap.model.ItemRefileRequest;
 import org.recap.model.request.ItemRequestInformation;
 import org.recap.model.request.ReplaceRequest;
+import org.recap.model.request.RequestStatusRequest;
 import org.recap.model.response.*;
 import org.recap.request.service.ItemRequestService;
 import org.recap.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.recap.service.RestHeaderService;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -439,5 +447,53 @@ public class RequestItemControllerUT extends BaseTestCaseUT {
         Object test = "test";
         Logger logger = LoggerFactory.getLogger(RequestItemController.class);
         mockedRequestItemController.logMessages(logger, test);
+    }
+
+    @Test
+    public void requestStatusReturnsOkWhenServiceSucceeds() {
+        RequestStatusRequest requestStatusRequest = new RequestStatusRequest();
+        requestStatusRequest.setBarcodes(Arrays.asList("barcode-1", "barcode-2"));
+        List<RequestStatusResponse> expectedResponses = Arrays.asList(
+                new RequestStatusResponse(),
+                new RequestStatusResponse()
+        );
+        expectedResponses.get(0).setItemBarcode("barcode-1");
+        expectedResponses.get(0).setStatus("READY");
+        expectedResponses.get(1).setItemBarcode("barcode-2");
+        expectedResponses.get(1).setStatus("PENDING");
+        Mockito.when(itemRequestService.getItemRequestStatusByBarcode(requestStatusRequest.getBarcodes())).thenReturn(expectedResponses);
+        ResponseEntity responseEntity = mockedRequestItemController.requestStatus(requestStatusRequest);
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(expectedResponses, responseEntity.getBody());
+        assertNotNull(responseEntity.getHeaders().get(ScsbCommonConstants.RESPONSE_DATE));
+    }
+
+    @Test
+    public void requestStatusReturnsServiceUnavailableWhenServiceThrows() {
+        RequestStatusRequest requestStatusRequest = new RequestStatusRequest();
+        requestStatusRequest.setBarcodes(Collections.singletonList("barcode-1"));
+        Mockito.when(itemRequestService.getItemRequestStatusByBarcode(requestStatusRequest.getBarcodes()))
+                .thenThrow(new RuntimeException("Service unavailable"));
+        ResponseEntity responseEntity = mockedRequestItemController.requestStatus(requestStatusRequest);
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, responseEntity.getStatusCode());
+        assertEquals(ScsbConstants.SCSB_PERSISTENCE_SERVICE_IS_UNAVAILABLE, responseEntity.getBody());
+        assertNotNull(responseEntity.getHeaders().get(ScsbCommonConstants.RESPONSE_DATE));
+    }
+
+    @Test
+    public void getHttpHeaders() {
+        ResponseEntity responseEntity = mockedRequestItemController.requestStatus(new RequestStatusRequest());
+        assertNotNull(responseEntity.getHeaders().get(ScsbCommonConstants.RESPONSE_DATE));
+    }
+
+    @Test
+    public void getRestHeaderService() {
+        RestHeaderService restHeaderService = new RestHeaderService();
+        ReflectionTestUtils.setField(mockedRequestItemController, "restHeaderService", restHeaderService);
+        RestHeaderService actual = mockedRequestItemController.getRestHeaderService();
+        assertNotNull(actual);
+        assertSame(restHeaderService, actual);
     }
 }

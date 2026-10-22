@@ -4,10 +4,14 @@ import com.pkrete.jsip2.connection.SIP2SocketConnection;
 import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseException;
 import com.pkrete.jsip2.messages.requests.SIP2CheckoutRequest;
 import com.pkrete.jsip2.messages.requests.SIP2LoginRequest;
+import com.pkrete.jsip2.messages.requests.SIP2PatronInformationRequest;
+import com.pkrete.jsip2.messages.requests.SIP2RecallRequest;
 import com.pkrete.jsip2.messages.requests.SIP2SCStatusRequest;
 import com.pkrete.jsip2.messages.responses.SIP2ACSStatusResponse;
 import com.pkrete.jsip2.messages.responses.SIP2CheckoutResponse;
 import com.pkrete.jsip2.messages.responses.SIP2LoginResponse;
+import com.pkrete.jsip2.messages.responses.SIP2PatronInformationResponse;
+import com.pkrete.jsip2.messages.responses.SIP2RecallResponse;
 import com.pkrete.jsip2.variables.SupportedMessages;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedConstruction;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.response.ItemCheckoutResponse;
+import org.recap.model.response.ItemRecallResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
@@ -203,6 +208,67 @@ public class CheckoutItemTest {
             assertNotNull(resp);
             assertFalse(resp.isSuccess());
             SIP2SocketConnection constructed = mocked.constructed().get(0);
+            verify(constructed, times(1)).close();
+        }
+    }
+
+    @Test
+    public void testRecallItem_Success() throws Exception {
+        try (MockedConstruction<SIP2SocketConnection> mocked = mockConstruction(SIP2SocketConnection.class,
+                (mockConn, ctx) -> {
+                    when(mockConn.connect()).thenReturn(true);
+
+                    SIP2LoginResponse loginResponse = mock(SIP2LoginResponse.class);
+                    when(loginResponse.isOk()).thenReturn(true);
+
+                    SIP2ACSStatusResponse acsStatusResponse = mock(SIP2ACSStatusResponse.class);
+                    when(acsStatusResponse.getSupportedMessages()).thenReturn(mock(SupportedMessages.class));
+
+                    SIP2PatronInformationResponse patronInfoResponse = mock(SIP2PatronInformationResponse.class);
+                    when(patronInfoResponse.isValidPatron()).thenReturn(true);
+                    when(patronInfoResponse.isValidPatronPassword()).thenReturn(true);
+                    when(patronInfoResponse.getScreenMessage()).thenReturn(Collections.emptyList());
+
+                    SIP2RecallResponse recallResponse = mock(SIP2RecallResponse.class);
+                    when(recallResponse.isOk()).thenReturn(true);
+                    when(recallResponse.getItemIdentifier()).thenReturn("barcode-123");
+                    when(recallResponse.getTitleIdentifier()).thenReturn("title-1");
+                    when(recallResponse.getInstitutionId()).thenReturn("INST_1");
+                    when(recallResponse.getPatronIdentifier()).thenReturn("patron123");
+                    when(recallResponse.getPickupLocation()).thenReturn("pickup-loc");
+                    when(recallResponse.getExpirationDate()).thenReturn("20250131    120000");
+                    when(recallResponse.getData()).thenReturn("recall-response-data");
+                    when(recallResponse.getScreenMessage()).thenReturn(Collections.singletonList("Recall successful"));
+
+                    when(mockConn.send(any())).thenAnswer(invocation -> {
+                        Object req = invocation.getArgument(0);
+                        if (req instanceof SIP2LoginRequest) {
+                            return loginResponse;
+                        } else if (req instanceof SIP2SCStatusRequest) {
+                            return acsStatusResponse;
+                        } else if (req instanceof SIP2PatronInformationRequest) {
+                            return patronInfoResponse;
+                        } else if (req instanceof SIP2RecallRequest) {
+                            return recallResponse;
+                        }
+                        return null;
+                    });
+
+                    when(mockConn.close()).thenReturn(true);
+                })) {
+
+            ItemRecallResponse resp = sipProtocolConnector.recallItem("barcode-123", "patron123", "INST_1", "2026-10-13", "bib-1", "pickup-loc");
+
+            assertNotNull(resp);
+            assertTrue(resp.isSuccess());
+            assertEquals("barcode-123", resp.getItemBarcode());
+            assertEquals("title-1", resp.getTitleIdentifier());
+            assertEquals("INST_1", resp.getInstitutionID());
+            assertEquals("patron123", resp.getPatronIdentifier());
+            assertEquals("Recall successful", resp.getScreenMessage());
+
+            SIP2SocketConnection constructed = mocked.constructed().get(0);
+            verify(constructed, atLeast(4)).send(any());
             verify(constructed, times(1)).close();
         }
     }

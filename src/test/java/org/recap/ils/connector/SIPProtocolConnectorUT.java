@@ -1,15 +1,22 @@
 package org.recap.ils.connector;
 
 import com.pkrete.jsip2.connection.SIP2SocketConnection;
+import com.pkrete.jsip2.exceptions.InvalidSIP2ResponseException;
+import com.pkrete.jsip2.messages.requests.SIP2CreateBibRequest;
+import com.pkrete.jsip2.messages.requests.SIP2LoginRequest;
+import com.pkrete.jsip2.messages.requests.SIP2PatronInformationRequest;
+import com.pkrete.jsip2.messages.requests.SIP2SCStatusRequest;
 import com.pkrete.jsip2.messages.responses.*;
 import com.pkrete.jsip2.variables.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.recap.common.ScsbConstants;
 import org.recap.model.ILSConfigProperties;
 import org.recap.model.request.ItemRequestInformation;
+import org.recap.model.response.ItemCreateBibResponse;
 import org.recap.util.PropertyUtil;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -18,7 +25,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith({SpringExtension.class})
@@ -284,79 +297,150 @@ public class SIPProtocolConnectorUT {
 
     @Test
     public void createBib() throws Exception {
-        String itemIdentifier = "223467";
-        String patronIdentifier = "2234567";
-        String institutionId = "2";
-        String titleIdentifier = "245";
-        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("TEST");
-        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
-        SIP2CreateBibResponse sip2CreateBibResponse = getSIP2CreateBibResponse();
-        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
-        sip2PatronInformationResponse.setValidPatron(true);
-        sip2PatronInformationResponse.setValidPatronPassword(true);
-        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
-        loginResponse.setOk(true);
-        ReflectionTestUtils.invokeMethod(sipProtocolConnector, "getSocketConnection");
-        sipProtocolConnector.createBib(itemIdentifier, patronIdentifier, institutionId, titleIdentifier);
+        SIPProtocolConnector connector = new SIPProtocolConnector();
+        connector.setInstitution("TEST");
+        connector.setIlsConfigProperties(getIlsConfigProperties());
+
+        try (MockedConstruction<SIP2SocketConnection> mocked = mockConstruction(SIP2SocketConnection.class,
+                (mock, context) -> {
+                    when(mock.connect()).thenReturn(true);
+
+                    SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+                    loginResponse.setOk(true);
+                    when(mock.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+
+                    SIP2ACSStatusResponse acsStatusResponse = new SIP2ACSStatusResponse("940");
+                    when(mock.send(any(SIP2SCStatusRequest.class))).thenReturn(acsStatusResponse);
+
+                    SIP2PatronInformationResponse patronInfo = new SIP2PatronInformationResponse("940");
+                    patronInfo.setValidPatron(true);
+                    patronInfo.setValidPatronPassword(true);
+                    patronInfo.setScreenMessage(Collections.emptyList());
+                    when(mock.send(any(SIP2PatronInformationRequest.class))).thenReturn(patronInfo);
+
+                    SIP2CreateBibResponse createBibResponse = new SIP2CreateBibResponse("940");
+                    createBibResponse.setOk(true);
+                    createBibResponse.setBibId("B-123");
+                    createBibResponse.setItemIdentifier("ITEM-123");
+                    createBibResponse.setScreenMessage(Arrays.asList("Success"));
+                    when(mock.send(any(SIP2CreateBibRequest.class))).thenReturn(createBibResponse);
+                })) {
+            ItemCreateBibResponse response = connector.createBib("ITEM-123", "P-123", "INST-1", "TITLE-1");
+
+            assertNotNull(response);
+            assertTrue(response.isSuccess());
+            assertEquals("B-123", response.getBibId());
+            assertEquals("ITEM-123", response.getItemId());
+            assertEquals("Success", response.getScreenMessage());
+        }
     }
 
     @Test
-    public void createBibelse() throws Exception {
-        String itemIdentifier = "223467";
-        String patronIdentifier = "2234567";
-        String institutionId = "2";
-        String titleIdentifier = "245";
-        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("TEST");
-        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
-        SIP2CreateBibResponse sip2CreateBibResponse = getSIP2CreateBibResponse();
-        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
-        sip2PatronInformationResponse.setValidPatron(false);
-        sip2PatronInformationResponse.setValidPatronPassword(false);
-        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
-        loginResponse.setOk(false);
-        ReflectionTestUtils.invokeMethod(sipProtocolConnector, "getSocketConnection");
-        sipProtocolConnector.createBib(itemIdentifier, patronIdentifier, institutionId, titleIdentifier);
+    public void createBibWhenLoginFails() throws Exception {
+        SIPProtocolConnector connector = new SIPProtocolConnector();
+        connector.setInstitution("TEST");
+        connector.setIlsConfigProperties(getIlsConfigProperties());
+
+        try (MockedConstruction<SIP2SocketConnection> mocked = mockConstruction(SIP2SocketConnection.class,
+                (mock, context) -> {
+                    when(mock.connect()).thenReturn(true);
+                    SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+                    loginResponse.setOk(false);
+                    when(mock.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+                })) {
+            ItemCreateBibResponse response = connector.createBib("ITEM-123", "P-123", "INST-1", "TITLE-1");
+
+            assertNotNull(response);
+            assertFalse(response.isSuccess());
+            assertEquals(ScsbConstants.ILS_LOGIN_FAILED, response.getScreenMessage());
+        }
     }
 
     @Test
-    public void createBibelse2() throws Exception {
-        String itemIdentifier = "223467";
-        String patronIdentifier = "2234567";
-        String institutionId = "2";
-        String titleIdentifier = "245";
-        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("TEST");
-        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
-        SIP2CreateBibResponse sip2CreateBibResponse = getSIP2CreateBibResponse();
-        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
-        sip2PatronInformationResponse.setValidPatron(false);
-        sip2PatronInformationResponse.setValidPatronPassword(false);
-        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
-        loginResponse.setOk(false);
-        ReflectionTestUtils.invokeMethod(sipProtocolConnector, "getSocketConnection");
-        sipProtocolConnector.createBib(itemIdentifier, patronIdentifier, institutionId, titleIdentifier);
+    public void createBibWhenPatronValidationFails() throws Exception {
+        SIPProtocolConnector connector = new SIPProtocolConnector();
+        connector.setInstitution("TEST");
+        connector.setIlsConfigProperties(getIlsConfigProperties());
+
+        try (MockedConstruction<SIP2SocketConnection> mocked = mockConstruction(SIP2SocketConnection.class,
+                (mock, context) -> {
+                    when(mock.connect()).thenReturn(true);
+
+                    SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
+                    loginResponse.setOk(true);
+                    when(mock.send(any(SIP2LoginRequest.class))).thenReturn(loginResponse);
+
+                    SIP2ACSStatusResponse acsStatusResponse = new SIP2ACSStatusResponse("940");
+                    when(mock.send(any(SIP2SCStatusRequest.class))).thenReturn(acsStatusResponse);
+
+                    SIP2PatronInformationResponse patronInfo = new SIP2PatronInformationResponse("940");
+                    patronInfo.setValidPatron(false);
+                    patronInfo.setValidPatronPassword(false);
+                    patronInfo.setScreenMessage(Collections.emptyList());
+                    when(mock.send(any(SIP2PatronInformationRequest.class))).thenReturn(patronInfo);
+                })) {
+            ItemCreateBibResponse response = connector.createBib("ITEM-123", "P-123", "INST-1", "TITLE-1");
+
+            assertNotNull(response);
+            assertFalse(response.isSuccess());
+            assertTrue(response.getScreenMessage().startsWith(ScsbConstants.PATRON_VALIDATION_FAILED));
+        }
     }
 
     @Test
-    public void createBibelse3() throws Exception {
-        String itemIdentifier = "223467";
-        String patronIdentifier = "2234567";
-        String institutionId = "2";
-        String titleIdentifier = "245";
-        ILSConfigProperties ilsConfigProperties = getIlsConfigProperties();
-        sipProtocolConnector.setInstitution("TEST");
-        sipProtocolConnector.setIlsConfigProperties(ilsConfigProperties);
-        SIP2CreateBibResponse sip2CreateBibResponse = getSIP2CreateBibResponse();
-        SIP2PatronInformationResponse sip2PatronInformationResponse = new SIP2PatronInformationResponse("940");
-        sip2PatronInformationResponse.setValidPatron(false);
-        sip2PatronInformationResponse.setValidPatronPassword(false);
-        SIP2LoginResponse loginResponse = new SIP2LoginResponse("940");
-        loginResponse.setOk(true);
-        ReflectionTestUtils.invokeMethod(sipProtocolConnector, "getSocketConnection");
-        sipProtocolConnector.createBib(itemIdentifier, patronIdentifier, institutionId, titleIdentifier);
+    public void createBibWhenSocketCannotConnect() throws Exception {
+        SIPProtocolConnector connector = new SIPProtocolConnector();
+        connector.setInstitution("TEST");
+        connector.setIlsConfigProperties(getIlsConfigProperties());
+
+        try (MockedConstruction<SIP2SocketConnection> mocked = mockConstruction(SIP2SocketConnection.class,
+                (mock, context) -> when(mock.connect()).thenReturn(false))) {
+            ItemCreateBibResponse response = connector.createBib("ITEM-123", "P-123", "INST-1", "TITLE-1");
+
+            assertNotNull(response);
+            assertFalse(response.isSuccess());
+            assertEquals(ScsbConstants.ILS_CONNECTION_FAILED, response.getScreenMessage());
+        }
     }
+
+    @Test
+    public void createBibWhenInvalidSipResponse() throws Exception {
+        SIPProtocolConnector connector = new SIPProtocolConnector();
+        connector.setInstitution("TEST");
+        connector.setIlsConfigProperties(getIlsConfigProperties());
+
+        try (MockedConstruction<SIP2SocketConnection> mocked = mockConstruction(SIP2SocketConnection.class,
+                (mock, context) -> {
+                    when(mock.connect()).thenReturn(true);
+                    when(mock.send(any())).thenThrow(new InvalidSIP2ResponseException("bad sip"));
+                })) {
+            ItemCreateBibResponse response = connector.createBib("ITEM-123", "P-123", "INST-1", "TITLE-1");
+
+            assertNotNull(response);
+            assertFalse(response.isSuccess());
+            assertEquals("bad sip", response.getScreenMessage());
+        }
+    }
+
+    @Test
+    public void createBibWhenGeneralException() throws Exception {
+        SIPProtocolConnector connector = new SIPProtocolConnector();
+        connector.setInstitution("TEST");
+        connector.setIlsConfigProperties(getIlsConfigProperties());
+
+        try (MockedConstruction<SIP2SocketConnection> mocked = mockConstruction(SIP2SocketConnection.class,
+                (mock, context) -> {
+                    when(mock.connect()).thenReturn(true);
+                    when(mock.send(any(SIP2LoginRequest.class))).thenThrow(new RuntimeException("boom"));
+                })) {
+            ItemCreateBibResponse response = connector.createBib("ITEM-123", "P-123", "INST-1", "TITLE-1");
+
+            assertNotNull(response);
+            assertFalse(response.isSuccess());
+            assertEquals("boom", response.getScreenMessage());
+        }
+    }
+
 
     @Test
     public void lookupPatron() throws Exception {
